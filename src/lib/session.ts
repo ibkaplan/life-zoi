@@ -8,6 +8,7 @@ import {
 } from "@/lib/validation";
 import {
   emptySession,
+  STEP_IDS,
   type CheckIn,
   type CompletedAssessment,
   type HabitGoal,
@@ -44,7 +45,7 @@ export function sanitizeSession(input: unknown): UserSession {
     typeof record.draftStep === "number" &&
     Number.isInteger(record.draftStep) &&
     record.draftStep >= 0 &&
-    record.draftStep <= 7
+    record.draftStep <= STEP_IDS.length - 1
       ? record.draftStep
       : 0;
 

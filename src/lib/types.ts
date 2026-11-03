@@ -208,6 +208,7 @@ export const STEP_IDS = [
   "substances",
   "mind",
   "goals",
+  "results",
   "review",
 ] as const;
 

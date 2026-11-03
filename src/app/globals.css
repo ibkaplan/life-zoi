@@ -460,16 +460,14 @@ textarea { min-height: 7rem; resize: vertical; }
 
 .home {
   min-height: 100vh;
-  color: #1a2820;
+  color: #1c2744;
   background:
-    radial-gradient(980px 460px at 0% -6%, rgba(186, 230, 253, 0.85), transparent 60%),
-    radial-gradient(820px 420px at 100% 0%, rgba(167, 243, 208, 0.75), transparent 58%),
-    radial-gradient(720px 380px at 88% 92%, rgba(253, 186, 186, 0.55), transparent 54%),
-    radial-gradient(640px 320px at 12% 100%, rgba(221, 214, 254, 0.7), transparent 52%),
-    #fffaf3;
+    radial-gradient(920px 440px at 0% -8%, rgba(221, 214, 254, 0.55), transparent 62%),
+    radial-gradient(760px 360px at 100% 0%, rgba(204, 232, 230, 0.4), transparent 58%),
+    #fbf8f4;
 }
 
-.home a { color: #3730a3; }
+.home a { color: #2a365f; }
 .home a.home-btn-primary, .home a.home-btn-primary:hover { color: #ffffff; }
 .home a.home-btn-secondary, .home a.home-btn-secondary:hover { color: #1a2820; }
 .home a.home-photo-card, .home a.home-photo-card:hover { color: #1a2820; }
@@ -500,7 +498,7 @@ textarea { min-height: 7rem; resize: vertical; }
   border-radius: 999px;
   text-decoration: none;
   font-weight: 700;
-  color: #312e81;
+  color: #1c2744;
 }
 
 .home-nav a:hover, .home-footer-links a:hover { background: rgba(255, 255, 255, 0.72); }
@@ -514,9 +512,19 @@ textarea { min-height: 7rem; resize: vertical; }
 
 .home-copy { display: grid; gap: 1rem; }
 
+.upload-placeholder {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.1rem 1.15rem;
+  border-radius: 20px;
+  border: 1px dashed #c4b5fd;
+  background: #fbf8f4;
+  color: #1c2744;
+}
+
 .home-kicker {
   margin: 0;
-  color: #6d28d9;
+  color: #4c4580;
   font-size: 0.92rem;
   font-weight: 750;
   letter-spacing: 0.12em;
@@ -525,7 +533,7 @@ textarea { min-height: 7rem; resize: vertical; }
 
 .home h1 {
   font-size: clamp(2.4rem, 6vw, 4.2rem);
-  color: #1a2820;
+  color: #1c2744;
   letter-spacing: -0.03em;
   max-width: 14ch;
 }
@@ -533,12 +541,12 @@ textarea { min-height: 7rem; resize: vertical; }
 .home-support {
   font-size: clamp(1.2rem, 2.2vw, 1.5rem);
   line-height: 1.45;
-  color: #312e81;
+  color: #2a365f;
   max-width: 36rem;
 }
 
 .home-intro, .home-section-head p, .home-cta p, .home-footer {
-  color: #3c3566;
+  color: #2c3558;
   font-size: 1.08rem;
 }
 
@@ -561,11 +569,11 @@ textarea { min-height: 7rem; resize: vertical; }
 
 .home-btn-primary {
   color: #ffffff;
-  background: #5b21b6;
-  box-shadow: 0 10px 24px rgba(91, 33, 182, 0.18);
+  background: #2a365f;
+  box-shadow: 0 10px 24px rgba(28, 39, 68, 0.12);
 }
 
-.home-btn-primary:hover { background: #4c1d95; }
+.home-btn-primary:hover { background: #1c2744; }
 
 .home-btn-secondary {
   color: #1a2820;
@@ -597,8 +605,8 @@ textarea { min-height: 7rem; resize: vertical; }
   text-decoration: none;
   border-radius: 28px;
   overflow: hidden;
-  border: 1px solid rgba(15, 118, 110, 0.16);
-  box-shadow: 0 12px 28px rgba(26, 40, 32, 0.06);
+  border: 1px solid rgba(196, 181, 253, 0.55);
+  box-shadow: 0 12px 28px rgba(28, 39, 68, 0.06);
   min-height: 100%;
 }
 
@@ -613,7 +621,7 @@ textarea { min-height: 7rem; resize: vertical; }
   font-size: 1.35rem;
   font-weight: 750;
   line-height: 1.25;
-  color: #1a2820;
+  color: #1c2744;
 }
 
 .home-photo-card:hover { transform: translateY(-2px); }
@@ -656,13 +664,74 @@ textarea { min-height: 7rem; resize: vertical; }
 .home-credits ul { margin: 0.4rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.45rem; }
 
 .home-gauge-section {
+  display: grid;
+  gap: 0.85rem;
   margin-bottom: 2.5rem;
   padding: clamp(1.3rem, 3vw, 2rem);
   width: min(1080px, calc(100% - 2rem));
   border-radius: 32px;
-  background: #fffdf8;
-  border: 1px solid rgba(15, 118, 110, 0.2);
+  background: #fffdfb;
+  border: 1px solid rgba(196, 181, 253, 0.65);
+  box-shadow: 0 14px 32px rgba(28, 39, 68, 0.05);
 }
+
+.home-outlook-labels {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.home-outlook-labels li {
+  margin: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: #f4f1fb;
+  color: #1c2744;
+  font-weight: 700;
+}
+
+.home-outlook-note { color: #3d4f63; font-size: 1rem; }
+
+.home-works { padding-bottom: 2.5rem; }
+
+.home-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.home-steps a {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.95rem 1.05rem;
+  border-radius: 24px;
+  background: #ffffff;
+  color: #1c2744;
+  text-decoration: none;
+  font-weight: 750;
+  font-size: 1.15rem;
+  border: 1px solid rgba(196, 181, 253, 0.55);
+  box-shadow: 0 10px 26px rgba(28, 39, 68, 0.05);
+}
+
+.home-steps a span {
+  color: #3d6f73;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+
+.home-step { position: relative; }
 
 .home-gauge {
   display: grid;
@@ -710,7 +779,7 @@ textarea { min-height: 7rem; resize: vertical; }
 
 .home-section-head { display: grid; gap: 0.55rem; margin-bottom: 1.25rem; max-width: 40rem; }
 
-.home h2 { color: #2e1065; font-size: clamp(1.7rem, 3vw, 2.3rem); }
+.home h2 { color: #2a365f; font-size: clamp(1.7rem, 3vw, 2.3rem); }
 
 .home-grid { display: grid; gap: 1.1rem; }
 
@@ -771,7 +840,7 @@ textarea { min-height: 7rem; resize: vertical; }
   border: 1px solid #e9e4f5;
   border-radius: 20px;
   padding: 1rem 1.1rem;
-  color: #312e81;
+  color: #1c2744;
 }
 
 .home-footer-brand { display: grid; gap: 0.35rem; }
@@ -787,11 +856,19 @@ textarea { min-height: 7rem; resize: vertical; }
 
 @media (min-width: 860px) {
   .home-hero { grid-template-columns: 1.05fr 0.95fr; padding-top: 1.25rem; }
-  .home-grid { grid-template-columns: repeat(3, 1fr); }
+  .home-grid { grid-template-columns: 1fr 1fr; }
   .home-life { grid-template-columns: 0.9fr 1.1fr; align-items: center; }
   .home-life-photos { grid-template-columns: 1fr 1fr; }
-  .home-gauge { grid-template-columns: 168px 1fr; }
-  .home-gauge-ring { justify-self: start; }
+  .home-steps { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  .home-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -0.95rem;
+    width: 0.7rem;
+    height: 2px;
+    background: #c4b5fd;
+  }
 }
 
 .assistant { color: #241b45; }
@@ -894,7 +971,7 @@ textarea { min-height: 7rem; resize: vertical; }
 .home-disclaimer {
   background: #fff7ed;
   color: #1a2820;
-  border: 2px solid #1d3f31;
+  border: 2px solid #1c2744;
   border-radius: 20px;
   padding: 1rem 1.1rem;
   max-width: 44rem;

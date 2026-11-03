@@ -48,49 +48,13 @@ const cards = [
     height: 733,
     alt: "An older woman smiles while walking outdoors in a red jacket.",
   },
-  {
-    href: "/nature",
-    title: "Bring more nature into your life",
-    src: "/home/card-nature.webp",
-    width: 1100,
-    height: 732,
-    alt: "Sunlight falls across a quiet forest path.",
-  },
-  {
-    href: "/progress",
-    title: "Your journey. Your progress. Your future.",
-    src: "/home/card-journey.webp",
-    width: 1100,
-    height: 732,
-    alt: "An older woman walks along a neighborhood sidewalk with a bouquet of flowers.",
-  },
 ] as const;
 
-const lifePhotos = [
-  {
-    src: "/home/life-seat.webp",
-    width: 900,
-    height: 1350,
-    alt: "An older woman sits comfortably indoors beside a turquoise door.",
-  },
-  {
-    src: "/home/life-art.webp",
-    width: 900,
-    height: 600,
-    alt: "An older woman looks at pictures in a gallery.",
-  },
-  {
-    src: "/home/card-food.webp",
-    width: 1100,
-    height: 733,
-    alt: "Fresh herbs and apples.",
-  },
-  {
-    src: "/home/card-nature.webp",
-    width: 1100,
-    height: 732,
-    alt: "A sunlit forest path.",
-  },
+const steps = [
+  { href: "/assessment", number: "01", title: "Fill out your assessment" },
+  { href: "/outlook", number: "02", title: "Get your life outlook" },
+  { href: "/what-if", number: "03", title: "Explore WHAT IF? scenarios" },
+  { href: "/plan", number: "04", title: "Build your personal plan" },
 ] as const;
 
 export default function HomePage() {
@@ -110,36 +74,35 @@ export default function HomePage() {
         <section className="page home-hero">
           <div className="home-copy">
             <p className="home-kicker">LIFEZOI</p>
-            <p className="home-brand">LIVE BETTER. MAKE LIFE MATTER.</p>
             <h1>YOUR LIFE. YOUR HEALTH. YOUR FUTURE.</h1>
             <p className="home-support">Have you ever wondered what your future health might look like?</p>
             <p className="home-intro">
-              Your everyday choices matter more than you may realize. Discover your health and longevity outlook.
+              Your everyday choices matter more than you may realize. Your future is not a fixed number.
             </p>
             <div className="home-actions">
               <Link className="home-btn home-btn-primary" href="/assessment">
-                <span>DISCOVER YOUR LIFE OUTLOOK</span>
-                <small>Start your personal health and lifestyle assessment</small>
-              </Link>
-              <Link className="home-btn home-btn-secondary" href="/outlook">
-                Your future is not a fixed number. Your choices matter.
+                <span>FILL OUT YOUR ASSESSMENT</span>
+                <small>Get your personal health and longevity outlook</small>
               </Link>
             </div>
             <p className="home-disclaimer" role="note">
               LifeZoi provides educational information and statistical estimates. It cannot predict your exact lifespan, diagnose medical conditions, or replace professional medical advice.
             </p>
+            <p>Disability or illness does not make a life less valuable.</p>
           </div>
           <figure className="home-hero-photo">
             <Image
-              src="/home/hero-park.webp"
+              src="/home/hero-hike.webp"
               width={1600}
-              height={1063}
+              height={1067}
               priority
               sizes="(min-width: 860px) 46vw, 100vw"
-              alt="Two adults smile together on a sunny lawn beneath trees."
+              alt="A woman and a girl stand together on a sunny mountain trail."
             />
           </figure>
         </section>
+
+        <HomeGauge />
 
         <section className="page home-features" aria-labelledby="home-paths-title">
           <div className="home-section-head">
@@ -149,33 +112,28 @@ export default function HomePage() {
           <div className="home-grid">
             {cards.map((card) => (
               <Link key={card.href} className="home-photo-card" href={card.href}>
-                <Image src={card.src} width={card.width} height={card.height} alt={card.alt} sizes="(min-width: 860px) 30vw, 100vw" />
+                <Image src={card.src} width={card.width} height={card.height} alt={card.alt} sizes="(min-width: 860px) 40vw, 100vw" />
                 <span>{card.title}</span>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="page home-life" aria-labelledby="home-life-title">
-          <div className="home-life-copy">
-            <h2 id="home-life-title">LIFE IS MORE THAN A NUMBER</h2>
-            <ul className="home-values">
-              <li>YOUR HEALTH GIVES YOU POSSIBILITIES.</li>
-              <li>YOUR CHOICES GIVE YOUR LIFE DIRECTION.</li>
-              <li>YOUR KINDNESS GIVES THE WORLD SOMETHING VALUABLE.</li>
-            </ul>
-            <p>Disability or illness does not make a life less valuable.</p>
+        <section className="page home-works" aria-labelledby="home-works-title">
+          <div className="home-section-head">
+            <h2 id="home-works-title">HOW LIFEZOI WORKS</h2>
           </div>
-          <ul className="home-life-photos">
-            {lifePhotos.map((photo) => (
-              <li key={photo.src + photo.alt}>
-                <Image src={photo.src} width={photo.width} height={photo.height} alt={photo.alt} sizes="(min-width: 860px) 22vw, 50vw" />
+          <ol className="home-steps">
+            {steps.map((step) => (
+              <li className="home-step" key={step.href}>
+                <Link href={step.href}>
+                  <span>{step.number}</span>
+                  {step.title}
+                </Link>
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
-
-        <HomeGauge />
 
         <footer className="page home-footer">
           <p className="home-note">
@@ -213,9 +171,11 @@ export default function HomePage() {
             <summary>Photo credits</summary>
             <ul>
               <li>
-                Couple on a lawn and woman walking: National Cancer Institute, public domain.{" "}
-                <a href="https://commons.wikimedia.org/wiki/File:Couple_walking_in_a_park.jpg">Couple walking in a park</a>
-                {" · "}
+                Woman and girl on a trail: Ronald Laubenstein, U.S. Fish and Wildlife Service, public domain.{" "}
+                <a href="https://commons.wikimedia.org/wiki/File:Woman_and_girl_hike_in_nature.jpg">Woman and girl hike in nature</a>
+              </li>
+              <li>
+                Woman walking: National Cancer Institute, public domain.{" "}
                 <a href="https://commons.wikimedia.org/wiki/File:Woman_power_walking.jpg">Woman power walking</a>
               </li>
               <li>
@@ -224,15 +184,7 @@ export default function HomePage() {
                 {", "}
                 <a href="https://commons.wikimedia.org/wiki/File:Sunrise_hiking_views_(Unsplash).jpg">sunrise ridge</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Fruits_and_Vegetables_(Unsplash).jpg">fruit and herbs</a>
-                {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Forest_path_at_sunset_(Unsplash).jpg">forest path</a>
-                {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Lady_with_a_floral_bouquet_(Unsplash).jpg">bouquet</a>
-                {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Portrait_of_elderly_woman_(Unsplash).jpg">seated portrait</a>
-                {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Elderly_woman_gazing_at_art_(Unsplash).jpg">gallery</a>.
+                <a href="https://commons.wikimedia.org/wiki/File:Fruits_and_Vegetables_(Unsplash).jpg">fruit and herbs</a>.
               </li>
             </ul>
           </details>
