@@ -1,22 +1,31 @@
 import Link from "next/link";
 
-export function LeafMark() {
+export function LeafMark({ tone = "forest" }: { tone?: "forest" | "violet" }) {
+  const background = tone === "violet" ? "#5b21b6" : "#1d3f31";
+  const leaf = tone === "violet" ? "#f5f3ff" : "#e7f3ea";
+  const stem = tone === "violet" ? "#5b21b6" : "#1d3f31";
   return (
     <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="9" fill="#1d3f31" />
+      <rect width="32" height="32" rx="9" fill={background} />
       <path
         d="M16 6.5c2.2 4.2 7 6.4 7 11.2a7 7 0 1 1-14 0c0-4.8 4.8-7 7-11.2z"
-        fill="#e7f3ea"
+        fill={leaf}
       />
-      <path d="M16 12.5v10" stroke="#1d3f31" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M16 12.5v10" stroke={stem} strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
 
-export function Logo({ href = "/" }: { href?: string }) {
+export function Logo({
+  href = "/",
+  tone = "forest",
+}: {
+  href?: string;
+  tone?: "forest" | "violet";
+}) {
   return (
     <Link href={href} className="wordmark">
-      <LeafMark />
+      <LeafMark tone={tone} />
       <span>lifeZoi</span>
     </Link>
   );

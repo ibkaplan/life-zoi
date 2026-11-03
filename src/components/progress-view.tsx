@@ -47,7 +47,10 @@ export function ProgressView() {
         <p className="kicker">Progress</p>
         <h1>A record of what you try</h1>
         <p className="lede">
-          A missed day is information, not a failure. lifeZoi does not claim a habit change caused a health result.
+          A missed day is information, not a failure. lifeZoi does not claim a habit change caused a health result. Check-ins here are user-reported. Measured clinic values are not stored. Estimates stay on the outlook page, and WHAT IF? stays hypothetical.
+        </p>
+        <p>
+          <Link href="/plan">Your progress matters. Open My Life Improvement Plan.</Link>
         </p>
       </div>
       <section className="card stack">

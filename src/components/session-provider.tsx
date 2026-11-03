@@ -8,12 +8,17 @@ import {
   todayDate,
   writeBrowserStore,
 } from "@/lib/browser-store";
+import { clearAssistantThread } from "@/lib/assistant";
+import { clearChangeLab } from "@/lib/change-lab";
+import { clearPurpose } from "@/lib/purpose";
+import { resetWellnessClient } from "@/lib/wellness/client-store";
 import { createSampleSession } from "@/lib/sample";
 import {
   completeDraft,
   removeCheckIn,
   removeGoal,
   removeScenario,
+  chooseReassessment,
   saveScenario,
   upsertCheckIn,
   upsertGoal,
@@ -22,6 +27,7 @@ import {
   emptySession,
   type Assessment,
   type HabitId,
+  type ReassessDays,
   type TrackableHabitId,
   type UserSession,
 } from "@/lib/types";
@@ -49,6 +55,7 @@ type SessionApi = {
   removeCheckIn: (id: string) => void;
   clearUserData: () => void;
   setSample: (on: boolean) => void;
+  setReassessment: (days: ReassessDays) => string | null;
 };
 
 const SessionContext = createContext<SessionApi | null>(null);
@@ -140,7 +147,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (sample) return;
         commit(removeCheckIn(stored, id));
       },
-      clearUserData: () => commit(emptySession(), false),
+      setReassessment: (days) => {
+        if (sample) return READ_ONLY;
+        commit(chooseReassessment(stored, days, todayDate()));
+        return null;
+      },
+      clearUserData: () => {
+        clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
+        clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
+        clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
+        resetWellnessClient();
+        commit(emptySession(), false);
+      },
       setSample: (on) => commit(stored, on),
     };
   }, [snapshot, session]);

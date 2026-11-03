@@ -12,6 +12,9 @@ Supabase credentials were not available for this build, so authentication and da
 - Closing the tab clears them.
 - That storage is not encrypted by lifeZoi and is not a secure health record.
 - Suggestion and WHAT IF? requests go to this app’s own server for validation, then are discarded. They are not sent to an AI service.
+- The AI Health Assistant is a local development mock. `AI_PROVIDER=mock` is the only enabled mode. A different provider name is refused, and no paid model, payment service, or health-record database is contacted.
+- Lab education can ask MedlinePlus Connect for a verified LOINC code only. Responses are cached for 12 hours. Personal results and documents are not sent. Real document upload is described in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active.
+- Your Life Matters reflections stay in this browser tab. They are personal notes about purpose and kindness. They are not a medical score, and positive karma is presented as a philosophical metaphor.
 - Sample data is labeled “Sample visitor” and is kept separate from what you type.
 
 `GET /api/status` reports `persistence: "development"` and `authentication: "not-configured"`. If Supabase variables are present, the status still says the app does not connect. Filling in `.env` does not turn accounts on.
@@ -68,12 +71,13 @@ This build will not start using Supabase by itself.
 
 The intended Vercel team is Right Intent LLC, slug `risi-0778846f`, team id `team_FthCxfnSPZ3JpaY3feKlqmIc`.
 
-No environment variables are required for development mode. Production should be served over HTTPS. Vercel provides that. Security headers set by the app are `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`.
+No environment variables are required for development mode. Production should be served over HTTPS. Vercel provides that. Security headers set by the app are `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy`. Every response also sends `X-Robots-Tag: noindex, nofollow`, and the root layout sets the same robots metadata. Leave both in place until a production privacy notice matches the real system. They ask search engines not to index the site. A `robots.txt` disallow rule is not a substitute.
 
 Do not deploy with a claim that accounts or encrypted health storage exist.
 
 ## Known limitations
 
+- Search indexing is off until a reviewed privacy notice matches the real system. Do not remove the `noindex` metadata or `X-Robots-Tag` header before that review.
 - No accounts, no database, and no HIPAA, GDPR, or other compliance claim.
 - Data in development mode is tab-local and easy to lose.
 - Suggestions are rules, not a clinician and not an AI model.

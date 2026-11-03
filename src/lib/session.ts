@@ -110,7 +110,13 @@ export function sanitizeSession(input: unknown): UserSession {
         .slice(0, CHECKIN_LIMIT)
     : [];
 
-  return { draft, draftStep, history, scenarios, goals: uniqueGoals, checkIns };
+  const reassessDays = record.reassessDays === 30 || record.reassessDays === 90 || record.reassessDays === 180
+    ? record.reassessDays
+    : 0;
+  const reassessOn =
+    typeof record.reassessOn === "string" && isRealISODate(record.reassessOn) ? record.reassessOn : "";
+
+  return { draft, draftStep, history, scenarios, goals: uniqueGoals, checkIns, reassessDays, reassessOn };
 }
 
 export function completeDraft(
@@ -158,6 +164,10 @@ export function saveScenario(session: UserSession, scenario: SavedScenario): Use
     ...session,
     scenarios: [scenario, ...session.scenarios].slice(0, SCENARIO_LIMIT),
   };
+}
+
+export function chooseReassessment(session: UserSession, days: 30 | 90 | 180, on: string): UserSession {
+  return { ...session, reassessDays: days, reassessOn: on };
 }
 
 export function removeScenario(session: UserSession, id: string): UserSession {

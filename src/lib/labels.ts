@@ -85,6 +85,11 @@ export const habitLabels: Record<HabitId, string> = {
   stress: "Stress-management practices",
   alcohol: "Drink less often",
   connection: "More social connection",
+  strength: "Strength exercises twice a week",
+  balance: "Balance exercises",
+  "sugary-drinks": "Fewer sugary drinks",
+  fiber: "More fiber",
+  outdoors: "More time outdoors",
   custom: "A change in your own words",
 };
 
@@ -123,6 +128,7 @@ export function assessmentHasAnswers(draft: Assessment): boolean {
       draft.mood ||
       draft.social ||
       draft.goals.length > 0 ||
-      draft.habitNote.trim(),
+      draft.habitNote.trim() ||
+      draft.purposeHope.trim(),
   );
 }

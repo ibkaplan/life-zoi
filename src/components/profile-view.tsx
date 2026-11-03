@@ -63,6 +63,7 @@ function rows(answers: Assessment) {
       <Row term="Social connection" value={answers.social ? socialLabels[answers.social] : ""} />
       <Row term="Focus" value={answers.goals.map((goal) => goalLabels[goal]).join(", ")} />
       <Row term="Note" value={answers.habitNote} />
+      <Row term="Hope for what health could support" value={answers.purposeHope} />
     </dl>
   );
 }
