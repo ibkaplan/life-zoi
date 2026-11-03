@@ -172,6 +172,7 @@ export default function HomePage() {
             <Link href="/assessment">Lifestyle assessment</Link>
             <Link href="/what-if">WHAT IF?</Link>
             <Link href="/progress">Progress</Link>
+            <Link href="/ai-assistant">AI Health Assistant</Link>
             <Link href="/settings">Settings</Link>
             <Link href="/privacy">Privacy</Link>
           </nav>

@@ -14,6 +14,7 @@ const links = [
   { href: "/assessment", label: "Lifestyle Assessment", short: "Assess" },
   { href: "/what-if", label: "WHAT IF?", short: "What if" },
   { href: "/progress", label: "Progress", short: "Progress" },
+  { href: "/ai-assistant", label: "AI Health Assistant", short: "Assist" },
   { href: "/settings", label: "Settings", short: "Settings" },
 ];
 
@@ -59,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [open]);
 
   const primary = links.filter((link) =>
-    ["/dashboard", "/assessment", "/what-if", "/progress"].includes(link.href),
+    ["/dashboard", "/assessment", "/what-if", "/progress", "/ai-assistant"].includes(link.href),
   );
 
   return (

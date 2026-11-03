@@ -32,6 +32,15 @@ export function DashboardView() {
           lifeZoi helps you look at everyday habits, explore a change in WHAT IF?, and keep a simple record of what you try. It does not diagnose illness or predict a lifespan.
         </p>
       </section>
+      <article className="card assistant-card stack">
+        <p className="kicker">AI Health Assistant</p>
+        <h2>Meet Your Personal AI Health Assistant</h2>
+        <p>Get answers, explore healthier habits, and receive guidance as you work toward your wellness goals.</p>
+        <p className="hint">Development replies stay on this server. No paid AI service is contacted, and assessment answers are not sent.</p>
+        <Link className="btn assistant-send" href="/ai-assistant">
+          Start a Conversation
+        </Link>
+      </article>
       <div className="grid-2">
         <article className="card stack">
           <h2>Lifestyle assessment</h2>

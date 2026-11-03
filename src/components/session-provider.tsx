@@ -8,6 +8,7 @@ import {
   todayDate,
   writeBrowserStore,
 } from "@/lib/browser-store";
+import { clearAssistantThread } from "@/lib/assistant";
 import { createSampleSession } from "@/lib/sample";
 import {
   completeDraft,
@@ -140,7 +141,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (sample) return;
         commit(removeCheckIn(stored, id));
       },
-      clearUserData: () => commit(emptySession(), false),
+      clearUserData: () => {
+        clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
+        commit(emptySession(), false);
+      },
       setSample: (on) => commit(stored, on),
     };
   }, [snapshot, session]);

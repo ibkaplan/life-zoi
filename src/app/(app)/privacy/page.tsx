@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           This build has no accounts and no database. Assessment answers, WHAT IF? scenarios, goals, and check-ins are kept in this browser tab’s session storage. Closing the tab clears them. They are not encrypted at rest by lifeZoi, and they are not a secure health record.
         </p>
         <p>
-          A suggestion or WHAT IF? request is sent to this app’s own server so the answers can be checked. The server does not store that request and does not send it to an AI service. No AI provider is configured.
+          A suggestion or WHAT IF? request is sent to this app’s own server so the answers can be checked. The server does not store that request and does not send it to an AI service. The AI Health Assistant uses a local development mock. It does not call a paid AI provider, and it does not send lifestyle assessment answers anywhere. A host may still log requests to this app.
         </p>
       </section>
       <section className="card stack">
