@@ -6,8 +6,10 @@ import { useSession } from "@/components/session-provider";
 import { SourceList, LoadingState } from "@/components/sources";
 import { formatTimestamp } from "@/lib/dates";
 import { habitLabels } from "@/lib/labels";
-import type { ScenarioIllustration } from "@/lib/scenarios";
+import { buildCombination, type ScenarioIllustration } from "@/lib/scenarios";
 import { HABIT_IDS, type Assessment, type HabitId } from "@/lib/types";
+
+type Combination = ReturnType<typeof buildCombination>;
 
 const presetIds = HABIT_IDS.filter((id) => id !== "custom");
 
@@ -27,10 +29,12 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
     habitId: HabitId;
     note: string;
   } | null>(null);
+  const [secondHabit, setSecondHabit] = useState<HabitId | "">("");
   const [request, setRequest] = useState<{
     key: string;
     status: "loading" | "error" | "ready";
     result: ScenarioIllustration | null;
+    combo: Combination | null;
     error: string;
   } | null>(null);
   const [savedMessage, setSavedMessage] = useState("");
@@ -59,7 +63,7 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
         setRequest((current) =>
           current?.key === "manual"
             ? current
-            : { key: requestKey, status: "ready", result: illustration, error: "" },
+            : { key: requestKey, status: "ready", result: illustration, combo: null, error: "" },
         );
       })
       .catch((error: unknown) => {
@@ -71,6 +75,7 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
                 key: requestKey,
                 status: "error",
                 result: null,
+                combo: null,
                 error:
                   error instanceof Error
                     ? error.message
@@ -97,16 +102,21 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
   async function showIllustration(event: React.FormEvent) {
     event.preventDefault();
     setSavedMessage("");
-    setRequest({ key: "manual", status: "loading", result: null, error: "" });
+    setRequest({ key: "manual", status: "loading", result: null, combo: null, error: "" });
     try {
       const illustration = await requestIllustration(habitId, note, latest, undefined);
-      setRequest({ key: "manual", status: "ready", result: illustration, error: "" });
+      let combo: Combination | null = null;
+      if (secondHabit && secondHabit !== habitId) {
+        const other = await requestIllustration(secondHabit, "", latest, undefined);
+        combo = buildCombination(illustration, other);
+      }
+      setRequest({ key: "manual", status: "ready", result: illustration, combo, error: "" });
     } catch (error: unknown) {
       const message =
         error instanceof Error && error.message
           ? error.message
           : "The illustration could not be prepared.";
-      setRequest({ key: "manual", status: "error", result: null, error: message });
+      setRequest({ key: "manual", status: "error", result: null, combo: null, error: message });
     }
   }
 
@@ -116,7 +126,7 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
         <p className="kicker">WHAT IF?</p>
         <h1>Explore one change</h1>
         <p className="lede">
-          Pick a habit, or describe your own. lifeZoi compares it with your latest completed assessment when you have one, and keeps established guidance separate from what is uncertain.
+          Pick a habit, or describe your own. Add a second habit if you want a hypothetical combination. lifeZoi compares it with your latest completed assessment when you have one, and keeps established guidance separate from what is uncertain. Every comparison is hypothetical.
         </p>
       </div>
       {scenarioId && !saved ? (
@@ -190,6 +200,28 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
             }
           />
         </label>
+        <fieldset className="field">
+          <legend>Optional second habit</legend>
+          <p className="hint">Compare your current routine, one change, and a combination. The combination is hypothetical and is not merged into a personal forecast.</p>
+          <div className="choices">
+            <label className="choice">
+              <input type="radio" name="second-habit" checked={secondHabit === ""} onChange={() => setSecondHabit("")} />
+              <span>No second habit</span>
+            </label>
+            {presetIds.map((id) => (
+              <label className="choice" key={`second-${id}`}>
+                <input
+                  type="radio"
+                  name="second-habit"
+                  value={id}
+                  checked={secondHabit === id}
+                  onChange={() => setSecondHabit(id)}
+                />
+                <span>{habitLabels[id]}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
         {formError ? (
           <p className="field-error" role="alert">
             {formError}
@@ -206,15 +238,18 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
         </p>
       ) : null}
       {status === "ready" && result ? (
-        <Illustration
-          result={result}
-          onSave={() => {
-            const error = saveScenario(result.habitId, result.yourNote || note);
-            setSavedMessage(error ?? "Saved in this browser tab.");
-          }}
-          savedMessage={savedMessage}
-          sample={sample}
-        />
+        <>
+          <Illustration
+            result={result}
+            onSave={() => {
+              const error = saveScenario(result.habitId, result.yourNote || note);
+              setSavedMessage(error ?? "Saved in this browser tab.");
+            }}
+            savedMessage={savedMessage}
+            sample={sample}
+          />
+          {visible?.combo ? <CombinationView combo={visible.combo} /> : null}
+        </>
       ) : null}
       <section className="stack">
         <h2>Saved in this tab</h2>
@@ -236,6 +271,27 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
         )}
       </section>
     </div>
+  );
+}
+
+function CombinationView({ combo }: { combo: Combination }) {
+  return (
+    <article className="card stack">
+      <p className="kicker">{combo.label}</p>
+      <h2>Current, one change, and a combination</h2>
+      <section>
+        <h3>Current</h3>
+        <p>{combo.current}</p>
+      </section>
+      <section>
+        <h3>One change</h3>
+        <p>{combo.oneChange}</p>
+      </section>
+      <section>
+        <h3>Combination</h3>
+        <p>{combo.together}</p>
+      </section>
+    </article>
   );
 }
 

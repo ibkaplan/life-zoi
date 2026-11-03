@@ -307,23 +307,28 @@ export function buildScenario(
       sources: [sources.whoConnection, sources.samhsa988],
     },
     strength: {
-      currentRoutine: movementCurrent(assessment),
+      currentRoutine: assessment
+        ? `${movementCurrent(assessment)} Strength practice: “${assessment.strength ? vegetableLabels[assessment.strength] : "not answered"}.”`
+        : NO_ASSESSMENT,
       proposedChange:
-        "Add muscle-strengthening movements on two days a week, starting with a familiar motion such as sit-to-stand.",
+        "Hypothetical: add muscle-strengthening movements on two days a week, starting with a familiar motion such as sit-to-stand. A chair version counts, only if it feels safe.",
       likelyBenefits: [
         "WHO includes muscle-strengthening activities for all major muscle groups on two or more days a week in its adult activity guidance.",
+        "Regular physical activity is associated with important health benefits.",
+        "The Physical Activity Guidelines describe muscle-strengthening as part of the adult picture, alongside aerobic activity.",
         "A shorter or easier start still counts. This page does not promise a change in strength or disease risk.",
       ],
       challenges: [
-        "Pain, balance, and access to a safe place can limit what is realistic.",
+        "Pain, balance, illness, equipment, and access to a safe place can limit what is realistic. Skip anything that hurts.",
         "Two days is a target to discuss, not a rule you must meet.",
       ],
       nextSteps: [
         "Pick two days and one movement you can do near a sturdy chair.",
+        "Ask a clinician if a condition makes strength work unclear.",
         "Stop if you feel pain, chest symptoms, or dizziness, and ask a clinician which movements are suitable.",
       ],
       established:
-        "Established public guidance: WHO describes muscle-strengthening activity as part of its physical activity recommendations for adults. This illustration does not prescribe a personal program.",
+        "Established public guidance: WHO describes muscle-strengthening activity as part of its physical activity recommendations for adults. The Physical Activity Guidelines also describe muscle-strengthening alongside aerobic activity. This illustration does not prescribe a personal program, and not every exercise fits every condition. This is hypothetical.",
       uncertain: UNCERTAIN,
       sources: [sources.whoActivity, sources.usActivityGuidelines],
     },
@@ -349,6 +354,51 @@ export function buildScenario(
       uncertain: UNCERTAIN,
       sources: [sources.whoActivity, sources.usActivityGuidelines],
     },
+    "sugary-drinks": {
+      currentRoutine: assessment
+        ? `You reported added-sugar drinks as “${assessment.addedSugar ? vegetableLabels[assessment.addedSugar] : "not answered"}.” Sugary drinks are a common source of added sugars. Naturally occurring sugars in milk and fruit are a different question.`
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: choose water or an unsweetened drink more often, if fluids are not restricted for you.",
+      likelyBenefits: [
+        "CDC’s Rethink Your Drink page discusses added sugars in drinks as something people can notice and change gradually.",
+        "A smaller change can still be the whole experiment.",
+      ],
+      challenges: ["Habit, cost, and social drinks can make a swap feel inconvenient."],
+      nextSteps: ["Read one label.", "Keep the drink you enjoy and make the next one smaller if you want."],
+      established: "Established public education about added sugars in drinks. This is hypothetical. It is not a personal quota.",
+      uncertain: UNCERTAIN,
+      sources: [sources.cdcRethinkDrink],
+    },
+    fiber: {
+      currentRoutine: assessment
+        ? `You reported fiber-containing foods as “${assessment.fiber ? vegetableLabels[assessment.fiber] : "not answered"}.” Vegetables or fruit: ${vegetableLabels[assessment.vegetables]}.`
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: add a small amount of beans, oats, fruit, or a whole grain, and increase slowly with the fluids you are allowed.",
+      likelyBenefits: [
+        "MedlinePlus describes fiber as part of a usual eating pattern and says to increase it gradually.",
+        "The Dietary Guidelines encourage vegetables, fruits, and whole grains.",
+      ],
+      challenges: ["A sudden large increase can feel uncomfortable. A fluid restriction from a clinician comes first."],
+      nextSteps: ["Add one familiar food.", "Drink fluids you are allowed."],
+      established: "Established public nutrition education. This is hypothetical and not a personal diet.",
+      uncertain: UNCERTAIN,
+      sources: [sources.medlineplusFiber, sources.dietaryGuidelines],
+    },
+    outdoors: {
+      currentRoutine: assessment
+        ? "Time outside is not a required field. Your movement and stress answers are the closest notes already saved."
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: spend a few adaptable minutes outside, at a window, or on a balcony. There is no fixed distance.",
+      likelyBenefits: [
+        "Regular physical activity is associated with important health benefits.",
+        "CDC says time outside can be a way to be active and reduce stress, and that sun protection still matters.",
+      ],
+      challenges: ["Weather, access, and disability change what outside means. A window counts as daylight, not as a workout."],
+      nextSteps: ["Use shade, clothing, or sunscreen when the sun is strong.", "Skip intentional tanning."],
+      established: "Established public notes on activity and sun safety. Time outside is not medicine and not a replacement for other habits. This is hypothetical.",
+      uncertain: UNCERTAIN,
+      sources: [sources.cdcSunSafety, sources.whoActivity],
+    },
   };
 
   const content = library[habitId];
@@ -358,6 +408,15 @@ export function buildScenario(
     yourNote: note,
     ...content,
   });
+}
+
+export function buildCombination(primary: ScenarioIllustration, secondary: ScenarioIllustration) {
+  return {
+    label: "Hypothetical",
+    current: primary.currentRoutine,
+    oneChange: `${primary.title}. ${primary.proposedChange}`,
+    together: `${primary.title} together with ${secondary.title}. ${secondary.proposedChange} Each change stays educational. lifeZoi does not merge them into a personal forecast.`,
+  };
 }
 
 export function scenarioText(scenario: ScenarioIllustration): string {

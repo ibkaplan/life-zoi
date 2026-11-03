@@ -27,6 +27,7 @@ import {
   SOCIAL_LEVELS,
   STEP_IDS,
   STRESS_LEVELS,
+  TABLE_SEX,
   VEGETABLE_PATTERNS,
   type Assessment,
   type GoalId,
@@ -37,7 +38,7 @@ import { firstInvalidStep, validateStep } from "@/lib/validation";
 const stepCopy: Record<StepId, { title: string; why: string }> = {
   about: {
     title: "About you",
-    why: "Name and age range are optional. They only personalize the welcome. lifeZoi does not need them to continue.",
+    why: "Name and age range are optional. An exact age and the female or male column are asked only because the official population table is organized that way. Height, weight, and a country note are optional context. They are not identifiers, and they are not a score.",
   },
   sleep: {
     title: "Sleep",
@@ -234,7 +235,7 @@ export function AssessmentWizard() {
       {saved ? (
         <p className="alert alert-ok" role="status">
           Saved in this browser tab. It is not stored in an account.{" "}
-          <Link href="/dashboard">Go to the dashboard</Link> or <Link href="/what-if">open WHAT IF?</Link>
+          <Link href="/outlook">See the educational outlook</Link>, <Link href="/dashboard">go to the dashboard</Link>, or <Link href="/what-if">open WHAT IF?</Link>
         </p>
       ) : null}
       {errors.form ? (
@@ -270,6 +271,49 @@ export function AssessmentWizard() {
                 value={draft.ageRange}
                 options={AGE_RANGES.map((value) => ({ value, label: ageLabels[value] }))}
                 onChange={(ageRange) => update({ ageRange })}
+              />
+              <NumberField
+                id="exactAge"
+                label="Exact age"
+                hint="Optional. Used only to look up one published population row. Leave blank to skip the number."
+                value={draft.exactAge}
+                max={100}
+                error={errors.exactAge}
+                onChange={(exactAge) => update({ exactAge })}
+              />
+              <Choice
+                legend="Which published column should the population table use?"
+                name="tableSex"
+                value={draft.tableSex}
+                options={TABLE_SEX.map((value) => ({
+                  value,
+                  label: value === "prefer-not" ? "Prefer not to say" : value === "another" ? "Another or not listed" : value === "female" ? "Female column" : "Male column",
+                }))}
+                onChange={(tableSex) => update({ tableSex })}
+              />
+              <p className="hint">The official table has female and male columns only. Another answer will not be assigned a column.</p>
+              <label className="field" htmlFor="populationNote">
+                <span>Country or population you want noted</span>
+                <span className="hint">Optional. The embedded table is the Social Security area, not a substitute for another country.</span>
+                <input id="populationNote" value={draft.populationNote} maxLength={280} onChange={(event) => update({ populationNote: event.target.value })} />
+              </label>
+              <NumberField
+                id="heightCm"
+                label="Height in centimeters"
+                hint="Optional. Stored as what you report. Not used to invent a result."
+                value={draft.heightCm}
+                max={250}
+                error={errors.heightCm}
+                onChange={(heightCm) => update({ heightCm })}
+              />
+              <NumberField
+                id="weightKg"
+                label="Weight in kilograms"
+                hint="Optional. Stored as what you report. Not used to invent a result."
+                value={draft.weightKg}
+                max={300}
+                error={errors.weightKg}
+                onChange={(weightKg) => update({ weightKg })}
               />
             </>
           ) : null}
@@ -326,6 +370,17 @@ export function AssessmentWizard() {
                 error={errors.sedentaryHours}
                 onChange={(sedentaryHours) => update({ sedentaryHours })}
               />
+              <p className="hint">Walking, strength, balance, and flexibility are optional. They help the plan name a kind of movement. There is no required distance.</p>
+              {(["walking", "strength", "balance", "flexibility"] as const).map((name) => (
+                <Choice
+                  key={name}
+                  legend={name === "walking" ? "Walking" : name === "strength" ? "Strength" : name === "balance" ? "Balance" : "Flexibility"}
+                  name={name}
+                  value={draft[name]}
+                  options={VEGETABLE_PATTERNS.map((value) => ({ value, label: vegetableLabels[value] }))}
+                  onChange={(value) => update({ [name]: value })}
+                />
+              ))}
             </>
           ) : null}
           {step === "nourishment" ? (
@@ -352,6 +407,22 @@ export function AssessmentWizard() {
                 }))}
                 onChange={(hydration) => update({ hydration })}
               />
+              <p className="hint">Fruit, fiber, protein, and added sugar are optional. Natural sugar in fruit is not treated as the same thing as sugary drinks.</p>
+              {([
+                ["fruit", "Fruit"],
+                ["fiber", "Fiber foods"],
+                ["protein", "Protein foods"],
+                ["addedSugar", "Added sugar or sugary drinks"],
+              ] as const).map(([name, label]) => (
+                <Choice
+                  key={name}
+                  legend={label}
+                  name={name}
+                  value={draft[name]}
+                  options={VEGETABLE_PATTERNS.map((value) => ({ value, label: vegetableLabels[value] }))}
+                  onChange={(value) => update({ [name]: value })}
+                />
+              ))}
             </>
           ) : null}
           {step === "substances" ? (
@@ -407,6 +478,31 @@ export function AssessmentWizard() {
                 options={SOCIAL_LEVELS.map((value) => ({ value, label: socialLabels[value] }))}
                 onChange={(social) => update({ social })}
               />
+              <p className="hint">These notes are optional and sensitive. They are asked so you can remember what to discuss with a clinician. lifeZoi does not diagnose from them and does not need your name, address, or record number.</p>
+              <label className="field" htmlFor="conditionsNote">
+                <span>Conditions you want to mention</span>
+                <textarea id="conditionsNote" maxLength={280} value={draft.conditionsNote} onChange={(event) => update({ conditionsNote: event.target.value })} />
+              </label>
+              <label className="field" htmlFor="familyNote">
+                <span>Family history you want to mention</span>
+                <textarea id="familyNote" maxLength={280} value={draft.familyNote} onChange={(event) => update({ familyNote: event.target.value })} />
+              </label>
+              <label className="field" htmlFor="bloodPressure">
+                <span>Blood pressure, if you already know it</span>
+                <input id="bloodPressure" value={draft.bloodPressure} maxLength={40} onChange={(event) => update({ bloodPressure: event.target.value })} />
+              </label>
+              <label className="field" htmlFor="glucose">
+                <span>Glucose, if you already know it</span>
+                <input id="glucose" value={draft.glucose} maxLength={40} onChange={(event) => update({ glucose: event.target.value })} />
+              </label>
+              <label className="field" htmlFor="hba1c">
+                <span>HbA1c, if you already know it</span>
+                <input id="hba1c" value={draft.hba1c} maxLength={40} onChange={(event) => update({ hba1c: event.target.value })} />
+              </label>
+              <label className="field" htmlFor="cholesterol">
+                <span>Cholesterol, if you already know it</span>
+                <input id="cholesterol" value={draft.cholesterol} maxLength={40} onChange={(event) => update({ cholesterol: event.target.value })} />
+              </label>
             </>
           ) : null}
           {step === "goals" ? (
@@ -510,6 +606,24 @@ function Review({
       value: draft.ageRange ? ageLabels[draft.ageRange] : "Not provided",
       step: "about",
     },
+    { label: "Exact age", value: draft.exactAge || "Not provided", step: "about" },
+    {
+      label: "Life table column",
+      value:
+        draft.tableSex === "female"
+          ? "Female column"
+          : draft.tableSex === "male"
+            ? "Male column"
+            : draft.tableSex === "another"
+              ? "Another or not listed"
+              : draft.tableSex === "prefer-not"
+                ? "Prefer not to say"
+                : "Not provided",
+      step: "about",
+    },
+    { label: "Population note", value: draft.populationNote || "Not provided", step: "about" },
+    { label: "Height", value: draft.heightCm ? `${draft.heightCm} cm` : "Not provided", step: "about" },
+    { label: "Weight", value: draft.weightKg ? `${draft.weightKg} kg` : "Not provided", step: "about" },
     {
       label: "Sleep",
       value: draft.sleepHours
@@ -529,11 +643,19 @@ function Review({
       value: draft.sedentaryHours ? `${draft.sedentaryHours} hours` : "Not provided",
       step: "movement",
     },
+    { label: "Walking", value: draft.walking ? vegetableLabels[draft.walking] : "Not provided", step: "movement" },
+    { label: "Strength", value: draft.strength ? vegetableLabels[draft.strength] : "Not provided", step: "movement" },
+    { label: "Balance", value: draft.balance ? vegetableLabels[draft.balance] : "Not provided", step: "movement" },
+    { label: "Flexibility", value: draft.flexibility ? vegetableLabels[draft.flexibility] : "Not provided", step: "movement" },
     {
       label: "Vegetables and fruit",
       value: draft.vegetables ? vegetableLabels[draft.vegetables] : "Not provided",
       step: "nourishment",
     },
+    { label: "Fruit", value: draft.fruit ? vegetableLabels[draft.fruit] : "Not provided", step: "nourishment" },
+    { label: "Fiber", value: draft.fiber ? vegetableLabels[draft.fiber] : "Not provided", step: "nourishment" },
+    { label: "Protein", value: draft.protein ? vegetableLabels[draft.protein] : "Not provided", step: "nourishment" },
+    { label: "Added sugar or sugary drinks", value: draft.addedSugar ? vegetableLabels[draft.addedSugar] : "Not provided", step: "nourishment" },
     {
       label: "Water",
       value: draft.hydration ? hydrationLabels[draft.hydration] : "Not provided",
@@ -564,6 +686,12 @@ function Review({
       value: draft.social ? socialLabels[draft.social] : "Not provided",
       step: "mind",
     },
+    { label: "Conditions you reported", value: draft.conditionsNote || "Not provided", step: "mind" },
+    { label: "Family history you reported", value: draft.familyNote || "Not provided", step: "mind" },
+    { label: "Blood pressure you typed", value: draft.bloodPressure || "Not provided", step: "mind" },
+    { label: "Glucose you typed", value: draft.glucose || "Not provided", step: "mind" },
+    { label: "HbA1c you typed", value: draft.hba1c || "Not provided", step: "mind" },
+    { label: "Cholesterol you typed", value: draft.cholesterol || "Not provided", step: "mind" },
     {
       label: "Focus",
       value: draft.goals.length ? draft.goals.map((goal) => goalLabels[goal]).join(", ") : "Not provided",

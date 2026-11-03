@@ -455,6 +455,7 @@ textarea { min-height: 7rem; resize: vertical; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .home-card:hover { transform: none; }
 }
 
 .home {
@@ -515,10 +516,10 @@ textarea { min-height: 7rem; resize: vertical; }
 }
 
 .home h1 {
-  font-size: clamp(2.7rem, 6.4vw, 4.6rem);
-  color: #2e1065;
-  letter-spacing: -0.035em;
-  max-width: 12ch;
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  color: #1a2820;
+  letter-spacing: -0.03em;
+  max-width: 14ch;
 }
 
 .home-support {
@@ -738,6 +739,70 @@ textarea { min-height: 7rem; resize: vertical; }
 .assistant-card {
   background: linear-gradient(135deg, #ffffff, #f5f3ff 42%, #ecfeff 78%, #fdf2f8);
   border-color: #ddd6fe;
+}
+
+.home-brand {
+  margin: 0;
+  color: #1d3f31;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.home-values {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+  color: #1a2820;
+  font-weight: 750;
+}
+
+.home-disclaimer {
+  background: #f4ecdf;
+  color: #1a2820;
+  border: 2px solid #1d3f31;
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+  max-width: 44rem;
+}
+
+.home-btn { flex-direction: column; gap: 0.15rem; line-height: 1.25; }
+.home-btn small { font-size: 0.85rem; font-weight: 650; letter-spacing: 0; }
+
+.learn h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); color: #1a2820; }
+.learn-link {
+  text-decoration: none;
+  color: inherit;
+  display: grid;
+  gap: 0.45rem;
+}
+.learn-link h2, .learn-link h3 { color: #1d3f31; }
+.example-only { border-style: dashed; background: #f4ecdf; }
+.chart-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.chart-list li {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(4rem, auto) auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+.bar-track {
+  display: block;
+  height: 0.75rem;
+  background: #e6f2e8;
+  border-radius: 999px;
+}
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: #1d3f31;
+  border-radius: 999px;
 }
 @media (min-width: 800px) {
   .assistant-topics ul { grid-template-columns: 1fr 1fr; }

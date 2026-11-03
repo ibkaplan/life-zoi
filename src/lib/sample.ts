@@ -19,6 +19,25 @@ const sampleAnswers: Assessment = {
   goals: ["sleep", "walk"],
   habitNote: "Sample note: a shorter evening wind-down.",
   purposeHope: "Sample hope: travel and spend active time with family.",
+  exactAge: "",
+  tableSex: "",
+  populationNote: "",
+  heightCm: "",
+  weightKg: "",
+  fruit: "",
+  fiber: "",
+  protein: "",
+  addedSugar: "",
+  walking: "",
+  strength: "",
+  balance: "",
+  flexibility: "",
+  conditionsNote: "",
+  familyNote: "",
+  bloodPressure: "",
+  glucose: "",
+  hba1c: "",
+  cholesterol: "",
 };
 
 export function createSampleSession(today: string): UserSession {
@@ -68,6 +87,8 @@ export function createSampleSession(today: string): UserSession {
         note: "Sample check-in",
       },
     ],
+    reassessDays: 0,
+    reassessOn: "",
   };
 }
 

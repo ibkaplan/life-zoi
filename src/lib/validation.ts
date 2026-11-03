@@ -12,6 +12,7 @@ import {
   SOCIAL_LEVELS,
   STEP_IDS,
   STRESS_LEVELS,
+  TABLE_SEX,
   TRACKABLE_HABIT_IDS,
   VEGETABLE_PATTERNS,
   type Assessment,
@@ -76,6 +77,25 @@ export function coerceAssessment(input: unknown): Assessment {
     goals: [...new Set(goals)],
     habitNote: cleanText(record.habitNote, NOTE_LIMIT),
     purposeHope: cleanText(record.purposeHope, NOTE_LIMIT),
+    exactAge: cleanText(record.exactAge, 3),
+    tableSex: oneOf(record.tableSex, TABLE_SEX),
+    populationNote: cleanText(record.populationNote, NOTE_LIMIT),
+    heightCm: cleanText(record.heightCm, 3),
+    weightKg: cleanText(record.weightKg, 3),
+    fruit: oneOf(record.fruit, VEGETABLE_PATTERNS),
+    fiber: oneOf(record.fiber, VEGETABLE_PATTERNS),
+    protein: oneOf(record.protein, VEGETABLE_PATTERNS),
+    addedSugar: oneOf(record.addedSugar, VEGETABLE_PATTERNS),
+    walking: oneOf(record.walking, VEGETABLE_PATTERNS),
+    strength: oneOf(record.strength, VEGETABLE_PATTERNS),
+    balance: oneOf(record.balance, VEGETABLE_PATTERNS),
+    flexibility: oneOf(record.flexibility, VEGETABLE_PATTERNS),
+    conditionsNote: cleanText(record.conditionsNote, NOTE_LIMIT),
+    familyNote: cleanText(record.familyNote, NOTE_LIMIT),
+    bloodPressure: cleanText(record.bloodPressure, 40),
+    glucose: cleanText(record.glucose, 40),
+    hba1c: cleanText(record.hba1c, 40),
+    cholesterol: cleanText(record.cholesterol, 40),
   };
 }
 
@@ -103,6 +123,18 @@ export function validateStep(step: StepId, draft: Assessment): FieldErrors {
   if (step === "about") {
     if (draft.displayName.trim().length > NAME_LIMIT) {
       errors.displayName = `Use ${NAME_LIMIT} characters or fewer.`;
+    }
+    if (draft.exactAge.trim()) {
+      const age = numberInRange(draft.exactAge, "age", 18, 100, true);
+      if (age.error) errors.exactAge = age.error;
+    }
+    if (draft.heightCm.trim()) {
+      const height = numberInRange(draft.heightCm, "height in centimeters", 100, 250, true);
+      if (height.error) errors.heightCm = height.error;
+    }
+    if (draft.weightKg.trim()) {
+      const weight = numberInRange(draft.weightKg, "weight in kilograms", 30, 300, true);
+      if (weight.error) errors.weightKg = weight.error;
     }
   }
   if (step === "sleep") {
@@ -211,6 +243,25 @@ export function validateComplete(
       goals: draft.goals,
       habitNote: draft.habitNote,
       purposeHope: draft.purposeHope,
+      exactAge: draft.exactAge.trim() ? Number(draft.exactAge) : null,
+      tableSex: draft.tableSex || null,
+      populationNote: draft.populationNote,
+      heightCm: draft.heightCm.trim() ? Number(draft.heightCm) : null,
+      weightKg: draft.weightKg.trim() ? Number(draft.weightKg) : null,
+      fruit: draft.fruit || null,
+      fiber: draft.fiber || null,
+      protein: draft.protein || null,
+      addedSugar: draft.addedSugar || null,
+      walking: draft.walking || null,
+      strength: draft.strength || null,
+      balance: draft.balance || null,
+      flexibility: draft.flexibility || null,
+      conditionsNote: draft.conditionsNote,
+      familyNote: draft.familyNote,
+      bloodPressure: draft.bloodPressure,
+      glucose: draft.glucose,
+      hba1c: draft.hba1c,
+      cholesterol: draft.cholesterol,
     },
   };
 }

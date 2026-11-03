@@ -156,20 +156,31 @@ export default function HomePage() {
       <main id="main">
         <section className="page home-hero">
           <div className="home-copy">
-            <p className="home-kicker">lifeZoi</p>
-            <h1>Your Life. Your Health. Your Future.</h1>
-            <p className="home-support">Small changes today can help you build a healthier tomorrow.</p>
+            <p className="home-kicker">LIFEZOI</p>
+            <p className="home-brand">LIVE BETTER. MAKE LIFE MATTER.</p>
+            <h1>YOUR LIFE. YOUR HEALTH. YOUR FUTURE.</h1>
+            <p className="home-support">Have you ever wondered what your future health might look like?</p>
             <p className="home-intro">
-              Welcome. lifeZoi is a calm place to reflect on everyday habits, look at one possible change, and keep a simple record of what you try. It is educational. It does not diagnose, recommend medication changes, or predict how long you will live.
+              Your everyday choices matter more than you may realize. Discover your health and longevity outlook. LifeZoi brings together health education, lifestyle assessment, nutrition, movement, emotional well-being, and personal growth.
             </p>
+            <ul className="home-values">
+              <li>YOUR HEALTH GIVES YOU POSSIBILITIES.</li>
+              <li>YOUR CHOICES GIVE YOUR LIFE DIRECTION.</li>
+              <li>YOUR KINDNESS GIVES THE WORLD SOMETHING VALUABLE.</li>
+            </ul>
+            <p>Disability or illness does not make a life less valuable.</p>
             <div className="home-actions">
               <Link className="home-btn home-btn-primary" href="/assessment">
-                Explore Your Health
+                <span>DISCOVER YOUR LIFE OUTLOOK</span>
+                <small>Start your personal health and lifestyle assessment</small>
               </Link>
-              <Link className="home-btn home-btn-secondary" href="/what-if">
-                Discover What If?
+              <Link className="home-btn home-btn-secondary" href="/outlook">
+                Your future is not a fixed number. Your choices matter.
               </Link>
             </div>
+            <p className="home-disclaimer" role="note">
+              LifeZoi provides educational information and statistical estimates. It cannot predict your exact lifespan, diagnose medical conditions, or replace professional medical advice.
+            </p>
           </div>
           <div className="home-art">
             <HomeArt />
@@ -223,11 +234,12 @@ export default function HomePage() {
         <section className="page home-cta" aria-labelledby="home-cta-title">
           <div>
             <h2 id="home-cta-title">Start with one reflection</h2>
-            <p>Open the lifestyle assessment, or look at a WHAT IF? illustration. Both stay on this site.</p>
+            <p>Open the assessment, look at a hypothetical WHAT IF?, or keep a simple record of what you try. All of it stays on this site.</p>
           </div>
           <div className="home-actions">
             <Link className="home-btn home-btn-primary" href="/assessment">
-              Explore Your Health
+              <span>DISCOVER YOUR LIFE OUTLOOK</span>
+              <small>Start your personal health and lifestyle assessment</small>
             </Link>
             <Link className="home-btn home-btn-secondary" href="/progress">
               Track Your Progress
@@ -246,8 +258,15 @@ export default function HomePage() {
           <nav className="home-footer-links" aria-label="Footer">
             <Link href="/dashboard">Dashboard</Link>
             <Link href="/assessment">Lifestyle assessment</Link>
+            <Link href="/outlook">Life outlook</Link>
+            <Link href="/plan">Improvement plan</Link>
             <Link href="/what-if">WHAT IF?</Link>
             <Link href="/progress">Progress</Link>
+            <Link href="/wellness-coach">Wellness coach</Link>
+            <Link href="/academy">Academy</Link>
+            <Link href="/choices">Daily choices</Link>
+            <Link href="/urges">Urges</Link>
+            <Link href="/nature">Nature</Link>
             <Link href="/ai-assistant">AI Health Assistant</Link>
             <Link href="/life-matters">Your Life Matters</Link>
             <Link href="/change-lab">Change Lab</Link>
