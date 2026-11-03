@@ -742,3 +742,46 @@ textarea { min-height: 7rem; resize: vertical; }
 @media (min-width: 800px) {
   .assistant-topics ul { grid-template-columns: 1fr 1fr; }
 }
+
+.change-lab { font-size: 1.125rem; }
+.change-lab .btn, .step-list button { min-height: 3.25rem; }
+.change-lab .choice { min-height: 3rem; }
+.step-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.step-list button {
+  border: 1px solid #c4b5fd;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #312e81;
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+}
+.step-list button.is-current { background: #5b21b6; color: #ffffff; }
+.change-lab table { width: 100%; border-collapse: collapse; }
+.change-lab th, .change-lab td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid #e7e0f5;
+}
+.change-lab input[type="text"],
+.change-lab input:not([type="radio"]):not([type="checkbox"]),
+.field input[type="date"] {
+  width: 100%;
+  min-height: 3rem;
+  font: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

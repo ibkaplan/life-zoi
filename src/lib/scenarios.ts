@@ -306,6 +306,49 @@ export function buildScenario(
       uncertain: UNCERTAIN,
       sources: [sources.whoConnection, sources.samhsa988],
     },
+    strength: {
+      currentRoutine: movementCurrent(assessment),
+      proposedChange:
+        "Add muscle-strengthening movements on two days a week, starting with a familiar motion such as sit-to-stand.",
+      likelyBenefits: [
+        "WHO includes muscle-strengthening activities for all major muscle groups on two or more days a week in its adult activity guidance.",
+        "A shorter or easier start still counts. This page does not promise a change in strength or disease risk.",
+      ],
+      challenges: [
+        "Pain, balance, and access to a safe place can limit what is realistic.",
+        "Two days is a target to discuss, not a rule you must meet.",
+      ],
+      nextSteps: [
+        "Pick two days and one movement you can do near a sturdy chair.",
+        "Stop if you feel pain, chest symptoms, or dizziness, and ask a clinician which movements are suitable.",
+      ],
+      established:
+        "Established public guidance: WHO describes muscle-strengthening activity as part of its physical activity recommendations for adults. This illustration does not prescribe a personal program.",
+      uncertain: UNCERTAIN,
+      sources: [sources.whoActivity, sources.usActivityGuidelines],
+    },
+    balance: {
+      currentRoutine: movementCurrent(assessment),
+      proposedChange:
+        "Practice balance near a counter or chair, and keep a hand free to hold on.",
+      likelyBenefits: [
+        "WHO describes multicomponent activity, including functional balance and strength, as part of activity guidance for older adults.",
+        "Practicing near support is a safety choice. It is not a prediction about falls.",
+      ],
+      challenges: [
+        "Dizziness, neuropathy, and an unfamiliar floor make balance practice riskier.",
+        "A person who feels unsteady should ask a clinician or physical therapist before trying one-foot standing.",
+      ],
+      nextSteps: [
+        "Start by standing at a counter with both feet down.",
+        "Skip the practice on any day you feel lightheaded.",
+        "If you have fallen recently, talk with a clinician before adding balance work.",
+      ],
+      established:
+        "Established public guidance: WHO includes functional balance and strength training in its physical activity guidance for older adults. This page does not estimate a personal fall risk.",
+      uncertain: UNCERTAIN,
+      sources: [sources.whoActivity, sources.usActivityGuidelines],
+    },
   };
 
   const content = library[habitId];

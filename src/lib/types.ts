@@ -41,6 +41,8 @@ export const HABIT_IDS = [
   "stress",
   "alcohol",
   "connection",
+  "strength",
+  "balance",
   "custom",
 ] as const;
 

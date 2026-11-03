@@ -41,6 +41,17 @@ export function DashboardView() {
           Start a Conversation
         </Link>
       </article>
+      <article className="card stack">
+        <p className="kicker">LifeZoi Change Lab</p>
+        <h2>Your personal health and lifestyle experiment</h2>
+        <p>
+          Start with a baseline, choose one small habit, and compare what you entered before and after. The record stays in this browser.
+        </p>
+        <div className="home-actions">
+          <Link className="btn btn-primary" href="/change-lab">Open Change Lab</Link>
+          <Link className="btn btn-secondary" href="/lab-results">Understand an example lab report</Link>
+        </div>
+      </article>
       <div className="grid-2">
         <article className="card stack">
           <h2>Lifestyle assessment</h2>

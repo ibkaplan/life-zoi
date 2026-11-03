@@ -11,6 +11,15 @@ import { HABIT_IDS, type Assessment, type HabitId } from "@/lib/types";
 
 const presetIds = HABIT_IDS.filter((id) => id !== "custom");
 
+const examples: { habitId: HabitId; label: string; note: string }[] = [
+  { habitId: "walk", label: "What if I walk 30 minutes daily?", note: "A daily 30-minute walk, on days that feel workable." },
+  { habitId: "eating", label: "What if I reduce added sugar?", note: "Fewer sugary drinks and sweets, without an all-or-nothing diet." },
+  { habitId: "sleep", label: "What if I improve my sleep?", note: "A steadier sleep window." },
+  { habitId: "balance", label: "What if I practice balance exercises?", note: "Balance practice near a sturdy support." },
+  { habitId: "eating", label: "What if I increase fiber?", note: "More beans, oats, vegetables, or fruit." },
+  { habitId: "strength", label: "What if I add strength training twice a week?", note: "Two days of familiar strength movements." },
+];
+
 export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
   const { ready, sample, session, saveScenario } = useSession();
   const [override, setOverride] = useState<{
@@ -118,6 +127,24 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
         </section>
       ) : null}
       <form className="card stack" onSubmit={showIllustration}>
+        <fieldset className="field">
+          <legend>Try a question</legend>
+          <div className="choices">
+            {examples.map((example) => (
+              <button
+                key={example.label}
+                className="btn btn-secondary"
+                type="button"
+                onClick={() => setOverride({ scenarioId: formKey, habitId: example.habitId, note: example.note })}
+              >
+                {example.label}
+              </button>
+            ))}
+          </div>
+          <p className="hint">
+            These questions fill the form. The illustration cites public sources and does not estimate a personal disease risk.
+          </p>
+        </fieldset>
         <fieldset className="field">
           <legend>Habit</legend>
           <div className="choices">

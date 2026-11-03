@@ -18,6 +18,14 @@ const links = [
   { href: "/settings", label: "Settings", short: "Settings" },
 ];
 
+const exploreLinks = [
+  { href: "/change-lab", label: "Change Lab" },
+  { href: "/lab-results", label: "Understand My Lab Results" },
+  { href: "/sugar-detective", label: "Sugar Detective" },
+  { href: "/food-labels", label: "Food Intelligence" },
+  { href: "/balance-challenge", label: "Balance and Brain Challenge" },
+];
+
 function current(pathname: string, href: string) {
   if (href === "/what-if") return pathname.startsWith("/what-if");
   return pathname === href;
@@ -134,6 +142,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <h2 id={titleId}>More</h2>
             {links.map((link) => (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            ))}
+            {exploreLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 {link.label}
               </Link>
