@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSyncExternalStore, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
@@ -83,7 +84,8 @@ export function ChangeLabView() {
         <p className="kicker">LifeZoi Change Lab</p>
         <h1>Your personal health and lifestyle experiment</h1>
         <p className="lede">
-          Choose one small habit experiment, practice it, and compare what you entered before and after. This is education, not a treatment, and it does not promise a health outcome.
+          Choose one small habit experiment, practice it, and compare what you entered before and after. This is education, not a treatment, and it does not promise a health outcome. It can be the Plan and Act steps in{" "}
+          <Link href="/life-matters">Your Life Matters</Link>.
         </p>
       </div>
       <p className="banner" role="status">

@@ -1,5 +1,14 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import {
+  BRAND_LINE,
+  BRAND_SUPPORT,
+  CENTRAL_MESSAGE,
+  DIRECTION_LINES,
+  FOUNDATIONS,
+  PROMISE_BOUNDARY,
+  SUPPORTING_MESSAGE,
+} from "@/lib/purpose";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
 
 function HomeArt() {
@@ -40,6 +49,44 @@ function HomeArt() {
       <circle cx="168" cy="404" r="10" fill="#ffffff" />
       <path d="M430 286c8 16 22 22 36 18-8 14-28 22-46 12 2-12 4-22 10-30z" fill="#f5f3ff" />
       <path d="M448 292c10-16 24-22 34-14-12 6-22 16-26 28-6-4-8-8-8-14z" fill="#ddd6fe" />
+    </svg>
+  );
+}
+
+function MatterHomeArt() {
+  return (
+    <svg
+      className="home-art-svg matter-float"
+      viewBox="0 0 640 520"
+      role="img"
+      aria-label="Earth at sunrise, with trees and people of different generations"
+    >
+      <defs>
+        <linearGradient id="matter-home-sky" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ddd6fe" />
+          <stop offset="50%" stopColor="#cffafe" />
+          <stop offset="100%" stopColor="#fbcfe8" />
+        </linearGradient>
+        <linearGradient id="matter-home-sun" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff7ed" />
+          <stop offset="100%" stopColor="#f9a8d4" />
+        </linearGradient>
+      </defs>
+      <rect width="640" height="520" rx="28" fill="url(#matter-home-sky)" />
+      <circle className="matter-sun" cx="470" cy="150" r="70" fill="url(#matter-home-sun)" />
+      <circle cx="230" cy="300" r="92" fill="#5eead4" />
+      <circle cx="200" cy="286" r="26" fill="#99f6e4" />
+      <circle cx="258" cy="312" r="18" fill="#0f766e" opacity="0.35" />
+      <path d="M70 360c22-62 36-62 58 0" fill="#0f766e" />
+      <rect x="92" y="360" width="14" height="48" fill="#115e59" />
+      <path d="M360 330c16-48 28-48 44 0" fill="#0d9488" />
+      <rect x="376" y="330" width="12" height="40" fill="#115e59" />
+      <circle cx="430" cy="300" r="18" fill="#5b21b6" />
+      <rect x="418" y="318" width="24" height="48" rx="10" fill="#7c3aed" />
+      <circle cx="490" cy="318" r="14" fill="#9d174d" />
+      <rect x="480" y="332" width="20" height="38" rx="8" fill="#db2777" />
+      <circle cx="548" cy="286" r="20" fill="#312e81" />
+      <rect x="534" y="306" width="28" height="54" rx="10" fill="#4338ca" />
     </svg>
   );
 }
@@ -101,6 +148,7 @@ export default function HomePage() {
       <header className="page home-bar">
         <Logo tone="violet" />
         <nav className="home-nav" aria-label="Homepage">
+          <Link href="/#your-life-matters">Your Life Matters</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/dashboard">Dashboard</Link>
         </nav>
@@ -144,6 +192,34 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="page home-matters" id="your-life-matters" aria-labelledby="life-matters-title">
+          <div className="home-matters-copy">
+            <p className="home-kicker">Your Life Matters</p>
+            <h2 id="life-matters-title">{CENTRAL_MESSAGE}</h2>
+            <p>{SUPPORTING_MESSAGE}</p>
+            <ul className="matter-lines">
+              {DIRECTION_LINES.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <div className="matter-foundations">
+              {FOUNDATIONS.map((item) => (
+                <article key={item.id}>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </article>
+              ))}
+            </div>
+            <p className="matter-brand">{BRAND_LINE}</p>
+            <p>{BRAND_SUPPORT}</p>
+            <p>{PROMISE_BOUNDARY}</p>
+            <Link className="home-btn home-btn-primary" href="/life-matters">
+              Begin your reflection
+            </Link>
+          </div>
+          <MatterHomeArt />
+        </section>
+
         <section className="page home-cta" aria-labelledby="home-cta-title">
           <div>
             <h2 id="home-cta-title">Start with one reflection</h2>
@@ -173,6 +249,7 @@ export default function HomePage() {
             <Link href="/what-if">WHAT IF?</Link>
             <Link href="/progress">Progress</Link>
             <Link href="/ai-assistant">AI Health Assistant</Link>
+            <Link href="/life-matters">Your Life Matters</Link>
             <Link href="/change-lab">Change Lab</Link>
             <Link href="/settings">Settings</Link>
             <Link href="/privacy">Privacy</Link>

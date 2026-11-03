@@ -67,7 +67,7 @@ export function SettingsView() {
       </section>
       <section className="card stack">
         <h2>Delete data in this browser</h2>
-        <p>This clears the assessment, scenarios, goals, check-ins, AI assistant conversation, and Change Lab record stored in this tab. It cannot delete a server account, because there is no account.</p>
+        <p>This clears the assessment, scenarios, goals, check-ins, AI assistant conversation, Change Lab record, and Your Life Matters reflections stored in this tab. It cannot delete a server account, because there is no account.</p>
         {cleared ? <p className="alert alert-ok" role="status">Data in this tab was cleared.</p> : null}
         {confirmClear ? (
           <div className="actions">

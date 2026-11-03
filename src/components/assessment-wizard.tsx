@@ -446,6 +446,23 @@ export function AssessmentWizard() {
                   onChange={(event) => update({ habitNote: event.target.value })}
                 />
               </label>
+              <label className="field" htmlFor="purposeHope">
+                <span>What would you like your health to help you experience or accomplish?</span>
+                <span className="hint">
+                  Optional, and separate from the health answers above. This is a personal hope, not a medical score. 280 characters or fewer.
+                </span>
+                <textarea
+                  id="purposeHope"
+                  maxLength={280}
+                  value={draft.purposeHope}
+                  onChange={(event) => update({ purposeHope: event.target.value })}
+                />
+                {errors.purposeHope ? (
+                  <p className="field-error" role="alert">
+                    {errors.purposeHope}
+                  </p>
+                ) : null}
+              </label>
             </>
           ) : null}
           {step === "review" ? (
@@ -553,6 +570,11 @@ function Review({
       step: "goals",
     },
     { label: "Note", value: draft.habitNote || "Not provided", step: "goals" },
+    {
+      label: "Hope for what health could support",
+      value: draft.purposeHope || "Not provided",
+      step: "goals",
+    },
   ];
   return (
     <dl className="review-list">

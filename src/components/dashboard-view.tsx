@@ -11,6 +11,7 @@ import {
   sleepQualityLabels,
 } from "@/lib/labels";
 import { LoadingState } from "@/components/sources";
+import { DIGNITY_NOTE, purposeReflection } from "@/lib/purpose";
 
 export function DashboardView() {
   const { ready, session, sample } = useSession();
@@ -74,6 +75,20 @@ export function DashboardView() {
           </Link>
         </article>
       </div>
+      <article className="card stack">
+        <p className="kicker">Your Life Matters</p>
+        <h2>Your life is more than your lifetime</h2>
+        <p>Health, purpose, and kindness sit together here. This reflection is separate from medical suggestions.</p>
+        <Link className="btn btn-primary" href="/life-matters">Open Your Life Matters</Link>
+      </article>
+      {latest?.answers.purposeHope ? (
+        <section className="card stack" aria-labelledby="purpose-hope-title">
+          <h2 id="purpose-hope-title">What you hope health can support</h2>
+          <p>{purposeReflection(latest.answers.purposeHope)}</p>
+          <p>{DIGNITY_NOTE}</p>
+          <p className="hint">This note is separate from the lifestyle suggestions below. It is not a risk score and it does not judge worth.</p>
+        </section>
+      ) : null}
       <section className="card stack">
         <h2>Lifestyle overview</h2>
         {latest ? (

@@ -51,6 +51,9 @@ function mockText(question: string): string {
   if (/\b(aging|older|longevity)\b/.test(lower)) {
     return `Healthy aging discussions often include sleep, movement, food, connection, and not smoking. lifeZoi does not promise that a habit will prevent disease. Everyday habits are a place to reflect, not a forecast. ${MOCK_NOTE}`;
   }
+  if (/\b(grandchildren|grandchild)\b/.test(lower) && /\b(travel|energy|trip|visit)\b/.test(lower)) {
+    return `That's a wonderful goal. We can explore small steps that may support your energy and mobility. Let's look at your sleep, daily movement, nutrition and current routine. Health can create more room for time with people you care about. It does not promise a longer life, prevent disease, or replace a clinician, and people living with illness or limits can still live meaningful lives. ${MOCK_NOTE}`;
+  }
   if (/\b(energy|week|habit|small change)\b/.test(lower)) {
     return `One small change this week, such as a consistent bedtime or a short walk, is easier to notice than many changes at once. Energy has many causes. This is general habit education, not a personalized medical assessment. ${MOCK_NOTE}`;
   }

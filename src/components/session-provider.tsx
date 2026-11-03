@@ -10,6 +10,7 @@ import {
 } from "@/lib/browser-store";
 import { clearAssistantThread } from "@/lib/assistant";
 import { clearChangeLab } from "@/lib/change-lab";
+import { clearPurpose } from "@/lib/purpose";
 import { createSampleSession } from "@/lib/sample";
 import {
   completeDraft,
@@ -145,6 +146,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       clearUserData: () => {
         clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
         clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
+        clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
         commit(emptySession(), false);
       },
       setSample: (on) => commit(stored, on),

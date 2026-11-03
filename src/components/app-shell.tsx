@@ -10,6 +10,7 @@ import { sources } from "@/lib/sources";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", short: "Home" },
+  { href: "/life-matters", label: "Your Life Matters", short: "Matters" },
   { href: "/profile", label: "My Profile", short: "Profile" },
   { href: "/assessment", label: "Lifestyle Assessment", short: "Assess" },
   { href: "/what-if", label: "WHAT IF?", short: "What if" },
@@ -68,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [open]);
 
   const primary = links.filter((link) =>
-    ["/dashboard", "/assessment", "/what-if", "/progress", "/ai-assistant"].includes(link.href),
+    ["/dashboard", "/life-matters", "/assessment", "/what-if", "/progress"].includes(link.href),
   );
 
   return (

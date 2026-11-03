@@ -125,6 +125,7 @@ export function assessmentHasAnswers(draft: Assessment): boolean {
       draft.mood ||
       draft.social ||
       draft.goals.length > 0 ||
-      draft.habitNote.trim(),
+      draft.habitNote.trim() ||
+      draft.purposeHope.trim(),
   );
 }

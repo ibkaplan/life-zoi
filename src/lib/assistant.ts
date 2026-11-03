@@ -4,6 +4,7 @@ export const WELCOME_MESSAGE =
   "Hello! I'm your LifeZoi AI Health Assistant. I can help you understand your health habits, explore wellness topics, and make informed lifestyle choices. What would you like to discuss today?";
 
 export const SUGGESTED_QUESTIONS = [
+  "I want to have enough energy to travel with my grandchildren.",
   "How can I improve my sleep?",
   "How can I reduce my sugar cravings?",
   "What exercises can improve my balance?",

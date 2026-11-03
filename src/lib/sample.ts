@@ -18,6 +18,7 @@ const sampleAnswers: Assessment = {
   social: "some",
   goals: ["sleep", "walk"],
   habitNote: "Sample note: a shorter evening wind-down.",
+  purposeHope: "Sample hope: travel and spend active time with family.",
 };
 
 export function createSampleSession(today: string): UserSession {

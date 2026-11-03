@@ -75,6 +75,7 @@ export function coerceAssessment(input: unknown): Assessment {
     social: oneOf(record.social, SOCIAL_LEVELS),
     goals: [...new Set(goals)],
     habitNote: cleanText(record.habitNote, NOTE_LIMIT),
+    purposeHope: cleanText(record.purposeHope, NOTE_LIMIT),
   };
 }
 
@@ -156,6 +157,9 @@ export function validateStep(step: StepId, draft: Assessment): FieldErrors {
     if (draft.habitNote.length > NOTE_LIMIT) {
       errors.habitNote = `Use ${NOTE_LIMIT} characters or fewer.`;
     }
+    if (draft.purposeHope.length > NOTE_LIMIT) {
+      errors.purposeHope = `Use ${NOTE_LIMIT} characters or fewer.`;
+    }
   }
   return errors;
 }
@@ -206,6 +210,7 @@ export function validateComplete(
       social: draft.social,
       goals: draft.goals,
       habitNote: draft.habitNote,
+      purposeHope: draft.purposeHope,
     },
   };
 }

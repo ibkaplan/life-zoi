@@ -19,13 +19,13 @@ export default function PrivacyPage() {
           This build has no accounts and no database. Assessment answers, WHAT IF? scenarios, goals, and check-ins are kept in this browser tab’s session storage. Closing the tab clears them. They are not encrypted at rest by lifeZoi, and they are not a secure health record.
         </p>
         <p>
-          A suggestion or WHAT IF? request is sent to this app’s own server so the answers can be checked. The server does not store that request and does not send it to an AI service. The AI Health Assistant uses a local development mock. It does not call a paid AI provider, and it does not send lifestyle assessment answers anywhere. A lab reference request sends only a verified LOINC code to MedlinePlus Connect. It does not send your name, a result, or a document. Change Lab answers stay in this browser tab. A host may still log requests to this app.
+          A suggestion or WHAT IF? request is sent to this app’s own server so the answers can be checked. The server does not store that request and does not send it to an AI service. The AI Health Assistant uses a local development mock. It does not call a paid AI provider, and it does not send lifestyle assessment answers anywhere. A lab reference request sends only a verified LOINC code to MedlinePlus Connect. It does not send your name, a result, or a document. Change Lab answers and Your Life Matters reflections stay in this browser tab. A host may still log requests to this app.
         </p>
       </section>
       <section className="card stack">
         <h2>What is collected</h2>
         <p>
-          Only what you type: an optional name and age range, sleep, movement, food and water, optional tobacco and alcohol answers, stress, mood, social connection, goals, notes, and check-ins. Sample data is labeled and is not your information.
+          Only what you type: an optional name and age range, sleep, movement, food and water, optional tobacco and alcohol answers, stress, mood, social connection, goals, an optional hope for what health could help you experience, notes, check-ins, and Your Life Matters reflections. Sample data is labeled and is not your information.
         </p>
       </section>
       <section className="card stack">

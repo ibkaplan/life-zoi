@@ -88,6 +88,7 @@ export type Assessment = {
   social: SocialLevel | "";
   goals: GoalId[];
   habitNote: string;
+  purposeHope: string;
 };
 
 export type NormalizedAssessment = {
@@ -107,6 +108,7 @@ export type NormalizedAssessment = {
   social: SocialLevel;
   goals: GoalId[];
   habitNote: string;
+  purposeHope: string;
 };
 
 export type CompletedAssessment = {
@@ -182,6 +184,7 @@ export const EMPTY_ASSESSMENT: Assessment = {
   social: "",
   goals: [],
   habitNote: "",
+  purposeHope: "",
 };
 
 export function emptySession(): UserSession {

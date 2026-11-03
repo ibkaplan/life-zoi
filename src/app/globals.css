@@ -146,7 +146,7 @@ a { color: var(--forest); }
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.15rem;
   background: var(--surface);
   border-top: 1px solid var(--line);
@@ -777,6 +777,113 @@ textarea { min-height: 7rem; resize: vertical; }
   min-height: 3rem;
   font: inherit;
 }
+.home-matters {
+  display: grid;
+  gap: 1.5rem;
+  width: min(1080px, calc(100% - 2rem));
+  margin: 0 auto 2.5rem;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(252, 231, 243, 0.95), transparent 36%),
+    linear-gradient(145deg, #f5f3ff 0%, #ecfeff 48%, #fdf2f8 100%);
+  border: 1px solid rgba(196, 181, 253, 0.75);
+  box-shadow: 0 18px 44px rgba(49, 46, 129, 0.08);
+}
+
+.home-matters h2,
+.life-matters h1 {
+  font-size: clamp(2.1rem, 5vw, 3.6rem);
+  line-height: 1.12;
+  color: #2e1065;
+}
+
+.matter-lines {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 1.15rem;
+  color: #312e81;
+}
+
+.matter-foundations {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.matter-foundations article,
+.matter-list li,
+.matter-journey li {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #ddd6fe;
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+}
+
+.matter-foundations h3,
+.matter-journey h3 { color: #5b21b6; font-size: 1.25rem; }
+
+.matter-brand {
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: #4c1d95;
+}
+
+.matter-art,
+.home-matters .home-art-svg {
+  width: 100%;
+  height: auto;
+  border-radius: 28px;
+}
+
+.matter-sun { transform-origin: center; animation: matter-glow 7s ease-in-out infinite; }
+
+.matter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.matter-nav a,
+.life-matters select {
+  min-height: 48px;
+  border-radius: 999px;
+  border: 1px solid #c4b5fd;
+  background: #ffffff;
+  color: #312e81;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+  font: inherit;
+}
+
+.life-matters select { width: 100%; border-radius: 16px; }
+
+.matter-list,
+.matter-journey {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.matter-journey { list-style: decimal; padding-left: 1.4rem; }
+
+.life-matters .lede,
+.life-matters p,
+.home-matters p { font-size: 1.08rem; line-height: 1.55; }
+
+@keyframes matter-glow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@media (min-width: 860px) {
+  .home-matters { grid-template-columns: 1.15fr 0.85fr; align-items: center; }
+  .matter-foundations { grid-template-columns: repeat(3, 1fr); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
