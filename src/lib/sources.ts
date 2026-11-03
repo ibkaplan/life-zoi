@@ -61,6 +61,26 @@ export const sources = {
     title: "988 Suicide & Crisis Lifeline",
     url: "https://www.samhsa.gov/mental-health/988",
   },
+  cdcRethinkDrink: {
+    name: "Centers for Disease Control and Prevention",
+    title: "Rethink Your Drink",
+    url: "https://www.cdc.gov/healthy-weight-growth/rethink-your-drink/index.html",
+  },
+  medlineplusFiber: {
+    name: "National Library of Medicine, MedlinePlus",
+    title: "Fiber",
+    url: "https://medlineplus.gov/ency/article/002470.htm",
+  },
+  cdcSunSafety: {
+    name: "Centers for Disease Control and Prevention",
+    title: "Sun Safety Facts",
+    url: "https://www.cdc.gov/skin-cancer/sun-safety/index.html",
+  },
+  ssaLifeTable: {
+    name: "Social Security Administration",
+    title: "Period Life Table, 2023, as used in the 2026 Trustees Report",
+    url: "https://www.ssa.gov/oact/STATS/table4c6.html",
+  },
 } as const satisfies Record<string, Source>;
 
 export const PROFESSIONAL_NOTICE =

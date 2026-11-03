@@ -29,7 +29,7 @@ export function DashboardView() {
         <p className="kicker">Dashboard</p>
         <h1>{name ? `Welcome, ${name}` : "Welcome"}</h1>
         <p className="lede">
-          lifeZoi helps you look at everyday habits, explore a change in WHAT IF?, and keep a simple record of what you try. It does not diagnose illness or predict a lifespan.
+          lifeZoi helps you look at everyday habits, explore a hypothetical change in WHAT IF?, and keep a simple record of what you try. It does not diagnose illness or predict how long anyone will live.
         </p>
       </section>
       <article className="card assistant-card stack">
@@ -97,6 +97,26 @@ export function DashboardView() {
           <p>No completed assessment yet. lifeZoi will not fill this in for you.</p>
         )}
         {sample ? <p className="hint">Shown from sample data.</p> : null}
+      </section>
+      <section className="stack">
+        <h2>Learn and plan</h2>
+        <div className="grid-2">
+          {[
+            ["/outlook", "Life outlook", "A population table, kept separate from your personal profile."],
+            ["/plan", "Improvement plan", "A few weekly priorities and a 30, 90, or 180 day reminder."],
+            ["/wellness-coach", "Wellness coach", "Hydration, food, and practical habit cues."],
+            ["/academy", "Academy", "Food education and movement ideas with gentler options."],
+            ["/choices", "Daily choices", "Why a habit matters, and what is still uncertain."],
+            ["/urges", "Urges", "Name a craving, pause only when it is safe, and choose."],
+            ["/nature", "Nature", "Daylight and time outside. Nature is not medicine."],
+            ["/habits", "Challenges", "Shared 7-day and 30-day journeys."],
+          ].map(([href, title, text]) => (
+            <Link key={href} className="card learn-link" href={href}>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </Link>
+          ))}
+        </div>
       </section>
       <section className="card stack">
         <h2>This month</h2>

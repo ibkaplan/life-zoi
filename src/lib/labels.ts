@@ -85,6 +85,10 @@ export const habitLabels: Record<HabitId, string> = {
   stress: "Stress-management practices",
   alcohol: "Drink less often",
   connection: "More social connection",
+  "sugary-drinks": "Fewer sugary drinks",
+  strength: "Strength practice",
+  fiber: "More fiber",
+  outdoors: "More time outdoors",
   custom: "A change in your own words",
 };
 

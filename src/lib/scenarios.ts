@@ -306,6 +306,66 @@ export function buildScenario(
       uncertain: UNCERTAIN,
       sources: [sources.whoConnection, sources.samhsa988],
     },
+    "sugary-drinks": {
+      currentRoutine: assessment
+        ? `You reported added-sugar drinks as “${assessment.addedSugar ? vegetableLabels[assessment.addedSugar] : "not answered"}.” Sugary drinks are a common source of added sugars. Naturally occurring sugars in milk and fruit are a different question.`
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: choose water or an unsweetened drink more often, if fluids are not restricted for you.",
+      likelyBenefits: [
+        "CDC’s Rethink Your Drink page discusses added sugars in drinks as something people can notice and change gradually.",
+        "A smaller change can still be the whole experiment.",
+      ],
+      challenges: ["Habit, cost, and social drinks can make a swap feel inconvenient."],
+      nextSteps: ["Read one label.", "Keep the drink you enjoy and make the next one smaller if you want."],
+      established: "Established public education about added sugars in drinks. This is hypothetical. It is not a personal quota.",
+      uncertain: UNCERTAIN,
+      sources: [sources.cdcRethinkDrink],
+    },
+    strength: {
+      currentRoutine: assessment
+        ? `You reported strength practice as “${assessment.strength ? vegetableLabels[assessment.strength] : "not answered"}.” Activity on ${assessment.activityDays} days is the broader movement note.`
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: add one slow strength move on two days, only if it feels safe. A chair version counts.",
+      likelyBenefits: [
+        "Regular physical activity is associated with important health benefits.",
+        "The Physical Activity Guidelines describe muscle-strengthening as part of the adult picture, alongside aerobic activity.",
+      ],
+      challenges: ["Pain, illness, and equipment limits mean some moves do not fit. Skip anything that hurts."],
+      nextSteps: ["Ask a clinician if a condition makes strength work unclear.", "Start with one move you can stop easily."],
+      established: "Established public activity guidance. Not every exercise fits every condition. This is hypothetical.",
+      uncertain: UNCERTAIN,
+      sources: [sources.usActivityGuidelines, sources.whoActivity],
+    },
+    fiber: {
+      currentRoutine: assessment
+        ? `You reported fiber-containing foods as “${assessment.fiber ? vegetableLabels[assessment.fiber] : "not answered"}.” Vegetables or fruit: ${vegetableLabels[assessment.vegetables]}.`
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: add a small amount of beans, oats, fruit, or a whole grain, and increase slowly with the fluids you are allowed.",
+      likelyBenefits: [
+        "MedlinePlus describes fiber as part of a usual eating pattern and says to increase it gradually.",
+        "The Dietary Guidelines encourage vegetables, fruits, and whole grains.",
+      ],
+      challenges: ["A sudden large increase can feel uncomfortable. A fluid restriction from a clinician comes first."],
+      nextSteps: ["Add one familiar food.", "Drink fluids you are allowed."],
+      established: "Established public nutrition education. This is hypothetical and not a personal diet.",
+      uncertain: UNCERTAIN,
+      sources: [sources.medlineplusFiber, sources.dietaryGuidelines],
+    },
+    outdoors: {
+      currentRoutine: assessment
+        ? "Time outside is not a required field. Your movement and stress answers are the closest notes already saved."
+        : NO_ASSESSMENT,
+      proposedChange: "Hypothetical: spend a few adaptable minutes outside, at a window, or on a balcony. There is no fixed distance.",
+      likelyBenefits: [
+        "Regular physical activity is associated with important health benefits.",
+        "CDC says time outside can be a way to be active and reduce stress, and that sun protection still matters.",
+      ],
+      challenges: ["Weather, access, and disability change what outside means. A window counts as daylight, not as a workout."],
+      nextSteps: ["Use shade, clothing, or sunscreen when the sun is strong.", "Skip intentional tanning."],
+      established: "Established public notes on activity and sun safety. Time outside is not medicine and not a replacement for other habits. This is hypothetical.",
+      uncertain: UNCERTAIN,
+      sources: [sources.cdcSunSafety, sources.whoActivity],
+    },
   };
 
   const content = library[habitId];
@@ -315,6 +375,15 @@ export function buildScenario(
     yourNote: note,
     ...content,
   });
+}
+
+export function buildCombination(primary: ScenarioIllustration, secondary: ScenarioIllustration) {
+  return {
+    label: "Hypothetical",
+    current: primary.currentRoutine,
+    oneChange: `${primary.title}. ${primary.proposedChange}`,
+    together: `${primary.title} together with ${secondary.title}. ${secondary.proposedChange} Each change stays educational. lifeZoi does not merge them into a personal forecast.`,
+  };
 }
 
 export function scenarioText(scenario: ScenarioIllustration): string {

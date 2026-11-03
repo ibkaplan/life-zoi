@@ -41,8 +41,18 @@ export const HABIT_IDS = [
   "stress",
   "alcohol",
   "connection",
+  "sugary-drinks",
+  "strength",
+  "fiber",
+  "outdoors",
   "custom",
 ] as const;
+
+export const TABLE_SEX = ["female", "male", "another", "prefer-not"] as const;
+export type TableSex = (typeof TABLE_SEX)[number];
+
+export const REASSESS_DAYS = [30, 90, 180] as const;
+export type ReassessDays = (typeof REASSESS_DAYS)[number];
 
 export const TRACKABLE_HABIT_IDS = [
   "walk",
@@ -86,6 +96,25 @@ export type Assessment = {
   social: SocialLevel | "";
   goals: GoalId[];
   habitNote: string;
+  exactAge: string;
+  tableSex: TableSex | "";
+  populationNote: string;
+  heightCm: string;
+  weightKg: string;
+  fruit: VegetablePattern | "";
+  fiber: VegetablePattern | "";
+  protein: VegetablePattern | "";
+  addedSugar: VegetablePattern | "";
+  walking: VegetablePattern | "";
+  strength: VegetablePattern | "";
+  balance: VegetablePattern | "";
+  flexibility: VegetablePattern | "";
+  conditionsNote: string;
+  familyNote: string;
+  bloodPressure: string;
+  glucose: string;
+  hba1c: string;
+  cholesterol: string;
 };
 
 export type NormalizedAssessment = {
@@ -105,6 +134,25 @@ export type NormalizedAssessment = {
   social: SocialLevel;
   goals: GoalId[];
   habitNote: string;
+  exactAge: number | null;
+  tableSex: TableSex | null;
+  populationNote: string;
+  heightCm: number | null;
+  weightKg: number | null;
+  fruit: VegetablePattern | null;
+  fiber: VegetablePattern | null;
+  protein: VegetablePattern | null;
+  addedSugar: VegetablePattern | null;
+  walking: VegetablePattern | null;
+  strength: VegetablePattern | null;
+  balance: VegetablePattern | null;
+  flexibility: VegetablePattern | null;
+  conditionsNote: string;
+  familyNote: string;
+  bloodPressure: string;
+  glucose: string;
+  hba1c: string;
+  cholesterol: string;
 };
 
 export type CompletedAssessment = {
@@ -140,6 +188,8 @@ export type UserSession = {
   scenarios: SavedScenario[];
   goals: HabitGoal[];
   checkIns: CheckIn[];
+  reassessDays: ReassessDays | 0;
+  reassessOn: string;
 };
 
 export type FieldErrors = Record<string, string>;
@@ -180,6 +230,25 @@ export const EMPTY_ASSESSMENT: Assessment = {
   social: "",
   goals: [],
   habitNote: "",
+  exactAge: "",
+  tableSex: "",
+  populationNote: "",
+  heightCm: "",
+  weightKg: "",
+  fruit: "",
+  fiber: "",
+  protein: "",
+  addedSugar: "",
+  walking: "",
+  strength: "",
+  balance: "",
+  flexibility: "",
+  conditionsNote: "",
+  familyNote: "",
+  bloodPressure: "",
+  glucose: "",
+  hba1c: "",
+  cholesterol: "",
 };
 
 export function emptySession(): UserSession {
@@ -190,5 +259,7 @@ export function emptySession(): UserSession {
     scenarios: [],
     goals: [],
     checkIns: [],
+    reassessDays: 0,
+    reassessOn: "",
   };
 }
