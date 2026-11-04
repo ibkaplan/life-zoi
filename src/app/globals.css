@@ -278,7 +278,17 @@ a { color: var(--forest); }
   gap: 0.4rem;
 }
 
-.btn-primary { background: var(--forest); color: white; }
+.btn-primary {
+  background: var(--forest);
+  color: #ffffff;
+  font-family: var(--font-sans-family), "Source Sans 3", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:focus-visible {
+  color: #ffffff;
+}
 .btn-primary:hover { background: var(--forest-strong); }
 .btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
 .btn-secondary:hover { background: var(--sand); }
@@ -555,9 +565,66 @@ textarea { min-height: 7rem; resize: vertical; }
   color: #ffffff;
   background: linear-gradient(135deg, #6d28d9 0%, #4338ca 58%, #0f766e 140%);
   box-shadow: 0 12px 28px rgba(67, 56, 202, 0.24);
+  font-family: var(--font-sans-family), "Source Sans 3", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.home-btn-primary:hover,
+.home-btn-primary:focus,
+.home-btn-primary:focus-visible {
+  color: #ffffff;
 }
 
 .home-btn-primary:hover { filter: brightness(1.06); }
+
+/* .home a is more specific than a single button class, so primary labels must repeat the link. */
+.home a.home-btn-primary,
+.home a.home-btn-primary:hover,
+.home a.home-btn-primary:focus,
+.home a.home-btn-primary:focus-visible,
+.home a.home-btn-primary:active,
+.home a.home-btn-primary span,
+.home a.home-btn-primary small,
+a.btn-primary,
+a.btn-primary:hover,
+a.btn-primary:focus,
+a.btn-primary:focus-visible,
+button.btn-primary,
+button.btn-primary:hover,
+button.btn-primary:focus,
+button.btn-primary:focus-visible,
+a.assistant-send,
+a.assistant-send:hover,
+a.assistant-send:focus,
+a.assistant-send:focus-visible,
+button.assistant-send,
+button.assistant-send:hover,
+button.assistant-send:focus,
+button.assistant-send:focus-visible,
+.step-list button.is-current,
+.step-list button.is-current:hover,
+.step-list button.is-current:focus,
+.step-list button.is-current:focus-visible {
+  color: #ffffff;
+  font-family: var(--font-sans-family), "Source Sans 3", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.home a.home-btn-primary small {
+  font-weight: 650;
+}
+
+.hero-panel a.btn-primary,
+.hero-panel a.btn-primary:hover,
+.hero-panel a.btn-primary:focus,
+.hero-panel a.btn-primary:focus-visible,
+.hero-panel button.btn-primary,
+.hero-panel button.btn-primary:hover,
+.hero-panel button.btn-primary:focus,
+.hero-panel button.btn-primary:focus-visible {
+  background: #f6f3ec;
+  color: var(--forest);
+}
 
 .home-btn-secondary {
   color: #312e81;
@@ -733,7 +800,13 @@ textarea { min-height: 7rem; resize: vertical; }
   border-radius: 999px;
   color: #ffffff;
   background: linear-gradient(135deg, #6d28d9, #4338ca 58%, #0f766e);
-  font-weight: 750;
+  font-family: var(--font-sans-family), "Source Sans 3", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+.assistant-send:hover,
+.assistant-send:focus,
+.assistant-send:focus-visible {
+  color: #ffffff;
 }
 .assistant-send:disabled { opacity: 0.55; }
 .assistant-card {
@@ -827,7 +900,15 @@ textarea { min-height: 7rem; resize: vertical; }
   padding: 0.55rem 0.95rem;
   font: inherit;
 }
-.step-list button.is-current { background: #5b21b6; color: #ffffff; }
+.step-list button.is-current,
+.step-list button.is-current:hover,
+.step-list button.is-current:focus,
+.step-list button.is-current:focus-visible {
+  background: #5b21b6;
+  color: #ffffff;
+  font-family: var(--font-sans-family), "Source Sans 3", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
 .change-lab table { width: 100%; border-collapse: collapse; }
 .change-lab th, .change-lab td {
   text-align: left;
