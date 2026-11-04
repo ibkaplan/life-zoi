@@ -202,7 +202,7 @@ export function validateComplete(
   const draft = coerceAssessment(input);
   const fields: FieldErrors = {};
   for (const step of STEP_IDS) {
-    if (step === "review" || step === "substances") continue;
+    if (step === "review" || step === "substances" || step === "results") continue;
     Object.assign(fields, validateStep(step, draft));
   }
   if (
@@ -268,7 +268,7 @@ export function validateComplete(
 
 export function firstInvalidStep(draft: Assessment): StepId | null {
   for (const step of STEP_IDS) {
-    if (step === "review" || step === "substances") continue;
+    if (step === "review" || step === "substances" || step === "results") continue;
     if (Object.keys(validateStep(step, draft)).length > 0) return step;
   }
   return null;

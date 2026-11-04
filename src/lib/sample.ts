@@ -1,5 +1,5 @@
 import { monthKey } from "@/lib/dates";
-import type { Assessment, UserSession } from "@/lib/types";
+import { STEP_IDS, type Assessment, type UserSession } from "@/lib/types";
 
 const sampleAnswers: Assessment = {
   displayName: "Sample visitor",
@@ -44,7 +44,7 @@ export function createSampleSession(today: string): UserSession {
   const month = monthKey(today);
   return {
     draft: { ...sampleAnswers, goals: [...sampleAnswers.goals] },
-    draftStep: 7,
+    draftStep: STEP_IDS.length - 1,
     history: [
       {
         id: "sample-assessment",
