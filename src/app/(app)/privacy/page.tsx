@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy",
-  description: "How lifeZoi handles answers in development mode, and what it does not claim.",
+  description: "How lifeZoi stores answers for an account, what stays in this browser, and what it does not claim.",
 };
 
 export default function PrivacyPage() {
@@ -11,34 +11,52 @@ export default function PrivacyPage() {
     <article className="stack-lg narrow">
       <div>
         <p className="kicker">Privacy</p>
-        <h1>What stays in this browser</h1>
+        <h1>How answers are stored</h1>
       </div>
       <section className="card stack">
-        <h2>Development mode</h2>
+        <h2>Accounts</h2>
         <p>
-          This build has no accounts and no database. Assessment answers, WHAT IF? scenarios, goals, and check-ins are kept in this browser tab’s session storage. Closing the tab clears them. They are not encrypted at rest by lifeZoi, and they are not a secure health record.
+          When account sign-in is configured, you can create an account with an email address and a password. Supabase Auth stores that login. After you sign in, assessment answers, WHAT IF? scenarios, habit goals, check-ins, the in-progress assessment, and the reassessment choice are saved in your rows in profiles, assessments, scenarios, habit_goals, and check_ins.
         </p>
         <p>
-          A suggestion or WHAT IF? request is sent to this app’s own server so the answers can be checked. The server does not store that request and does not send it to an AI service. The AI Health Assistant uses a local development mock. It does not call a paid AI provider, and it does not send lifestyle assessment answers anywhere. A lab reference request sends only a verified LOINC code to MedlinePlus Connect. It does not send your name, a result, or a document. Change Lab answers and Your Life Matters reflections stay in this browser tab. A host may still log requests to this app.
+          Row level security allows a row only when auth.uid() matches user_id. If an authenticator app is confirmed for the account, those rows also stay closed until the sign-in includes that 6-digit code. The browser uses the public anon key and your session. It does not use the service role key.
+        </p>
+        <p>
+          Without an account, or when Supabase is not configured, assessment answers, scenarios, goals, and check-ins stay in this browser tab’s session storage. Closing the tab clears that tab copy. lifeZoi does not encrypt that tab storage, and it is not a secure health record.
+        </p>
+        <p>
+          A suggestion or WHAT IF? request is still sent to this app’s own server so the answers can be checked. The server does not store that request and does not send it to an AI service. The AI Health Assistant uses a local development mock and does not send lifestyle assessment answers anywhere. A lab reference request sends only a verified LOINC code to MedlinePlus Connect. Change Lab answers, Your Life Matters reflections, the assistant conversation, and wellness notes stay in this browser tab. A host or Supabase may still log requests.
+        </p>
+      </section>
+      <section className="card stack">
+        <h2>Authenticator app</h2>
+        <p>
+          You can enroll a time-based one-time code, the same kind of code Google Authenticator and similar apps create. Setup shows a QR code and a secret. You confirm a 6-digit code. Later sign-ins ask for a new code before saved answers open. This uses Supabase Auth’s built-in authenticator support. It is not a paid Supabase add-on. The authenticator secret is stored by Supabase Auth, not in the lifeZoi answer tables.
+        </p>
+        <p>
+          The project’s existing email confirmation stays on. If creating an account asks you to confirm email, use that message before the first sign-in.
         </p>
       </section>
       <section className="card stack">
         <h2>What is collected</h2>
         <p>
-          Only what you type: an optional name and age range, sleep, movement, food and water, optional tobacco and alcohol answers, stress, mood, social connection, goals, an optional hope for what health could help you experience, notes, check-ins, and Your Life Matters reflections. Sample data is labeled and is not your information.
+          The account email, the password held by Supabase Auth, and an optional authenticator factor. In the answer tables: an optional name and age range, sleep, movement, food and water, optional tobacco and alcohol answers, stress, mood, social connection, goals, an optional hope for what health could help you experience, notes, check-ins, and the in-progress assessment. Sample data is labeled “Sample visitor” and is not written into an account.
+        </p>
+        <p>
+          One email address is the admin account. The database sets that role when the profile is saved. The screen cannot grant admin.
         </p>
       </section>
       <section className="card stack">
         <h2>Deletion</h2>
         <p>
-          Use Settings to clear data in this browser, or close the tab. There is no server account to delete. When Supabase is connected in a future build, account deletion will need to remove that user’s rows. The prepared database rules are in supabase/schema.sql and are not active here.
+          Settings can clear the saved rows for the signed-in account, or delete the account. Deleting the account removes the login and that person’s rows. Closing the tab clears only the copy kept in the tab. Clearing data does not promise that a host or Supabase has erased every backup or log.
         </p>
         <Link href="/settings">Open settings</Link>
       </section>
       <section className="card stack">
         <h2>What this is not</h2>
         <p>
-          lifeZoi does not claim HIPAA, GDPR, or any other compliance. It is not a medical device, it does not diagnose, and it does not predict how long someone will live. Production hosting on Vercel uses HTTPS. That does not by itself make the development-mode storage secure.
+          lifeZoi does not claim HIPAA, GDPR, or any other compliance. It is not a medical device, it does not diagnose, and it does not predict how long someone will live. HTTPS and row level security do not by themselves make this a complete health record.
         </p>
       </section>
     </article>

@@ -1,4 +1,5 @@
 import { isRealISODate } from "@/lib/dates";
+import { SAMPLE_VISITOR_NAME } from "@/lib/sample";
 import {
   AGE_RANGES,
   ALCOHOL_PATTERNS,
@@ -121,7 +122,9 @@ function numberInRange(
 export function validateStep(step: StepId, draft: Assessment): FieldErrors {
   const errors: FieldErrors = {};
   if (step === "about") {
-    if (draft.displayName.trim().length > NAME_LIMIT) {
+    if (draft.displayName.trim().toLowerCase() === SAMPLE_VISITOR_NAME.toLowerCase()) {
+      errors.displayName = "Sample visitor is reserved for the labeled example.";
+    } else if (draft.displayName.trim().length > NAME_LIMIT) {
       errors.displayName = `Use ${NAME_LIMIT} characters or fewer.`;
     }
     if (draft.exactAge.trim()) {

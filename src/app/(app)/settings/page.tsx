@@ -3,7 +3,7 @@ import { SettingsView } from "@/components/settings-view";
 
 export const metadata: Metadata = {
   title: "Settings",
-  description: "Development mode, sample data, and how to clear lifeZoi data in this browser.",
+  description: "Account sign-in, sample data, and how to clear lifeZoi answers.",
 };
 
 export default function SettingsPage() {

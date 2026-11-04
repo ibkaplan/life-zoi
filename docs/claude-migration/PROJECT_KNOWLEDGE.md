@@ -37,14 +37,14 @@ People: the project brief names Igor Kaplansky. The GitHub login on the reposito
 
 These match `main`, not pull request #1.
 
-- Local development mode is the system. `getAppStatus` always returns `persistence: "development"` and `authentication: "not-configured"`, even if Supabase variables are present (`src/lib/status.ts`).
-- Notes and answers stay in the browser tab (`sessionStorage`). There is no account system and no AI provider.
-- Settings clear the tab after a confirm button. They do not ask the person to type `delete`, and they do not export JSON.
-- Sample label string is `Sample visitor`.
+- Signed-in answers use Supabase Auth and row level security when the public URL and anon key are set (`src/lib/status.ts`). `getAppStatus` reports `authentication: "supabase"` only for that real adapter. Missing or unused configuration stays `persistence: "development"` and `authentication: "not-configured"`.
+- Without an account, notes and answers stay in the browser tab (`sessionStorage`). There is no AI provider. Sample data labeled `Sample visitor` is not written into an account.
+- Settings clear the tab, and for a signed-in person also clear that account’s rows, after a confirm button. They do not ask the person to type `delete`, and they do not export JSON. A separate control deletes the login.
+- The only admin email is `tatyanaserikovaru@gmail.com`, checked on the server and set by a database trigger. The client cannot grant admin.
 - Check-ins are done or not done. They are not a three-way done / partial / skipped record.
 - Suggestion cards are not capped at four.
 - An internal wording filter withholds illustrations or suggestion lists that trip `src/lib/claims.ts`.
-- Future authorization helper is `decideAccess` in `src/lib/access.ts`. It is not wired to a session.
+- Authorization helper `decideAccess` in `src/lib/access.ts` runs before an account write. Row level security still requires `auth.uid()` to match `user_id`.
 - Security headers are set in `next.config.ts`.
 - The intended host is Vercel for Right Intent LLC. The team slug in `README.md` is `risi-0778846f`. No env vars are required for development mode.
 - The repository is public. An earlier attempt to make it private did not succeed. Do not assume a later agent can flip visibility.
@@ -93,7 +93,7 @@ These match `main`, not pull request #1.
 - Collect only what the assessment already asks for.
 - Do not log health answers from application code. Assume the platform might.
 - Production transport is HTTPS on Vercel.
-- No rate limit, account lockout, or audit log exists, because there are no accounts.
+- No application rate limit, account lockout, or audit log is implemented beyond Supabase Auth’s own controls.
 - No performance budget is documented. Avoid large client dependencies; the runtime dependency list is only Next and React.
 - Charts must stay understandable on a phone and must not use color as the only signal. The progress view describes bars with the words Done and Not done.
 

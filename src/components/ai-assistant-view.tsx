@@ -34,7 +34,7 @@ type Usage = {
 
 const topics = [
   ["General health questions", "Educational information about wellness, prevention, and healthy aging."],
-  ["Personal health analysis", "Not available yet. Assessment answers stay in this browser until privacy review."],
+  ["Personal health analysis", "Not available yet. The assistant does not read your saved assessment."],
   ["Nutrition and sleep", "Practical education about food, hydration, sleep, and daily habits."],
   ["Movement and fitness", "General ideas for activity, gentle exercise, balance, and mobility."],
   ["Lab results", "Not available yet. File upload waits for a privacy and security review."],
@@ -202,7 +202,7 @@ export function AiAssistantView() {
           onChange={(event) => setDraft(event.target.value)}
         />
         <p className="assistant-consent">
-          Personal assessment answers are not sent in this development stage. They stay in this browser until accounts, consent, and a privacy review are in place.
+          Personal assessment answers are not sent to the assistant. This conversation stays in this browser tab.
         </p>
         <button className="btn assistant-send" type="submit" disabled={pending || !draft.trim()}>
           Send

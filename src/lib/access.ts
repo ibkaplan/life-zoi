@@ -3,9 +3,8 @@ export type AccessDecision =
   | { allowed: false; reason: "unauthenticated" | "not-owner" };
 
 /**
- * Rule for a future authenticated store: a record is readable or writable
- * only by the signed-in user who owns it. Development mode has no accounts
- * and does not store records on the server, so this rule is not a live login.
+ * A record is readable or writable only by the signed-in user who owns it.
+ * Account saves call this before writing rows. Row level security still applies.
  */
 export function decideAccess(
   actorUserId: string | null | undefined,

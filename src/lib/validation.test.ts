@@ -51,6 +51,7 @@ describe("questionnaire validation", () => {
       validateStep("movement", validAnswers({ activityDays: "0", activityMinutes: "" })).activityMinutes,
     ).toBeUndefined();
     expect(validateStep("goals", validAnswers({ goals: [] })).goals).toBeTruthy();
+    expect(validateStep("about", validAnswers({ displayName: "Sample visitor" })).displayName).toMatch(/reserved/i);
     expect(firstInvalidStep(validAnswers({ sleepHours: "" }))).toBe("sleep");
   });
 

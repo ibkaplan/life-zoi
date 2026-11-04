@@ -6,17 +6,17 @@ Read `docs/claude-migration/INDEX.md` first, then the document that matches the 
 
 ## Architecture
 
-Next.js App Router, TypeScript, Tailwind CSS 4, React 19. There is no database client and no AI provider. Answers stay in `sessionStorage` for the current tab. Server routes validate and respond, then discard the body.
+Next.js App Router, TypeScript, Tailwind CSS 4, React 19. Signed-in answers are stored in Supabase with the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set. Without that configuration, answers stay in `sessionStorage` for the current tab. There is no AI provider. Server routes validate and respond, then discard the body.
 
 Important paths on `main`:
 
 - `src/app/` — pages and route handlers
 - `src/components/` — shell, assessment, WHAT IF?, progress, settings
 - `src/lib/` — validation, scenarios, recommendations, session sanitizing, access rule
-- `supabase/schema.sql` — prepared schema only; the app does not connect to it
+- `supabase/schema.sql` — account tables, row level security, admin role trigger, and account deletion
 - `README.md` — setup, deployment notes, and limitations
 
-Routes: `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/what-if/[id]`, `/progress`, `/settings`, `/privacy`, `GET /api/status`, `POST /api/recommendations`, `POST /api/what-if`.
+Routes: `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/what-if/[id]`, `/progress`, `/settings`, `/privacy`, `GET /api/status`, `GET /api/account`, `POST /api/recommendations`, `POST /api/what-if`.
 
 ## Development standards
 

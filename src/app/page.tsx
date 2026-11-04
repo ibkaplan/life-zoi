@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomeGauge } from "@/components/home-gauge";
 import { Logo } from "@/components/logo";
+import { StorageNote } from "@/components/storage-note";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
 
 const nav = [
@@ -136,9 +137,7 @@ export default function HomePage() {
         </section>
 
         <footer className="page home-footer">
-          <p className="home-note">
-            Development mode: there is no account. Answers stay in this browser tab until you close it. They are not securely stored.
-          </p>
+          <StorageNote />
           <div className="home-footer-brand">
             <Logo tone="violet" />
             <p>Educational habit reflection for everyday life.</p>

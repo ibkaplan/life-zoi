@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { Logo } from "@/components/logo";
 import { useSession } from "@/components/session-provider";
+import { useAccount } from "@/lib/account-store";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE } from "@/lib/sources";
 import { sources } from "@/lib/sources";
 
@@ -61,6 +62,7 @@ function current(pathname: string, href: string) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { sample, ready } = useSession();
+  const account = useAccount();
   const [menuPath, setMenuPath] = useState<string | null>(null);
   const open = menuPath === pathname;
   const panelRef = useRef<HTMLDivElement>(null);
@@ -125,9 +127,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
       <main id="main" className="page app-main stack-lg">
         <p className="banner" role="status">
-          Development mode. lifeZoi is not signed in and does not have secure storage.
-          Answers stay in this browser tab and are removed when the tab closes.
+          {account.phase === "loading"
+            ? "Checking sign-in…"
+            : account.phase === "ready"
+              ? "Signed in. Saved assessment answers, habits, and progress are stored with this account. Sample data is not written to the account."
+              : account.phase === "needs-mfa"
+                ? "Enter the authenticator code in Settings to finish sign-in. Saved answers stay closed until then."
+                : account.phase === "off"
+                  ? "Account sign-in is not configured. Answers stay in this browser tab and are removed when the tab closes."
+                  : "You are not signed in. Answers stay in this browser tab until you sign in. Sample data is not written to an account."}
         </p>
+        {account.error ? (
+          <p className="banner" role="alert">
+            {account.error}
+          </p>
+        ) : null}
         {ready && sample ? (
           <p className="banner banner-sample" role="status">
             Sample data. This is an example, not your information, and it is not saved as your record.

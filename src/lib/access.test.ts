@@ -17,15 +17,26 @@ describe("data access rules", () => {
     expect(decideAccess("user-1", "user-1")).toEqual({ allowed: true });
   });
 
-  it("reports that authentication is not configured", async () => {
+  it("reports authentication only when the real adapter has a public Supabase config", async () => {
     expect(getAppStatus({}).authentication).toBe("not-configured");
+    expect(getAppStatus({}).persistence).toBe("development");
     expect(getAppStatus({}).supabaseVariablesPresent).toBe(false);
-    expect(
-      getAppStatus({
+    const presentButUnused = getAppStatus(
+      {
         NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: "public-key",
-      }).detail,
-    ).toContain("does not connect");
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: "public-anon-key-value",
+      },
+      { adapter: "absent" },
+    );
+    expect(presentButUnused.authentication).toBe("not-configured");
+    expect(presentButUnused.persistence).toBe("development");
+    expect(presentButUnused.detail).toContain("not using the account adapter");
+    const connected = getAppStatus({
+      NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "public-anon-key-value",
+    });
+    expect(connected.authentication).toBe("supabase");
+    expect(connected.persistence).toBe("account");
     const response = await statusGet();
     const body = (await response.json()) as { persistence: string; authentication: string };
     expect(body.persistence).toBe("development");

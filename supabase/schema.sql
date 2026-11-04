@@ -1,16 +1,28 @@
--- lifeZoi schema for a future Supabase project.
--- Applying this file does not connect the app. The current build stays in
--- development mode and does not authenticate anyone.
--- Rows are scoped to auth.uid(). Do not use the service role for user reads.
+-- lifeZoi account tables.
+-- The app uses the anon key and the signed-in user's session.
+-- Do not use the service role in the browser or to read these rows.
+-- auth.uid() must match user_id. A verified authenticator factor also
+-- requires an AAL2 session before these rows can be read or written.
 
 create extension if not exists pgcrypto;
 
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
+  role text not null default 'member',
+  session_state jsonb not null default '{}'::jsonb,
   updated_at timestamptz not null default now(),
-  constraint profiles_name_length check (display_name is null or char_length(display_name) <= 40)
+  constraint profiles_name_length check (display_name is null or char_length(display_name) <= 40),
+  constraint profiles_role_value check (role in ('member', 'admin')),
+  constraint profiles_session_state_size check (octet_length(session_state::text) <= 24000)
 );
+
+alter table public.profiles add column if not exists role text not null default 'member';
+alter table public.profiles add column if not exists session_state jsonb not null default '{}'::jsonb;
+alter table public.profiles drop constraint if exists profiles_role_value;
+alter table public.profiles add constraint profiles_role_value check (role in ('member', 'admin'));
+alter table public.profiles drop constraint if exists profiles_session_state_size;
+alter table public.profiles add constraint profiles_session_state_size check (octet_length(session_state::text) <= 24000);
 
 create table if not exists public.assessments (
   id uuid primary key default gen_random_uuid(),
@@ -53,27 +65,142 @@ alter table public.scenarios enable row level security;
 alter table public.habit_goals enable row level security;
 alter table public.check_ins enable row level security;
 
-create policy "profiles_own_rows" on public.profiles
-  for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+-- True when this request may use the caller's rows.
+-- A verified authenticator factor requires AAL2. Enrollment can finish at AAL1
+-- because the new factor is not verified yet.
+create or replace function public.auth_session_may_use_rows()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    auth.uid() is not null
+    and (
+      coalesce(auth.jwt() ->> 'aal', 'aal1') = 'aal2'
+      or not exists (
+        select 1
+        from auth.mfa_factors
+        where user_id = auth.uid()
+          and status::text = 'verified'
+      )
+    );
+$$;
 
-create policy "assessments_own_rows" on public.assessments
-  for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+revoke all on function public.auth_session_may_use_rows() from public;
+grant execute on function public.auth_session_may_use_rows() to anon, authenticated;
 
-create policy "scenarios_own_rows" on public.scenarios
-  for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+-- The client cannot choose a role. The database sets it from the account email.
+create or replace function public.enforce_profile_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  account_email text;
+begin
+  if auth.uid() is null or new.user_id is distinct from auth.uid() then
+    raise exception 'profile owner mismatch';
+  end if;
+  select lower(btrim(email)) into account_email
+  from auth.users
+  where id = new.user_id;
+  if account_email = 'tatyanaserikovaru@gmail.com' then
+    new.role := 'admin';
+  else
+    new.role := 'member';
+  end if;
+  if new.display_name is not null and lower(btrim(new.display_name)) = 'sample visitor' then
+    raise exception 'sample data is not saved to an account';
+  end if;
+  if lower(btrim(coalesce(new.session_state #>> '{draft,displayName}', ''))) = 'sample visitor' then
+    raise exception 'sample data is not saved to an account';
+  end if;
+  return new;
+end;
+$$;
 
-create policy "habit_goals_own_rows" on public.habit_goals
-  for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+revoke all on function public.enforce_profile_role() from public;
+grant execute on function public.enforce_profile_role() to authenticated;
 
-create policy "check_ins_own_rows" on public.check_ins
+drop trigger if exists profiles_enforce_role on public.profiles;
+create trigger profiles_enforce_role
+  before insert or update on public.profiles
+  for each row execute function public.enforce_profile_role();
+
+create or replace function public.reject_sample_assessment()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if lower(btrim(coalesce(new.answers ->> 'displayName', ''))) = 'sample visitor' then
+    raise exception 'sample data is not saved to an account';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function public.reject_sample_assessment() from public;
+grant execute on function public.reject_sample_assessment() to authenticated;
+
+drop trigger if exists assessments_reject_sample on public.assessments;
+create trigger assessments_reject_sample
+  before insert or update on public.assessments
+  for each row execute function public.reject_sample_assessment();
+
+create or replace function public.delete_own_account()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  actor uuid := auth.uid();
+begin
+  if actor is null or not public.auth_session_may_use_rows() then
+    raise exception 'account deletion is not available for this sign-in';
+  end if;
+  delete from public.check_ins where user_id = actor;
+  delete from public.habit_goals where user_id = actor;
+  delete from public.scenarios where user_id = actor;
+  delete from public.assessments where user_id = actor;
+  delete from public.profiles where user_id = actor;
+  delete from auth.users where id = actor;
+end;
+$$;
+
+revoke all on function public.delete_own_account() from public;
+grant execute on function public.delete_own_account() to authenticated;
+
+drop policy if exists profiles_own_rows on public.profiles;
+create policy profiles_own_rows on public.profiles
   for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  using (auth.uid() = user_id and public.auth_session_may_use_rows())
+  with check (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+drop policy if exists assessments_own_rows on public.assessments;
+create policy assessments_own_rows on public.assessments
+  for all
+  using (auth.uid() = user_id and public.auth_session_may_use_rows())
+  with check (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+drop policy if exists scenarios_own_rows on public.scenarios;
+create policy scenarios_own_rows on public.scenarios
+  for all
+  using (auth.uid() = user_id and public.auth_session_may_use_rows())
+  with check (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+drop policy if exists habit_goals_own_rows on public.habit_goals;
+create policy habit_goals_own_rows on public.habit_goals
+  for all
+  using (auth.uid() = user_id and public.auth_session_may_use_rows())
+  with check (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+drop policy if exists check_ins_own_rows on public.check_ins;
+create policy check_ins_own_rows on public.check_ins
+  for all
+  using (auth.uid() = user_id and public.auth_session_may_use_rows())
+  with check (auth.uid() = user_id and public.auth_session_may_use_rows());

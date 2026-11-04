@@ -17,7 +17,7 @@ lifeZoi is a responsive web app for habit reflection, WHAT IF? lifestyle illustr
 
 ## Architecture in brief
 
-`main` is a Next.js 16 App Router application (TypeScript, React 19, Tailwind CSS 4). Persistence is development mode: `sessionStorage` in the open tab, cleared when the tab closes. `GET /api/status` reports `persistence: "development"` and `authentication: "not-configured"`. `supabase/schema.sql` is a prepared design with row level security. The app does not connect to Supabase. No AI provider is called. There is no account system.
+`main` is a Next.js 16 App Router application (TypeScript, React 19, Tailwind CSS 4). Signed-in assessment answers, scenarios, goals, and check-ins are stored in Supabase when the public URL and anon key are set. Otherwise answers stay in `sessionStorage` for the open tab. `GET /api/status` reports `authentication: "supabase"` only when that account adapter is really configured. `supabase/schema.sql` is the account schema with row level security. No AI provider is called. The only admin email is stored in a server allowlist and a database trigger.
 
 An earlier Cursor agent also opened https://github.com/ibkaplan/life-zoi/pull/1 on `cursor/lifezoi-app-ce49`. That pull request is a second implementation. On 2026-11-01 GitHub reported it open, conflicting with `main`, and not merged. Do not treat it as the source of truth.
 

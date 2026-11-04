@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AccountPanel } from "@/components/account-panel";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
+import { useAccount } from "@/lib/account-store";
 import type { AppStatus } from "@/lib/status";
 
 export function SettingsView() {
   const { ready, sample, setSample, clearUserData } = useSession();
+  const account = useAccount();
   const [status, setStatus] = useState<AppStatus | null>(null);
   const [statusError, setStatusError] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
@@ -33,10 +36,11 @@ export function SettingsView() {
     <div className="stack-lg narrow">
       <div>
         <p className="kicker">Settings</p>
-        <h1>Privacy and this browser</h1>
+        <h1>Account and privacy</h1>
       </div>
+      <AccountPanel />
       <section className="card stack">
-        <h2>Development mode</h2>
+        <h2>Storage</h2>
         {statusError ? (
           <p role="alert">The app status could not be loaded.</p>
         ) : status ? (
@@ -48,7 +52,7 @@ export function SettingsView() {
           <p role="status">Checking configuration…</p>
         )}
         <p>
-          Supabase is the planned place for accounts and saved data. The SQL for row-level security is in the repository, and it is not connected here. Adding environment variables does not sign you in.
+          Signed-in answers are stored for that account under row level security. Without an account, they stay in this browser tab. Sample data is labeled and is not written into an account.
         </p>
         <Link href="/privacy">Read the privacy notes</Link>
       </section>
@@ -66,9 +70,17 @@ export function SettingsView() {
         )}
       </section>
       <section className="card stack">
-        <h2>Delete data in this browser</h2>
-        <p>This clears the assessment, scenarios, goals, check-ins, AI assistant conversation, Change Lab record, Your Life Matters reflections, wellness check-ins, urge records, moment plans, if-then plans, and nature journal stored in this tab. It cannot delete a server account, because there is no account.</p>
-        {cleared ? <p className="alert alert-ok" role="status">Data in this tab was cleared.</p> : null}
+        <h2>{account.phase === "ready" ? "Clear saved answers" : "Delete data in this browser"}</h2>
+        <p>
+          {account.phase === "ready"
+            ? "This clears the saved assessment, scenarios, goals, and check-ins in your account, plus the AI assistant conversation, Change Lab record, Your Life Matters reflections, and wellness notes stored in this tab. It does not delete the login."
+            : "This clears the assessment, scenarios, goals, check-ins, AI assistant conversation, Change Lab record, Your Life Matters reflections, wellness check-ins, urge records, moment plans, if-then plans, and nature journal stored in this tab."}
+        </p>
+        {cleared ? (
+          <p className="alert alert-ok" role="status">
+            {account.phase === "ready" ? "Saved answers were cleared." : "Data in this tab was cleared."}
+          </p>
+        ) : null}
         {confirmClear ? (
           <div className="actions">
             <button
@@ -88,7 +100,7 @@ export function SettingsView() {
           </div>
         ) : (
           <button className="btn btn-danger" type="button" onClick={() => setConfirmClear(true)}>
-            Clear data in this browser
+            {account.phase === "ready" ? "Clear saved answers" : "Clear data in this browser"}
           </button>
         )}
       </section>

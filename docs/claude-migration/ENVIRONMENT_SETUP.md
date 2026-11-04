@@ -55,10 +55,10 @@ File: `.env.example`. Copy only if you want the names locally. Leave values blan
 
 | Name | Purpose | Required now |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Future public Supabase URL. Commented out. | No |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Future anon key. Not a license to skip row level security. | No |
+| `NEXT_PUBLIC_SUPABASE_URL` | Public Supabase URL. Required for accounts. | No |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key. Not a license to skip row level security. | No |
 
-`src/lib/status.ts` reads those two names and still reports that the app does not connect.
+`src/lib/status.ts` reports `authentication: "supabase"` only when the account adapter is in use and both values are a real public config. Empty or unused values stay `not-configured`.
 
 Do not add `SUPABASE_SERVICE_ROLE_KEY` to any client bundle. The README forbids shipping it to the browser. It is not in `.env.example`.
 
@@ -72,7 +72,7 @@ Verify development mode:
 curl -s http://localhost:3000/api/status
 ```
 
-Expect JSON with `persistence` `development` and `authentication` `not-configured`.
+Expect JSON with `persistence` `development` and `authentication` `not-configured` when the public Supabase variables are unset. With the account adapter and those variables set, expect `authentication` `supabase` and `persistence` `account`.
 
 ## Vercel
 

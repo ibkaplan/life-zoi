@@ -1,8 +1,10 @@
 import { monthKey } from "@/lib/dates";
 import { STEP_IDS, type Assessment, type UserSession } from "@/lib/types";
 
+export const SAMPLE_VISITOR_NAME = "Sample visitor";
+
 const sampleAnswers: Assessment = {
-  displayName: "Sample visitor",
+  displayName: SAMPLE_VISITOR_NAME,
   ageRange: "40-49",
   sleepHours: "6.5",
   sleepQuality: "fair",

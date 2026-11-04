@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
+import { clearAccountRecords, useAccount, writeAccountSession } from "@/lib/account-store";
 import {
   getBrowserStoreServerSnapshot,
   getBrowserStoreSnapshot,
@@ -67,28 +68,32 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     getBrowserStoreSnapshot,
     getBrowserStoreServerSnapshot,
   );
+  const account = useAccount();
+  const signedIn = account.phase === "ready";
   const session = useMemo(
-    () => (snapshot.sample ? createSampleSession(todayDate()) : snapshot.stored),
-    [snapshot],
+    () => (snapshot.sample ? createSampleSession(todayDate()) : signedIn ? account.session : snapshot.stored),
+    [account.session, signedIn, snapshot],
   );
 
   const api = useMemo<SessionApi>(() => {
-    const stored = snapshot.stored;
+    const stored = signedIn ? account.session : snapshot.stored;
     const sample = snapshot.sample;
-    function commit(next: UserSession, sampleFlag = sample) {
-      writeBrowserStore(next, sampleFlag);
+    function commit(next: UserSession, mode: "soon" | "now" = "now") {
+      if (sample) return;
+      if (signedIn) writeAccountSession(next, mode);
+      else writeBrowserStore(next, false);
     }
     return {
-      ready: snapshot.ready,
+      ready: snapshot.ready && account.phase !== "loading",
       sample,
       session,
       setDraft: (draft) => {
         if (sample) return;
-        commit({ ...stored, draft });
+        commit({ ...stored, draft }, "soon");
       },
       setDraftStep: (step) => {
         if (sample) return;
-        commit({ ...stored, draftStep: step });
+        commit({ ...stored, draftStep: step }, "soon");
       },
       completeAssessment: () => {
         if (sample) return { ok: false, fields: { form: READ_ONLY } };
@@ -157,11 +162,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
         clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
         resetWellnessClient();
-        commit(emptySession(), false);
+        if (signedIn) void clearAccountRecords();
+        writeBrowserStore(emptySession(), false);
       },
-      setSample: (on) => commit(stored, on),
+      setSample: (on) => writeBrowserStore(snapshot.stored, on),
     };
-  }, [snapshot, session]);
+  }, [account.phase, account.session, session, signedIn, snapshot]);
 
   return <SessionContext.Provider value={api}>{children}</SessionContext.Provider>;
 }

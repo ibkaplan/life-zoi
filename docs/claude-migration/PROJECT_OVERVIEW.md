@@ -108,7 +108,7 @@ There is no separate backend service, queue, or background worker.
 
 Browser session (`src/lib/types.ts`): draft assessment, draft step, assessment history, saved scenarios, habit goals, check-ins. Limits while sanitizing: 24 history entries, 30 scenarios, 400 check-ins (`src/lib/session.ts`).
 
-Prepared SQL tables, not used by the app: `profiles`, `assessments`, `scenarios`, `habit_goals`, `check_ins`. Each enables row level security with `auth.uid() = user_id`. The file does not contain a service-role policy. Applying the file does not connect the app. The SQL has not been executed against a live Supabase project in any record available here.
+Account tables: `profiles`, `assessments`, `scenarios`, `habit_goals`, `check_ins`. Each enables row level security with `auth.uid() = user_id`. A verified authenticator factor also requires an AAL2 session. The file does not grant the service role a bypass policy. The app reads and writes these rows with the anon key and the signed-in session when the public environment variables are set.
 
 ## APIs and integrations
 
