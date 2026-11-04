@@ -20,7 +20,6 @@ import {
 } from "@/lib/mfa";
 import { loadStoredSession } from "@/lib/session";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
-import { readPublicSupabaseConfig } from "@/lib/supabase-config";
 import { emptySession, type UserSession } from "@/lib/types";
 
 const SAVE_ERROR = "Saved answers could not be stored. Try again.";
@@ -116,10 +115,6 @@ export function useAccount() {
 }
 
 async function boot() {
-  if (!readPublicSupabaseConfig()) {
-    publish({ ...signedOut(), phase: "off" });
-    return;
-  }
   const supabase = getBrowserSupabase();
   if (!supabase) {
     publish({ ...signedOut(), phase: "off" });
