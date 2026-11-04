@@ -1,145 +1,60 @@
+import Image from "next/image";
 import Link from "next/link";
+import { HomeGauge } from "@/components/home-gauge";
 import { Logo } from "@/components/logo";
-import {
-  BRAND_LINE,
-  BRAND_SUPPORT,
-  CENTRAL_MESSAGE,
-  DIRECTION_LINES,
-  FOUNDATIONS,
-  PROMISE_BOUNDARY,
-  SUPPORTING_MESSAGE,
-} from "@/lib/purpose";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
 
-function HomeArt() {
-  return (
-    <svg
-      className="home-art-svg"
-      viewBox="0 0 640 520"
-      role="img"
-      aria-label="Illustration of a sunrise over soft hills and a winding path"
-    >
-      <defs>
-        <linearGradient id="home-sky" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ede9fe" />
-          <stop offset="48%" stopColor="#ecfeff" />
-          <stop offset="100%" stopColor="#fce7f3" />
-        </linearGradient>
-        <linearGradient id="home-sun" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff7ed" />
-          <stop offset="100%" stopColor="#f9a8d4" />
-        </linearGradient>
-        <linearGradient id="home-hill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#5eead4" />
-          <stop offset="100%" stopColor="#0f766e" />
-        </linearGradient>
-        <linearGradient id="home-hill-far" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#c4b5fd" />
-          <stop offset="100%" stopColor="#6366f1" />
-        </linearGradient>
-      </defs>
-      <rect width="640" height="520" fill="url(#home-sky)" />
-      <circle cx="470" cy="150" r="72" fill="url(#home-sun)" />
-      <ellipse cx="150" cy="120" rx="70" ry="28" fill="#ffffff" opacity="0.72" />
-      <ellipse cx="210" cy="108" rx="46" ry="20" fill="#fbcfe8" opacity="0.9" />
-      <path d="M0 340c80-70 150-40 230-90 70-44 130-20 210 10 70 26 130 10 200-30v290H0V340z" fill="url(#home-hill-far)" opacity="0.9" />
-      <path d="M0 400c90-50 160-20 250-70 80-44 140-16 230 18 60 22 110 16 160-8v180H0V400z" fill="url(#home-hill)" />
-      <path d="M300 250c18 46 8 90-18 140" fill="none" stroke="#ffffff" strokeWidth="16" strokeLinecap="round" />
-      <path d="M292 392c-36 18-70 22-112 16" fill="none" stroke="#fce7f3" strokeWidth="12" strokeLinecap="round" />
-      <circle cx="168" cy="404" r="10" fill="#ffffff" />
-      <path d="M430 286c8 16 22 22 36 18-8 14-28 22-46 12 2-12 4-22 10-30z" fill="#f5f3ff" />
-      <path d="M448 292c10-16 24-22 34-14-12 6-22 16-26 28-6-4-8-8-8-14z" fill="#ddd6fe" />
-    </svg>
-  );
-}
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/outlook", label: "Life outlook" },
+  { href: "/what-if", label: "WHAT IF" },
+  { href: "/academy/meals", label: "Nutrition" },
+  { href: "/academy/move", label: "Movement" },
+  { href: "/nature", label: "Nature" },
+  { href: "/progress", label: "Progress" },
+  { href: "/profile", label: "Profile" },
+] as const;
 
-function MatterHomeArt() {
-  return (
-    <svg
-      className="home-art-svg matter-float"
-      viewBox="0 0 640 520"
-      role="img"
-      aria-label="Earth at sunrise, with trees and people of different generations"
-    >
-      <defs>
-        <linearGradient id="matter-home-sky" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ddd6fe" />
-          <stop offset="50%" stopColor="#cffafe" />
-          <stop offset="100%" stopColor="#fbcfe8" />
-        </linearGradient>
-        <linearGradient id="matter-home-sun" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fff7ed" />
-          <stop offset="100%" stopColor="#f9a8d4" />
-        </linearGradient>
-      </defs>
-      <rect width="640" height="520" rx="28" fill="url(#matter-home-sky)" />
-      <circle className="matter-sun" cx="470" cy="150" r="70" fill="url(#matter-home-sun)" />
-      <circle cx="230" cy="300" r="92" fill="#5eead4" />
-      <circle cx="200" cy="286" r="26" fill="#99f6e4" />
-      <circle cx="258" cy="312" r="18" fill="#0f766e" opacity="0.35" />
-      <path d="M70 360c22-62 36-62 58 0" fill="#0f766e" />
-      <rect x="92" y="360" width="14" height="48" fill="#115e59" />
-      <path d="M360 330c16-48 28-48 44 0" fill="#0d9488" />
-      <rect x="376" y="330" width="12" height="40" fill="#115e59" />
-      <circle cx="430" cy="300" r="18" fill="#5b21b6" />
-      <rect x="418" y="318" width="24" height="48" rx="10" fill="#7c3aed" />
-      <circle cx="490" cy="318" r="14" fill="#9d174d" />
-      <rect x="480" y="332" width="20" height="38" rx="8" fill="#db2777" />
-      <circle cx="548" cy="286" r="20" fill="#312e81" />
-      <rect x="534" y="306" width="28" height="54" rx="10" fill="#4338ca" />
-    </svg>
-  );
-}
-
-function IconLifestyle() {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true">
-      <circle cx="16" cy="16" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="M16 10v6l4 2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function IconWhatIf() {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M8 20c4-8 12-8 16 0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M10 14h4M18 14h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="16" cy="22" r="1.6" fill="currentColor" />
-    </svg>
-  );
-}
-
-function IconProgress() {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true">
-      <path d="M7 22h4v-6H7v6zm7 0h4V10h-4v12zm7 0h4v-9h-4v9z" fill="currentColor" />
-    </svg>
-  );
-}
-
-const features = [
+const cards = [
   {
     href: "/assessment",
-    title: "Understand Your Lifestyle",
-    text: "Discover how your everyday habits affect your health and well-being.",
-    icon: <IconLifestyle />,
-    tone: "violet",
+    title: "Know where you stand today",
+    src: "/home/card-today.webp",
+    width: 1100,
+    height: 825,
+    alt: "An older man sits by a bright cafe window with a cup of tea.",
   },
   {
     href: "/what-if",
-    title: "Explore What If?",
-    text: "See how possible lifestyle changes could influence your future health.",
-    icon: <IconWhatIf />,
-    tone: "turquoise",
+    title: "What if you made a change?",
+    src: "/home/card-change.webp",
+    width: 1100,
+    height: 733,
+    alt: "A person stands on a grassy ridge under a peach and blue sunrise.",
   },
   {
-    href: "/progress",
-    title: "Track Your Progress",
-    text: "Follow your habits, goals, and personal progress over time.",
-    icon: <IconProgress />,
-    tone: "pink",
+    href: "/academy/meals",
+    title: "Eat well. Feel better.",
+    src: "/home/card-food.webp",
+    width: 1100,
+    height: 733,
+    alt: "Green herbs and a crate of apples at a market.",
   },
+  {
+    href: "/academy/move",
+    title: "Movement is life",
+    src: "/home/card-move.webp",
+    width: 1100,
+    height: 733,
+    alt: "An older woman smiles while walking outdoors in a red jacket.",
+  },
+] as const;
+
+const steps = [
+  { href: "/assessment", number: "01", title: "Fill out your assessment" },
+  { href: "/outlook", number: "02", title: "Get your life outlook" },
+  { href: "/what-if", number: "03", title: "Explore WHAT IF? scenarios" },
+  { href: "/plan", number: "04", title: "Build your personal plan" },
 ] as const;
 
 export default function HomePage() {
@@ -148,103 +63,76 @@ export default function HomePage() {
       <header className="page home-bar">
         <Logo tone="violet" />
         <nav className="home-nav" aria-label="Homepage">
-          <Link href="/#your-life-matters">Your Life Matters</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/dashboard">Dashboard</Link>
+          {nav.map((item) => (
+            <Link key={item.href} href={item.href}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
       </header>
       <main id="main">
         <section className="page home-hero">
           <div className="home-copy">
             <p className="home-kicker">LIFEZOI</p>
-            <p className="home-brand">LIVE BETTER. MAKE LIFE MATTER.</p>
             <h1>YOUR LIFE. YOUR HEALTH. YOUR FUTURE.</h1>
             <p className="home-support">Have you ever wondered what your future health might look like?</p>
             <p className="home-intro">
-              Your everyday choices matter more than you may realize. Discover your health and longevity outlook. LifeZoi brings together health education, lifestyle assessment, nutrition, movement, emotional well-being, and personal growth.
+              Your everyday choices matter more than you may realize. Your future is not a fixed number.
             </p>
-            <ul className="home-values">
-              <li>YOUR HEALTH GIVES YOU POSSIBILITIES.</li>
-              <li>YOUR CHOICES GIVE YOUR LIFE DIRECTION.</li>
-              <li>YOUR KINDNESS GIVES THE WORLD SOMETHING VALUABLE.</li>
-            </ul>
-            <p>Disability or illness does not make a life less valuable.</p>
             <div className="home-actions">
               <Link className="home-btn home-btn-primary" href="/assessment">
-                <span>DISCOVER YOUR LIFE OUTLOOK</span>
-                <small>Start your personal health and lifestyle assessment</small>
-              </Link>
-              <Link className="home-btn home-btn-secondary" href="/outlook">
-                Your future is not a fixed number. Your choices matter.
+                <span>FILL OUT YOUR ASSESSMENT</span>
+                <small>Get your personal health and longevity outlook</small>
               </Link>
             </div>
             <p className="home-disclaimer" role="note">
               LifeZoi provides educational information and statistical estimates. It cannot predict your exact lifespan, diagnose medical conditions, or replace professional medical advice.
             </p>
+            <p>Disability or illness does not make a life less valuable.</p>
           </div>
-          <div className="home-art">
-            <HomeArt />
-          </div>
+          <figure className="home-hero-photo">
+            <Image
+              src="/home/hero-hike.webp"
+              width={1600}
+              height={1067}
+              priority
+              sizes="(min-width: 860px) 46vw, 100vw"
+              alt="A woman and a girl stand together on a sunny mountain trail."
+            />
+          </figure>
         </section>
 
-        <section className="page home-features" aria-labelledby="home-features-title">
+        <HomeGauge />
+
+        <section className="page home-features" aria-labelledby="home-paths-title">
           <div className="home-section-head">
-            <h2 id="home-features-title">A welcoming place to begin</h2>
-            <p>Choose one path. You can leave sensitive questions blank, and nothing here is a medical instruction.</p>
+            <h2 id="home-paths-title">Choose a path</h2>
+            <p>Each card opens a part of lifeZoi that is already here. Sensitive questions can stay blank.</p>
           </div>
           <div className="home-grid">
-            {features.map((feature) => (
-              <Link key={feature.href} className="home-card" href={feature.href}>
-                <span className={`home-icon home-icon-${feature.tone}`}>{feature.icon}</span>
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
+            {cards.map((card) => (
+              <Link key={card.href} className="home-photo-card" href={card.href}>
+                <Image src={card.src} width={card.width} height={card.height} alt={card.alt} sizes="(min-width: 860px) 40vw, 100vw" />
+                <span>{card.title}</span>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="page home-matters" id="your-life-matters" aria-labelledby="life-matters-title">
-          <div className="home-matters-copy">
-            <p className="home-kicker">Your Life Matters</p>
-            <h2 id="life-matters-title">{CENTRAL_MESSAGE}</h2>
-            <p>{SUPPORTING_MESSAGE}</p>
-            <ul className="matter-lines">
-              {DIRECTION_LINES.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-            <div className="matter-foundations">
-              {FOUNDATIONS.map((item) => (
-                <article key={item.id}>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </article>
-              ))}
-            </div>
-            <p className="matter-brand">{BRAND_LINE}</p>
-            <p>{BRAND_SUPPORT}</p>
-            <p>{PROMISE_BOUNDARY}</p>
-            <Link className="home-btn home-btn-primary" href="/life-matters">
-              Begin your reflection
-            </Link>
+        <section className="page home-works" aria-labelledby="home-works-title">
+          <div className="home-section-head">
+            <h2 id="home-works-title">HOW LIFEZOI WORKS</h2>
           </div>
-          <MatterHomeArt />
-        </section>
-
-        <section className="page home-cta" aria-labelledby="home-cta-title">
-          <div>
-            <h2 id="home-cta-title">Start with one reflection</h2>
-            <p>Open the assessment, look at a hypothetical WHAT IF?, or keep a simple record of what you try. All of it stays on this site.</p>
-          </div>
-          <div className="home-actions">
-            <Link className="home-btn home-btn-primary" href="/assessment">
-              <span>DISCOVER YOUR LIFE OUTLOOK</span>
-              <small>Start your personal health and lifestyle assessment</small>
-            </Link>
-            <Link className="home-btn home-btn-secondary" href="/progress">
-              Track Your Progress
-            </Link>
-          </div>
+          <ol className="home-steps">
+            {steps.map((step) => (
+              <li className="home-step" key={step.href}>
+                <Link href={step.href}>
+                  <span>{step.number}</span>
+                  {step.title}
+                </Link>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <footer className="page home-footer">
@@ -264,6 +152,8 @@ export default function HomePage() {
             <Link href="/progress">Progress</Link>
             <Link href="/wellness-coach">Wellness coach</Link>
             <Link href="/academy">Academy</Link>
+            <Link href="/academy/meals">Nutrition</Link>
+            <Link href="/academy/move">Movement</Link>
             <Link href="/choices">Daily choices</Link>
             <Link href="/urges">Urges</Link>
             <Link href="/nature">Nature</Link>
@@ -271,6 +161,7 @@ export default function HomePage() {
             <Link href="/life-matters">Your Life Matters</Link>
             <Link href="/change-lab">Change Lab</Link>
             <Link href="/settings">Settings</Link>
+            <Link href="/profile">Profile</Link>
             <Link href="/privacy">Privacy</Link>
           </nav>
           <p>{PROFESSIONAL_NOTICE}</p>
@@ -278,6 +169,27 @@ export default function HomePage() {
             {CRISIS_NOTICE}{" "}
             <a href={sources.samhsa988.url}>SAMHSA: 988 Suicide & Crisis Lifeline</a>
           </p>
+          <details className="home-credits">
+            <summary>Photo credits</summary>
+            <ul>
+              <li>
+                Woman and girl on a trail: Ronald Laubenstein, U.S. Fish and Wildlife Service, public domain.{" "}
+                <a href="https://commons.wikimedia.org/wiki/File:Woman_and_girl_hike_in_nature.jpg">Woman and girl hike in nature</a>
+              </li>
+              <li>
+                Woman walking: National Cancer Institute, public domain.{" "}
+                <a href="https://commons.wikimedia.org/wiki/File:Woman_power_walking.jpg">Woman power walking</a>
+              </li>
+              <li>
+                Other photos are CC0, via Wikimedia Commons:{" "}
+                <a href="https://commons.wikimedia.org/wiki/File:Old_man_reading_newspaper_with_tea_(Unsplash).jpg">cafe window</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Sunrise_hiking_views_(Unsplash).jpg">sunrise ridge</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Fruits_and_Vegetables_(Unsplash).jpg">fruit and herbs</a>.
+              </li>
+            </ul>
+          </details>
         </footer>
       </main>
     </div>

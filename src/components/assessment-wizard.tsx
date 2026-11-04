@@ -64,6 +64,10 @@ const stepCopy: Record<StepId, { title: string; why: string }> = {
     title: "What you want to work on",
     why: "Choose at least one focus. lifeZoi uses this, with your other answers, to decide what to emphasize.",
   },
+  results: {
+    title: "UPLOAD YOUR HEALTH RESULTS (OPTIONAL)",
+    why: "Nothing is uploaded or analyzed. This step does not send a file anywhere.",
+  },
   review: {
     title: "Review",
     why: "Check the answers before saving them in this browser tab. You can come back and change them.",
@@ -504,6 +508,19 @@ export function AssessmentWizard() {
                 <input id="cholesterol" value={draft.cholesterol} maxLength={40} onChange={(event) => update({ cholesterol: event.target.value })} />
               </label>
             </>
+          ) : null}
+          {step === "results" ? (
+            <div className="upload-placeholder" role="note">
+              <p>
+                <strong>Nothing is uploaded or analyzed.</strong>
+              </p>
+              <p>
+                There is no file control here. A lab report, photo, or other document is not received, stored, or read.
+              </p>
+              <p>
+                Blood pressure, glucose, HbA1c, and cholesterol can still be typed by hand on Stress, mood, and people. Those notes stay in this browser tab. They are not a diagnosis.
+              </p>
+            </div>
           ) : null}
           {step === "goals" ? (
             <>
