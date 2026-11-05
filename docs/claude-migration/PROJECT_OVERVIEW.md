@@ -151,7 +151,7 @@ Runtime: `next`, `react`, `react-dom`, and `@supabase/supabase-js`. Dev: Tailwin
 - Pull request #1 is closed, not merged, and still differs from `main`. The tracker has not recorded the owner’s decision.
 - The repository is public.
 - Unit tests were not executed during this documentation pass. Fifty-one `it()` cases are written in twelve files under `src/lib/`, including account, assistant, Change Lab, MedlinePlus, outlook-related, wellness, and the original assessment tests. They do not connect to a live database.
-- No GitHub issues were open on 2026-11-01. This refresh did not re-list issues.
+- `gh issue list` returned no issues on 2026-11-05. `gh pr list` showed no open pull requests.
 
 ## Requirements that still govern the product
 
