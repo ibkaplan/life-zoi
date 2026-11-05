@@ -37,6 +37,8 @@ People: the project brief names Igor Kaplansky. The GitHub login on the reposito
 
 These match `main`, not pull request #1.
 
+- `main` is the canonical tree (owner decision LZ-3, 2026-11-05). Pull request #1 stays closed.
+
 - `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers use Supabase Auth and row level security when the public URL and anon key pass `isPublicSupabaseConfig`. `getAppStatus` reports `authentication: "supabase"` and `persistence: "account"` only then. Missing configuration stays `persistence: "development"` and `authentication: "not-configured"`, even if stray variables are present but invalid.
 - The browser client must read `process.env.NEXT_PUBLIC_SUPABASE_URL` and `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` as direct property accesses. Passing `process.env` through an argument stays empty in the client bundle (`1d6a333`).
 - Without an account, assessment answers stay in the browser tab (`sessionStorage`). Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in the tab even when an account exists. Sample data labeled `Sample visitor` is not written into an account.
@@ -118,7 +120,7 @@ No production incident is recorded. The earlier miss of a public site without `n
 
 - Migration documentation was written 2026-11-01 and refreshed 2026-11-05 by Cursor agent `bc-d9827e20-0c85-51e9-8d6d-eaa0b1f3ed8c`. The refresh did not change application code.
 - Agent metadata is point-in-time. The local-clone agent was not in the list this run could read.
-- Branch protection was not readable with the token used (403). Rulesets returned an empty list. Whether a review is required to merge was not proven by a settings read.
+- On 2026-11-05 GitHub reported `main` as `protected: false`, so GitHub enforces no review or check.
 
 ## Inaccessible knowledge
 

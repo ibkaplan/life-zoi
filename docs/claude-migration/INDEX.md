@@ -20,7 +20,7 @@ lifeZoi is a responsive web app for habit reflection, WHAT IF? lifestyle illustr
 
 `main` is a Next.js 16 App Router application (TypeScript, React 19, Tailwind CSS 4). The session adapter is Supabase. Signed-in assessment answers, scenarios, goals, and check-ins are stored with the anon key and row level security when the public URL and anon key are set. Otherwise those answers stay in `sessionStorage`. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in that connected case. Change Lab, Your Life Matters, wellness notes, and the assistant thread stay in the tab. The assistant is a development mock and refuses any other `AI_PROVIDER`. MedlinePlus is queried by LOINC code only. Search indexing is off (`robots` metadata and `X-Robots-Tag`).
 
-https://github.com/ibkaplan/life-zoi/pull/1 was a second implementation. On 2026-11-05 it was closed and had never been merged. `main` is the tree to edit. The Cursor tracker still leaves the canonical-tree checkbox open.
+https://github.com/ibkaplan/life-zoi/pull/1 was a second implementation. On 2026-11-05 it was closed and had never been merged. `main` is the tree to edit. The owner confirmed that on 2026-11-05 (LZ-3).
 
 ## Migration status
 
@@ -74,7 +74,7 @@ See [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md).
 ## Active priorities
 
 1. Edit `main`. Pull request #1 is already closed and was not merged.
-2. The tracker checkbox LZ-3 is still open: the owner has not recorded a canonical-tree decision. Do not revive pull request #1 while waiting.
+2. LZ-3 is answered: on 2026-11-05 the owner approved `main` as canonical. Do not revive pull request #1.
 3. Before any public launch: privacy, security, scientific, and legal review. Keep `noindex`. Review 988 wording and the population life-table copy.
 4. Do not turn on a paid AI provider or document upload without the controls in [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md).
 
@@ -83,12 +83,11 @@ See [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md).
 - Cursor conversation transcripts and the coordinator’s full operating prompt were not in git and were not copied here.
 - Which person or agent pushed `2ed8ef7` and `a6bfdcc` directly to `main` is not linked from the accessible agent metadata.
 - The idle agent `bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6` has no recorded artifact.
-- Branch protection could not be read (GitHub returned 403 for the protection endpoint). Repository rulesets listed as empty. Required reviews are therefore unconfirmed.
+- On 2026-11-05 GitHub reported `main` as `protected: false`. GitHub requires no review or check, so the coordinator runs the checks before merging.
 - No Cursor automation id was available to look up. None were found in GitHub Actions or in this agent’s subscriptions.
 - Supabase and AI secret values were not read. The README says a live Supabase project already has the account tables. This refresh did not query that database.
 - Igor’s wife’s Cursor agents and tracker.
 - The local-clone agent’s transcript. The tracker marks LZ-6 done.
-- Unit tests were not re-run for this documentation edit. Fifty-one `it()` cases are written across twelve files.
 - The live homepage was not browsed on 2026-11-05.
 
 ## Integrations that still need a person

@@ -1,17 +1,17 @@
 # Active work
 
-Snapshot date: 2026-11-05. Source of truth for code is GitHub `main` at `1d6a333`. The Cursor tracker was read and not edited by this refresh.
+Snapshot date: 2026-11-05. Source of truth for code is GitHub `main`. Verified by Claude at `a857fce` (docs-only after `1d6a333`). The Cursor tracker was read and not edited.
 
 ## Snapshot
 
 | Item | State on 2026-11-05 |
 | --- | --- |
-| Default branch | `main` at `1d6a33377b792952fda52dd2b5a9e57c6464c086` |
+| Default branch | `main` at `a857fce47cc8966dbac8f8624b43b28ba44a62d3` (#11, docs refresh). GitHub reports it unprotected. |
 | Closed, not merged | Pull request #1 (`cursor/lifezoi-app-ce49` at `0ab8b12`). Also #4, #5, #6, and #7, whose commits are already in `main` via #8. |
-| Merged since the first docs | #3 `noindex`, #8 stack (`cd15d65`), #9 contrast (`0c1bef4`), #10 quieter homepage (`6063296`), then account commits `39be250` and `1d6a333` |
+| Merged since the first docs | #3 `noindex`, #8 stack (`cd15d65`), #9 contrast (`0c1bef4`), #10 quieter homepage (`6063296`), account commits `39be250` and `1d6a333`, #11 docs refresh (`a857fce`) |
 | Open pull requests | None in `gh pr list` for open state at inspection. Re-check before acting. |
 | GitHub Actions | None (`total_count` 0) |
-| Tracker | LZ-3 still open (canonical tree). LZ-7 is this doc refresh. LZ-1, LZ-2, LZ-4, LZ-5, and LZ-6 are done. |
+| Tracker | LZ-3 answered by the owner on 2026-11-05: `main` is canonical. LZ-1, LZ-2, LZ-4, LZ-5, LZ-6, and LZ-7 are done. New work is tracked in GitHub. |
 | Live HTTP | Not re-requested on 2026-11-05. |
 
 Agents were not stopped. Chat history outside the tracker and git was not copied. Igor’s wife’s Cursor setup is a second contributor and is not in this project’s agent list.
@@ -26,7 +26,7 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 4. Status: done in the tracker. The pull request was later closed without merge. `main` continued and now includes accounts and the stacked tools.
 5. Completed: the closed branch and `main` both started as assessment, WHAT IF?, and progress apps. They are not the same tree.
 6. Files and branches: current app on `main`; alternative app still on `cursor/lifezoi-app-ce49`.
-7. Outstanding: the owner’s recorded decision (LZ-3), not a merge.
+7. Outstanding: nothing. LZ-3 was answered on 2026-11-05 in favor of `main`.
 8. Blockers: none for day-to-day edits on `main`.
 9. Next action: work from `main`. Do not merge or reopen pull request #1 unless the owner asks.
 10. References: https://github.com/ibkaplan/life-zoi/pull/1, agent https://cursor.com/agents/bc-efe0545d-9f0c-5bcb-9551-93e15378ce49, `README.md`.
@@ -35,13 +35,13 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 
 1. Name: Canonical tree decision.
 2. Objective: stop maintaining two apps.
-3. Assigned agent: none. Tracker id LZ-3, still unchecked on 2026-11-05.
-4. Status: open as a decision. GitHub has already closed pull request #1 without merging it, and `main` has moved on (`noindex`, accounts, Change Lab, and the other tools).
+3. Assigned agent: none. Tracker id LZ-3.
+4. Status: decided 2026-11-05. The owner approved `main` as canonical in the Claude project. Before that it was open as a decision. GitHub has already closed pull request #1 without merging it, and `main` has moved on (`noindex`, accounts, Change Lab, and the other tools).
 5. Completed: `main` is the integrated product. The other branch is historical.
 6. Files: the closed branch still differs, including `localStorage` and its own validation routes.
-7. Outstanding: a recorded yes or no from the owner. Closing the pull request did not check the tracker box.
-8. Blockers: the owner. Merging the branch would conflict and would discard later `main` work.
-9. Next action: keep `main`. Ask the owner to close LZ-3 explicitly. Do not port the old branch unless they name a behavior that is still missing.
+7. Outstanding: none. The Cursor tracker box itself was not edited.
+8. Blockers: none. Merging the branch would still conflict and discard later `main` work.
+9. Next action: keep `main`. Do not port the old branch unless the owner names a behavior that is still missing.
 10. References: pull request #1, `README.md`, [PROJECT_KNOWLEDGE.md](PROJECT_KNOWLEDGE.md).
 
 ### Launch reviews
@@ -74,14 +74,14 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 
 1. Name: Re-run checks on the default branch.
 2. Objective: know whether the tree Claude will edit still passes its own scripts.
-3. Assigned agent: none. The migration did not run the suite.
-4. Status: outstanding.
-5. Completed: tests exist, including account, mock assistant, Change Lab, and MedlinePlus cases. This refresh did not run them.
+3. Assigned agent: Claude coordinator, 2026-11-05.
+4. Status: done at `a857fce` with Node v22.23.4 and npm 10.9.9.
+5. Completed: `npm ci`, `npm test` (12 files, 79 tests passed), `npm run typecheck`, `npm run lint`, and `npm run build` all exit 0. With Supabase variables unset, `GET /api/status` returned `development` / `not-configured` and `GET /api/ai-assistant` returned `mode: mock`. `X-Robots-Tag: noindex, nofollow` and the robots meta tag are both served. A headless Chromium pass at 390 px and 1280 px over home, dashboard, profile, assessment, WHAT IF?, progress, outlook, settings, privacy, Change Lab, assistant, and lab results showed HTTP 200, no horizontal overflow, and no console errors. Outlook shows the “not an individual prediction” label. Turning on the sample in Settings labels dashboard, progress, WHAT IF?, and outlook as sample data and sets a separate `lifezoi.sample.v1` flag without writing into the person’s session.
 6. Files: `package.json`, `src/lib/**/*.test.ts`.
-7. Outstanding: `npm ci`, `npm test`, `npm run typecheck`, `npm run lint`, and a browser pass of the main flows.
-8. Blockers: none technical. Time and an environment with Node 22.
-9. Next action: this is the first Claude verification task in [INDEX.md](INDEX.md).
-10. References: `README.md` scripts.
+7. Outstanding: the signed-in account flow and the live deployed site were not checked. Both need the real Supabase settings or a local session.
+8. Blockers: none.
+9. Next action: none for the default branch. Re-run before each merge.
+10. References: `README.md` scripts, [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md).
 
 ### Indexing
 
@@ -115,7 +115,7 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 
 ## Priority order
 
-1. Verify `main` with the test scripts.
-2. Ask the owner to record LZ-3. Do not reopen pull request #1 in the meantime.
+1. `main` is verified and canonical. Keep pull request #1 closed.
+2. Re-run the required scripts before every merge, because GitHub enforces no checks.
 3. Leave paid AI, document upload, and launch claims until a person asks.
 4. Keep `noindex`.
