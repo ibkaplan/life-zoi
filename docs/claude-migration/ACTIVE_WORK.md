@@ -12,7 +12,7 @@ Snapshot date: 2026-11-05. Source of truth for code is GitHub `main`. Verified b
 | Open pull requests | None in `gh pr list` for open state at inspection. Re-check before acting. |
 | GitHub Actions | None (`total_count` 0) |
 | Tracker | LZ-3 answered by the owner on 2026-11-05: `main` is canonical. LZ-1, LZ-2, LZ-4, LZ-5, LZ-6, and LZ-7 are done. New work is tracked in GitHub. |
-| Live HTTP | Not re-requested on 2026-11-05. |
+| Live HTTP | 2026-11-05: production deployment `dpl_7BaFBHgQozU5iQaRkicHkeSUo6Z8` (`e559e91`) is READY. `/api/status` returns `account` / `supabase`, `/api/ai-assistant` returns `mock`, and `X-Robots-Tag` plus the robots meta tag are served. |
 
 Agents were not stopped. Chat history outside the tracker and git was not copied. Igor’s wife’s Cursor setup is a second contributor and is not in this project’s agent list.
 
@@ -65,7 +65,7 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 4. Status: implemented in code. The README says the live project already has the tables. This refresh did not query it.
 5. Completed: browser client, anon key, TOTP-aware policies, admin allowlist, `GET /api/account`, deletion function in SQL.
 6. Files: `src/lib/account-store.ts`, `src/lib/supabase-browser.ts`, `supabase/schema.sql`.
-7. Outstanding: confirm production env vars and that the live schema matches the file. Do not paste secrets into git.
+7. Outstanding: production `/api/status` reports `account` / `supabase` (2026-11-05), so the public settings are set. Not yet checked: a real sign-in, and whether the live schema matches `supabase/schema.sql`. Both touch production data and need the owner. Do not paste secrets into git.
 8. Blockers: none for tab-only development.
 9. Next action: leave credentials in the host. Do not add a service-role key to the client.
 10. References: `README.md` section “Supabase”.
@@ -78,7 +78,7 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 4. Status: done at `a857fce` with Node v22.23.4 and npm 10.9.9.
 5. Completed: `npm ci`, `npm test` (12 files, 79 tests passed), `npm run typecheck`, `npm run lint`, and `npm run build` all exit 0. With Supabase variables unset, `GET /api/status` returned `development` / `not-configured` and `GET /api/ai-assistant` returned `mode: mock`. `X-Robots-Tag: noindex, nofollow` and the robots meta tag are both served. A headless Chromium pass at 390 px and 1280 px over home, dashboard, profile, assessment, WHAT IF?, progress, outlook, settings, privacy, Change Lab, assistant, and lab results showed HTTP 200, no horizontal overflow, and no console errors. Outlook shows the “not an individual prediction” label. Turning on the sample in Settings labels dashboard, progress, WHAT IF?, and outlook as sample data and sets a separate `lifezoi.sample.v1` flag without writing into the person’s session.
 6. Files: `package.json`, `src/lib/**/*.test.ts`.
-7. Outstanding: the signed-in account flow and the live deployed site were not checked. Both need the real Supabase settings or a local session.
+7. Outstanding: the signed-in account flow was not checked. It creates production rows and needs the owner. The live site was checked separately (see Snapshot).
 8. Blockers: none.
 9. Next action: none for the default branch. Re-run before each merge.
 10. References: `README.md` scripts, [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md).
@@ -91,7 +91,7 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 4. Status: present on `main` in layout metadata and `X-Robots-Tag`.
 5. Completed: both mechanisms. Pull request #1’s copy is no longer the only one.
 6. Files: `src/app/layout.tsx`, `next.config.ts`.
-7. Outstanding: confirm the deployed HTML still sends them after later deploys. Do not remove them.
+7. Outstanding: none. 2026-11-05: production at `e559e91` sends both. Do not remove them.
 8. Blockers: none.
 9. Next action: leave them. Recheck only when a privacy review asks.
 10. References: `README.md` deploy section.

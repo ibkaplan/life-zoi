@@ -24,7 +24,7 @@ https://github.com/ibkaplan/life-zoi/pull/1 was a second implementation. On 2026
 
 ## Migration status
 
-Migration documentation landed in pull request #2 (`c9f003a`). This refresh updates those files to `main` at `1d6a333` after the stacked app work, the contrast fix, Supabase accounts, and the inlined browser Supabase settings. Application code is not changed by the refresh. Cursor agents were not stopped. Retirement of the Cursor project still requires [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md).
+Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed in #11. On 2026-11-05 the owner approved the Claude readiness report and LZ-3 (`main` is canonical). Claude verified `main` locally and in production and recorded it in #12 and the close-out pull request. The Claude side of [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) is complete. The owner still has to save any Cursor chat notes worth keeping and archive the Cursor agents. Claude cannot reach Cursor.
 
 ## Documents
 
