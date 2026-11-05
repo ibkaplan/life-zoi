@@ -1,6 +1,6 @@
 # Automations
 
-Inventory date: 2026-11-01. Nothing here was disabled.
+Inventory date: 2026-11-05. Nothing here was disabled. GitHub Actions `total_count` was still 0. This run’s subscription list was not re-fetched; no automation id was added to the tracker. Vercel remains the only observed deploy check.
 
 ## What was checked
 

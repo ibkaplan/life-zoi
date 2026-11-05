@@ -4,7 +4,7 @@ This plan is not implemented. The lab screen accepts no file, stores no document
 
 ## What would have to exist first
 
-1. A real account, not a browser tab.
+1. A real account, not only a browser tab. Assessment accounts now exist. They do not by themselves authorize a document upload. The lab screen still accepts no file.
 2. Explicit consent that names what is uploaded, who can see it, and how long it is kept.
 3. Encryption in transit and at rest, with keys the application server does not put in browser code.
 4. Access control so one person cannot read another person's file.

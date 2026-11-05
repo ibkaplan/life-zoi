@@ -14,7 +14,7 @@ Use this file to avoid repeating rejected ideas or breaking safety rules. Pair i
 - The product name is lifeZoi. WHAT IF? is a feature inside it.
 - Do not diagnose, recommend changing prescription medication, promise a specific lifespan, predict a date of death, or present uncertain estimates as medical facts.
 - Do not invent citations, percentages, or risk reductions. If a number is not in the cited public source and the person’s own answer, do not create one.
-- Quantitative personal risk and “years gained” stay out of the product.
+- Quantitative personal risk and “years gained” stay out of the product. A copied Social Security population figure may be shown only with the existing population label, and only for an age row that was copied. Do not interpolate it or call it the person’s lifespan.
 - Guidance stays qualitative. Separate established public guidance from outcomes that vary by person.
 - Sample data is always labeled as sample data and is not the person’s record.
 - If Supabase or AI credentials are missing, stay in a clearly documented local development mode. Do not fake authentication or secure storage.
@@ -23,7 +23,7 @@ Use this file to avoid repeating rejected ideas or breaking safety rules. Pair i
 - Keep API keys and service-role keys on the server. Never prefix a secret with `NEXT_PUBLIC_`.
 - Validate on the server as well as in the browser. Do not store assessment bodies in application storage on the server.
 - Remember that a host can still log those request bodies.
-- `noindex` remains until a production privacy notice matches the real system. `main` is currently missing this guard. Do not drop `noindex` once it exists unless the legal review says the notice matches.
+- `noindex` remains until a production privacy notice matches the real system. `main` sets it in metadata and in `X-Robots-Tag`. Do not remove either unless the legal review says the notice matches.
 - The 988 line is for the United States. Do not generalize it to other countries without review.
 - Source links need a human check before launch. They were chosen because the pages were reachable when the copy was written. They can move.
 - Before public launch, privacy, security, scientific, and legal review are still required.
@@ -31,14 +31,16 @@ Use this file to avoid repeating rejected ideas or breaking safety rules. Pair i
 - Preserve working behavior unless the task asks for a change.
 - Do not report a test, build, or deploy as passed unless it was run.
 
-People: the project brief names Igor Kaplansky. The GitHub login on the repository is `ibkaplan`.
+People: the project brief names Igor Kaplansky. The GitHub login on the repository is `ibkaplan`. His wife also works on the repo from a separate Cursor setup. Her agents and task tracker are not visible from this project. The admin allowlist email is the one already committed in `src/lib/admin-allowlist.ts` and `README.md`.
 
 ## Current project decisions
 
 These match `main`, not pull request #1.
 
-- Signed-in answers use Supabase Auth and row level security when the public URL and anon key are set (`src/lib/status.ts`). `getAppStatus` reports `authentication: "supabase"` only for that real adapter. Missing or unused configuration stays `persistence: "development"` and `authentication: "not-configured"`.
-- Without an account, notes and answers stay in the browser tab (`sessionStorage`). There is no AI provider. Sample data labeled `Sample visitor` is not written into an account.
+- `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers use Supabase Auth and row level security when the public URL and anon key pass `isPublicSupabaseConfig`. `getAppStatus` reports `authentication: "supabase"` and `persistence: "account"` only then. Missing configuration stays `persistence: "development"` and `authentication: "not-configured"`, even if stray variables are present but invalid.
+- The browser client must read `process.env.NEXT_PUBLIC_SUPABASE_URL` and `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` as direct property accesses. Passing `process.env` through an argument stays empty in the client bundle (`1d6a333`).
+- Without an account, assessment answers stay in the browser tab (`sessionStorage`). Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in the tab even when an account exists. Sample data labeled `Sample visitor` is not written into an account.
+- The assistant is mock-only. `AI_PROVIDER` other than `mock` is refused with no outbound call. `.env.example` prices and `gpt-4o-mini` are labels, not a live bill or a live model.
 - Settings clear the tab, and for a signed-in person also clear that account’s rows, after a confirm button. They do not ask the person to type `delete`, and they do not export JSON. A separate control deletes the login.
 - The only admin email is `tatyanaserikovaru@gmail.com`, checked on the server and set by a database trigger. The client cannot grant admin.
 - Check-ins are done or not done. They are not a three-way done / partial / skipped record.
@@ -52,8 +54,9 @@ These match `main`, not pull request #1.
 
 ## Historical context
 
-- The first commit is `57cddd7` (placeholder). `2ed8ef7` added the development-mode app to `main`. `a6bfdcc` ignored local Vercel env files, including an OIDC token path.
-- Separately, Cursor agent `bc-efe0545d-9f0c-5bcb-9551-93e15378ce49` built another full app and opened pull request #1 at `0ab8b12`. The project tracker marked LZ-1 done against that pull request. The pull request conflicts with `main`.
+- The first commit is `57cddd7` (placeholder). `2ed8ef7` added the development-mode app to `main`. `a6bfdcc` ignored local Vercel env files. `c9f003a` added the first Claude migration docs.
+- Pull request #1 (`0ab8b12`) was a second app. It was closed without merge on 2026-11-04. Pull requests #3 and #8 brought the later stacked product onto `main`. #9 fixed primary button contrast. #10 merged the quieter homepage. `39be250` added accounts. `1d6a333` fixed browser inlining of the public Supabase settings.
+- Igor’s MacBook Air has a local clone at `~/github/life-zoi`, created by Cursor agent `bc-52dc787f-c35a-51fa-8c57-6796ebe25a65` on a self-hosted worker. That path is a Cursor feature. Claude Desktop or local Claude Code is the replacement.
 - The product specification asked for Next.js App Router, TypeScript, and Tailwind, and for an honest development mode when credentials were missing. Both trees followed that shape. They did not stay on one branch.
 - Cursor project memory outside git was limited to `notes.md`, the specification, the builder’s implementation report, and the migration assignment. Transcripts were not part of that store.
 
@@ -80,8 +83,8 @@ These match `main`, not pull request #1.
 
 ## Known pitfalls
 
-- Two agents editing “the lifeZoi app” produced two products. Check open pulls and `main` before a large change.
-- `README.md` on `main` is ahead of some assumptions in the pull request report (storage, export, noindex, test file layout). Read the tree you are on.
+- Two early trees diverged. Pull request #1 is closed, not merged. Check `main` before trusting older docs that say Supabase is disconnected or that `noindex` is missing.
+- Feature pull requests #4 through #7 were closed without a separate merge. Their commits arrived through #8. Do not reopen them to “land” work that is already on `main`.
 - `npm run typecheck` on `main` needs the Next.js typegen step. A bare `tsc` script from the other branch is not this branch’s script.
 - Vitest on `main` uses `vitest.config.ts`. The pull request uses `vitest.config.mts`.
 - Browser storage is not encrypted by the app.
@@ -93,34 +96,35 @@ These match `main`, not pull request #1.
 - Collect only what the assessment already asks for.
 - Do not log health answers from application code. Assume the platform might.
 - Production transport is HTTPS on Vercel.
-- No application rate limit, account lockout, or audit log is implemented beyond Supabase Auth’s own controls.
-- No performance budget is documented. Avoid large client dependencies; the runtime dependency list is only Next and React.
+- No application rate limit, account lockout, or audit log is implemented beyond Supabase Auth’s own controls and the MedlinePlus outbound cap.
+- No performance budget is documented. Runtime dependencies are Next, React, and `@supabase/supabase-js`.
 - Charts must stay understandable on a phone and must not use color as the only signal. The progress view describes bars with the words Done and Not done.
 
 ## Incidents
 
-No production incident is recorded. The operational miss that matters is the divergent implementations and the public site on `main` without `noindex`.
+No production incident is recorded. The earlier miss of a public site without `noindex` is corrected on `main`. The remaining product risk is reading the SSA population figure, or the mock assistant, as personal medical advice.
 
 ## Design decisions not to reverse casually
 
 - Educational tone and the professional-care notice in `src/lib/sources.ts`.
 - Server-side validation of suggestions and scenarios.
-- Row level security as the future database rule, owner-only, no service-role reads.
-- Honest development mode in `/api/status`.
+- Row level security for account rows, owner-only, no service-role reads, AAL2 after a verified authenticator factor.
+- Honest `/api/status`: account mode only when the adapter and public config are both real.
+- Mock-only assistant until a person approves a provider.
 - Separation of sample data.
 - The prohibited-claim filter.
 
 ## Temporary task-specific information
 
-- Migration documentation was written 2026-11-01 by Cursor agent `bc-d9827e20-0c85-51e9-8d6d-eaa0b1f3ed8c`. It did not change application code and did not merge pull request #1.
-- Agent metadata, mergeability, and the live HEAD response are point-in-time. Recheck before relying on them.
+- Migration documentation was written 2026-11-01 and refreshed 2026-11-05 by Cursor agent `bc-d9827e20-0c85-51e9-8d6d-eaa0b1f3ed8c`. The refresh did not change application code.
+- Agent metadata is point-in-time. The local-clone agent was not in the list this run could read.
 - Branch protection was not readable with the token used (403). Rulesets returned an empty list. Whether a review is required to merge was not proven by a settings read.
 
 ## Inaccessible knowledge
 
 - Full Cursor chats, including any verbal decisions that never reached git or the project store.
-- The work, if any, inside agent `bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6`.
-- The identity of the session that pushed `main`, beyond the git author “Cursor Agent” and a co-author trailer for the GitHub login `ibkaplan`.
-- Supabase project state. There is no evidence a project was created.
-- Contents of Vercel environment variables. They must not be copied into git.
-- Whether the deployed HTML still matches `a6bfdcc`. Only response headers were checked.
+- The work, if any, inside agent `bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6` and inside `bc-3073812f-5e00-5bf8-9506-46876dee1c1b` beyond its name.
+- Igor’s wife’s Cursor chats and tracker.
+- The transcript of the MacBook clone agent. The tracker says the clone path is `~/github/life-zoi`.
+- Live Supabase contents. The README states the tables exist. The values of Vercel environment variables were not read and must not be copied into git.
+- Whether the deployed HTML matches `1d6a333`. This refresh did not browse the site.

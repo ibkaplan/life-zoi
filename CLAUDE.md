@@ -2,21 +2,23 @@
 
 lifeZoi is a responsive health and longevity web app. WHAT IF? is a feature inside it, not the product name. The app helps people reflect on habits, compare a lifestyle change with public guidance, and record progress. It is educational. It does not diagnose, recommend medication changes, or predict lifespan.
 
-Read `docs/claude-migration/INDEX.md` first, then the document that matches the task. Treat `main` as the codebase. Pull request #1 is a conflicting second implementation; do not merge it as part of routine work.
+Read `docs/claude-migration/INDEX.md` first, then the document that matches the task. Treat `main` as the codebase. Pull request #1 was closed without being merged. Do not reopen or merge it unless a person asks.
 
 ## Architecture
 
-Next.js App Router, TypeScript, Tailwind CSS 4, React 19. Signed-in answers are stored in Supabase with the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set. Without that configuration, answers stay in `sessionStorage` for the current tab. There is no AI provider. Server routes validate and respond, then discard the body.
+Next.js App Router, TypeScript, Tailwind CSS 4, React 19. `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers, scenarios, goals, and check-ins use the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are a real public config. The browser client reads those two names directly so Next can inline them (`src/lib/supabase-browser.ts`). Without that configuration, answers stay in `sessionStorage` for the current tab. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in the connected case.
+
+The AI Health Assistant is a local mock. `AI_PROVIDER` other than `mock` is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
 
 Important paths on `main`:
 
-- `src/app/` — pages and route handlers
+- `src/app/` — pages and route handlers, including academy, Change Lab, outlook, and the assistant
 - `src/components/` — shell, assessment, WHAT IF?, progress, settings
-- `src/lib/` — validation, scenarios, recommendations, session sanitizing, access rule
-- `supabase/schema.sql` — account tables, row level security, admin role trigger, and account deletion
+- `src/lib/` — validation, scenarios, recommendations, accounts, wellness, and `src/lib/ai/`
+- `supabase/schema.sql` — account tables, row level security, authenticator-aware policies, admin role trigger, and account deletion
 - `README.md` — setup, deployment notes, and limitations
 
-Routes: `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/what-if/[id]`, `/progress`, `/settings`, `/privacy`, `GET /api/status`, `GET /api/account`, `POST /api/recommendations`, `POST /api/what-if`.
+Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(app)/`. API routes: `GET /api/status`, `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `POST /api/recommendations`, `POST /api/what-if`.
 
 ## Development standards
 
@@ -38,22 +40,23 @@ Run the relevant tests for any behavior you change. Do not claim tests, a deploy
 
 Keep one accurate backlog. Decompose work so each task has a branch, files it may touch, and a way to tell it is done. Delegate independent work only when the file sets do not overlap. Review the result against the safety rules below before merging. Record durable decisions in `docs/claude-migration/` or the README, not only in chat.
 
-Current priority: decide what to do with the conflicting open pull request, then continue from `main`. Details are in `docs/claude-migration/ACTIVE_WORK.md`.
+Current priority: the tracker still has LZ-3, the owner’s decision on whether `main` or the closed pull request #1 is canonical. Until that is answered, continue from `main` and do not revive pull request #1. Details are in `docs/claude-migration/ACTIVE_WORK.md`.
 
 ## Delegated work
 
-Use a worker for a bounded change. One worker per branch. Do not run two writers on the same files. Cloud sessions are enough for repository edits and unit tests. Use a local Claude Code session when the task needs a browser, local secrets, or a machine the cloud session cannot reach.
+Use a worker for a bounded change. One worker per branch. Do not run two writers on the same files. Cloud sessions are enough for repository edits and unit tests. Use Claude Desktop or local Claude Code when the task needs a browser, local secrets, or files on a person’s machine. That local session replaces Cursor’s self-hosted worker path (`agent worker start` and a checkout such as `~/github/life-zoi`). It does not attach to a Cursor worker.
 
 Require `npm test`, `npm run typecheck`, and `npm run lint` for application changes, plus `npm run build` when routing, config, or rendering changes. Medical and privacy copy needs a careful read, not only a green test run.
 
 ## Operational restrictions
 
 - Do not expose secrets, tokens, or service-role keys. Do not commit `.env` files.
-- Filling in Supabase or AI variables must not be described as turning accounts or AI on. `src/lib/status.ts` stays in development mode until a real adapter exists.
-- Do not fake authentication or secure storage.
+- Do not put a service-role key in the browser or in a `NEXT_PUBLIC_` variable. The anon key is public only with row level security.
+- Do not describe the mock assistant as a live model. Do not set `AI_PROVIDER` to anything but `mock` unless a person approves a real provider and the code is changed to allow it.
+- Do not fake authentication or secure storage. Empty Supabase variables must stay `not-configured`.
 - Do not claim HIPAA, GDPR, or other regulatory compliance.
-- Guidance stays qualitative. Do not invent citations, percentages, risk reductions, or a date of death.
-- `noindex` is still required before a public launch whose privacy notice matches the real system. `main` does not set it today. Do not remove a future `noindex` until that review is done.
+- Guidance stays qualitative. Do not invent citations, percentages, risk reductions, or a date of death. The Life outlook page may show a copied Social Security population figure only with the existing “not an individual prediction” label. Do not turn that figure into a personal lifespan.
+- `noindex` is set in the root layout and as `X-Robots-Tag: noindex, nofollow`. Leave both until a production privacy notice matches the real system.
 - The 988 wording is for the United States and still needs review before launch.
 - Hosts can log validation request bodies even though application code does not store them.
 - Do not deploy, change infrastructure, or rotate credentials unless the task explicitly says so and a person has approved production changes.
@@ -71,3 +74,4 @@ Require `npm test`, `npm run typecheck`, and `npm run lint` for application chan
 - `docs/claude-migration/CLAUDE_WORKFLOW.md` — how to coordinate in Claude Code
 - `docs/claude-migration/AUTOMATIONS.md` — triggers that do and do not exist
 - `docs/claude-migration/MIGRATION_CHECKLIST.md` — verification before retiring Cursor
+- `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` — future lab-document rules; not implemented

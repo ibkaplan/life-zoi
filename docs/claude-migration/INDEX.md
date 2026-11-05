@@ -13,17 +13,18 @@ lifeZoi is a responsive web app for habit reflection, WHAT IF? lifestyle illustr
 | Visibility | Public |
 | Homepage recorded on the repo | https://life-zoi.vercel.app |
 | Product owner named in the project brief | Igor Kaplansky (GitHub login `ibkaplan`) |
-| Snapshot used for these docs | `main` at `a6bfdcc` (2026-10-29), inspected 2026-11-01 |
+| Other contributor | Igor’s wife, in a separate Cursor setup. Her agents and tracker are not visible from this project. |
+| Snapshot used for these docs | `main` at `1d6a333` (2026-11-05 inspection) |
 
 ## Architecture in brief
 
-`main` is a Next.js 16 App Router application (TypeScript, React 19, Tailwind CSS 4). Signed-in assessment answers, scenarios, goals, and check-ins are stored in Supabase when the public URL and anon key are set. Otherwise answers stay in `sessionStorage` for the open tab. `GET /api/status` reports `authentication: "supabase"` only when that account adapter is really configured. `supabase/schema.sql` is the account schema with row level security. No AI provider is called. The only admin email is stored in a server allowlist and a database trigger.
+`main` is a Next.js 16 App Router application (TypeScript, React 19, Tailwind CSS 4). The session adapter is Supabase. Signed-in assessment answers, scenarios, goals, and check-ins are stored with the anon key and row level security when the public URL and anon key are set. Otherwise those answers stay in `sessionStorage`. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in that connected case. Change Lab, Your Life Matters, wellness notes, and the assistant thread stay in the tab. The assistant is a development mock and refuses any other `AI_PROVIDER`. MedlinePlus is queried by LOINC code only. Search indexing is off (`robots` metadata and `X-Robots-Tag`).
 
-An earlier Cursor agent also opened https://github.com/ibkaplan/life-zoi/pull/1 on `cursor/lifezoi-app-ce49`. That pull request is a second implementation. On 2026-11-01 GitHub reported it open, conflicting with `main`, and not merged. Do not treat it as the source of truth.
+https://github.com/ibkaplan/life-zoi/pull/1 was a second implementation. On 2026-11-05 it was closed and had never been merged. `main` is the tree to edit. The Cursor tracker still leaves the canonical-tree checkbox open.
 
 ## Migration status
 
-Documentation for a move from Cursor cloud agents to Claude Code was added in the migration pull request that introduced this directory. Application code was not changed. Cursor agents were not stopped. Pull request #1 was not merged. Retirement of the Cursor project still requires the checklist in [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md).
+Migration documentation landed in pull request #2 (`c9f003a`). This refresh updates those files to `main` at `1d6a333` after the stacked app work, the contrast fix, Supabase accounts, and the inlined browser Supabase settings. Application code is not changed by the refresh. Cursor agents were not stopped. Retirement of the Cursor project still requires [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md).
 
 ## Documents
 
@@ -38,6 +39,7 @@ Documentation for a move from Cursor cloud agents to Claude Code was added in th
 | [CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md) | Coordinator and worker workflow in Claude Code |
 | [AUTOMATIONS.md](AUTOMATIONS.md) | Schedules and triggers, including those that do not exist |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
+| [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |
 
 ## Recommended reading order
 
@@ -45,31 +47,36 @@ Documentation for a move from Cursor cloud agents to Claude Code was added in th
 2. [CLAUDE.md](../../CLAUDE.md) — rules that apply to every change.
 3. [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) — what the software is.
 4. [PROJECT_KNOWLEDGE.md](PROJECT_KNOWLEDGE.md) — constraints that are easy to violate.
-5. [ACTIVE_WORK.md](ACTIVE_WORK.md) — what is unfinished, especially pull request #1.
+5. [ACTIVE_WORK.md](ACTIVE_WORK.md) — the open canonical-tree checkbox and launch reviews.
 6. [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md) — how to run it.
-7. [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md) and [CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md) — how work was coordinated and how to continue.
-8. [AUTOMATIONS.md](AUTOMATIONS.md) — do not expect hidden schedulers.
-9. [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) — prove the new environment before leaving Cursor.
+7. [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) — do not build upload from this plan alone.
+8. [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md) and [CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md) — how work was coordinated and how to continue.
+9. [AUTOMATIONS.md](AUTOMATIONS.md) — do not expect hidden schedulers.
+10. [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) — prove the new environment before leaving Cursor.
 
 ## Agents that existed
 
-There was no large fleet. Visible Cursor cloud agents on 2026-11-01:
+Visible from this Cursor project on 2026-11-05. Igor’s wife has a second Cursor setup whose agents are not in this list.
 
 | Agent | Role | Status seen |
 | --- | --- | --- |
-| [lifeZoi web app](https://cursor.com/agents/bc-df653408-8f63-4fd1-bd42-4e04dfa09f6e) (`bc-df653408-8f63-4fd1-bd42-4e04dfa09f6e`) | Cursor Project coordinator. Tracker lived in the project store, not in git. | Idle. No branch and no pull request on the agent record. |
-| [LifeZoi web app](https://cursor.com/agents/bc-efe0545d-9f0c-5bcb-9551-93e15378ce49) (`bc-efe0545d-9f0c-5bcb-9551-93e15378ce49`) | Built the alternative app and opened pull request #1. | Idle. Turn had finished. Pull request open and conflicting. |
-| [lifeZoi application](https://cursor.com/agents/bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6) (`bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6`) | Unknown. No branch, pull request, or dashboard events were recorded. | Idle. Work product not identifiable from accessible metadata. |
-| Claude Code migration (`bc-d9827e20-0c85-51e9-8d6d-eaa0b1f3ed8c`) | Wrote this documentation only. | This migration task. |
+| [lifeZoi web app](https://cursor.com/agents/bc-df653408-8f63-4fd1-bd42-4e04dfa09f6e) (`bc-df653408-8f63-4fd1-bd42-4e04dfa09f6e`) | Coordinator. Tracker is the project store `notes.md`, not git. | Idle. Model recorded as Claude Opus. No branch on the agent record. |
+| [Merge stacked app work](https://cursor.com/agents/bc-ba2e5916-e902-5eca-96cb-2eace1639ac8) (`bc-ba2e5916-e902-5eca-96cb-2eace1639ac8`) | Integrated the stacked app into `main` as pull request #8. | Idle. |
+| [Blue button contrast](https://cursor.com/agents/bc-b910e6d5-7db7-5dc7-9f80-11f1a4f1a0b1) (`bc-b910e6d5-7db7-5dc7-9f80-11f1a4f1a0b1`) | Primary button contrast, pull request #9. | Idle. |
+| [LifeZoi web app](https://cursor.com/agents/bc-efe0545d-9f0c-5bcb-9551-93e15378ce49) (`bc-efe0545d-9f0c-5bcb-9551-93e15378ce49`) | Built the alternative app, pull request #1. | Idle. That pull request is closed and was not merged. |
+| [Verify merged lifeZoi pages](https://cursor.com/agents/bc-3073812f-5e00-5bf8-9506-46876dee1c1b) (`bc-3073812f-5e00-5bf8-9506-46876dee1c1b`) | Visible idle run. No branch on the record. Work product not read. | Idle. |
+| [lifeZoi application](https://cursor.com/agents/bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6) (`bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6`) | No branch or pull request in accessible metadata. | Idle. |
+| Local lifeZoi clone (`bc-52dc787f-c35a-51fa-8c57-6796ebe25a65`) | Cloned the repo to `~/github/life-zoi` on Igor’s MacBook Air through a Cursor self-hosted worker. | Not in the agent list this run could read. No self-hosted worker was connected at inspection. |
+| Claude Code migration (`bc-d9827e20-0c85-51e9-8d6d-eaa0b1f3ed8c`) | Wrote and is refreshing this documentation. | This task. |
 
-Model recorded for those runs: Grok 4.7. Full prompts and transcripts were not exported. See [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md).
+See [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md).
 
 ## Active priorities
 
-1. Keep `main` as the working tree until a person chooses otherwise.
-2. Do not merge pull request #1 while it conflicts. Decide whether to close it, salvage pieces, or replace `main`.
-3. Do not deploy new behavior or connect Supabase until that decision is explicit.
-4. Before any public launch: privacy, security, scientific, and legal review. Keep qualitative guidance. Review 988 wording and indexing.
+1. Edit `main`. Pull request #1 is already closed and was not merged.
+2. The tracker checkbox LZ-3 is still open: the owner has not recorded a canonical-tree decision. Do not revive pull request #1 while waiting.
+3. Before any public launch: privacy, security, scientific, and legal review. Keep `noindex`. Review 988 wording and the population life-table copy.
+4. Do not turn on a paid AI provider or document upload without the controls in [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md).
 
 ## Known missing information
 
@@ -78,20 +85,22 @@ Model recorded for those runs: Grok 4.7. Full prompts and transcripts were not e
 - The idle agent `bc-bc67516b-2cce-5d31-9ade-5337fb5df8d6` has no recorded artifact.
 - Branch protection could not be read (GitHub returned 403 for the protection endpoint). Repository rulesets listed as empty. Required reviews are therefore unconfirmed.
 - No Cursor automation id was available to look up. None were found in GitHub Actions or in this agent’s subscriptions.
-- Supabase and AI credentials are intentionally absent. Do not invent them.
-- Unit tests on `main` were not re-run while writing these documents. Sixteen `it()` cases exist in four files.
-- The live site returned HTTP 200 with the app’s security headers on 2026-11-01. Page copy was not reviewed in a browser for this migration.
+- Supabase and AI secret values were not read. The README says a live Supabase project already has the account tables. This refresh did not query that database.
+- Igor’s wife’s Cursor agents and tracker.
+- The local-clone agent’s transcript. The tracker marks LZ-6 done.
+- Unit tests were not re-run for this documentation edit. Fifty-one `it()` cases are written across twelve files.
+- The live homepage was not browsed on 2026-11-05.
 
 ## Integrations that still need a person
 
-None are required to run development mode. Optional later work needs a person to create a Supabase project, apply `supabase/schema.sql`, and add a server adapter. An AI provider is not part of this version. Vercel already has a project; production changes still need explicit approval. Details: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md).
+Tab-only mode needs no secrets. Accounts need the public Supabase URL and anon key in the host, not in git. A paid model and document upload are not configured. Vercel already hosts the repo. Details: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md).
 
 ## Initialize the Claude coordinator
 
 1. Open the GitHub repository in a Claude Code Project after this documentation is on `main`.
 2. Confirm the session loaded root `CLAUDE.md`.
 3. Read this index, then [ACTIVE_WORK.md](ACTIVE_WORK.md) and [PROJECT_KNOWLEDGE.md](PROJECT_KNOWLEDGE.md).
-4. Use one coordinator session. Do not start parallel implementation workers until pull request #1 has a decision.
+4. Use one coordinator session. Do not start parallel implementation workers on the same files. Do not reopen pull request #1 unless the owner asks.
 5. Track new work in GitHub issues or pull requests so it survives outside Cursor’s project store.
 6. Follow [CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md) for model choice and delegation. The Claude Ultra subscription is not an unlimited pool.
 
@@ -106,8 +115,8 @@ npm run typecheck
 npm run lint
 ```
 
-Then start `npm run dev` and request `GET /api/status`. Expect `product` `lifeZoi`, `persistence` `development`, and `authentication` `not-configured`. Confirm sample data is labeled and that the UI does not show a lifespan or a health score. Do not merge pull request #1 as part of this check.
+Then start `npm run dev` and request `GET /api/status`. With Supabase variables unset, expect `persistence` `development` and `authentication` `not-configured`. With the public URL and anon key set, expect `persistence` `account` and `authentication` `supabase`. Confirm sample data is labeled. A population figure, if shown, must keep the “not an individual prediction” label. Confirm `GET /api/ai-assistant` reports mock mode.
 
 ## Before retiring Cursor
 
-Complete [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md). Leave Cursor agents running until a person confirms Claude can edit, test, and open pull requests. Do not delete the Cursor project store until the conflicting pull request decision and the safety rules are accepted in Claude.
+Complete [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md). Leave Cursor agents running until a person confirms Claude can edit, test, and open pull requests. Do not delete the Cursor project store until LZ-3 is answered and the safety rules are accepted in Claude. A local checkout belongs in Claude Desktop or local Claude Code, not in a Cursor self-hosted worker.
