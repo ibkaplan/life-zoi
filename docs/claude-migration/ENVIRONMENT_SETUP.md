@@ -55,16 +55,18 @@ File: `.env.example`. Copy only if you want the names locally. Leave values blan
 
 | Name | Purpose | Required now |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Public Supabase URL. Required for accounts. | No |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key. Not a license to skip row level security. | No |
+| `NEXT_PUBLIC_SUPABASE_URL` | Public Supabase URL. The browser client inlines this direct `process.env` read. | Only for accounts |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key. Not a license to skip row level security. | Only for accounts |
+| `AI_PROVIDER` | Must stay `mock`. Any other value is refused and does not call a network. | No |
+| `AI_MODEL` | Label only. Default in code is `gpt-4o-mini` if unset or invalid. Not called. | No |
+| `AI_PLAN` | `basic`, `premium`, or `advanced`. Planning only. There is no unlimited plan. | No |
+| `AI_PROMPT_CENTS_PER_1K` and `AI_COMPLETION_CENTS_PER_1K` | Planning estimates, not a bill. | No |
 
-`src/lib/status.ts` reports `authentication: "supabase"` only when the account adapter is in use and both values are a real public config. Empty or unused values stay `not-configured`.
+`src/lib/status.ts` reports `authentication: "supabase"` and `persistence: "account"` only when `SESSION_ADAPTER` is `supabase` and both public values pass `isPublicSupabaseConfig` (https URL, anon key length 20–4096, no whitespace). Otherwise status stays `not-configured`.
 
-Do not add `SUPABASE_SERVICE_ROLE_KEY` to any client bundle. The README forbids shipping it to the browser. It is not in `.env.example`.
+Do not add `SUPABASE_SERVICE_ROLE_KEY` to any client bundle. It is not in `.env.example`. Do not add `OPENAI_API_KEY`. The mock does not use one.
 
-Pull request #1’s `.env.example` also comments `# OPENAI_API_KEY=` as a future server-only name. That line is not on `main`. There is no AI client in either tree’s dependency list. Do not create a key for this migration.
-
-Cloud agents do not need these variables to build or test. Local agents do not either. If a person later adds them on Vercel, add them in the Vercel project settings, not in git.
+Cloud and local test runs do not need these variables. Account testing needs the public pair in the environment, not in git. Production values belong in Vercel, and this refresh did not read them.
 
 Verify development mode:
 
@@ -93,16 +95,16 @@ Expect JSON with `persistence` `development` and `authentication` `not-configure
 
 | | |
 | --- | --- |
-| Purpose | Planned accounts and database. Not active. |
-| Config | `supabase/schema.sql`. No `supabase/config.toml`. No JS client dependency. |
-| Cloud / local | Neither needs a Supabase login to develop this version. |
-| Permissions | A person with a Supabase account, later. |
-| Manual | Create a project, run the SQL in the SQL editor, then implement a server adapter. Keys alone do nothing. |
-| Verify | `GET /api/status` stays `not-configured` until that adapter exists and the status code is intentionally changed. Querying a live project was not possible; no project URL is configured. |
+| Purpose | Accounts and the five user tables. Code is connected when the public env vars are valid. |
+| Config | `supabase/schema.sql`. Client: `@supabase/supabase-js` in `src/lib/supabase-browser.ts`. No `supabase/config.toml`. |
+| Cloud / local | Not required to run unit tests. Required to exercise sign-in. |
+| Permissions | The public anon key plus a user session. Not the service role. |
+| Manual | The README says the live project already has the tables. Applying `schema.sql` again is a database change and was not done here. Set the public URL and anon key on the host. |
+| Verify | `GET /api/status` matches the env actually loaded. This refresh did not call the live Supabase API. |
 
 ## Not used
 
-Stripe, email, SMS, and third-party AI APIs have no code, env names on `main`, or package dependencies. Do not add them in a migration or cleanup pass.
+Stripe, transactional email, and SMS have no code. MedlinePlus Connect is used for LOINC lookups. A third-party AI API is named only so the mock can refuse it. Do not add a provider key in a documentation pass.
 
 ## CI/CD
 
@@ -110,7 +112,7 @@ GitHub Actions: no `.github/workflows` and the workflows API returned `total_cou
 
 The only automated check observed is Vercel’s GitHub deployment status. It does not run `npm test`.
 
-Deployment procedure today: Vercel builds the default branch. The README says to import the repo as Next.js and leave Supabase and AI variables empty. This migration did not deploy.
+Deployment procedure today: Vercel builds the default branch. Accounts on the deployed site need the public Supabase variables in the Vercel project. `AI_PROVIDER` should remain `mock`. This refresh did not deploy.
 
 Background jobs and cron: none in the app and none in GitHub Actions.
 
@@ -124,15 +126,17 @@ Cursor-only context that does not travel automatically:
 - Cloud agent roster and computer-use browser runs.
 - The token that talks to Cursor’s agent APIs.
 
-`AGENTS.md` is not on `main`. The copy on pull request #1 is a generated Next.js notice, not custom policy. `CLAUDE.md` is the instruction file for Claude.
+`AGENTS.md` on `main` is the generated Next.js notice, not custom policy. `CLAUDE.md` is the instruction file for Claude.
 
 ## Auth dependencies outside the app
 
-GitHub authentication for pushing branches. Vercel’s GitHub app for deploys. No OAuth app for end users. Local `.env.local` may contain a Vercel OIDC token after `vercel link`; `a6bfdcc` ignores it. Never commit that file.
+GitHub authentication for pushing branches. Vercel’s GitHub app for deploys. End-user sign-in is Supabase Auth, not a separate OAuth app in this repo. Local `.env.local` may contain a Vercel OIDC token after `vercel link`; `a6bfdcc` ignores it. Never commit that file.
+
+A checkout on Igor’s Mac at `~/github/life-zoi` was made by a Cursor self-hosted worker. For Claude, open that directory in Claude Desktop or the local Claude Code CLI. Do not expect `agent worker start` to be part of the Claude setup.
 
 ## Network
 
-Local dev binds to the machine running `next dev`. Tests are unit tests and do not need the network. Builds may fetch Google font metadata because `src/app/layout.tsx` uses `next/font/google` (Fraunces and Source Sans 3). A locked-down cloud builder needs outbound access to those font hosts and to `registry.npmjs.org`.
+Local dev binds to the machine running `next dev`. Most unit tests do not need the network. A LOINC lookup calls MedlinePlus when that route is exercised. Builds may fetch Google font metadata because `src/app/layout.tsx` uses `next/font/google` (Fraunces and Source Sans 3). A locked-down cloud builder needs outbound access to those font hosts, `registry.npmjs.org`, and, for a live reference lookup, `connect.medlineplus.gov`. Supabase hosts are needed only when accounts are configured.
 
 ## Verify the whole local loop
 

@@ -1,6 +1,6 @@
 # lifeZoi project overview
 
-Facts below describe GitHub `main` at `a6bfdcc` unless a sentence names pull request #1. Status was checked on 2026-11-01. Nothing here was redeployed or retested as part of the migration documents.
+Facts below describe GitHub `main` at `1d6a333` unless a sentence names another commit. Status was checked on 2026-11-05. Nothing here was redeployed or retested as part of this documentation refresh. Earlier sentences that said Supabase was not connected are withdrawn.
 
 ## Purpose
 
@@ -10,25 +10,25 @@ Business objective of the first version: a polished, trustworthy, responsive web
 
 ## People who use it
 
-An adult using a phone or desktop browser, looking at their own sleep, movement, food, tobacco, alcohol, stress, mood, connection, and goals. No clinician portal, care team, or account holder exists. Sensitive questions can be skipped. The interface is English.
+An adult using a phone or desktop browser, looking at their own sleep, movement, food, tobacco, alcohol, stress, mood, connection, and goals. Sensitive questions can be skipped. The interface is English. Email and password accounts exist when Supabase public settings are present, including an authenticator-app step. There is still no clinician portal. Igor Kaplansky owns the product brief. His wife uses a separate Cursor setup and is the admin allowlist identity in `src/lib/admin-allowlist.ts`. Her agents are not visible here.
 
 ## What `main` implements
 
-These flows exist in the repository and are part of the running development-mode design:
+These flows exist on `main`. Account storage applies only when the public Supabase config is present. Other notes below stay in the tab.
 
 | Area | Status on `main` | Where |
 | --- | --- | --- |
-| Landing page | Implemented | `src/app/page.tsx` |
+| Landing page, including a lifestyle-profile prompt | Implemented | `src/app/page.tsx`, `src/lib/home-gauge.ts` |
 | Dashboard, profile, assessment, WHAT IF?, progress, settings, privacy | Implemented | `src/app/(app)/` |
+| Your Life Matters | Implemented, tab storage | `src/app/(app)/life-matters/page.tsx`, `src/lib/purpose.ts` |
+| Life outlook, including a copied SSA population figure | Implemented | `src/app/(app)/outlook/page.tsx`, `src/lib/outlook.ts`, `src/lib/life-table.ts` |
+| Change Lab experiments | Implemented, tab storage | `src/app/(app)/change-lab/page.tsx`, `src/lib/change-lab.ts` |
+| Nutrition, movement, nature, urges, habits, choices, wellness coach | Implemented | `src/app/(app)/academy/`, `nature/`, `urges/`, `habits/`, `choices/`, `wellness-coach/` |
+| Lab education and MedlinePlus by LOINC | Implemented. No file upload | `src/app/(app)/lab-results/page.tsx`, `src/lib/medlineplus.ts` |
+| AI Health Assistant | Development mock only | `src/app/(app)/ai-assistant/page.tsx`, `src/lib/ai/` |
+| Supabase email/password accounts and authenticator enrollment | Implemented when public env vars are set | `src/lib/account-store.ts`, `src/lib/mfa.ts`, `supabase/schema.sql` |
 | Desktop nav and a compact mobile bar | Implemented | `src/components/app-shell.tsx` |
-| Multi-step assessment with Back, Continue, review, and validation | Implemented | `src/components/assessment-wizard.tsx`, `src/lib/validation.ts` |
-| WHAT IF? presets plus a custom note that must not invent evidence | Implemented | `src/lib/scenarios.ts`, `src/components/what-if-view.tsx` |
-| Monthly check-ins, goals, history | Implemented | `src/components/progress-view.tsx` |
-| Rule-based suggestions with sources | Implemented | `src/lib/recommendations.ts`, `POST /api/recommendations` |
-| Development-mode banner and status | Implemented | `GET /api/status`, `src/lib/status.ts` |
-| Sample data kept separate and labeled | Implemented | `src/lib/sample.ts` (`Sample visitor`) |
-| Prepared Supabase schema and an access helper | Not connected | `supabase/schema.sql`, `src/lib/access.ts` |
-| Accounts, encrypted health storage, AI | Not implemented | — |
+| `noindex` | Implemented | `src/app/layout.tsx`, `X-Robots-Tag` in `next.config.ts` |
 
 Assessment steps: about, sleep, movement, nourishment, substances, mind, goals, review (`STEP_IDS` in `src/lib/types.ts`). Tobacco and alcohol can be left unanswered. Age range includes prefer-not.
 
@@ -36,56 +36,57 @@ WHAT IF? habit ids: `walk`, `sleep`, `eating`, `smoking`, `stress`, `alcohol`, `
 
 Progress stores goals (days per week) and check-ins (`done` boolean plus a note). A chart is shown only after two check-ins for that habit in the month. There is no partial/skipped status on `main`.
 
-Suggestions are generated from the completed assessment. The list is not capped at four. A wording check can withhold the whole list. No model is called.
+Suggestions are generated from the completed assessment. The list is not capped at four. A wording check can withhold the whole list. The suggestion route does not call a model.
 
-Session keys: `lifezoi.session.v1` and `lifezoi.sample.v1` in `sessionStorage` (`src/lib/session.ts`). Closing the tab drops them. Settings can clear the tab or preview the labeled sample. There is no JSON export on `main`.
+The assistant route does call the in-process mock. Replies are labeled development mock replies. `resolveAiProvider` rejects every provider name except `mock` and does not open a network connection for that rejection.
 
-Security headers from `next.config.ts`: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` with camera, microphone, and geolocation disabled. `poweredByHeader` is false.
+Life outlook can show one number copied from the SSA Period Life Table for an exact age and the female or male column, with the label “Population-based statistical estimate — not an individual prediction.” Ages that were not copied are left blank. It is not a personal lifespan and not a date of death. Qualitative labels on the same page are readings of reported answers, and the code says no validated prediction model is implemented.
 
-`main` does not set `robots` noindex. That is a launch gap. The product rule is to keep the site out of indexes until a production privacy notice matches the real system.
+Session keys `lifezoi.session.v1` and `lifezoi.sample.v1` remain in `sessionStorage`. Change Lab, purpose notes, the assistant thread, and wellness notes use their own session keys. Closing the tab drops them. Signed-in assessment data is additionally stored in Supabase. Sample data stays labeled `Sample visitor` and is not written into an account.
 
-## Pull request #1 (not the default branch)
+Security headers from `next.config.ts`: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` with camera, microphone, and geolocation disabled, and `X-Robots-Tag: noindex, nofollow`. The root layout sets the same robots metadata. `poweredByHeader` is false.
 
-https://github.com/ibkaplan/life-zoi/pull/1
+## Pull request history that matters
 
-- Branch `cursor/lifezoi-app-ce49`, commit `0ab8b12`, opened 2026-10-29.
-- Open on 2026-11-01. GitHub merge state `DIRTY` / `CONFLICTING`. Not merged. Do not merge it under the migration authorization.
-- It is a second Next.js app, not a small patch on `main`. It uses `localStorage`, sets `robots: { index: false, follow: false }`, validates through `/api/validate/assessment`, `/api/validate/check-in`, and `/api/validate/scenario`, and keeps tests in `src/lib/lifezoi.test.ts` (15 `it()` cases in that file).
-- The Cursor implementation report for that agent describes browser drafts, JSON export, delete-by-typing-`delete`, six scenarios, check-in states of done / partial / skipped, and suggestions capped at four. Those details belong to that branch. They were not re-tested while writing this file.
-- `AGENTS.md` on that branch is the stock Next.js agent-rules comment generated by `next dev`, not a product specification.
+https://github.com/ibkaplan/life-zoi/pull/1 is closed, not merged (closed 2026-11-04). It remains a second app on `cursor/lifezoi-app-ce49` at `0ab8b12`: `localStorage`, its own validation routes, and `src/lib/lifezoi.test.ts`. Do not merge it. The tracker checkbox LZ-3 still asks the owner to decide whether that closed request or `main` is canonical.
 
-Continuing from both trees at once will keep producing conflicts. See [ACTIVE_WORK.md](ACTIVE_WORK.md).
+Pull requests #3 and #8 merged the stacked work onto `main` (`cd15d65`): `noindex`, the homepage redesign, the mock assistant, Change Lab, Your Life Matters, and the nutrition, wellness, and habit tools. #4, #5, #6, and #7 are closed and were not merged. On 2026-11-05 GitHub showed them closed at the same time as #1. Their commits are already on `main` through #8. An earlier note that the coordinator could not close them is out of date.
+
+Pull request #9 merged the primary-button contrast fix (`0c1bef4`). Pull request #10 merged the quieter homepage (`6063296`). `39be250` added Supabase accounts. `1d6a333` inlines the public Supabase settings in the browser client.
+
+`AGENTS.md` on `main` is the stock Next.js agent-rules comment, not a product specification.
 
 ## Planned and not built
 
-From the original product specification and the README on `main`:
+- A reviewed production privacy notice, crisis wording outside the United States, and a decision to remove `noindex`.
+- Scientific review of WHAT IF?, outlook, and guidance text against the cited pages, including the SSA table.
+- A paid AI provider. The mock must keep refusing other provider names until that approval, and outputs that add diagnoses or personal lifespan claims must still be rejected.
+- Document upload. See [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md). Accounts for assessment rows do not satisfy that plan.
+- Making the repository private. It was still public on 2026-11-05.
 
-- Supabase Auth and a server session that calls `decideAccess` before every read or write.
-- Account deletion that removes that user’s rows.
-- A reviewed production privacy notice, a decision about indexing, and crisis wording outside the United States.
-- Scientific review of WHAT IF? and guidance text against the cited public pages.
-- Any AI provider, only after keys stay server-side and outputs that add numbers, diagnoses, or lifespan claims are rejected.
-- Making the repository private. The README states the GitHub token used when `main` was built could not change visibility. The repo was still public on 2026-11-01.
-
-No roadmap file exists in git. The Cursor project store had a single task, LZ-1, marked done, pointing at pull request #1. That tracker is not in the repository.
+The Cursor tracker is not in git. On 2026-11-05 its open product item was LZ-3. LZ-7 is this documentation refresh.
 
 ## Architecture
 
-Browser UI (React client components) holds the session. Server route handlers validate JSON and return illustrations or suggestions. They do not write a database. `src/lib/access.ts` is the intended future rule: a record is allowed only when `actorUserId` equals `recordUserId`. Development mode has no actor, so the helper is not a live login.
+The browser holds a tab session and, when configured, a Supabase Auth session. `decideAccess` runs before an account write. Row level security still applies. Route handlers for suggestions and WHAT IF? validate JSON, respond, and do not store the body. The assistant handler stays inside the mock. The references route may call MedlinePlus Connect with a LOINC code and caches the response for 12 hours.
 
 ```text
-Browser sessionStorage
-  -> session provider / browser store
-  -> pages for assessment, WHAT IF?, progress, settings
-  -> POST /api/recommendations or POST /api/what-if
-       -> validate, build from rules, respond, discard
+Browser
+  sessionStorage for tab-only answers, Change Lab, purpose, assistant, wellness
+  Supabase JS client (anon key, PKCE) when public env vars inline
+    -> profiles, assessments, scenarios, habit_goals, check_ins
+POST /api/recommendations and POST /api/what-if
+  -> validate, build from rules, discard
+GET|POST /api/ai-assistant
+  -> mock, or a refusal if AI_PROVIDER is not mock
+GET /api/references?loinc=
+  -> MedlinePlus Connect, code only
 GET /api/status
-  -> always development / not-configured
-supabase/schema.sql
-  -> not applied by the app
+  -> account/supabase only when SESSION_ADAPTER is supabase and the public config is valid
+  -> otherwise development/not-configured
 ```
 
-There is no separate backend service, queue, or background worker.
+There is no separate backend service, queue, or background worker. `@supabase/supabase-js` is a runtime dependency.
 
 ## Stack
 
@@ -102,29 +103,30 @@ There is no separate backend service, queue, or background worker.
 | Fonts | Fraunces and Source Sans 3 |
 | Host intended for production | Vercel. Repo homepage https://life-zoi.vercel.app. Team slug recorded in `README.md`: `risi-0778846f`. |
 
-`package.json` name is `life-zoi`. The unmerged pull request names the package `lifezoi`.
+`package.json` name is `life-zoi`. The closed pull request #1 branch names the package `lifezoi`. Node on the documentation host was not rechecked on 2026-11-05; the README still requires Node.js 22.
 
 ## Data model
 
 Browser session (`src/lib/types.ts`): draft assessment, draft step, assessment history, saved scenarios, habit goals, check-ins. Limits while sanitizing: 24 history entries, 30 scenarios, 400 check-ins (`src/lib/session.ts`).
 
-Account tables: `profiles`, `assessments`, `scenarios`, `habit_goals`, `check_ins`. Each enables row level security with `auth.uid() = user_id`. A verified authenticator factor also requires an AAL2 session. The file does not grant the service role a bypass policy. The app reads and writes these rows with the anon key and the signed-in session when the public environment variables are set.
+Account tables, used by the app when the public config is present: `profiles` (including `role` and `session_state`), `assessments`, `scenarios`, `habit_goals`, `check_ins`. Row level security uses `auth.uid()` plus `auth_session_may_use_rows()`, which requires AAL2 after a verified authenticator factor. The SQL does not grant the service role a bypass for reads. The README says the live project already has the original tables and that `supabase/schema.sql` adds the role, session fields, authenticator policies, and `delete_own_account()`. This documentation pass did not run that SQL or query the live database.
 
 ## APIs and integrations
 
 | Integration | Role now |
 | --- | --- |
-| None for accounts or AI | Development mode is the system |
-| Supabase | Schema file only. Env names exist and are commented in `.env.example`. Presence of the variables does not change status. |
-| Vercel | Host. `main` commit `a6bfdcc` had a successful Vercel deployment status. A HEAD request to https://life-zoi.vercel.app on 2026-11-01 returned 200 and the security headers. HTML was not reviewed. |
-| Public health pages | Linked as sources from `src/lib/sources.ts` (WHO, NHLBI, NIMH, NIAAA, Nutrition.gov, Dietary Guidelines, Smokefree.gov, ODPHP, SAMHSA 988). |
+| Supabase Auth and Postgres | Active code path. Public URL and anon key required at runtime. Service role is not in `.env.example` and must not be added as `NEXT_PUBLIC_`. |
+| AI provider | Mock only. Env names in `.env.example` are planning labels. A non-mock provider is refused. |
+| MedlinePlus Connect | `https://connect.medlineplus.gov/service`, LOINC only, 12-hour cache, 20 outbound calls per minute in `src/lib/medlineplus.ts`. |
+| Vercel | Host. Homepage recorded as https://life-zoi.vercel.app. This refresh did not request it. |
+| Public health pages | `src/lib/sources.ts` and `src/lib/wellness/sources.ts`, plus the SSA period life table URL in `src/lib/life-table.ts`. |
 | Stripe, email, SMS | Not present |
-| GitHub Actions | No workflows |
+| GitHub Actions | No workflows (`total_count` 0 on 2026-11-05) |
 | MCP servers | None in the repository |
 
 ## Authentication and authorization
 
-No sign-in. `decideAccess` denies a missing actor and a mismatched owner. Hiding a button is not authorization. Future work must enforce the rule on the server and in the database. Do not put a service-role key in the browser or use it to read user rows.
+Email and password sign-in uses the browser Supabase client when the public config is valid. Authenticator enrollment uses Supabase TOTP. `GET /api/account` reads a verified session from the `Authorization` header and returns `signedIn`, `isAdmin`, and `email`. Admin is an allowlist in `src/lib/admin-allowlist.ts` and a database trigger. The client cannot grant it. `decideAccess` still denies a missing actor and a mismatched owner. Hiding a button is not authorization. Do not use the service role to read user rows.
 
 ## Hosting
 
@@ -134,22 +136,22 @@ This migration did not deploy and did not change project settings.
 
 ## Dependencies that matter
 
-Runtime: `next`, `react`, `react-dom` only. Dev: Tailwind, TypeScript, ESLint, Vitest, `vite-tsconfig-paths`. No Supabase client, no AI SDK, no auth library.
+Runtime: `next`, `react`, `react-dom`, and `@supabase/supabase-js`. Dev: Tailwind, TypeScript, ESLint, Vitest, `vite-tsconfig-paths`. No paid AI SDK.
 
 ## Limitations and debt
 
 - Tab storage is unencrypted, shared with anything else that can read that origin’s `sessionStorage`, and lost when the tab closes. It is not a backup and not a health record.
-- Application code does not store validation bodies. The host can still log them. Do not treat a public URL as a reviewed launch.
-- No accounts, recovery, audit log, or multi-device sync.
-- Source URLs can move. They need a check before launch.
-- Guidance is a fixed rule list, not a clinical guideline.
+- Application code does not store suggestion or WHAT IF? bodies. The host can still log them. Account rows are a different store.
+- Tab storage is not a backup. Account storage is not a claim of compliance, and it is not encrypted by lifeZoi beyond Supabase and HTTPS.
+- Change Lab, purpose, assistant, and wellness notes are not in the account tables.
+- Source URLs can move. They need a check before launch. The SSA figures were copied on 2026-11-03 and are not interpolated.
+- Guidance is educational, not a clinical guideline. The population figure is easy to misread as a personal lifespan.
 - 988 is United States wording.
-- `noindex` is missing on `main`.
-- `src/lib/access.ts` and the SQL file can be mistaken for a finished secure store. They are not.
-- Two implementations exist. `main` and pull request #1 disagree on storage, routes, indexing, check-in shape, and tests.
+- `noindex` is present and must stay until the privacy review.
+- Pull request #1 is closed, not merged, and still differs from `main`. The tracker has not recorded the owner’s decision.
 - The repository is public.
-- Unit tests on `main` were not executed during this documentation pass. The files contain 16 `it()` cases: `src/lib/access.test.ts` (5), `src/lib/recommendations.test.ts` (3), `src/lib/scenarios.test.ts` (4), `src/lib/validation.test.ts` (4). Scenarios tests also read the SQL text for row level security. They do not connect to a database.
-- No GitHub issues were open.
+- Unit tests were not executed during this documentation pass. Fifty-one `it()` cases are written in twelve files under `src/lib/`, including account, assistant, Change Lab, MedlinePlus, outlook-related, wellness, and the original assessment tests. They do not connect to a live database.
+- No GitHub issues were open on 2026-11-01. This refresh did not re-list issues.
 
 ## Requirements that still govern the product
 
@@ -161,11 +163,12 @@ Security requirements: HTTPS in production, security headers already set, secret
 
 | Decision | Why |
 | --- | --- |
-| Development mode instead of a pretend login | Credentials were not available. Faking success would mislead users. |
-| `sessionStorage` on `main` | Matches “this tab only” and makes the lack of durable storage obvious. Pull request #1 chose `localStorage` instead. |
-| Rule-based copy with a prohibited-claim filter | No AI provider, and the product forbids fabricated precision. |
-| Suggestions and illustrations computed on the server | Validation is not only in the browser. Bodies are still not stored. |
-| RLS in SQL before any connection | The access rule is ready for a later adapter and is not silently skipped in the design. |
+| Development mode when Supabase env is missing | Empty configuration must not look like a signed-in account. |
+| Supabase anon key and RLS for account rows | The service role must not read user rows. A verified authenticator factor requires AAL2. |
+| `sessionStorage` for notes the account tables do not hold | Change Lab, purpose, assistant, and wellness notes stay on the tab. |
+| Mock assistant that refuses other providers | A model name in `.env.example` is not a live integration. |
+| SSA figure only from copied rows, with a population label | Avoids an interpolated personal lifespan. |
+| `noindex` plus `X-Robots-Tag` | The public URL is not a reviewed launch. |
 | Sample data in a separate flag | Demo content must not be confused with a person’s answers. |
 
 ## Related documents
@@ -173,4 +176,5 @@ Security requirements: HTTPS in production, security headers already set, secret
 - [PROJECT_KNOWLEDGE.md](PROJECT_KNOWLEDGE.md)
 - [ACTIVE_WORK.md](ACTIVE_WORK.md)
 - [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
+- [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md)
 - Repository `README.md`

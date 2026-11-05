@@ -7,7 +7,7 @@ The new Claude coordinator runs this after `CLAUDE.md` and `docs/claude-migratio
 - [ ] Claude Code can clone https://github.com/ibkaplan/life-zoi and see default branch `main`.
 - [ ] Root `CLAUDE.md` is present and the session is using it.
 - [ ] `docs/claude-migration/INDEX.md` links resolve.
-- [ ] Pull request #1 is still treated as conflicting work, not merged by accident.
+- [ ] Pull request #1 stays closed and unmerged unless the owner explicitly reopens that decision.
 
 Already observed: the repo is public, default branch `main`, pull request #1 open and conflicting, no other open pulls, no issues.
 
@@ -33,8 +33,9 @@ Already observed: Cursor had one coordinator, one builder with a pull request, a
 - [ ] `npm run typecheck` passes.
 - [ ] `npm run lint` passes.
 - [ ] `npm run dev` serves http://localhost:3000.
-- [ ] `GET /api/status` reports `lifeZoi`, `development`, and `not-configured`.
-- [ ] Sample data is labeled. No health score and no lifespan appear in the empty and sample paths.
+- [ ] `GET /api/status` reports `development` / `not-configured` without public Supabase settings, and `account` / `supabase` when those settings are valid.
+- [ ] `GET /api/ai-assistant` reports mock mode.
+- [ ] Sample data is labeled. Any SSA population figure keeps the “not an individual prediction” label.
 - [ ] Phone-width and desktop-width layouts of dashboard, assessment, WHAT IF?, and progress do not overflow horizontally.
 
 Already observed: commands are documented. Tests were not executed during the documentation edit. Homepage HEAD returned 200. HTML was not reviewed.
@@ -42,7 +43,7 @@ Already observed: commands are documented. Tests were not executed during the do
 ## Integrations
 
 - [ ] GitHub pull requests can be opened by the Claude credential.
-- [ ] No Supabase key is required for the checks above.
+- [ ] The unit-test commands pass without a Supabase service-role key. Account checks, if run, use only the public anon key.
 - [ ] `.env.example` still has blank or commented values. No secret file is committed.
 - [ ] Vercel is unchanged unless a person asked for a deploy.
 - [ ] If a deploy is later approved, the live site still says notes stay in the browser.
@@ -61,7 +62,7 @@ Already observed: branch protection endpoint returned 403. Rulesets list was emp
 - [ ] Diffs contain no API keys, tokens, private keys, or passwords.
 - [ ] Service-role and AI keys are not introduced.
 - [ ] The app does not claim HIPAA or GDPR compliance.
-- [ ] `noindex` policy is understood: missing on `main`, present on pull request #1, still required before a reviewed public launch.
+- [ ] `noindex` stays on `main` in both the layout metadata and `X-Robots-Tag`.
 
 ## Deployment permissions
 

@@ -15,9 +15,9 @@ The durable tracker in the Cursor project store (`notes.md`) has a single task: 
 | Name | lifeZoi web app |
 | Id | `bc-df653408-8f63-4fd1-bd42-4e04dfa09f6e` |
 | URL | https://cursor.com/agents/bc-df653408-8f63-4fd1-bd42-4e04dfa09f6e |
-| Status on 2026-11-01 | Idle. Not archived. |
+| Status on 2026-11-05 | Idle. Not archived. |
 | Source | Cursor desktop |
-| Model recorded | Grok 4.7 |
+| Model recorded | Claude Opus (the 2026-11-01 record said Grok 4.7; the later list says `claude-opus-5-5-medium`) |
 | Branch / pull request on the agent record | None |
 
 Responsibilities that can be reconstructed:
@@ -54,7 +54,7 @@ No event-driven or scheduled coordinator duty was found. This migration run’s 
 | --- | --- |
 | Id | `bc-efe0545d-9f0c-5bcb-9551-93e15378ce49` |
 | URL | https://cursor.com/agents/bc-efe0545d-9f0c-5bcb-9551-93e15378ce49 |
-| Status on 2026-11-01 | Idle. Last recorded dashboard event: pull request created. |
+| Status on 2026-11-05 | Idle. Pull request #1 is closed and was not merged. |
 | Model | Grok 4.7 |
 | Branch | `cursor/lifezoi-app-ce49` |
 | Deliverable | https://github.com/ibkaplan/life-zoi/pull/1 commit `0ab8b12` |
@@ -65,7 +65,7 @@ No event-driven or scheduled coordinator duty was found. This migration run’s 
 | Review | No GitHub reviews on the pull request at inspection time. Vercel and Vercel Preview Comments were success. Merge was already conflicting. |
 | Completion | The agent’s turn finished. The product is not merged and is not the default branch. |
 
-Constraints it was expected to follow are the product rules in [PROJECT_KNOWLEDGE.md](PROJECT_KNOWLEDGE.md). Its tree does set `noindex`. `main` does not.
+Constraints it was expected to follow are the product rules in [PROJECT_KNOWLEDGE.md](PROJECT_KNOWLEDGE.md). `main` now also sets `noindex`. Do not revive this branch to get that behavior.
 
 ### lifeZoi application — no recorded output
 
@@ -79,12 +79,59 @@ Constraints it was expected to follow are the product rules in [PROJECT_KNOWLEDG
 
 Do not invent a role for this run. Its conversation was not readable from the project store. If it produced the commits on `main`, that link was not present in the agent record.
 
+### Merge stacked app work
+
+| | |
+| --- | --- |
+| Id | `bc-ba2e5916-e902-5eca-96cb-2eace1639ac8` |
+| URL | https://cursor.com/agents/bc-ba2e5916-e902-5eca-96cb-2eace1639ac8 |
+| Status on 2026-11-05 | Idle |
+| Branch | `cursor/integrate-lifezoi-stack-9ac8` |
+| Deliverable | Merged pull request #8, `cd15d65` |
+
+This is the integration of work attributed to Igor’s wife’s stack: `noindex`, homepage, mock assistant, Change Lab, Your Life Matters, and the nutrition, wellness, and habit tools. Her own agent ids are not visible from this project.
+
+### Blue button contrast
+
+| | |
+| --- | --- |
+| Id | `bc-b910e6d5-7db7-5dc7-9f80-11f1a4f1a0b1` |
+| URL | https://cursor.com/agents/bc-b910e6d5-7db7-5dc7-9f80-11f1a4f1a0b1 |
+| Status on 2026-11-05 | Idle |
+| Deliverable | Merged pull request #9, `0c1bef4` |
+
+### Verify merged lifeZoi pages
+
+| | |
+| --- | --- |
+| Id | `bc-3073812f-5e00-5bf8-9506-46876dee1c1b` |
+| URL | https://cursor.com/agents/bc-3073812f-5e00-5bf8-9506-46876dee1c1b |
+| Status on 2026-11-05 | Idle. Source recorded as internal. No branch and no model name on the record. |
+
+Its result was not read. Do not invent a pass or a failure.
+
+### Local lifeZoi clone
+
+| | |
+| --- | --- |
+| Id | `bc-52dc787f-c35a-51fa-8c57-6796ebe25a65` |
+| Status in this run’s agent list | Not listed on 2026-11-05 |
+| What the tracker says | LZ-6 done. Cloned the repo to `~/github/life-zoi` on Igor’s MacBook Air. |
+
+The run used a Cursor self-hosted worker (`agent worker start`) on that Mac. Igor’s Mac runs several of those workers, one per repository under `~/github`. No self-hosted worker was connected when this documentation was refreshed, so the machine could not be inspected from here.
+
+That local path is a Cursor feature. Claude Desktop or a local Claude Code session replaces it: clone or open `~/github/life-zoi` (or any other checkout) in Claude on the Mac. Claude does not register a Cursor worker and does not share Cursor’s machine pool.
+
+### Second Cursor setup
+
+Igor’s wife works on this repository from her own Cursor setup. The stacked product changes came through that work and were merged from this project. Her agents, chats, and tracker are not visible here. Do not guess her task list. The app’s admin allowlist is the email already stored in `src/lib/admin-allowlist.ts`.
+
 ### Claude Code migration — documentation only
 
 | | |
 | --- | --- |
 | Id | `bc-d9827e20-0c85-51e9-8d6d-eaa0b1f3ed8c` |
-| Purpose | Write this `docs/claude-migration/` set and root `CLAUDE.md`. |
+| Purpose | Write this directory, then refresh it for `main` at `1d6a333`. |
 | Constraint | No application changes. Do not merge pull request #1. Do not contact the other agents. |
 
 ## How coordination worked
@@ -98,7 +145,8 @@ Do not invent a role for this run. Its conversation was not readable from the pr
 | Review | Unclear for `main`. Pull request #1 had no human review. | Coordinator reads the diff and the safety rules before merge. |
 | Integrate | `main` moved by direct commits. Pull request #1 no longer applies cleanly. | Merge only fast-forward or conflict-free pull requests. Do not force pull request #1. |
 | Failures | No written recovery | If a session stalls, leave its branch intact and continue from GitHub, not from memory. |
-| Choose next work | Tracker shows nothing pending | A person, or the coordinator, picks from [ACTIVE_WORK.md](ACTIVE_WORK.md). Nothing starts itself. |
+| Choose next work | Tracker’s open product item is LZ-3. LZ-7 is this doc refresh. | A person, or the coordinator, picks from [ACTIVE_WORK.md](ACTIVE_WORK.md). Nothing starts itself. |
+| Local machine | Cursor self-hosted worker plus `~/github/life-zoi` | Claude Desktop or local Claude Code on that checkout. |
 
 ## Capability differences
 

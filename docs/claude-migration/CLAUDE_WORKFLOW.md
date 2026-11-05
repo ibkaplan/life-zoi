@@ -52,7 +52,7 @@ Expected deliverable: a branch and a pull request, or a clear statement that the
 | Work | Where |
 | --- | --- |
 | Edits, unit tests, typecheck, lint, pull requests | Claude Code cloud thread with this repo |
-| Browser checks of layout at phone and desktop widths, local env files, Vercel CLI against a personal login | Claude Code local session (Desktop or CLI) |
+| Browser checks of layout at phone and desktop widths, local env files, the Mac checkout at `~/github/life-zoi` | Claude Desktop or local Claude Code. This replaces Cursor’s self-hosted worker. |
 | Collaboration | GitHub branches and pull requests |
 
 Cloud limits to plan for:
@@ -69,7 +69,7 @@ Local limits:
 
 ## Concurrency
 
-One writer per file set. Practical rule for this repo: one implementation branch at a time until pull request #1 is closed or deliberately rebuilt. The app shares `src/lib/types.ts`, the shell, and the global CSS. Parallel feature branches will conflict.
+One writer per file set. Pull request #1 is already closed. The app still shares `src/lib/types.ts`, the shell, and the global CSS, so parallel feature branches will conflict. Igor’s wife may edit from her own Cursor setup at the same time. Look at open pull requests before starting.
 
 Isolated git worktrees are appropriate when a documentation change must not touch a dirty app checkout. They are not a reason to run two feature branches.
 
@@ -116,8 +116,8 @@ Specific Claude model names change. Pick by capability and cost inside the produ
 ## First sessions
 
 1. Coordinator reads [INDEX.md](INDEX.md) and runs the verification commands in it.
-2. Coordinator reports test results and restates the pull request #1 conflict.
-3. Stop and ask the owner which tree wins if the next task would edit product code.
-4. Only then assign an implementation worker.
+2. Coordinator reports test results and treats `main` as the tree. Pull request #1 stays closed unless the owner reopens the question.
+3. Ask the owner only if LZ-3 is still unchecked and the next task would resurrect the old branch.
+4. Assign an implementation worker for a bounded change on a new branch from `main`.
 
 Do not open a Supabase project, an AI account, or a production deploy in the first session.
