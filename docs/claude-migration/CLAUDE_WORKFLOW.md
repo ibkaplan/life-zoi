@@ -87,7 +87,7 @@ For application changes, require:
 
 For documentation-only changes, require a diff limited to the intended docs, a link check, and a secret scan. Do not demand a product release.
 
-GitHub branch protection could not be read. If GitHub requires a review, wait for it. Do not bypass it.
+GitHub reported `main` as unprotected on 2026-11-05, and there is no CI, so the coordinator runs the checks above before merging. If GitHub later requires a review, wait for it. Do not bypass it.
 
 ## Model use on a Claude Ultra subscription
 
@@ -117,7 +117,7 @@ Specific Claude model names change. Pick by capability and cost inside the produ
 
 1. Coordinator reads [INDEX.md](INDEX.md) and runs the verification commands in it.
 2. Coordinator reports test results and treats `main` as the tree. Pull request #1 stays closed unless the owner reopens the question.
-3. Ask the owner only if LZ-3 is still unchecked and the next task would resurrect the old branch.
+3. LZ-3 is answered in favor of `main`. Do not resurrect the old branch.
 4. Assign an implementation worker for a bounded change on a new branch from `main`.
 
 Do not open a Supabase project, an AI account, or a production deploy in the first session.

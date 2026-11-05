@@ -48,7 +48,7 @@ Security headers from `next.config.ts`: `X-Content-Type-Options: nosniff`, `Refe
 
 ## Pull request history that matters
 
-https://github.com/ibkaplan/life-zoi/pull/1 is closed, not merged (closed 2026-11-04). It remains a second app on `cursor/lifezoi-app-ce49` at `0ab8b12`: `localStorage`, its own validation routes, and `src/lib/lifezoi.test.ts`. Do not merge it. The tracker checkbox LZ-3 still asks the owner to decide whether that closed request or `main` is canonical.
+https://github.com/ibkaplan/life-zoi/pull/1 is closed, not merged (closed 2026-11-04). It remains a second app on `cursor/lifezoi-app-ce49` at `0ab8b12`: `localStorage`, its own validation routes, and `src/lib/lifezoi.test.ts`. Do not merge it. On 2026-11-05 the owner confirmed `main` as canonical (LZ-3).
 
 Pull requests #3 and #8 merged the stacked work onto `main` (`cd15d65`): `noindex`, the homepage redesign, the mock assistant, Change Lab, Your Life Matters, and the nutrition, wellness, and habit tools. #4, #5, #6, and #7 are closed and were not merged. On 2026-11-05 GitHub showed them closed at the same time as #1. Their commits are already on `main` through #8. An earlier note that the coordinator could not close them is out of date.
 
@@ -64,7 +64,7 @@ Pull request #9 merged the primary-button contrast fix (`0c1bef4`). Pull request
 - Document upload. See [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md). Accounts for assessment rows do not satisfy that plan.
 - Making the repository private. It was still public on 2026-11-05.
 
-The Cursor tracker is not in git. On 2026-11-05 its open product item was LZ-3. LZ-7 is this documentation refresh.
+The Cursor tracker is not in git. LZ-3 was answered on 2026-11-05 in favor of `main`.
 
 ## Architecture
 
@@ -150,7 +150,7 @@ Runtime: `next`, `react`, `react-dom`, and `@supabase/supabase-js`. Dev: Tailwin
 - `noindex` is present and must stay until the privacy review.
 - Pull request #1 is closed, not merged, and still differs from `main`. The tracker has not recorded the owner’s decision.
 - The repository is public.
-- Unit tests were not executed during this documentation pass. Fifty-one `it()` cases are written in twelve files under `src/lib/`, including account, assistant, Change Lab, MedlinePlus, outlook-related, wellness, and the original assessment tests. They do not connect to a live database.
+- On 2026-11-05 Claude ran the suite at `a857fce`: 79 tests in twelve files under `src/lib/` passed, including account, assistant, Change Lab, MedlinePlus, outlook-related, wellness, and the original assessment tests. They do not connect to a live database.
 - `gh issue list` returned no issues on 2026-11-05. `gh pr list` showed no open pull requests.
 
 ## Requirements that still govern the product
