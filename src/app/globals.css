@@ -1627,6 +1627,48 @@ button.assistant-send:focus-visible,
   font-weight: 750;
   text-decoration: none;
 }
+.wellness-live {
+  display: grid;
+  gap: 0.65rem;
+  background: #ffffff;
+  border: 1px solid #E9DDFB;
+  border-radius: 22px;
+  padding: 0.95rem 1rem;
+}
+.wellness-live textarea {
+  width: 100%;
+  min-height: 6.5rem;
+  border-radius: 16px;
+  border: 1px solid #D4C4F5;
+  background: #ffffff;
+  color: #172554;
+  font: inherit;
+  font-size: 1.05rem;
+  padding: 0.8rem 1rem;
+  resize: vertical;
+}
+.wellness-thread { display: grid; gap: 0.55rem; }
+.wellness-bubble {
+  margin: 0;
+  border-radius: 18px;
+  padding: 0.75rem 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.wellness-bubble .wellness-kicker { display: block; margin-bottom: 0.25rem; }
+.wellness-bubble.user { background: #F4EEFF; }
+.wellness-bubble.assistant {
+  background: #ffffff;
+  border: 1px solid rgba(113, 54, 200, 0.14);
+}
+.wellness-suggestion {
+  margin: 0;
+  background: #DCEEFF;
+  border-radius: 18px;
+  padding: 0.7rem 0.9rem;
+  line-height: 1.45;
+}
+.wellness-suggestion .wellness-kicker { display: block; margin-bottom: 0.25rem; }
 .wellness-listening {
   margin: 0;
   width: fit-content;
@@ -1643,7 +1685,7 @@ button.assistant-send:focus-visible,
 @media (max-width: 720px) {
   .wellness-filters button { flex: 1 1 100%; }
   .wellness-feelings { grid-template-columns: 1fr; }
-  .wellness-speech .btn, .wellness-back, .wellness-links a { width: 100%; justify-content: center; }
+  .wellness-speech .btn, .wellness-back, .wellness-links a, .wellness-live .btn { width: 100%; justify-content: center; }
 }
 
 @media print {

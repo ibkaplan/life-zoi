@@ -57,14 +57,15 @@ File: `.env.example`. Copy only if you want the names locally. Leave values blan
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Public Supabase URL. The browser client inlines this direct `process.env` read. | Only for accounts |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key. Not a license to skip row level security. | Only for accounts |
-| `AI_PROVIDER` | Must stay `mock`. Any other value is refused and does not call a network. | No |
-| `AI_MODEL` | Label only. Default in code is `gpt-4o-mini` if unset or invalid. Not called. | No |
+| `AI_PROVIDER` | Must stay `mock` on the development endpoint. Any other value is refused and does not call a network. | No |
+| `AI_MODEL` | Label only for that endpoint. Default in code is `gpt-4o-mini` if unset or invalid. Not called. | No |
 | `AI_PLAN` | `basic`, `premium`, or `advanced`. Planning only. There is no unlimited plan. | No |
 | `AI_PROMPT_CENTS_PER_1K` and `AI_COMPLETION_CENTS_PER_1K` | Planning estimates, not a bill. | No |
+| `GEMINI_API_KEY` | Server-only key for `/api/ai-assistant/wellness`. Empty keeps the 50 prepared answers. The code calls `gemini-3.5-flash-lite` only. | No |
 
 `src/lib/status.ts` reports `authentication: "supabase"` and `persistence: "account"` only when `SESSION_ADAPTER` is `supabase` and both public values pass `isPublicSupabaseConfig` (https URL, anon key length 20–4096, no whitespace). Otherwise status stays `not-configured`.
 
-Do not add `SUPABASE_SERVICE_ROLE_KEY` to any client bundle. It is not in `.env.example`. Do not add `OPENAI_API_KEY`. The mock does not use one.
+Do not add `SUPABASE_SERVICE_ROLE_KEY` to any client bundle. It is not in `.env.example`. Do not add `OPENAI_API_KEY`. The development mock does not use one. `GEMINI_API_KEY` is optional, server-only, and empty in `.env.example`.
 
 Cloud and local test runs do not need these variables. Account testing needs the public pair in the environment, not in git. Production values belong in Vercel, and this refresh did not read them.
 

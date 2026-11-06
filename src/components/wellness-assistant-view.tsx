@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import { adapterStatusLabel } from "@/lib/wellness-assistant/adapter";
+import { WellnessLivePanel } from "@/components/wellness-live-panel";
 import {
+  FEELING_HEADING,
   LIMITED_SET_MESSAGE,
   NO_ENGLISH_VOICE_MESSAGE,
+  PREPARED_ANSWERS_REMAIN,
   RECOGNITION_UNSUPPORTED_MESSAGE,
   SPEECH_UNSUPPORTED_MESSAGE,
   VOICE_PRIVACY_NOTE,
-  FEELING_HEADING,
   WELLNESS_ASSISTANT_EMERGENCY,
   WELLNESS_ASSISTANT_KIND,
   WELLNESS_ASSISTANT_NOTE,
@@ -164,6 +165,8 @@ export function WellnessAssistantView() {
           {WELLNESS_ASSISTANT_NOTE}
         </p>
       </header>
+
+      <WellnessLivePanel onOpenQuestion={choose} />
 
       <div className="wellness-filters" role="group" aria-label="Question categories">
         <button type="button" aria-pressed={category === "all" && !selected} onClick={() => { setCategory("all"); setSelectedId(null); setFeelingId(null); }}>
@@ -341,7 +344,7 @@ export function WellnessAssistantView() {
           </section>
           <p className="wellness-kind">{WELLNESS_ASSISTANT_KIND}</p>
           <p className="wellness-emergency" role="note">{WELLNESS_ASSISTANT_EMERGENCY}</p>
-          <p className="wellness-source">{adapterStatusLabel()}</p>
+          <p className="wellness-source">{PREPARED_ANSWERS_REMAIN}</p>
         </>
       )}
     </div>

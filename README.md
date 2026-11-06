@@ -15,7 +15,7 @@ Email and password sign-in uses Supabase Auth when `NEXT_PUBLIC_SUPABASE_URL` an
 - That tab storage is not encrypted by lifeZoi and is not a secure health record.
 - Sample data is labeled “Sample visitor” and is not written into an account.
 - Suggestion and WHAT IF? requests go to this app’s own server for validation, then are discarded. They are not sent to an AI service.
-- The Wellness Assistant at `/ai-assistant` shows prepared questions and answers stored in the app. It is not a live chatbot. Listening uses the browser’s speech synthesis and does not send answer text to a speech service. Ask by voice is optional and uses the browser’s speech recognition. LifeZoi does not receive that audio. `AI_PROVIDER=mock` is the only enabled mode on the unused development endpoint. A different provider name is refused, and no paid model, payment service, or health-record database is contacted.
+- The Wellness Assistant at `/ai-assistant` keeps 50 prepared questions and answers in the app. Ask in your own words calls this app’s server. If `GEMINI_API_KEY` is set, the server sends that session’s questions to Google’s free-tier Gemini model `gemini-3.5-flash-lite` and does not send lab results, diagnoses, or account records. If the key is missing or the free tier cannot answer, the prepared answer is shown. Listening uses the browser’s speech synthesis and does not send answer text to a speech service. Ask by voice is optional and uses the browser’s speech recognition. LifeZoi does not receive that audio. `AI_PROVIDER=mock` is the only enabled mode on the separate development endpoint `POST /api/ai-assistant`. A different provider name there is refused. No payment service is contacted.
 - Lab education can ask MedlinePlus Connect for a verified LOINC code only. Responses are cached for 12 hours. Personal results and documents are not sent. Real document upload is described in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active.
 - Your Life Matters reflections, Change Lab notes, the assistant conversation, and wellness notes stay in this browser tab. Your Life Matters notes are personal reflections about purpose and kindness. They are not a medical score, and positive karma is presented as a philosophical metaphor.
 
@@ -81,7 +81,8 @@ Do not deploy with a claim of HIPAA, GDPR, or other compliance.
 - Search indexing is off until a reviewed privacy notice matches the real system. Do not remove the `noindex` metadata or `X-Robots-Tag` header before that review.
 - Accounts store the signed-in session described above. There is no HIPAA, GDPR, or other compliance claim.
 - Data without an account is tab-local and easy to lose. Tab storage and account storage are not encrypted by lifeZoi beyond what the host and Supabase provide.
-- Suggestions are rules, not a clinician and not an AI model.
+- Suggestions on the main flows are rules, not a clinician and not an AI model.
+- The wellness assistant uses prepared answers unless `GEMINI_API_KEY` is set on the server. That key calls only the free-tier Gemini model named in `.env.example`. It is not a clinician.
 - Quantitative personal risk, “years gained,” and dates of death are intentionally absent.
 - The GitHub token used in this environment could not change the repository from public to private.
 - Row level security is in `supabase/schema.sql` and is enabled on the account tables.
