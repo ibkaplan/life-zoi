@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PagePhoto } from "@/components/page-photo";
+import { WeeklyProgress } from "@/components/weekly-progress";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
 import {
@@ -49,12 +50,13 @@ export function ProgressView() {
         <p className="kicker">Progress</p>
         <h1>A record of what you try</h1>
         <p className="lede">
-          A missed day is information, not a failure. lifeZoi does not claim a habit change caused a health result. Check-ins here are user-reported. Measured clinic values are not stored. Estimates stay on the outlook page, and WHAT IF? stays hypothetical.
+          A missed day is information, not a failure. lifeZoi does not claim a habit change caused a health result. Check-ins here are user-reported. Measured clinic values are not stored.           Estimates stay on the outlook page, and WHAT IF? stays hypothetical.
         </p>
         <p>
           <Link href="/plan">Your progress matters. Open My Life Improvement Plan.</Link>
         </p>
       </div>
+      <WeeklyProgress />
       <section className="card stack">
         <h2>Habit goals</h2>
         <p>Choose a habit and how many days a week you want to aim for. This is your goal, not a prescription.</p>

@@ -15,23 +15,32 @@ import { clearChangeLab } from "@/lib/change-lab";
 import { clearPurpose } from "@/lib/purpose";
 import { resetWellnessClient } from "@/lib/wellness/client-store";
 import { createSampleSession } from "@/lib/sample";
+import { mondayOf } from "@/lib/dates";
 import {
   completeDraft,
   removeCheckIn,
   removeGoal,
   removeScenario,
+  removeWeightEntry,
   chooseReassessment,
   saveScenario,
   upsertCheckIn,
   upsertGoal,
+  upsertWeeklyCheckIn,
+  upsertWeightEntry,
 } from "@/lib/session";
+import { selectedAccomplishments } from "@/lib/weekly-progress";
 import {
   emptySession,
+  WEEKLY_ACCOMPLISHMENT_IDS,
   type Assessment,
+  type EnergyLevel,
   type HabitId,
   type ReassessDays,
   type TrackableHabitId,
   type UserSession,
+  type WeeklyAccomplishmentId,
+  type WeightUnit,
 } from "@/lib/types";
 import { validateCheckInDate, validateDaysPerWeek } from "@/lib/validation";
 
@@ -55,6 +64,13 @@ type SessionApi = {
     note: string;
   }) => string | null;
   removeCheckIn: (id: string) => void;
+  saveWeeklyCheckIn: (input: {
+    energy: EnergyLevel | null;
+    accomplishments: WeeklyAccomplishmentId[];
+    proudOf: string;
+  }) => string | null;
+  saveWeight: (input: { date: string; value: number; unit: WeightUnit }) => string | null;
+  removeWeight: (id: string) => void;
   clearUserData: () => void;
   setSample: (on: boolean) => void;
   setReassessment: (days: ReassessDays) => string | null;
@@ -152,6 +168,55 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       removeCheckIn: (id) => {
         if (sample) return;
         commit(removeCheckIn(stored, id));
+      },
+      saveWeeklyCheckIn: (input) => {
+        if (sample) return READ_ONLY;
+        const weekStart = mondayOf(todayDate());
+        if (!weekStart) return "This week could not be saved.";
+        const energy =
+          input.energy === null ||
+          (Number.isInteger(input.energy) && input.energy >= 1 && input.energy <= 5)
+            ? input.energy
+            : null;
+        if (input.energy !== null && energy === null) return "Choose an energy from 1 to 5, or leave it unset.";
+        const accomplishments = selectedAccomplishments(
+          Object.fromEntries(WEEKLY_ACCOMPLISHMENT_IDS.map((id) => [id, input.accomplishments.includes(id)])),
+        );
+        const existing = stored.weeklyCheckIns.find((item) => item.weekStart === weekStart);
+        commit(
+          upsertWeeklyCheckIn(stored, {
+            id: existing?.id ?? crypto.randomUUID(),
+            weekStart,
+            savedAt: new Date().toISOString(),
+            energy,
+            accomplishments,
+            proudOf: input.proudOf.trim().slice(0, 280),
+          }),
+        );
+        return null;
+      },
+      saveWeight: (input) => {
+        if (sample) return READ_ONLY;
+        const dateError = validateCheckInDate(input.date, todayDate());
+        if (dateError) return dateError;
+        if (input.unit !== "lb" && input.unit !== "kg") return "Choose pounds or kilograms.";
+        if (typeof input.value !== "number" || !Number.isFinite(input.value)) return "Enter a weight greater than 0.";
+        const value = Math.round(input.value * 100) / 100;
+        if (value <= 0 || value > 1000) return "Enter a weight greater than 0 and up to 1000.";
+        const existing = stored.weightEntries.find((item) => item.date === input.date && item.unit === input.unit);
+        commit(
+          upsertWeightEntry(stored, {
+            id: existing?.id ?? crypto.randomUUID(),
+            date: input.date,
+            value,
+            unit: input.unit,
+          }),
+        );
+        return null;
+      },
+      removeWeight: (id) => {
+        if (sample) return;
+        commit(removeWeightEntry(stored, id));
       },
       setReassessment: (days) => {
         if (sample) return READ_ONLY;

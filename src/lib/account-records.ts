@@ -18,6 +18,8 @@ export type ProfileWrite = {
     draftStep: number;
     reassessDays: UserSession["reassessDays"];
     reassessOn: string;
+    weeklyCheckIns: UserSession["weeklyCheckIns"];
+    weightEntries: UserSession["weightEntries"];
   };
   updated_at: string;
 };
@@ -93,6 +95,8 @@ export function isBlankSession(session: UserSession): boolean {
     session.scenarios.length === 0 &&
     session.goals.length === 0 &&
     session.checkIns.length === 0 &&
+    session.weeklyCheckIns.length === 0 &&
+    session.weightEntries.length === 0 &&
     session.draftStep === 0 &&
     session.reassessDays === 0 &&
     session.reassessOn === "" &&
@@ -142,6 +146,8 @@ export function sessionToRows(session: UserSession, actorUserId: string, updated
         draftStep: session.draftStep,
         reassessDays: session.reassessDays,
         reassessOn: session.reassessOn,
+        weeklyCheckIns: session.weeklyCheckIns,
+        weightEntries: session.weightEntries,
       },
       updated_at: updatedAt,
     },
@@ -215,6 +221,8 @@ export function rowsToSession(input: AccountRead): UserSession {
     draftStep: state.draftStep,
     reassessDays: state.reassessDays,
     reassessOn: state.reassessOn,
+    weeklyCheckIns: state.weeklyCheckIns,
+    weightEntries: state.weightEntries,
     history: input.assessments.map((row) => ({
       id: row.id,
       completedAt: row.completed_at,

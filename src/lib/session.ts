@@ -1,4 +1,4 @@
-import { isRealISODate } from "@/lib/dates";
+import { isRealISODate, mondayOf } from "@/lib/dates";
 import {
   coerceAssessment,
   isHabitId,
@@ -9,16 +9,24 @@ import {
 import {
   emptySession,
   STEP_IDS,
+  WEEKLY_ACCOMPLISHMENT_IDS,
   type CheckIn,
   type CompletedAssessment,
+  type EnergyLevel,
   type HabitGoal,
   type SavedScenario,
   type UserSession,
+  type WeeklyAccomplishmentId,
+  type WeeklyCheckIn,
+  type WeightEntry,
+  type WeightUnit,
 } from "@/lib/types";
 
 const HISTORY_LIMIT = 24;
 const SCENARIO_LIMIT = 30;
 const CHECKIN_LIMIT = 400;
+const WEEKLY_LIMIT = 104;
+const WEIGHT_LIMIT = 400;
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
@@ -35,6 +43,33 @@ function cleanId(value: unknown): string {
 function cleanNote(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.replace(/[\u0000-\u001F\u007F]/g, "").trim().slice(0, 280);
+}
+
+function cleanEnergy(value: unknown): EnergyLevel | null {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 5) return null;
+  return value as EnergyLevel;
+}
+
+function cleanAccomplishments(value: unknown): WeeklyAccomplishmentId[] {
+  if (!Array.isArray(value)) return [];
+  const picked: WeeklyAccomplishmentId[] = [];
+  for (const item of value) {
+    if (typeof item !== "string" || !WEEKLY_ACCOMPLISHMENT_IDS.includes(item as WeeklyAccomplishmentId)) continue;
+    if (picked.includes(item as WeeklyAccomplishmentId)) continue;
+    picked.push(item as WeeklyAccomplishmentId);
+  }
+  return picked;
+}
+
+function cleanWeightValue(value: unknown): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  const rounded = Math.round(value * 100) / 100;
+  if (rounded <= 0 || rounded > 1000) return null;
+  return rounded;
+}
+
+function cleanWeightUnit(value: unknown): WeightUnit | null {
+  return value === "lb" || value === "kg" ? value : null;
 }
 
 export function sanitizeSession(input: unknown): UserSession {
@@ -111,13 +146,63 @@ export function sanitizeSession(input: unknown): UserSession {
         .slice(0, CHECKIN_LIMIT)
     : [];
 
+  const weeklyCheckIns = Array.isArray(record.weeklyCheckIns)
+    ? record.weeklyCheckIns
+        .map((item): WeeklyCheckIn | null => {
+          const row = asRecord(item);
+          if (!row) return null;
+          const id = cleanId(row.id);
+          const weekStart = typeof row.weekStart === "string" ? mondayOf(row.weekStart) : "";
+          const savedAt = typeof row.savedAt === "string" ? row.savedAt : "";
+          if (!id || !weekStart || Number.isNaN(Date.parse(savedAt))) return null;
+          return {
+            id,
+            weekStart,
+            savedAt,
+            energy: cleanEnergy(row.energy),
+            accomplishments: cleanAccomplishments(row.accomplishments),
+            proudOf: cleanNote(row.proudOf),
+          };
+        })
+        .filter((item): item is WeeklyCheckIn => item !== null)
+        .filter((item, index, all) => all.findIndex((other) => other.weekStart === item.weekStart) === index)
+        .slice(0, WEEKLY_LIMIT)
+    : [];
+
+  const weightEntries = Array.isArray(record.weightEntries)
+    ? record.weightEntries
+        .map((item): WeightEntry | null => {
+          const row = asRecord(item);
+          if (!row) return null;
+          const id = cleanId(row.id);
+          const date = typeof row.date === "string" ? row.date : "";
+          const unit = cleanWeightUnit(row.unit);
+          const value = cleanWeightValue(row.value);
+          if (!id || !isRealISODate(date) || !unit || value === null) return null;
+          return { id, date, value, unit };
+        })
+        .filter((item): item is WeightEntry => item !== null)
+        .slice(0, WEIGHT_LIMIT)
+    : [];
+
   const reassessDays = record.reassessDays === 30 || record.reassessDays === 90 || record.reassessDays === 180
     ? record.reassessDays
     : 0;
   const reassessOn =
     typeof record.reassessOn === "string" && isRealISODate(record.reassessOn) ? record.reassessOn : "";
 
-  return { draft, draftStep, history, scenarios, goals: uniqueGoals, checkIns, reassessDays, reassessOn };
+  return {
+    draft,
+    draftStep,
+    history,
+    scenarios,
+    goals: uniqueGoals,
+    checkIns,
+    weeklyCheckIns,
+    weightEntries,
+    reassessDays,
+    reassessOn,
+  };
 }
 
 export function completeDraft(
@@ -158,6 +243,20 @@ export function upsertCheckIn(session: UserSession, checkIn: CheckIn): UserSessi
 
 export function removeCheckIn(session: UserSession, id: string): UserSession {
   return { ...session, checkIns: session.checkIns.filter((item) => item.id !== id) };
+}
+
+export function upsertWeeklyCheckIn(session: UserSession, checkIn: WeeklyCheckIn): UserSession {
+  const rest = session.weeklyCheckIns.filter((item) => item.weekStart !== checkIn.weekStart);
+  return { ...session, weeklyCheckIns: [checkIn, ...rest].slice(0, WEEKLY_LIMIT) };
+}
+
+export function upsertWeightEntry(session: UserSession, entry: WeightEntry): UserSession {
+  const rest = session.weightEntries.filter((item) => !(item.date === entry.date && item.unit === entry.unit));
+  return { ...session, weightEntries: [entry, ...rest].slice(0, WEIGHT_LIMIT) };
+}
+
+export function removeWeightEntry(session: UserSession, id: string): UserSession {
+  return { ...session, weightEntries: session.weightEntries.filter((item) => item.id !== id) };
 }
 
 export function saveScenario(session: UserSession, scenario: SavedScenario): UserSession {

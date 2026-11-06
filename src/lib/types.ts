@@ -184,6 +184,30 @@ export type CheckIn = {
   note: string;
 };
 
+export const WEEKLY_ACCOMPLISHMENT_IDS = ["movement", "food", "water", "sleep", "relax"] as const;
+
+export type WeeklyAccomplishmentId = (typeof WEEKLY_ACCOMPLISHMENT_IDS)[number];
+
+export type EnergyLevel = 1 | 2 | 3 | 4 | 5;
+
+export type WeeklyCheckIn = {
+  id: string;
+  weekStart: string;
+  savedAt: string;
+  energy: EnergyLevel | null;
+  accomplishments: WeeklyAccomplishmentId[];
+  proudOf: string;
+};
+
+export type WeightUnit = "lb" | "kg";
+
+export type WeightEntry = {
+  id: string;
+  date: string;
+  value: number;
+  unit: WeightUnit;
+};
+
 export type UserSession = {
   draft: Assessment;
   draftStep: number;
@@ -191,6 +215,8 @@ export type UserSession = {
   scenarios: SavedScenario[];
   goals: HabitGoal[];
   checkIns: CheckIn[];
+  weeklyCheckIns: WeeklyCheckIn[];
+  weightEntries: WeightEntry[];
   reassessDays: ReassessDays | 0;
   reassessOn: string;
 };
@@ -264,6 +290,8 @@ export function emptySession(): UserSession {
     scenarios: [],
     goals: [],
     checkIns: [],
+    weeklyCheckIns: [],
+    weightEntries: [],
     reassessDays: 0,
     reassessOn: "",
   };

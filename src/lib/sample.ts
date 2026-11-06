@@ -66,6 +66,8 @@ export function createSampleSession(today: string): UserSession {
       { habitId: "walk", daysPerWeek: 3 },
       { habitId: "sleep", daysPerWeek: 5 },
     ],
+    weeklyCheckIns: [],
+    weightEntries: [],
     checkIns: [
       {
         id: "sample-check-1",

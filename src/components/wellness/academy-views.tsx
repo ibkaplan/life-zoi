@@ -28,7 +28,7 @@ export function AcademyHome() {
         </Link>
         <Link className="card learn-link" href="/academy/meals">
           <h2>Meal lessons</h2>
-          <p>Planning, portions, protein, fiber, fish, shopping, storage, timing, added sugar, homemade bread, and gut health.</p>
+          <p>A healthy plate, protein, sodium, fats, plants, shopping, added sugar, homemade bread, gut health, and the lesson library.</p>
         </Link>
         <Link className="card learn-link" href="/academy/move">
           <h2>Movement library</h2>
@@ -144,12 +144,19 @@ export function MealIndex() {
   return (
     <div className="learn stack-lg">
       <PagePhoto id="nutrition" />
-      <p className="kicker">Nutrition & Fitness Academy</p>
-      <h1>Meal lessons</h1>
+      <p className="kicker">Nutrition</p>
+      <h1>Nutrition</h1>
       <p className="lede">
-        The lesson library is still here. Daily food patterns, added sugar, homemade bread, and gut health are part of this same page.
+        Build a plate, compare labels, and keep the lessons already on this page: added sugar, homemade bread, gut health, and the meal library.
       </p>
       <nav className="actions" aria-label="Nutrition topics">
+        <a className="btn btn-secondary" href="#healthy-plate">Healthy plate</a>
+        <a className="btn btn-secondary" href="#protein">Protein</a>
+        <a className="btn btn-secondary" href="#hidden-salt">Hidden salt</a>
+        <a className="btn btn-secondary" href="#healthy-fats">Healthy fats</a>
+        <a className="btn btn-secondary" href="#eat-the-rainbow">Plants</a>
+        <a className="btn btn-secondary" href="#grocery">Grocery</a>
+        <a className="btn btn-secondary" href="#nutrition-challenge">Challenge</a>
         <a className="btn btn-secondary" href="#daily-choices">Daily choices</a>
         <a className="btn btn-secondary" href="#sugar-hiding">Labels and added sugar</a>
         <a className="btn btn-secondary" href="#bake-bread">Homemade bread</a>
