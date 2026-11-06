@@ -13,7 +13,7 @@ export const DIRECTION_LINES = [
   "Your kindness gives the world something valuable.",
 ] as const;
 
-export const BRAND_LINE = "LifeZoi — Live Longer. Live Better. Make Life Matter.";
+export const BRAND_LINE = "LIVE BETTER. MAKE LIFE MATTER.";
 
 export const BRAND_SUPPORT =
   "Your health is your opportunity to create a better future — for yourself and for the people around you.";

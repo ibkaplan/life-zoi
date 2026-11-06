@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { EvidenceLine, ReadOnlyNote, WellnessSources } from "@/components/wellness/bits";
 import { activities, mealModules } from "@/lib/wellness/academy";
@@ -139,6 +140,7 @@ function FoodCard({ food }: { food: FoodRecord }) {
 export function MealIndex() {
   return (
     <div className="learn stack-lg">
+      <PagePhoto id="nutrition" />
       <p className="kicker">Nutrition & Fitness Academy</p>
       <h1>Meal lessons</h1>
       {mealModules.map((module) => (
@@ -180,6 +182,7 @@ export function MealDetail({ slug }: { slug: string }) {
 export function MoveIndex() {
   return (
     <div className="learn stack-lg">
+      <PagePhoto id="movement" />
       <p className="kicker">Nutrition & Fitness Academy</p>
       <h1>Movement library</h1>
       <p className="lede">
@@ -222,14 +225,14 @@ export function MoveDetail({ slug }: { slug: string }) {
 function ActivitySketch({ kind }: { kind: "walk" | "chair" | "balance" | "band" | "stretch" }) {
   return (
     <svg className="learn-sketch" viewBox="0 0 240 140" role="img" aria-label="Simple original sketch of the movement">
-      <rect width="240" height="140" rx="18" fill="#f5f3ff" />
-      <circle cx="78" cy="36" r="12" fill="#5b21b6" />
-      <path d="M78 48 v34" stroke="#312e81" strokeWidth="4" strokeLinecap="round" />
-      {kind === "walk" ? <path d="M78 82 l-16 28 M78 82 l18 26 M78 62 l20 10" stroke="#0f766e" strokeWidth="4" strokeLinecap="round" /> : null}
-      {kind === "chair" ? <path d="M70 110 h40 M78 82 v28 M60 70 h28" stroke="#0f766e" strokeWidth="4" strokeLinecap="round" /> : null}
-      {kind === "balance" ? <path d="M78 82 l-8 30 M70 112 l22 0 M120 20 v100" stroke="#0f766e" strokeWidth="4" strokeLinecap="round" /> : null}
-      {kind === "band" ? <path d="M58 70 h40 M150 78 h40" stroke="#0f766e" strokeWidth="4" strokeLinecap="round" /> : null}
-      {kind === "stretch" ? <path d="M78 60 l24 -16 M78 82 v28" stroke="#0f766e" strokeWidth="4" strokeLinecap="round" /> : null}
+      <rect width="240" height="140" rx="18" fill="#E9DDFB" />
+      <circle cx="78" cy="36" r="12" fill="#7136C8" />
+      <path d="M78 48 v34" stroke="#5725A8" strokeWidth="4" strokeLinecap="round" />
+      {kind === "walk" ? <path d="M78 82 l-16 28 M78 82 l18 26 M78 62 l20 10" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
+      {kind === "chair" ? <path d="M70 110 h40 M78 82 v28 M60 70 h28" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
+      {kind === "balance" ? <path d="M78 82 l-8 30 M70 112 l22 0 M120 20 v100" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
+      {kind === "band" ? <path d="M58 70 h40 M150 78 h40" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
+      {kind === "stretch" ? <path d="M78 60 l24 -16 M78 82 v28" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
     </svg>
   );
 }

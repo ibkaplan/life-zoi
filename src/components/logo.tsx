@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 export function LeafMark({ tone = "forest" }: { tone?: "forest" | "violet" }) {
-  const background = tone === "violet" ? "#5b21b6" : "#1d3f31";
-  const leaf = tone === "violet" ? "#f5f3ff" : "#e7f3ea";
-  const stem = tone === "violet" ? "#5b21b6" : "#1d3f31";
+  const background = tone === "violet" ? "#7136C8" : "#5725A8";
+  const leaf = tone === "violet" ? "#E9DDFB" : "#DCEEFF";
+  const stem = background;
   return (
     <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
       <rect width="32" height="32" rx="9" fill={background} />

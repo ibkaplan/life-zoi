@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { SourceList, LoadingState } from "@/components/sources";
 import { formatTimestamp } from "@/lib/dates";
@@ -122,6 +123,7 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
 
   return (
     <div className="stack-lg">
+      <PagePhoto id="what-if" />
       <div className="narrow stack">
         <p className="kicker">WHAT IF?</p>
         <h1>Explore one change</h1>

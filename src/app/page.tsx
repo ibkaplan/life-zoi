@@ -75,10 +75,11 @@ export default function HomePage() {
         <section className="page home-hero">
           <div className="home-copy">
             <p className="home-kicker">LIFEZOI</p>
+            <p className="home-brand">LIVE BETTER. MAKE LIFE MATTER.</p>
             <h1>YOUR LIFE. YOUR HEALTH. YOUR FUTURE.</h1>
             <p className="home-support">Have you ever wondered what your future health might look like?</p>
             <p className="home-intro">
-              Your everyday choices matter more than you may realize. Your future is not a fixed number.
+              Your everyday choices matter more than you may realize. Your future is not a fixed number. The longevity outlook looks at the habits you describe and the public guidance around them, so you can see where you stand today. It is an educational picture, not a count of years and not a diagnosis.
             </p>
             <div className="home-actions">
               <Link className="home-btn home-btn-primary" href="/assessment">
@@ -93,12 +94,12 @@ export default function HomePage() {
           </div>
           <figure className="home-hero-photo">
             <Image
-              src="/home/hero-hike.webp"
+              src="/home/hero-meadow.webp"
               width={1600}
-              height={1067}
+              height={1200}
               priority
               sizes="(min-width: 860px) 46vw, 100vw"
-              alt="A woman and a girl stand together on a sunny mountain trail."
+              alt="A woman in her forties stands alone in a wildflower meadow under a blue sky."
             />
           </figure>
         </section>
@@ -171,21 +172,36 @@ export default function HomePage() {
           <details className="home-credits">
             <summary>Photo credits</summary>
             <ul>
+              <li>Meadow portrait: image created for LifeZoi.</li>
               <li>
-                Woman and girl on a trail: Ronald Laubenstein, U.S. Fish and Wildlife Service, public domain.{" "}
-                <a href="https://commons.wikimedia.org/wiki/File:Woman_and_girl_hike_in_nature.jpg">Woman and girl hike in nature</a>
-              </li>
-              <li>
-                Woman walking: National Cancer Institute, public domain.{" "}
+                Woman walking on the homepage card: National Cancer Institute, public domain.{" "}
                 <a href="https://commons.wikimedia.org/wiki/File:Woman_power_walking.jpg">Woman power walking</a>
               </li>
               <li>
-                Other photos are CC0, via Wikimedia Commons:{" "}
+                Other homepage photos are CC0, via Wikimedia Commons:{" "}
                 <a href="https://commons.wikimedia.org/wiki/File:Old_man_reading_newspaper_with_tea_(Unsplash).jpg">cafe window</a>
                 {", "}
                 <a href="https://commons.wikimedia.org/wiki/File:Sunrise_hiking_views_(Unsplash).jpg">sunrise ridge</a>
                 {", "}
                 <a href="https://commons.wikimedia.org/wiki/File:Fruits_and_Vegetables_(Unsplash).jpg">fruit and herbs</a>.
+              </li>
+              <li>
+                Section photos are CC0, via Wikimedia Commons:{" "}
+                <a href="https://commons.wikimedia.org/wiki/File:Colorful_Wildflowers_(Unsplash).jpg">wildflowers</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Mountains_by_the_lake_(Unsplash).jpg">lake and mountains</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Walking_up_an_outdoor_path_(Unsplash).jpg">split lane</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Vegetable_Salad_(Unsplash).jpg">vegetable bowl</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Woman_walking_down_path_(Unsplash).jpg">park path</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Elevating_view_of_forest_trees_(Unsplash).jpg">forest trees</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Stepping_stone_staircase_(Unsplash).jpg">stone steps</a>
+                {", "}
+                <a href="https://commons.wikimedia.org/wiki/File:Open_book_(Unsplash).jpg">open book</a>.
               </li>
             </ul>
           </details>

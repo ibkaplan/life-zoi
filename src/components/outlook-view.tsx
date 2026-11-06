@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
 import { SSA_LIFE_TABLE_URL, SSA_TABLE_META } from "@/lib/life-table";
@@ -18,6 +19,7 @@ export function OutlookView() {
 
   return (
     <div className="learn stack-lg">
+      <PagePhoto id="outlook" />
       <p className="kicker">Life outlook</p>
       <h1>Your future is not a fixed number</h1>
       <p className="lede">

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { formatTimestamp } from "@/lib/dates";
 import {
@@ -76,6 +77,7 @@ export function ProfileView() {
 
   return (
     <div className="stack-lg narrow">
+      <PagePhoto id="profile" />
       <div>
         <p className="kicker">My Profile</p>
         <h1>Only what you provided</h1>

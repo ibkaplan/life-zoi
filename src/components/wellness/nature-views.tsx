@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { PagePhoto } from "@/components/page-photo";
 import { EvidenceLine, ReadOnlyNote, WellnessSources } from "@/components/wellness/bits";
 import { ChallengePanel } from "@/components/wellness/challenge-panel";
 import { useWellness } from "@/components/wellness/use-wellness";
@@ -32,6 +33,7 @@ const links = [
 export function NatureHome() {
   return (
     <div className="learn stack-lg">
+      <PagePhoto id="nature" />
       <header className="stack">
         <p className="kicker">The power of nature</p>
         <h1>You are part of nature. Make time to reconnect.</h1>

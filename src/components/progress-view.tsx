@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
 import {
@@ -43,6 +44,7 @@ export function ProgressView() {
 
   return (
     <div className="stack-lg">
+      <PagePhoto id="progress" />
       <div className="narrow stack">
         <p className="kicker">Progress</p>
         <h1>A record of what you try</h1>
