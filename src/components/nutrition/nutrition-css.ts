@@ -2,6 +2,124 @@ export const nutritionCss = `
 .nz-wrap {
   display: grid;
   gap: 1.25rem;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.nz-wrap h2 {
+  font-size: clamp(1.85rem, 3vw, 2.5rem);
+}
+
+.nz-wrap h3 {
+  font-size: 1.45rem;
+}
+
+.nz-studio {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.nz-split {
+  display: grid;
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.nz-plate {
+  margin: 0;
+  width: min(100%, 26rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  border: 8px solid #ffffff;
+  background: #ffffff;
+  justify-self: center;
+}
+
+.nz-wedge {
+  margin: 0;
+  padding: 1rem;
+  overflow: hidden;
+  color: #172554;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.nz-wedge h3 {
+  font-size: 1.05rem;
+}
+
+.nz-wedge ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nz-wedge li {
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.nz-wedgeProduce {
+  grid-row: 1 / span 2;
+  background: #dceeff;
+  padding-left: 1.6rem;
+}
+
+.nz-wedgeProtein {
+  background: #e9ddfb;
+  padding-right: 0.7rem;
+  padding-bottom: 0.4rem;
+}
+
+.nz-wedgeGrain {
+  background: #f7f8ff;
+  padding-right: 0.7rem;
+  padding-top: 0.4rem;
+}
+
+.nz-pick {
+  text-align: left;
+  display: grid;
+  gap: 0.15rem;
+  min-height: 48px;
+  border-radius: 16px;
+  border: 1px solid #e9ddfb;
+  background: #ffffff;
+  color: #172554;
+  padding: 0.75rem 0.9rem;
+  font: inherit;
+  font-size: 1.05rem;
+}
+
+.nz-pick[aria-pressed="true"] {
+  background: #e9ddfb;
+  border-color: #7136c8;
+}
+
+.nz-checkList,
+.nz-steps {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.nz-checkList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nz-draw {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
 }
 
 .nz-panel {
@@ -280,7 +398,8 @@ export const nutritionCss = `
 
 @media (min-width: 720px) {
   .nz-grid.nz-two,
-  .nz-compare {
+  .nz-compare,
+  .nz-split {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -305,6 +424,12 @@ export const nutritionCss = `
 }
 
 @media print {
+  body.nutrition-printing .learn:not(.nz-wrap) > *:not(.nz-wrap),
+  body.nutrition-printing .nz-studio > *:not(.nz-printing),
+  body.nutrition-printing .nz-studio ~ * {
+    display: none !important;
+  }
+
   body.nutrition-printing .topbar,
   body.nutrition-printing .bottom-nav,
   body.nutrition-printing .footer-note,

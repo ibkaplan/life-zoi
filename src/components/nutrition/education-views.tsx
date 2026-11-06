@@ -32,6 +32,7 @@ import {
   type NutritionSource,
 } from "@/lib/nutrition/education";
 import { upsertCheck } from "@/lib/wellness/storage";
+import { NutritionStudio } from "@/components/nutrition/plate-views";
 import { nutritionCss } from "@/components/nutrition/nutrition-css";
 
 function NutritionStyles() {
@@ -283,6 +284,7 @@ export function NutritionEducation() {
   return (
     <div className={"nz-wrap"}>
       <NutritionStyles />
+      <NutritionStudio />
       <section className={"nz-panel"} id="daily-choices">
         <p className={"nz-kicker"}>Added sugar</p>
         <h2>{dailyChoices.title}</h2>
