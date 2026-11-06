@@ -1,0 +1,48 @@
+import { choice, multi, type ChoiceActivity, type MultiActivity } from "@/lib/brain-quiz/activities";
+
+const c = choice;
+
+export const numberQuestions: readonly (ChoiceActivity | MultiActivity)[] = [
+  c("N01", "numbers", "easy", "Seven plus eight", "What is 7 + 8?", ["15", "14", "16", "13"], 0, ["7 + 8 = 15.", "14 is 7 + 7.", "16 is 8 + 8.", "13 is 7 + 6."]),
+  c("N02", "numbers", "easy", "A dozen", "How many items are in one dozen?", ["12", "10", "6", "24"], 0, ["A dozen means 12.", "10 is a decade, not a dozen.", "6 is half a dozen.", "24 is two dozen."]),
+  c("N03", "numbers", "easy", "Half of twenty", "What is half of 20?", ["10", "5", "12", "40"], 0, ["20 ÷ 2 = 10.", "5 is half of 10.", "12 is more than half of 20.", "40 is double 20."]),
+  c("N04", "numbers", "easy", "Minutes in an hour", "How many minutes are in 2 hours?", ["120", "60", "100", "90"], 0, ["Each hour has 60 minutes, so two hours have 120.", "60 is one hour.", "100 is not 60 × 2.", "90 is an hour and a half."]),
+  c("N05", "numbers", "easy", "Nine times nine", "What is 9 × 9?", ["81", "72", "18", "99"], 0, ["9 × 9 = 81.", "72 is 9 × 8.", "18 is 9 × 2.", "99 writes the digit 9 twice and is not the product."]),
+  c("N06", "numbers", "easy", "Smaller fraction", "Which is smaller, 1/3 or 1/5?", ["1/5", "1/3", "They are equal", "1/2"], 0, ["Sharing one item among 5 people gives a smaller piece than sharing it among 3.", "1/3 is the larger of the two fractions.", "The denominators differ, so the fractions are not equal.", "1/2 is larger than both."]),
+  c("N07", "numbers", "easy", "Count by fives", "5, 10, 15, 20, … What comes next?", ["25", "21", "30", "24"], 0, ["The step is 5, so 25 is next.", "21 adds 1.", "30 skips 25.", "24 adds 4."]),
+  c("N08", "numbers", "easy", "Subtract", "What is 100 − 37?", ["63", "73", "67", "137"], 0, ["100 − 37 = 63.", "73 subtracts 27.", "67 subtracts 33.", "137 adds the numbers."]),
+  c("N09", "numbers", "medium", "Twelve times six", "What is 12 × 6?", ["72", "62", "18", "86"], 0, ["12 × 6 = 72.", "62 is 12 × 5 plus 2.", "18 is 12 + 6.", "86 does not match the product."]),
+  c("N10", "numbers", "medium", "Which fraction is larger", "Which is larger, 3/4 or 2/3?", ["3/4", "2/3", "They are equal", "1/2"], 0, ["3/4 is 0.75 and 2/3 is about 0.67.", "2/3 is the smaller fraction.", "The two fractions are not equal.", "1/2 is smaller than both."]),
+  c("N11", "numbers", "medium", "Fifteen percent", "What is 15% of 80?", ["12", "15", "8", "20"], 0, ["10% of 80 is 8, and 5% is 4, so 15% is 12.", "15 would be 15% of 100.", "8 is only 10% of 80.", "20 is 25% of 80."]),
+  c("N12", "numbers", "medium", "Add the fractions", "What is 1/2 + 1/4?", ["3/4", "2/6", "1/6", "2/4"], 0, ["1/2 is 2/4, and 2/4 + 1/4 = 3/4.", "Adding the denominators does not add fractions.", "1/6 is smaller than either starting fraction.", "2/4 simplifies to 1/2 and leaves out the extra quarter."]),
+  c("N13", "numbers", "medium", "Two to the fifth", "What is 2 × 2 × 2 × 2 × 2?", ["32", "16", "10", "25"], 0, ["Five twos multiplied make 32.", "16 is four twos multiplied.", "10 is 2 × 5, not five twos.", "25 is 5 × 5."]),
+  c("N14", "numbers", "medium", "Split 144", "What is 144 ÷ 12?", ["12", "14", "10", "24"], 0, ["12 × 12 = 144, so the quotient is 12.", "14 × 12 is 168.", "10 × 12 is 120.", "24 × 12 is 288."]),
+  c("N15", "numbers", "medium", "Half times half", "What is 0.5 × 0.5?", ["0.25", "1", "0.5", "2.5"], 0, ["Half of a half is a quarter, which is 0.25.", "1 would be 0.5 + 0.5.", "0.5 is one of the factors, not the product.", "2.5 is much larger than both factors."]),
+  c("N16", "numbers", "medium", "Decimal or fraction", "Which is larger, 0.8 or 3/4?", ["0.8", "3/4", "They are equal", "0.7"], 0, ["0.8 is 4/5, and 4/5 is larger than 3/4.", "3/4 is 0.75, which is smaller than 0.8.", "0.80 and 0.75 are not equal.", "0.7 is smaller than both."]),
+  c("N17", "numbers", "medium", "Notebook price", "Three notebooks cost 12 coins in total. Each notebook costs the same. What is the price of one?", ["4", "3", "6", "9"], 0, ["12 ÷ 3 = 4.", "3 would make the total 9.", "6 would make the total 18.", "9 is the price of the other two notebooks together."]),
+  c("N18", "numbers", "medium", "Rectangle area", "A rectangle is 5 units wide and 4 units tall. What is its area?", ["20", "9", "18", "10"], 0, ["Area is width × height: 5 × 4 = 20.", "9 is 5 + 4.", "18 is 6 × 3, not this rectangle.", "10 is the distance around two sides, not the area."]),
+  c("N19", "numbers", "medium", "Percent of ninety", "45 is what percent of 90?", ["50%", "45%", "25%", "90%"], 0, ["45 is half of 90, and half is 50%.", "45% of 90 would be 40.5.", "25% of 90 is 22.5.", "90% of 90 is 81."]),
+  c("N20", "numbers", "hard", "Two and a half times four", "What is 2.5 × 4?", ["10", "8", "6.5", "12"], 0, ["2 × 4 = 8 and 0.5 × 4 = 2, so the product is 10.", "8 leaves out the extra half four times.", "6.5 adds 2.5 and 4.", "12 is 3 × 4."]),
+  c("N21", "numbers", "hard", "Fifteen percent of 200", "What is 15% of 200?", ["30", "15", "20", "50"], 0, ["10% of 200 is 20 and 5% is 10, so 15% is 30.", "15 is 15% of 100.", "20 is 10% of 200.", "50 is 25% of 200."]),
+  c("N22", "numbers", "hard", "Shared multiple", "What is the smallest positive number that is a multiple of both 4 and 6?", ["12", "24", "10", "4"], 0, ["12 is divisible by 4 and by 6, and no smaller positive number is.", "24 works, but it is not the smallest.", "10 is divisible by neither 4 nor 6.", "4 is not a multiple of 6."]),
+  c("N23", "numbers", "hard", "Subtract fractions", "What is 7/8 − 1/2?", ["3/8", "6/8", "6/6", "1/8"], 0, ["1/2 is 4/8, and 7/8 − 4/8 = 3/8.", "6/8 subtracts 1/8 instead of 1/2.", "6/6 is 1, which is larger than 7/8.", "1/8 would mean 6/8 was subtracted."]),
+  c("N24", "numbers", "hard", "Square perimeter", "A square has sides of length 6. What is the distance all the way around?", ["24", "12", "36", "18"], 0, ["Four sides of 6 make 24.", "12 is only two sides.", "36 is the area, 6 × 6.", "18 is three sides."]),
+  c("N25", "numbers", "hard", "Double again", "3, 6, 12, 24, … What comes next?", ["48", "36", "30", "27"], 0, ["Each term doubles, so 24 × 2 = 48.", "36 adds 12.", "30 adds 6.", "27 adds 3."]),
+  c("N26", "numbers", "easy", "Eight times seven", "What is 8 × 7?", ["56", "54", "15", "64"], 0, ["8 × 7 = 56.", "54 is 9 × 6.", "15 is 8 + 7.", "64 is 8 × 8."]),
+  c("N27", "numbers", "medium", "Coins left", "What is 1,000 − 250?", ["750", "650", "850", "1,250"], 0, ["1,000 − 250 = 750.", "650 subtracts 350.", "850 subtracts 150.", "1,250 adds the numbers."]),
+  multi(
+    "N28",
+    "numbers",
+    "medium",
+    "Multiples of three",
+    "Select every multiple of 3. The full set is required.",
+    ["6", "10", "12", "14"],
+    [0, 2],
+    [
+      "6 = 3 × 2, so it is a multiple of 3.",
+      "10 is not divisible by 3.",
+      "12 = 3 × 4, so it is a multiple of 3.",
+      "14 is not divisible by 3.",
+    ],
+  ),
+];

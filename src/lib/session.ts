@@ -1,3 +1,4 @@
+import { sanitizeBrain } from "@/lib/brain-quiz/progress";
 import { isRealISODate, mondayOf } from "@/lib/dates";
 import {
   coerceAssessment,
@@ -202,6 +203,7 @@ export function sanitizeSession(input: unknown): UserSession {
     weightEntries,
     reassessDays,
     reassessOn,
+    brainQuiz: sanitizeBrain(record.brainQuiz),
   };
 }
 

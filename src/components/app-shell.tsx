@@ -40,6 +40,7 @@ const exploreLinks = [
   { href: "/sugar-detective", label: "Sugar Detective", short: "Sugar" },
   { href: "/food-labels", label: "Food Intelligence", short: "Labels" },
   { href: "/balance-challenge", label: "Balance and Brain Challenge", short: "Balance" },
+  { href: "/brain-quiz", label: "Brain & Habit Quiz", short: "Quiz" },
 ];
 
 const links = [...primaryLinks, ...moreLinks, ...exploreLinks];
@@ -54,6 +55,7 @@ const prefixes = [
   "/habits",
   "/urges",
   "/nature",
+  "/brain-quiz",
 ];
 
 function current(pathname: string, href: string) {

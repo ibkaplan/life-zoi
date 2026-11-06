@@ -12,6 +12,7 @@ import {
 import { clearAssistantThread } from "@/lib/assistant";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
+import { clearBrainLocal, sanitizeBrain, writeBrainLocal, type BrainProgress } from "@/lib/brain-quiz/progress";
 import { clearPurpose } from "@/lib/purpose";
 import { resetWellnessClient } from "@/lib/wellness/client-store";
 import { createSampleSession } from "@/lib/sample";
@@ -72,6 +73,7 @@ type SessionApi = {
   saveWeight: (input: { date: string; value: number; unit: WeightUnit }) => string | null;
   removeWeight: (id: string) => void;
   clearUserData: () => void;
+  saveBrain: (brainQuiz: BrainProgress) => void;
   setSample: (on: boolean) => void;
   setReassessment: (days: ReassessDays) => string | null;
 };
@@ -223,11 +225,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         commit(chooseReassessment(stored, days, todayDate()));
         return null;
       },
+      saveBrain: (brainQuiz) => {
+        if (sample) return;
+        const clean = sanitizeBrain(brainQuiz);
+        writeBrainLocal(typeof window === "undefined" ? null : window.localStorage, clean);
+        commit({ ...stored, brainQuiz: clean });
+      },
       clearUserData: () => {
         clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
         clearRecentQuestions(typeof window === "undefined" ? null : window.sessionStorage);
         clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
         clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
+        clearBrainLocal(typeof window === "undefined" ? null : window.localStorage);
         resetWellnessClient();
         if (signedIn) void clearAccountRecords();
         writeBrowserStore(emptySession(), false);

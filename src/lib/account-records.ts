@@ -1,4 +1,5 @@
 import { decideAccess } from "@/lib/access";
+import { isEmptyBrain } from "@/lib/brain-quiz/progress";
 import { SAMPLE_VISITOR_NAME } from "@/lib/sample";
 import { sanitizeSession } from "@/lib/session";
 import {
@@ -20,6 +21,7 @@ export type ProfileWrite = {
     reassessOn: string;
     weeklyCheckIns: UserSession["weeklyCheckIns"];
     weightEntries: UserSession["weightEntries"];
+    brainQuiz: UserSession["brainQuiz"];
   };
   updated_at: string;
 };
@@ -103,7 +105,8 @@ export function isBlankSession(session: UserSession): boolean {
     session.draft.displayName.trim() === "" &&
     session.draft.sleepHours.trim() === "" &&
     session.draft.goals.length === 0 &&
-    session.draft.habitNote.trim() === ""
+    session.draft.habitNote.trim() === "" &&
+    isEmptyBrain(session.brainQuiz)
   );
 }
 
@@ -148,6 +151,7 @@ export function sessionToRows(session: UserSession, actorUserId: string, updated
         reassessOn: session.reassessOn,
         weeklyCheckIns: session.weeklyCheckIns,
         weightEntries: session.weightEntries,
+        brainQuiz: session.brainQuiz,
       },
       updated_at: updatedAt,
     },
@@ -223,6 +227,7 @@ export function rowsToSession(input: AccountRead): UserSession {
     reassessOn: state.reassessOn,
     weeklyCheckIns: state.weeklyCheckIns,
     weightEntries: state.weightEntries,
+    brainQuiz: state.brainQuiz,
     history: input.assessments.map((row) => ({
       id: row.id,
       completedAt: row.completed_at,

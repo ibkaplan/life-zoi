@@ -1,3 +1,5 @@
+import { emptyBrainProgress, type BrainProgress } from "@/lib/brain-quiz/progress";
+
 export const AGE_RANGES = [
   "18-29",
   "30-39",
@@ -219,6 +221,7 @@ export type UserSession = {
   weightEntries: WeightEntry[];
   reassessDays: ReassessDays | 0;
   reassessOn: string;
+  brainQuiz: BrainProgress;
 };
 
 export type FieldErrors = Record<string, string>;
@@ -294,5 +297,6 @@ export function emptySession(): UserSession {
     weightEntries: [],
     reassessDays: 0,
     reassessOn: "",
+    brainQuiz: emptyBrainProgress(),
   };
 }
