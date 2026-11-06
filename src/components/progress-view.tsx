@@ -15,6 +15,7 @@ import {
   monthKey,
 } from "@/lib/dates";
 import { habitLabels } from "@/lib/labels";
+import { ITEM_IDS } from "@/lib/my-day/plan";
 import { TRACKABLE_HABIT_IDS, type TrackableHabitId } from "@/lib/types";
 
 export function ProgressView() {
@@ -57,6 +58,29 @@ export function ProgressView() {
         </p>
       </div>
       <WeeklyProgress />
+      <section className="card stack">
+        <h2>My Day marks</h2>
+        <p>Activities you marked done. This is a count of those marks, not a health result.</p>
+        {session.myDay && Object.keys(session.myDay.days).length > 0 ? (
+          <ul className="record-list">
+            {Object.values(session.myDay.days)
+              .sort((a, b) => b.date.localeCompare(a.date))
+              .map((day) => {
+                const done = ITEM_IDS.filter((id) => day.items[id]?.status === "done").length;
+                return (
+                  <li key={day.date}>
+                    <strong>{formatLongDate(day.date)}</strong>
+                    <p>{done} {done === 1 ? "activity" : "activities"} marked done</p>
+                  </li>
+                );
+              })}
+          </ul>
+        ) : (
+          <p>
+            No My Day marks yet. <Link href="/my-day">Open My Day</Link>
+          </p>
+        )}
+      </section>
       <section className="card stack">
         <h2>Habit goals</h2>
         <p>Choose a habit and how many days a week you want to aim for. This is your goal, not a prescription.</p>

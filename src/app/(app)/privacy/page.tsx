@@ -54,6 +54,13 @@ export default function PrivacyPage() {
         <Link href="/settings">Open settings</Link>
       </section>
       <section className="card stack">
+        <h2>Sharing a link</h2>
+        <p>
+          Share the Care can save an invitation code for the signed-in account, plus three numbers: links created, opens, and registrations. The shared web address contains only that code. It does not contain a name, an email address, a user id, or health information. The person who opens the link can create a separate account from Settings. lifeZoi does not open a contact list or send the message.
+        </p>
+        <Link href="/share-the-care">Share the Care</Link>
+      </section>
+      <section className="card stack">
         <h2>What this is not</h2>
         <p>
           lifeZoi does not claim HIPAA, GDPR, or any other compliance. It is not a medical device, it does not diagnose, and it does not predict how long someone will live. HTTPS and row level security do not by themselves make this a complete health record.

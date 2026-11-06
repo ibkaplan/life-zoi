@@ -4,12 +4,12 @@ import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
-import {
-  commitMyDay,
-  getMyDayServerSnapshot,
-  getMyDaySnapshot,
-  subscribeMyDay,
-} from "@/lib/my-day/client";
+import { useAccount } from "@/lib/account-store";
+import { isEmptyBrain } from "@/lib/brain-quiz/progress";
+import { isEmptyEmotional } from "@/lib/emotional-wellness/storage";
+import { getEmotionalServerSnapshot, getEmotionalStoreSnapshot, subscribeEmotionalStore } from "@/lib/emotional-wellness/store";
+import { isEmptyFoodPlan } from "@/lib/food-plan/types";
+import { getMyDayServerSnapshot, getMyDaySnapshot, subscribeMyDay } from "@/lib/my-day/client";
 import { emptyHabitJourney } from "@/lib/habit-transformation/model";
 import {
   ayurvedaNote,
@@ -23,6 +23,8 @@ import {
 } from "@/lib/my-day/plan";
 import {
   cycleItem,
+  emptyMyDay,
+  ensureToday,
   isClockTime,
   setAyurvedaHidden,
   setItemNote,
@@ -37,31 +39,42 @@ const OVERVIEW = [
   ["Brain challenge", "/brain-quiz"],
   ["Habit", "/habit-transformation"],
   ["Sleep and recovery", "/choices/sleep"],
+  ["Emotional Wellness", "/emotional-wellness"],
   ["Progress", "/progress"],
   ["Wellness Assistant", "/ai-assistant"],
 ] as const;
 
 export function MyDayView() {
   const session = useSession();
+  const account = useAccount();
   const snap = useSyncExternalStore(subscribeMyDay, getMyDaySnapshot, getMyDayServerSnapshot);
+  const emotional = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
+  const signedIn = account.phase === "ready";
   if (!session.ready || !snap.ready || !snap.today) return <LoadingState label="Loading your day…" />;
 
   const answers = session.sample ? null : (session.session.history[0]?.answers ?? null);
   const journey = session.sample ? emptyHabitJourney() : session.session.habitJourney;
   const weights = session.sample ? [] : session.session.weightEntries;
-  const day = snap.file.days[snap.today];
+  const source = session.sample ? emptyMyDay() : session.session.myDay;
+  const file = ensureToday(source, snap.today);
+  const day = file.days[snap.today];
   if (!day) return <LoadingState label="Loading your day…" />;
 
-  const items = presentDay(day, snap.file.savedTimes, answers, journey);
+  const items = presentDay(day, file.savedTimes, answers, journey, {
+    date: snap.today,
+    foodPlan: session.sample || isEmptyFoodPlan(session.session.foodPlan) ? null : session.session.foodPlan,
+    brain: session.sample || isEmptyBrain(session.session.brainQuiz) ? null : session.session.brainQuiz,
+    emotionalNotes: !session.sample && signedIn && !isEmptyEmotional(emotional),
+  });
   const progress = dayProgress(items);
   const calories = calorieEstimate(answers);
   const protein = proteinEstimate(answers);
   const chart = weightChart(weights);
   const today = snap.today;
-  const file = snap.file;
 
   function update(next: typeof file) {
-    commitMyDay(next);
+    if (session.sample) return;
+    session.saveMyDay(next);
   }
 
   return (

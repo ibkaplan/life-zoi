@@ -95,10 +95,23 @@ export function sanitizeMyDay(input: unknown): MyDayFile {
   return file;
 }
 
-export function loadMyDay(storage: MemoryStorage | null): MyDayFile {
+export function isEmptyMyDay(file: MyDayFile): boolean {
+  if (file.ayurvedaHidden) return false;
+  if (Object.keys(file.savedTimes).length > 0) return false;
+  for (const day of Object.values(file.days)) {
+    for (const id of ITEM_IDS) {
+      const item = day.items[id];
+      if (!item) continue;
+      if (item.status !== "open" || item.note !== "" || item.variant !== 0 || item.shorter) return false;
+    }
+  }
+  return true;
+}
+
+export function loadMyDay(storage: MemoryStorage | null, key = MY_DAY_STORAGE_KEY): MyDayFile {
   if (!storage) return emptyMyDay();
   try {
-    const raw = storage.getItem(MY_DAY_STORAGE_KEY);
+    const raw = storage.getItem(key);
     if (!raw) return emptyMyDay();
     return sanitizeMyDay(JSON.parse(raw) as unknown);
   } catch {
@@ -106,8 +119,8 @@ export function loadMyDay(storage: MemoryStorage | null): MyDayFile {
   }
 }
 
-export function saveMyDay(storage: MemoryStorage | null, file: MyDayFile) {
-  storage?.setItem(MY_DAY_STORAGE_KEY, JSON.stringify(sanitizeMyDay(file)));
+export function saveMyDay(storage: MemoryStorage | null, file: MyDayFile, key = MY_DAY_STORAGE_KEY) {
+  storage?.setItem(key, JSON.stringify(sanitizeMyDay(file)));
 }
 
 export function ensureToday(file: MyDayFile, today: string): MyDayFile {

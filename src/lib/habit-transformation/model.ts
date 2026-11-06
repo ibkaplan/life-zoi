@@ -329,10 +329,10 @@ export function saveWeekNote(journey: HabitJourney, note: WeekNote): HabitJourne
   return sanitizeHabitJourney({ ...journey, notes });
 }
 
-export function readHabitLocal(storage: Pick<Storage, "getItem"> | null): HabitJourney | null {
+export function readHabitLocal(storage: Pick<Storage, "getItem"> | null, key = HABIT_STORAGE_KEY): HabitJourney | null {
   if (!storage) return null;
   try {
-    const raw = storage.getItem(HABIT_STORAGE_KEY);
+    const raw = storage.getItem(key);
     if (!raw) return null;
     return sanitizeHabitJourney(JSON.parse(raw) as unknown);
   } catch {
@@ -340,11 +340,11 @@ export function readHabitLocal(storage: Pick<Storage, "getItem"> | null): HabitJ
   }
 }
 
-export function writeHabitLocal(storage: Pick<Storage, "setItem"> | null, journey: HabitJourney) {
+export function writeHabitLocal(storage: Pick<Storage, "setItem"> | null, journey: HabitJourney, key = HABIT_STORAGE_KEY) {
   if (!storage) return;
-  storage.setItem(HABIT_STORAGE_KEY, JSON.stringify(sanitizeHabitJourney(journey)));
+  storage.setItem(key, JSON.stringify(sanitizeHabitJourney(journey)));
 }
 
-export function clearHabitLocal(storage: Pick<Storage, "removeItem"> | null) {
-  storage?.removeItem(HABIT_STORAGE_KEY);
+export function clearHabitLocal(storage: Pick<Storage, "removeItem"> | null, key = HABIT_STORAGE_KEY) {
+  storage?.removeItem(key);
 }

@@ -1,9 +1,12 @@
 import { localISODate } from "@/lib/dates";
+import { takeForAccount, userStorageKey, guestStorageKey } from "@/lib/owned-local";
 import {
   emptyProgress,
+  isEmptyStudio,
   loadProgress,
   markLessonComplete,
   markMission,
+  MOVEMENT_STUDIO_KEY,
   progressAfterPlay,
   restartWeek,
   saveProgress,
@@ -19,12 +22,37 @@ type StudioSnapshot = {
 const serverSnapshot: StudioSnapshot = { progress: emptyProgress(), today: null };
 let snapshot: StudioSnapshot = serverSnapshot;
 let ready = false;
+let activeKey = MOVEMENT_STUDIO_KEY;
 const listeners = new Set<() => void>();
 
 function ensure() {
   if (ready || typeof window === "undefined") return;
   ready = true;
-  snapshot = { progress: loadProgress(window.sessionStorage), today: localISODate() };
+  snapshot = { progress: emptyProgress(), today: localISODate() };
+}
+
+export function bindStudioOwner(userId: string | null) {
+  if (typeof window === "undefined") return;
+  const storage = window.sessionStorage;
+  if (userId) {
+    const raw = takeForAccount(storage, MOVEMENT_STUDIO_KEY, userId, false);
+    activeKey = userStorageKey(MOVEMENT_STUDIO_KEY, userId);
+    snapshot = {
+      progress: raw ? loadProgress(storage, activeKey) : emptyProgress(),
+      today: localISODate(),
+    };
+  } else {
+    activeKey = guestStorageKey(MOVEMENT_STUDIO_KEY);
+    const guest = loadProgress(storage, activeKey);
+    const legacy = loadProgress(storage, MOVEMENT_STUDIO_KEY);
+    snapshot = {
+      progress: !isEmptyStudio(guest) ? guest : legacy,
+      today: localISODate(),
+    };
+    if (isEmptyStudio(guest) && !isEmptyStudio(legacy)) activeKey = MOVEMENT_STUDIO_KEY;
+  }
+  ready = true;
+  emit();
 }
 
 function emit() {
@@ -34,7 +62,7 @@ function emit() {
 function commit(progress: StudioProgress) {
   ensure();
   snapshot = { progress, today: snapshot.today };
-  if (typeof window !== "undefined") saveProgress(window.sessionStorage, progress);
+  if (typeof window !== "undefined") saveProgress(window.sessionStorage, progress, activeKey);
   emit();
 }
 

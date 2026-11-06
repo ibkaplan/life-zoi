@@ -115,20 +115,31 @@ export function clearNoteBucket(store: EmotionalStore, bucket: NoteBucket): Emot
   return { ...store, [bucket]: [] };
 }
 
-export function loadEmotionalStore(storage: Pick<Storage, "getItem"> | null): EmotionalStore {
+export function isEmptyEmotional(store: EmotionalStore): boolean {
+  return (
+    store.country === "unset" &&
+    store.countryNote === "" &&
+    store.context === "general" &&
+    store.journal.length === 0 &&
+    store.joys.length === 0 &&
+    store.caregiverNotes.length === 0
+  );
+}
+
+export function loadEmotionalStore(storage: Pick<Storage, "getItem"> | null, key = EMOTIONAL_STORAGE_KEY): EmotionalStore {
   if (!storage) return emptyEmotionalStore();
   try {
-    return sanitizeEmotionalStore(JSON.parse(storage.getItem(EMOTIONAL_STORAGE_KEY) ?? "null"));
+    return sanitizeEmotionalStore(JSON.parse(storage.getItem(key) ?? "null"));
   } catch {
     return emptyEmotionalStore();
   }
 }
 
-export function saveEmotionalStore(storage: Pick<Storage, "setItem"> | null, store: EmotionalStore) {
+export function saveEmotionalStore(storage: Pick<Storage, "setItem"> | null, store: EmotionalStore, key = EMOTIONAL_STORAGE_KEY) {
   if (!storage) return;
-  storage.setItem(EMOTIONAL_STORAGE_KEY, JSON.stringify(sanitizeEmotionalStore(store)));
+  storage.setItem(key, JSON.stringify(sanitizeEmotionalStore(store)));
 }
 
-export function clearEmotionalStorage(storage: Pick<Storage, "removeItem"> | null) {
-  storage?.removeItem(EMOTIONAL_STORAGE_KEY);
+export function clearEmotionalStorage(storage: Pick<Storage, "removeItem"> | null, key = EMOTIONAL_STORAGE_KEY) {
+  storage?.removeItem(key);
 }

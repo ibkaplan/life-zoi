@@ -23,7 +23,7 @@ export const PAGE_DESCRIPTION =
   "A rules-based emotional support page with a separate crisis check, short optional exercises, and private notes. Not clinical care.";
 
 export const JOURNAL_PRIVACY =
-  "Your journal stays in this browser’s local storage. It is not shown to other people, it is not sent to an account by this page, and it is not a diagnosis.";
+  "Your journal stays in this browser’s local storage. It is not shown to other people, it is not sent to an account by this page, and it is not a diagnosis. Signing out hides it until this same account signs in again.";
 
 export const JOY_NOTE =
   "Small joys are optional. Skip this if naming one feels wrong today. These notes stay in this browser and are not a diagnosis.";

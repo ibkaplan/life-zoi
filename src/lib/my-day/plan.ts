@@ -1,3 +1,7 @@
+import { isEmptyBrain, type BrainProgress } from "@/lib/brain-quiz/progress";
+import { mealById } from "@/lib/food-plan/meals";
+import { planBlockReason } from "@/lib/food-plan/plan";
+import type { FoodPlanState } from "@/lib/food-plan/types";
 import { mealModule } from "@/lib/wellness/academy";
 import { lessonById } from "@/lib/wellness/movement-studio/catalog";
 import { scriptById } from "@/lib/wellness/movement-studio/scripts";
@@ -443,11 +447,38 @@ function relaxView(answers: Assessment | null, shorter: boolean): MoveView {
   return view;
 }
 
+export type DaySources = {
+  date?: string;
+  foodPlan?: FoodPlanState | null;
+  brain?: BrainProgress | null;
+  emotionalNotes?: boolean;
+};
+
+function weekdayIndex(iso: string): number | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+  const sunday = date.getUTCDay();
+  return sunday === 0 ? 6 : sunday - 1;
+}
+
+function savedMeal(plan: FoodPlanState | null | undefined, date: string, slot: "breakfast" | "lunch" | "dinner") {
+  if (!plan?.week || planBlockReason(plan.profile)) return null;
+  const index = weekdayIndex(date);
+  if (index === null) return null;
+  const planned = plan.week.days.find((item) => item.index === index)?.meals.find((meal) => meal.slot === slot);
+  if (!planned) return null;
+  return mealById(planned.mealId);
+}
+
 export function presentDay(
   day: DayRecord,
   savedTimes: Partial<Record<ItemId, string>>,
   answers: Assessment | null,
   journey: HabitJourney,
+  sources?: DaySources,
 ): PresentedItem[] {
   const plans = plansFor(journey);
   const habits = habitOptions(answers, plans);
@@ -476,11 +507,25 @@ export function presentDay(
       return { ...base, section: "Workout", ...move };
     }
     if (id === "breakfast" || id === "lunch" || id === "dinner") {
+      const saved = savedMeal(sources?.foodPlan, sources?.date || day.date, id);
+      if (saved) {
+        return {
+          ...base,
+          section: "Nutrition",
+          title: saved.name,
+          detail: state.shorter ? saved.summary : `${saved.summary} Portions stay the ones already saved.`,
+          steps: state.shorter ? [] : saved.steps.slice(0, 3),
+          href: "/food-plan/week",
+          hrefLabel: "Open the saved food plan",
+          why: "This is the meal already saved on your food plan for this weekday. My Day does not build a new menu.",
+        };
+      }
       const meal = mealView(id, answers, state.variant, state.shorter);
       return { ...base, section: "Nutrition", steps: [], ...meal };
     }
     if (id === "brain") {
       const daily = mod(state.variant, 2) === 0;
+      const savedBrain = Boolean(sources?.brain && !isEmptyBrain(sources.brain));
       return {
         ...base,
         section: "Brain challenge",
@@ -490,7 +535,7 @@ export function presentDay(
           : "One link to the quiz that is already on this site. A score is not a health measure.",
         href: daily ? "/brain-quiz/daily" : "/brain-quiz",
         hrefLabel: daily ? "Open today's Brain & Habit Quiz" : "Open the Brain & Habit Quiz",
-        why: "",
+        why: savedBrain ? "You already have Brain & Habit Quiz marks saved. A score is not a health measure." : "",
       };
     }
     if (id === "break") {
@@ -511,6 +556,11 @@ export function presentDay(
     }
     if (id === "relax") {
       const relax = relaxView(answers, state.shorter);
+      if (sources?.emotionalNotes) {
+        relax.why = [relax.why, "You have Emotional Wellness notes in this browser. They are not a diagnosis, and that page has not been clinically reviewed."]
+          .filter(Boolean)
+          .join(" ");
+      }
       return { ...base, section: "Sleep and recovery", ...relax };
     }
     const progressLink = mod(state.variant, 2) === 0;

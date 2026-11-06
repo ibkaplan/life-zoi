@@ -88,10 +88,14 @@ export function sanitizeProgress(value: unknown): StudioProgress {
   };
 }
 
-export function loadProgress(storage: Pick<Storage, "getItem"> | null): StudioProgress {
+export function isEmptyStudio(state: StudioProgress): boolean {
+  return state.completedLessonIds.length === 0 && Object.keys(state.missionWeeks).length === 0;
+}
+
+export function loadProgress(storage: Pick<Storage, "getItem"> | null, key = MOVEMENT_STUDIO_KEY): StudioProgress {
   if (!storage) return emptyProgress();
   try {
-    const raw = storage.getItem(MOVEMENT_STUDIO_KEY);
+    const raw = storage.getItem(key);
     if (!raw) return emptyProgress();
     return sanitizeProgress(JSON.parse(raw) as unknown);
   } catch {
@@ -99,8 +103,8 @@ export function loadProgress(storage: Pick<Storage, "getItem"> | null): StudioPr
   }
 }
 
-export function saveProgress(storage: Pick<Storage, "setItem">, state: StudioProgress) {
-  storage.setItem(MOVEMENT_STUDIO_KEY, JSON.stringify(sanitizeProgress(state)));
+export function saveProgress(storage: Pick<Storage, "setItem">, state: StudioProgress, key = MOVEMENT_STUDIO_KEY) {
+  storage.setItem(key, JSON.stringify(sanitizeProgress(state)));
 }
 
 export function markLessonComplete(state: StudioProgress, lessonId: string): StudioProgress {
