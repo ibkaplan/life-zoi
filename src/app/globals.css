@@ -1501,12 +1501,12 @@ button.assistant-send:focus-visible,
 .wellness-assistant {
   color: #172554;
   display: grid;
-  gap: 1.35rem;
-  max-width: 46rem;
+  gap: 0.85rem;
+  max-width: 100%;
 }
 .wellness-intro, .wellness-answer-panel, .wellness-voice {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.45rem;
 }
 .wellness-kicker {
   margin: 0;
@@ -1516,22 +1516,23 @@ button.assistant-send:focus-visible,
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.wellness-assistant h1 { color: #5725A8; font-size: clamp(1.85rem, 4vw, 2.8rem); }
-.wellness-assistant h2 { color: #5725A8; font-size: clamp(1.35rem, 2.4vw, 1.8rem); }
+.wellness-assistant h1 { color: #5725A8; font-size: clamp(1.7rem, 3vw, 2.35rem); }
+.wellness-assistant h2 { color: #5725A8; font-size: clamp(1.2rem, 2vw, 1.5rem); }
 .wellness-subtitle {
   margin: 0;
   color: #0E7490;
-  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
   font-weight: 750;
 }
-.wellness-welcome, .wellness-answer { font-size: 1.2rem; line-height: 1.6; }
+.wellness-welcome { font-size: 1.05rem; line-height: 1.45; }
+.wellness-answer { font-size: 1.2rem; line-height: 1.6; }
 .wellness-kind, .wellness-source { color: #3E4E80; }
 .wellness-note, .wellness-emergency {
   margin: 0;
   background: #ffffff;
   border: 1px solid #E9DDFB;
   border-radius: 18px;
-  padding: 0.95rem 1rem;
+  padding: 0.65rem 0.85rem;
 }
 .wellness-emergency { background: #DCEEFF; border-color: #4295E8; }
 .wellness-search, .wellness-voice-picker { display: grid; gap: 0.45rem; }
@@ -1566,7 +1567,39 @@ button.assistant-send:focus-visible,
   padding: 0.9rem 1rem;
   cursor: pointer;
 }
-.wellness-filters button { border-radius: 999px; text-align: center; }
+.wellness-filters button {
+  border-radius: 999px;
+  text-align: center;
+  flex: 1 1 11rem;
+  min-height: 46px;
+  padding: 0.4rem 0.75rem;
+  font-size: 1rem;
+}
+.wellness-feelings-block { display: grid; gap: 0.4rem; }
+.wellness-feelings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+.wellness-feelings button {
+  min-height: 44px;
+  border-radius: 16px;
+  border: 2px solid #D4C4F5;
+  background: #ffffff;
+  color: #172554;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 750;
+  text-align: left;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+}
+.wellness-feelings button[aria-pressed="true"] {
+  background: #5725A8;
+  border-color: #5725A8;
+  color: #ffffff;
+}
+.wellness-feeling-result { display: grid; gap: 0.7rem; }
 .wellness-filters button[aria-pressed="true"] {
   background: #5725A8;
   border-color: #5725A8;
@@ -1604,8 +1637,12 @@ button.assistant-send:focus-visible,
   font-weight: 750;
 }
 .wellness-speech .btn { min-height: 52px; }
+@media (min-width: 900px) {
+  .wellness-feelings { grid-template-columns: 1fr 1fr 1fr; }
+}
 @media (max-width: 720px) {
   .wellness-filters button { flex: 1 1 100%; }
+  .wellness-feelings { grid-template-columns: 1fr; }
   .wellness-speech .btn, .wellness-back, .wellness-links a { width: 100%; justify-content: center; }
 }
 

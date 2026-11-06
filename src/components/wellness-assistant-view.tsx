@@ -9,6 +9,7 @@ import {
   RECOGNITION_UNSUPPORTED_MESSAGE,
   SPEECH_UNSUPPORTED_MESSAGE,
   VOICE_PRIVACY_NOTE,
+  FEELING_HEADING,
   WELLNESS_ASSISTANT_EMERGENCY,
   WELLNESS_ASSISTANT_KIND,
   WELLNESS_ASSISTANT_NOTE,
@@ -17,9 +18,12 @@ import {
   WELLNESS_ASSISTANT_WELCOME,
 } from "@/lib/wellness-assistant/copy";
 import {
+  FEELINGS,
+  FEELING_SUPPORT,
   WELLNESS_CATEGORIES,
   WELLNESS_QUESTIONS,
   categoryLabel,
+  feelingById,
   popularQuestions,
   questionById,
   questionsInCategory,
@@ -70,6 +74,7 @@ export function WellnessAssistantView() {
   const [category, setCategory] = useState<"all" | WellnessCategoryId>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [feelingId, setFeelingId] = useState<string | null>(null);
   const recognitionReady = useSyncExternalStore(
     subscribeEnglishVoices,
     recognitionSupportSnapshot,
@@ -102,6 +107,8 @@ export function WellnessAssistantView() {
     openQuestion(id, setSelectedId);
     setVoiceMatch(null);
   }
+
+  const activeFeeling = feelingId ? feelingById(feelingId) : null;
 
   function startListening() {
     const Ctor = recognitionConstructor();
@@ -149,19 +156,78 @@ export function WellnessAssistantView() {
   return (
     <div className="wellness-assistant">
       <header className="wellness-intro">
-        <p className="wellness-kicker">Prepared wellness information</p>
+        <p className="wellness-kicker">Prepared educational information</p>
         <h1>{WELLNESS_ASSISTANT_TITLE}</h1>
         <p className="wellness-subtitle">{WELLNESS_ASSISTANT_SUBTITLE}</p>
         <p className="wellness-welcome">{WELLNESS_ASSISTANT_WELCOME}</p>
-        <p className="wellness-kind">{WELLNESS_ASSISTANT_KIND}</p>
         <p className="wellness-note" role="note">
           {WELLNESS_ASSISTANT_NOTE}
         </p>
-        <p className="wellness-emergency" role="note">
-          {WELLNESS_ASSISTANT_EMERGENCY}
-        </p>
-        <p className="wellness-source">{adapterStatusLabel()}</p>
       </header>
+
+      <div className="wellness-filters" role="group" aria-label="Question categories">
+        <button type="button" aria-pressed={category === "all" && !selected} onClick={() => { setCategory("all"); setSelectedId(null); setFeelingId(null); }}>
+          All questions
+        </button>
+        {WELLNESS_CATEGORIES.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={category === item.id && !selected}
+            onClick={() => {
+              setCategory(item.id);
+              setSelectedId(null);
+              setFeelingId(null);
+              setQuery("");
+            }}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <section className="wellness-feelings-block" aria-labelledby="feeling-heading">
+        <h2 id="feeling-heading">{FEELING_HEADING}</h2>
+        <div className="wellness-feelings">
+          {FEELINGS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={feelingId === item.id}
+              onClick={() => {
+                setFeelingId(item.id);
+                setSelectedId(null);
+                setQuery("");
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        {activeFeeling ? (
+          <div className="wellness-feeling-result">
+            <p>{FEELING_SUPPORT}</p>
+            {activeFeeling.note ? <p>{activeFeeling.note}</p> : null}
+            {activeFeeling.prompts ? (
+              <div className="wellness-questions">
+                {activeFeeling.prompts.map((prompt) => (
+                  <button key={prompt.label} type="button" onClick={() => choose(prompt.questionId)}>
+                    {prompt.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <QuestionButtons
+                questions={activeFeeling.questionIds.flatMap((id) => {
+                  const item = questionById(id);
+                  return item ? [item] : [];
+                })}
+                onChoose={choose}
+              />
+            )}
+          </div>
+        ) : null}
+      </section>
 
       {selected ? (
         <AnswerPanel question={selected} onBack={() => setSelectedId(null)} onChoose={choose} />
@@ -186,22 +252,6 @@ export function WellnessAssistantView() {
               autoComplete="off"
             />
           </form>
-
-          <div className="wellness-filters" role="group" aria-label="Question categories">
-            <button type="button" aria-pressed={category === "all"} onClick={() => setCategory("all")}>
-              All questions
-            </button>
-            {WELLNESS_CATEGORIES.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={category === item.id}
-                onClick={() => setCategory(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
 
           <section className="wellness-voice" aria-labelledby="ask-by-voice-title">
             <h2 id="ask-by-voice-title">Ask by voice</h2>
@@ -277,12 +327,21 @@ export function WellnessAssistantView() {
             {filtered.length === 0 ? (
               <div className="stack">
                 <p role="status">{LIMITED_SET_MESSAGE}</p>
-                <QuestionButtons questions={popularQuestions()} onChoose={choose} />
+                <div className="wellness-filters" role="group" aria-label="Topics you can open">
+                  {WELLNESS_CATEGORIES.map((item) => (
+                    <button key={item.id} type="button" onClick={() => { setCategory(item.id); setQuery(""); }}>
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <QuestionButtons questions={filtered} onChoose={choose} />
             )}
           </section>
+          <p className="wellness-kind">{WELLNESS_ASSISTANT_KIND}</p>
+          <p className="wellness-emergency" role="note">{WELLNESS_ASSISTANT_EMERGENCY}</p>
+          <p className="wellness-source">{adapterStatusLabel()}</p>
         </>
       )}
     </div>

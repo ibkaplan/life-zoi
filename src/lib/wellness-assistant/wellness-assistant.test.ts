@@ -10,7 +10,10 @@ import {
   WELLNESS_ASSISTANT_WELCOME,
 } from "@/lib/wellness-assistant/copy";
 import {
+  FEELINGS,
+  FEELING_SUPPORT,
   POPULAR_IDS,
+  TIRED_EXPLORE,
   WELLNESS_CATEGORIES,
   WELLNESS_QUESTIONS,
   isPopular,
@@ -43,11 +46,11 @@ const EXACT_ANSWERS: Record<string, string> = {
   "sleepy-after-eating":
     "Feeling sleepy after a meal can happen for several reasons, including meal size, sleep quality, and normal changes in alertness during the day. Try balanced meals with vegetables, protein, and fiber-rich foods. Notice whether very large meals make you feel more tired.",
   "walking-feel-better":
-    "Yes. Regular walking can support heart health, muscle function, mood, and general fitness. You do not have to walk for a long time at first. Even a short, comfortable walk can be a good starting point. Gradually increase your activity as you feel able.",
+    "Regular walking can support heart health, muscle function, mood, and general fitness. You do not have to walk for a long time at first. Even a short, comfortable walk can be a good starting point. Gradually increase your activity as you feel able.",
   "healthier-habits":
     "Choose one small habit and practice it regularly. For example, take a short walk, add vegetables to one meal, or go to bed at a consistent time. Make your goals realistic. Small steps that you can repeat are often easier to maintain than major changes all at once.",
   "sleep-better":
-    "Try going to bed and waking up at similar times each day. Keep your bedroom comfortable and quiet, reduce bright screens before bedtime, and create a relaxing evening routine. Avoid large meals and excessive caffeine late in the day. If sleep problems continue, talk with a healthcare professional.",
+    "Try going to bed and waking up at similar times each day. Keep your bedroom comfortable and quiet, reduce bright screens before bedtime, and create a relaxing evening routine. Avoid excessive caffeine late in the day. If sleep problems continue, talk with a healthcare professional.",
   "wake-at-night":
     "Nighttime waking can be related to stress, noise, temperature, caffeine, medications, or health conditions. Try noticing patterns in your sleep diary. If waking frequently affects your daily life, consider discussing it with your healthcare professional.",
   "gentle-exercise-relax":
@@ -73,19 +76,69 @@ const EXACT_ANSWERS: Record<string, string> = {
   "improve-balance":
     "Balance practice can include supported standing, gentle weight shifting, heel raises, and controlled side steps. Use a sturdy support when needed. Start slowly and practice in a safe area. If you have frequent falls or significant balance problems, seek professional guidance.",
   "exercise-often":
-    "Activity needs vary by age, health, and ability. Many adults can work toward the public health recommendation of 150 minutes of moderate aerobic activity per week, along with muscle-strengthening activities on at least two days. If you are new to exercise, start gradually. Any movement you can safely add is a useful beginning.",
+    "Many adults can work toward 150 minutes of moderate aerobic activity per week, along with muscle-strengthening activities on at least two days. Activity needs vary by age, health, and ability. If you are new to exercise, start gradually.",
   "restart-activity":
     "Yes, many people can begin with gentle activities such as short walks or chair exercises. Start with a comfortable duration and increase slowly. If you have health concerns or physical limitations, ask a healthcare professional about a suitable starting plan.",
   "notice-changes":
-    "Everyone is different. Some people notice changes in their sleep, energy, mood, or daily routines within days or weeks. Other changes take longer. There is no guaranteed timeline. Focus on your habits and your own observations rather than comparing yourself with others.",
+    "Everyone is different. Some people notice changes in sleep, energy, mood, or daily routines within days or weeks. Other changes take longer. There is no guaranteed timeline. Focus on your habits and your own observations rather than comparing yourself with others.",
   "weight-not-changing":
-    "Body weight can be influenced by many factors, including food intake, activity, sleep, stress, medications, hormones, and fluid changes. Weight can also fluctuate naturally. Consider tracking other aspects of progress, such as movement, sleep, strength, energy, and waist measurements if you choose.",
+    "Body weight can be influenced by food intake, activity, sleep, stress, medications, hormones, and fluid changes. Weight can fluctuate naturally. Consider tracking other aspects of progress, such as movement, sleep, strength, energy, and waist measurements if you choose.",
   "health-without-weight-loss":
     "Absolutely. Regular movement, balanced meals, better sleep, improved strength, and stress management can all support health, even when your weight stays the same. Your progress is about more than a number on a scale.",
   "missed-day":
     "That is completely normal. One missed day does not erase your progress. Simply return to your routine when you are ready. Focus on consistency over time, not perfection.",
   "stay-motivated":
     "Choose goals that matter to you. Keep them small and realistic. Celebrate everyday achievements, such as completing a walk, trying a new healthy meal, or going to bed on time. Record what makes you feel proud. Progress is personal.",
+  "water-amount":
+    "Water needs vary depending on your activity, climate, health, and other factors. Drink regularly throughout the day and pay attention to thirst. Foods such as fruits and vegetables also provide water. If you have been advised to limit fluids because of a medical condition, follow your healthcare professional's guidance.",
+  "sluggish-morning":
+    "Morning energy can be affected by sleep quality, sleep timing, stress, and daily routines. Try getting up at a consistent time, opening the curtains for daylight, drinking some water, and doing a few gentle movements. Notice which habits help you start the day comfortably.",
+  "active-older":
+    "Stay curious and keep moving in ways that suit your abilities. Walking, gentle strength exercises, balance practice, stretching, social activities, and hobbies can all contribute to an active lifestyle. Start at a comfortable level and build gradually.",
+  "walk-after-dinner":
+    "For many people, a comfortable walk after dinner can be a pleasant way to add movement to the day. Start gently and choose a pace that feels right. If walking after meals causes discomfort or you have medical restrictions, choose another time or ask your healthcare professional.",
+  "evening-routine":
+    "Choose a few simple activities that help you slow down. You might dim the lights, listen to quiet music, read, stretch gently, or prepare for the next morning. Try to keep your bedtime consistent.",
+  "more-protein":
+    "Include protein-rich foods throughout the day. Examples include eggs, fish, chicken, Greek yogurt, cottage cheese, beans, lentils, tofu, nuts, and seeds. Try adding one protein-rich food to breakfast, lunch, and dinner. Individual protein needs vary.",
+  "carbohydrates":
+    "No. Carbohydrates are an important source of energy. Foods such as whole grains, beans, fruits, and vegetables also provide fiber and nutrients. Instead of avoiding all carbohydrates, focus on food quality, portions, and balanced meals.",
+  "supermarket":
+    "Compare Nutrition Facts labels. Look at added sugars, sodium, fiber, protein, and serving sizes. Compare similar products rather than relying only on front-of-package claims. Choose foods that fit your needs, preferences, and budget.",
+  "healthy-fats":
+    "Unsaturated fats are found in foods such as olive oil, avocados, walnuts, seeds, and fatty fish. Replacing some saturated fats with unsaturated fats can support heart health. Fats are still energy-rich, so enjoy them in appropriate amounts.",
+  "strength-training":
+    "Strength exercises help maintain muscle function and support everyday activities such as standing up, carrying groceries, and climbing stairs. You can begin with gentle bodyweight exercises or suitable resistance bands. Choose a safe level for your abilities.",
+  "flexibility":
+    "Gentle stretching and regular mobility exercises can help you practice comfortable movement. Move slowly, avoid bouncing, and do not force a stretch. Consistency matters more than stretching as far as possible.",
+  "sit-all-day":
+    "Try taking regular movement breaks. Stand up if you can, walk around briefly, stretch your shoulders, or try gentle seated exercises. Small movement breaks can help reduce long periods of uninterrupted sitting.",
+  "measure-progress":
+    "You can track your movement minutes, exercise sessions, sleep, energy, mood, waist measurements, and personal achievements. You might notice that walking feels easier or that you have more confidence with everyday activities. Choose the measurements that matter to you.",
+  "bloated":
+    "Bloating can have many possible causes, including eating patterns, certain foods, constipation, and digestive conditions. Eating slowly, drinking enough water, and increasing fiber gradually may help some people. If bloating is persistent, painful, or accompanied by concerning symptoms, seek medical advice.",
+  "clothes-fit":
+    "Yes. Clothing fit can change for several reasons, including body measurements, fluid changes, and how your body composition changes. Weight alone does not tell the whole story. If you choose, track waist or other measurements over time using consistent methods.",
+  "non-scale":
+    "Non-scale victories are positive changes that are not measured by body weight. Examples include sleeping better, feeling stronger, walking farther, having more energy, or feeling more confident. These achievements are important parts of your personal wellness journey.",
+  "realistic-goals":
+    "Choose one or two changes that feel manageable. Make your goal specific and practical. For example, walk for ten minutes three times this week or add vegetables to lunch each day. Review your progress and adjust your goals when needed.",
+  "first-week":
+    "Take a moment to recognize what you accomplished. Review your movement, nutrition, sleep, and personal observations. Choose one habit you would like to continue and one small new goal for the next week.",
+  "recognize-improvements":
+    "Look at your own records over time. You may notice better sleep, more regular movement, improved confidence, or easier everyday activities. Write down what you observe. Your progress does not need to look like anyone else's.",
+  "blood-pressure":
+    "Blood pressure measurements can help you understand an important part of your cardiovascular health. High blood pressure often has no noticeable symptoms, so regular measurement may be useful. Discuss your readings and any concerns with your healthcare professional.",
+  "blood-sugar":
+    "Blood sugar, also called blood glucose, is the amount of glucose in your blood. Your body uses glucose as an energy source. Blood glucose can change after meals, activity, stress, and during illness. Your healthcare professional can explain your personal test results.",
+  "hba1c":
+    "HbA1c is a blood test that reflects your average blood glucose over approximately the previous three months. It is used by healthcare professionals to assess blood sugar levels and help evaluate diabetes risk or management. Your result should be interpreted using appropriate clinical guidance.",
+  "checkups":
+    "Regular checkups give you an opportunity to discuss your health, review medications, ask questions, and understand which screening tests may be appropriate for your age and personal history. Your healthcare professional can help determine what you need.",
+  "heart-habits":
+    "Healthy habits such as regular physical activity, balanced meals, not smoking, sufficient sleep, and managing stress can support cardiovascular health. Small, consistent choices can contribute to a healthier lifestyle. Your personal health needs may require additional medical guidance.",
+  "when-to-talk":
+    "Speak with a healthcare professional if you have persistent symptoms, unexplained changes in your health, or questions about medications or test results. Seek urgent help for severe or sudden symptoms such as chest pain, severe difficulty breathing, fainting, or signs of stroke.",
 };
 
 const UNSAFE_ANSWER =
@@ -112,35 +165,41 @@ describe("prepared wellness assistant", () => {
 
   it("shows the prepared assistant wording", () => {
     expect(WELLNESS_ASSISTANT_TITLE).toBe("LIFEZOI WELLNESS ASSISTANT");
-    expect(WELLNESS_ASSISTANT_SUBTITLE).toBe("How can we help you feel better today?");
+    expect(WELLNESS_ASSISTANT_SUBTITLE).toBe("Your everyday companion for healthier living.");
     expect(WELLNESS_ASSISTANT_WELCOME).toBe(
-      "Hello! Choose a question below to explore simple ideas for better everyday health. You can read the answer or listen to it.",
+      "How are you feeling today? Let's find a helpful next step together.",
     );
     expect(WELLNESS_ASSISTANT_NOTE).toBe(
-      "LifeZoi provides general wellness education, not medical diagnosis or treatment.",
+      "LifeZoi Wellness Assistant provides prepared educational information to support everyday wellness. It is not a live AI medical service and does not diagnose or treat health conditions.",
     );
     expect(WELLNESS_ASSISTANT_EMERGENCY).toContain("emergency services");
     expect(WELLNESS_ASSISTANT_EMERGENCY).toContain("healthcare professional");
-    expect(LIMITED_SET_MESSAGE).toContain("limited set");
+    expect(LIMITED_SET_MESSAGE).toBe(
+      "I don't have a prepared answer for that exact question yet. Please choose one of the topics below.",
+    );
     expect(SPEECH_STARTS_ONLY_FROM_CLICK).toBe(true);
   });
 
-  it("stores the 25 exact answers in five categories", () => {
-    expect(WELLNESS_QUESTIONS).toHaveLength(25);
-    expect(new Set(WELLNESS_QUESTIONS.map((item) => item.id)).size).toBe(25);
+  it("stores the 50 exact answers in seven categories", () => {
+    expect(WELLNESS_QUESTIONS).toHaveLength(50);
+    expect(new Set(WELLNESS_QUESTIONS.map((item) => item.id)).size).toBe(50);
     expect(WELLNESS_CATEGORIES.map((item) => item.label)).toEqual([
       "Energy & Daily Wellness",
       "Sleep & Relaxation",
       "Nutrition & Sugar",
       "Movement & Fitness",
+      "Weight & Body Wellness",
       "Motivation & Personal Progress",
+      "Health Awareness",
     ]);
-    expect(questionsInCategory("energy")).toHaveLength(5);
-    expect(questionsInCategory("sleep")).toHaveLength(4);
-    expect(questionsInCategory("nutrition")).toHaveLength(6);
-    expect(questionsInCategory("movement")).toHaveLength(5);
-    expect(questionsInCategory("motivation")).toHaveLength(5);
-    expect(questionsInCategory("all")).toHaveLength(25);
+    expect(questionsInCategory("energy")).toHaveLength(8);
+    expect(questionsInCategory("sleep")).toHaveLength(6);
+    expect(questionsInCategory("nutrition")).toHaveLength(10);
+    expect(questionsInCategory("movement")).toHaveLength(8);
+    expect(questionsInCategory("weight")).toHaveLength(5);
+    expect(questionsInCategory("motivation")).toHaveLength(7);
+    expect(questionsInCategory("awareness")).toHaveLength(6);
+    expect(questionsInCategory("all")).toHaveLength(50);
     for (const item of WELLNESS_QUESTIONS) {
       expect(item.answer).toBe(EXACT_ANSWERS[item.id]);
       expect(item.answer).not.toMatch(UNSAFE_ANSWER);
@@ -150,7 +209,8 @@ describe("prepared wellness assistant", () => {
 
   it("connects three related questions by id, including the sweets example", () => {
     for (const item of WELLNESS_QUESTIONS) {
-      expect(item.relatedIds).toHaveLength(3);
+      expect(item.relatedIds.length).toBeGreaterThanOrEqual(2);
+      expect(item.relatedIds.length).toBeLessThanOrEqual(3);
       expect(new Set(item.relatedIds).size).toBe(3);
       expect(item.relatedIds).not.toContain(item.id);
       expect(relatedQuestions(item.id).map((related) => related.id)).toEqual([...item.relatedIds]);
@@ -168,12 +228,10 @@ describe("prepared wellness assistant", () => {
     expect(isPopular("wake-at-night")).toBe(false);
     const staticRoutes = new Set([
       "/academy/meals",
-      "/academy/move",
       "/academy/move/resources",
       "/progress",
       "/choices/sleep",
-      "/sugar-detective",
-      "/balance-challenge",
+      "/lab-results",
     ]);
     for (const item of WELLNESS_QUESTIONS) {
       expect(item.links.length).toBeGreaterThan(0);
@@ -194,6 +252,37 @@ describe("prepared wellness assistant", () => {
     expect(questionById("improve-balance")?.links.some((link) => link.href.includes("balance"))).toBe(true);
     expect(questionById("crave-sweets")?.links.some((link) => link.href === "/academy/meals")).toBe(true);
     expect(questionById("stay-motivated")?.links.some((link) => link.href === "/progress")).toBe(true);
+    expect(questionsInCategory("nutrition").every((item) => item.links.some((link) => link.href === "/academy/meals"))).toBe(true);
+    expect(questionsInCategory("movement").every((item) => item.links.some((link) => link.href === "/academy/move/resources"))).toBe(true);
+    expect(questionsInCategory("weight").every((item) => item.links.some((link) => link.href === "/progress"))).toBe(true);
+    expect(questionsInCategory("motivation").every((item) => item.links.some((link) => link.href === "/progress"))).toBe(true);
+    expect(FEELING_SUPPORT).toBe("Thank you for sharing. Let's explore a few simple ideas that may help.");
+    expect(FEELINGS.map((item) => item.label)).toEqual([
+      "I feel tired",
+      "I am having trouble sleeping",
+      "I crave sweets",
+      "I want to lose weight",
+      "I have no motivation",
+      "I want to become stronger",
+      "I feel stressed",
+      "I want to eat healthier",
+      "I want to move more",
+      "I want to improve my daily habits",
+      "I feel bloated",
+      "I want to improve my balance",
+      "I feel good and want to improve further",
+    ]);
+    const tired = FEELINGS.find((item) => item.id === "tired");
+    expect(tired?.note).toBe(TIRED_EXPLORE);
+    expect(tired?.prompts?.map((prompt) => prompt.label)).toEqual([
+      "How well have you been sleeping?",
+      "How often do you move during the day?",
+      "Are you eating regular balanced meals?",
+    ]);
+    for (const feeling of FEELINGS) {
+      for (const id of feeling.questionIds) expect(questionById(id)).toBeTruthy();
+      for (const prompt of feeling.prompts ?? []) expect(questionById(prompt.questionId)).toBeTruthy();
+    }
   });
 
   it("searches and matches only the prepared library", () => {

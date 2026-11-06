@@ -1,12 +1,14 @@
 export const WELLNESS_ASSISTANT_TITLE = "LIFEZOI WELLNESS ASSISTANT";
 
-export const WELLNESS_ASSISTANT_SUBTITLE = "How can we help you feel better today?";
+export const WELLNESS_ASSISTANT_SUBTITLE = "Your everyday companion for healthier living.";
 
 export const WELLNESS_ASSISTANT_WELCOME =
-  "Hello! Choose a question below to explore simple ideas for better everyday health. You can read the answer or listen to it.";
+  "How are you feeling today? Let's find a helpful next step together.";
 
 export const WELLNESS_ASSISTANT_NOTE =
-  "LifeZoi provides general wellness education, not medical diagnosis or treatment.";
+  "LifeZoi Wellness Assistant provides prepared educational information to support everyday wellness. It is not a live AI medical service and does not diagnose or treat health conditions.";
+
+export const FEELING_HEADING = "I WANT TO TALK ABOUT HOW I FEEL";
 
 export const WELLNESS_ASSISTANT_EMERGENCY =
   "If you have emergency symptoms, contact emergency services. If a symptom persists, talk with a healthcare professional.";
@@ -15,7 +17,7 @@ export const WELLNESS_ASSISTANT_KIND =
   "This is a prepared wellness information assistant. The answers are written in advance. It is not a live chatbot.";
 
 export const LIMITED_SET_MESSAGE =
-  "This assistant answers a limited set of prepared questions. Here are related questions you can open.";
+  "I don't have a prepared answer for that exact question yet. Please choose one of the topics below.";
 
 export const VOICE_PRIVACY_NOTE =
   "Ask by voice uses your browser’s speech recognition. That browser speech service may process the audio. LifeZoi does not receive the audio. You can edit the words before you confirm.";
