@@ -1,4 +1,5 @@
 import { emptyBrainProgress, type BrainProgress } from "@/lib/brain-quiz/progress";
+import { emptyHabitJourney, type HabitJourney } from "@/lib/habit-transformation/model";
 
 export const AGE_RANGES = [
   "18-29",
@@ -222,6 +223,7 @@ export type UserSession = {
   reassessDays: ReassessDays | 0;
   reassessOn: string;
   brainQuiz: BrainProgress;
+  habitJourney: HabitJourney;
 };
 
 export type FieldErrors = Record<string, string>;
@@ -298,5 +300,6 @@ export function emptySession(): UserSession {
     reassessDays: 0,
     reassessOn: "",
     brainQuiz: emptyBrainProgress(),
+    habitJourney: emptyHabitJourney(),
   };
 }

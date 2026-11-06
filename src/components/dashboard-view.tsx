@@ -137,6 +137,7 @@ export function DashboardView() {
             ["/nature", "Nature", "Daylight and time outside. Nature is not medicine."],
             ["/habits", "Challenges", "Shared 7-day and 30-day journeys."],
             ["/brain-quiz", "Brain & Habit Quiz", "Short games and habit questions. Scores are not a health measure."],
+            ["/habit-transformation", "Habit Transformation", "Small steps, a personal plan, and a daily check-in. Not a diagnosis."],
           ].map(([href, title, text]) => (
             <Link key={href} className="card learn-link" href={href}>
               <h3>{title}</h3>

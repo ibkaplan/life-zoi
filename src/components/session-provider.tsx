@@ -13,6 +13,7 @@ import { clearAssistantThread } from "@/lib/assistant";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
 import { clearBrainLocal, sanitizeBrain, writeBrainLocal, type BrainProgress } from "@/lib/brain-quiz/progress";
+import { clearHabitLocal, sanitizeHabitJourney, writeHabitLocal, type HabitJourney } from "@/lib/habit-transformation/model";
 import { clearPurpose } from "@/lib/purpose";
 import { resetWellnessClient } from "@/lib/wellness/client-store";
 import { createSampleSession } from "@/lib/sample";
@@ -74,6 +75,7 @@ type SessionApi = {
   removeWeight: (id: string) => void;
   clearUserData: () => void;
   saveBrain: (brainQuiz: BrainProgress) => void;
+  saveHabit: (habitJourney: HabitJourney) => void;
   setSample: (on: boolean) => void;
   setReassessment: (days: ReassessDays) => string | null;
 };
@@ -231,12 +233,19 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         writeBrainLocal(typeof window === "undefined" ? null : window.localStorage, clean);
         commit({ ...stored, brainQuiz: clean });
       },
+      saveHabit: (habitJourney) => {
+        if (sample) return;
+        const clean = sanitizeHabitJourney(habitJourney);
+        writeHabitLocal(typeof window === "undefined" ? null : window.localStorage, clean);
+        commit({ ...stored, habitJourney: clean });
+      },
       clearUserData: () => {
         clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
         clearRecentQuestions(typeof window === "undefined" ? null : window.sessionStorage);
         clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
         clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
         clearBrainLocal(typeof window === "undefined" ? null : window.localStorage);
+        clearHabitLocal(typeof window === "undefined" ? null : window.localStorage);
         resetWellnessClient();
         if (signedIn) void clearAccountRecords();
         writeBrowserStore(emptySession(), false);

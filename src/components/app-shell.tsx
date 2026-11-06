@@ -18,6 +18,7 @@ const primaryLinks = [
   { href: "/academy/move", label: "Movement", short: "Move" },
   { href: "/library", label: "Health Library", short: "Library" },
   { href: "/nature", label: "Nature", short: "Nature" },
+  { href: "/habit-transformation", label: "Habit Transformation", short: "Habits" },
   { href: "/progress", label: "Progress", short: "Progress" },
   { href: "/profile", label: "Profile", short: "Profile" },
 ];
@@ -56,6 +57,7 @@ const prefixes = [
   "/urges",
   "/nature",
   "/brain-quiz",
+  "/habit-transformation",
 ];
 
 function current(pathname: string, href: string) {
@@ -101,7 +103,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [open]);
 
   const primary = primaryLinks.filter((link) =>
-    ["/dashboard", "/outlook", "/what-if", "/nature", "/progress"].includes(link.href),
+    ["/dashboard", "/outlook", "/what-if", "/habit-transformation", "/nature", "/progress"].includes(link.href),
   );
 
   return (

@@ -155,7 +155,7 @@ a { color: var(--forest); }
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.15rem;
   background: var(--surface);
   border-top: 1px solid var(--line);
@@ -182,7 +182,7 @@ a { color: var(--forest); }
   background: var(--sage);
 }
 
-.bottom-nav span { font-size: 0.78rem; }
+.bottom-nav span { font-size: 0.72rem; line-height: 1.15; text-align: center; }
 
 .menu-button {
   min-height: 44px;
@@ -2101,6 +2101,39 @@ button.assistant-send:focus-visible,
 .quiz-barAlt { fill: var(--blue); }
 
 .quiz-found { color: var(--deep); font-weight: 700; }
+
+.habit-nav {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.habit-nav a {
+  flex: 0 0 auto;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 650;
+}
+
+.habit-nav a[aria-current="page"] {
+  background: var(--lavender);
+  border-color: var(--primary);
+  color: var(--deep);
+}
+
+.habit-quote {
+  font-family: var(--font-display-family), Georgia, serif;
+  font-size: 1.35rem;
+  line-height: 1.35;
+}
 
 @media (min-width: 720px) {
   .quiz-cats { grid-template-columns: 1fr 1fr; }

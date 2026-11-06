@@ -1,4 +1,5 @@
 import { emptyBrainProgress } from "@/lib/brain-quiz/progress";
+import { emptyHabitJourney } from "@/lib/habit-transformation/model";
 import { monthKey } from "@/lib/dates";
 import { STEP_IDS, type Assessment, type UserSession } from "@/lib/types";
 
@@ -95,6 +96,7 @@ export function createSampleSession(today: string): UserSession {
     reassessDays: 0,
     reassessOn: "",
     brainQuiz: emptyBrainProgress(),
+    habitJourney: emptyHabitJourney(),
   };
 }
 
