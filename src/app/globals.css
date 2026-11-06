@@ -1289,3 +1289,85 @@ button.assistant-send:focus-visible,
     scroll-behavior: auto !important;
   }
 }
+
+.library-kicker {
+  color: #E9DDFB;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.library-brand { letter-spacing: 0.06em; font-weight: 750; }
+.library-brand-ink { color: #5725A8; font-weight: 750; letter-spacing: 0.04em; }
+
+.library-disclaimer {
+  background: #DCEEFF;
+  color: #172554;
+  border: 2px solid #5725A8;
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+}
+
+.library-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.library-art {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+}
+
+.idea-card {
+  background: linear-gradient(145deg, #5725A8 0%, #7136C8 55%, #4295E8 100%);
+  color: #F7F8FF;
+  border-radius: 28px;
+  padding: 1.4rem;
+  display: grid;
+  gap: 0.8rem;
+  min-height: 280px;
+}
+
+.idea-card a { color: #F7F8FF; }
+.idea-card h1, .idea-card h2 { color: #F7F8FF; }
+
+.library-cal {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.library-cal li {
+  min-height: 44px;
+  border-radius: 12px;
+  background: #F7F8FF;
+  border: 1px solid #DDD4F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #172554;
+}
+
+.library-cal li.is-marked {
+  background: #E9DDFB;
+  box-shadow: inset 0 -3px 0 #7136C8;
+}
+
+@media (min-width: 720px) {
+  .library-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media print {
+  .topbar, .bottom-nav, .menu-button, .no-print, .banner, .footer-note, .skip, .dialog-backdrop {
+    display: none !important;
+  }
+  .app-main { padding: 0 !important; }
+  body { background: white; }
+  .library-sheet { box-shadow: none; }
+}
