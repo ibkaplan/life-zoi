@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { EvidenceLine, ReadOnlyNote, WellnessSources } from "@/components/wellness/bits";
+import { BreadRecipePage, NutritionEducation } from "@/components/nutrition/education-views";
+import { breadRecipe } from "@/lib/nutrition/education";
 import { activities, mealModules } from "@/lib/wellness/academy";
 import { FOOD_GROUPS, foods } from "@/lib/wellness/foods";
 import { coachingFocus } from "@/lib/wellness/personalize";
@@ -25,7 +27,7 @@ export function AcademyHome() {
         </Link>
         <Link className="card learn-link" href="/academy/meals">
           <h2>Meal lessons</h2>
-          <p>Planning, portions, protein, fiber, fish, shopping, storage, and timing.</p>
+          <p>Planning, portions, protein, fiber, fish, shopping, storage, timing, added sugar, homemade bread, and gut health.</p>
         </Link>
         <Link className="card learn-link" href="/academy/move">
           <h2>Movement library</h2>
@@ -143,6 +145,18 @@ export function MealIndex() {
       <PagePhoto id="nutrition" />
       <p className="kicker">Nutrition & Fitness Academy</p>
       <h1>Meal lessons</h1>
+      <p className="lede">
+        The lesson library is still here. Daily food patterns, added sugar, homemade bread, and gut health are part of this same page.
+      </p>
+      <nav className="actions" aria-label="Nutrition topics">
+        <a className="btn btn-secondary" href="#daily-choices">Daily choices</a>
+        <a className="btn btn-secondary" href="#sugar-hiding">Labels and added sugar</a>
+        <a className="btn btn-secondary" href="#bake-bread">Homemade bread</a>
+        <a className="btn btn-secondary" href="#feed-your-gut">Gut health</a>
+        <a className="btn btn-secondary" href="#lesson-library">Lesson library</a>
+      </nav>
+      <NutritionEducation />
+      <h2 id="lesson-library">Lesson library</h2>
       {mealModules.map((module) => (
         <Link key={module.slug} className="card learn-link" href={`/academy/meals/${module.slug}`}>
           <h2>{module.title}</h2>
@@ -154,6 +168,7 @@ export function MealIndex() {
 }
 
 export function MealDetail({ slug }: { slug: string }) {
+  if (breadRecipe(slug)) return <BreadRecipePage slug={slug} />;
   const lesson = mealModules.find((item) => item.slug === slug);
   if (!lesson) return null;
   return (

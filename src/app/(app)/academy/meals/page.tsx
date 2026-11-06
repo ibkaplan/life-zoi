@@ -3,7 +3,7 @@ import { MealIndex } from "@/components/wellness/academy-views";
 
 export const metadata: Metadata = {
   title: "Meal education",
-  description: "Meal lessons about everyday foods. No universal calorie target.",
+  description: "Meal lessons, added-sugar education, homemade bread, and gut health. No universal calorie target.",
 };
 
 export default function MealsPage() {
