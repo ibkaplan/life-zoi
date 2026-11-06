@@ -34,6 +34,7 @@ const moreLinks = [
   { href: "/urges", label: "Urges", short: "Urges" },
   { href: "/habits", label: "Challenges", short: "Habits" },
   { href: "/ai-assistant", label: "Wellness Assistant", short: "Assist" },
+  { href: "/emotional-wellness", label: "Emotional Wellness", short: "Feelings" },
   { href: "/settings", label: "Settings", short: "Settings" },
 ];
 
@@ -61,6 +62,7 @@ const prefixes = [
   "/brain-quiz",
   "/habit-transformation",
   "/food-plan",
+  "/emotional-wellness",
 ];
 
 function current(pathname: string, href: string) {

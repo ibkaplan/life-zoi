@@ -2173,6 +2173,41 @@ button.assistant-send:focus-visible,
   color: var(--deep);
 }
 
+.ew-log {
+  display: grid;
+  gap: 0.7rem;
+  max-height: 32rem;
+  overflow: auto;
+}
+
+.ew-bubble {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  background: #fff;
+}
+
+.ew-bubble-companion { background: var(--lavender); }
+
+.ew-bubble-crisis {
+  background: var(--danger-bg);
+  border-color: #efd2cb;
+  color: var(--ink);
+}
+
+.ew-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ew-chip[aria-pressed="true"] {
+  background: var(--lavender);
+  border-color: var(--primary);
+  color: var(--deep);
+}
+
 .food-card {
   background: #f6f1e6;
   border-color: #d5e4d4;
@@ -2219,3 +2254,5 @@ button.assistant-send:focus-visible,
   .topbar, .bottom-nav, .banner, .footer-note, .food-nav, .no-print { display: none !important; }
   .food-print-root { color: black; }
 }
+
+.ew-step { font-size: 1.08rem; }

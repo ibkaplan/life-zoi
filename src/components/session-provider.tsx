@@ -16,6 +16,7 @@ import { clearBrainLocal, sanitizeBrain, writeBrainLocal, type BrainProgress } f
 import { sanitizeFoodPlan } from "@/lib/food-plan/plan";
 import type { FoodPlanState } from "@/lib/food-plan/types";
 import { clearHabitLocal, sanitizeHabitJourney, writeHabitLocal, type HabitJourney } from "@/lib/habit-transformation/model";
+import { clearEmotionalStore } from "@/lib/emotional-wellness/store";
 import { clearPurpose } from "@/lib/purpose";
 import { resetWellnessClient } from "@/lib/wellness/client-store";
 import { createSampleSession } from "@/lib/sample";
@@ -253,6 +254,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
         clearBrainLocal(typeof window === "undefined" ? null : window.localStorage);
         clearHabitLocal(typeof window === "undefined" ? null : window.localStorage);
+        clearEmotionalStore();
         resetWellnessClient();
         if (signedIn) void clearAccountRecords();
         writeBrowserStore(emptySession(), false);
