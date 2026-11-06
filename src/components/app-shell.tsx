@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { CareInviteWatcher } from "@/components/care-invite-watcher";
 import { Logo } from "@/components/logo";
 import { useSession } from "@/components/session-provider";
 import { useAccount } from "@/lib/account-store";
@@ -33,6 +34,7 @@ const moreLinks = [
   { href: "/urges", label: "Urges", short: "Urges" },
   { href: "/habits", label: "Challenges", short: "Habits" },
   { href: "/ai-assistant", label: "Wellness Assistant", short: "Assist" },
+  { href: "/share-the-care", label: "Share the Care", short: "Share" },
   { href: "/settings", label: "Settings", short: "Settings" },
 ];
 
@@ -154,6 +156,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Sample data. This is an example, not your information, and it is not saved as your record.
           </p>
         ) : null}
+        <CareInviteWatcher />
         {children}
         <footer className="footer-note">
           <p>{PROFESSIONAL_NOTICE}</p>
