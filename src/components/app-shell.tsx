@@ -11,6 +11,7 @@ import { sources } from "@/lib/sources";
 
 const primaryLinks = [
   { href: "/dashboard", label: "Home", short: "Home" },
+  { href: "/my-day", label: "My Day", short: "My Day" },
   { href: "/life-matters", label: "Your Life Matters", short: "Matters" },
   { href: "/outlook", label: "Life outlook", short: "Outlook" },
   { href: "/what-if", label: "WHAT IF?", short: "What if" },
