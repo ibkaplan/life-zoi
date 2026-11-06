@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "englishProfanity": ["fuck", "fucking", "fucker", "shit", "shitty", "bitch", "asshole", "bastard"],
+  "russianProfanity": ["хуй", "хуйня", "пизда", "пиздец", "блядь", "блять", "ебать", "ебаный", "сука", "мудак"],
+  "insults": ["idiot", "stupid", "moron", "dumbass", "imbecile", "retard", "идиот", "дурак", "тупой", "дебил", "мразь", "урод"],
+  "threats": ["i will kill you", "ill kill you", "i will hurt you", "kill yourself", "я тебя убью", "убью тебя"],
+  "hate": ["go back to your country", "are vermin", "should be exterminated"],
+  "hateWords": ["nigger", "nigga", "kike", "spic", "chink", "faggot", "жид", "хач"],
+  "spam": ["buy now", "click here", "free crypto"],
+  "quotationCues": ["quote", "quoted", "said", "saying", "example", "practice", "practiced", "guideline", "phrase", "word", "цитата", "сказал", "сказала", "пример", "слово"]
+}
