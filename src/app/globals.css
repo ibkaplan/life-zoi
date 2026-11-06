@@ -1371,3 +1371,141 @@ button.assistant-send:focus-visible,
   body { background: white; }
   .library-sheet { box-shadow: none; }
 }
+
+.home-free-exercise {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 2.2rem;
+  padding: clamp(1.2rem, 3vw, 1.8rem);
+  border-radius: 28px;
+  background: #E9DDFB;
+  border: 1px solid #D4C4F5;
+  color: #172554;
+}
+
+.home-free-exercise h2 {
+  color: #5725A8;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+}
+
+.free-move {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.15rem 1.15rem 1.25rem;
+  border-radius: 22px;
+  background: linear-gradient(160deg, #E9DDFB, #DCEEFF);
+  border: 1px solid #E9DDFB;
+  color: #172554;
+}
+
+.free-move h2,
+.free-guide h1,
+.free-guide h2,
+.free-guide h3 { color: #5725A8; }
+
+.free-brand {
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  color: #5725A8;
+}
+
+.free-guide { font-size: 1.2rem; }
+.free-guide p,
+.free-guide li { overflow-wrap: anywhere; }
+
+.free-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.free-pills a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #172554;
+  text-decoration: none;
+  border: 1px solid #D4C4F5;
+}
+
+.free-hub-grid,
+.free-steps,
+.free-links {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.free-steps { margin: 0; padding-left: 1.3rem; }
+.free-steps li { padding-left: 0.2rem; }
+
+.free-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.free-links li {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid #E9DDFB;
+}
+
+.free-links span { color: #3E4E80; font-size: 0.95rem; }
+
+.free-url { overflow-wrap: anywhere; }
+
+.free-safety {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem 1.05rem;
+  border-radius: 18px;
+  background: #DCEEFF;
+  border: 2px solid #5725A8;
+  color: #172554;
+}
+
+.free-sketch {
+  width: min(100%, 420px);
+  height: auto;
+}
+
+.video-frame {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 16 / 9;
+  background: #172554;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (min-width: 800px) {
+  .free-hub-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media print {
+  .topbar,
+  .bottom-nav,
+  .menu-button,
+  .footer-note,
+  .banner,
+  .no-print { display: none !important; }
+  body { background: #ffffff; }
+  .free-guide { font-size: 16pt; color: #172554; }
+  .app-main { padding: 0; }
+}

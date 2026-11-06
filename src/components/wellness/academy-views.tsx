@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PagePhoto } from "@/components/page-photo";
+import { FreeExerciseSection } from "@/components/wellness/free-exercise-views";
 import { useSession } from "@/components/session-provider";
 import { EvidenceLine, ReadOnlyNote, WellnessSources } from "@/components/wellness/bits";
 import { BreadRecipePage, NutritionEducation } from "@/components/nutrition/education-views";
@@ -31,7 +32,7 @@ export function AcademyHome() {
         </Link>
         <Link className="card learn-link" href="/academy/move">
           <h2>Movement library</h2>
-          <p>Walking, strength, balance, and seated options. No copied videos.</p>
+          <p>Walking, strength, balance, seated options, and free exercise resources.</p>
         </Link>
         <Link className="card learn-link" href="/academy/coaching">
           <h2>Coaching from your assessment</h2>
@@ -203,6 +204,7 @@ export function MoveIndex() {
       <p className="lede">
         Drawings on these pages were made for lifeZoi. They are not photographs or copied videos. Stop any move that hurts or does not fit your condition.
       </p>
+      <FreeExerciseSection />
       {activities.map((item) => (
         <Link key={item.slug} className="card learn-link" href={`/academy/move/${item.slug}`}>
           <h2>{item.title}</h2>

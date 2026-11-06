@@ -4,6 +4,7 @@ import { HomeGauge } from "@/components/home-gauge";
 import { Logo } from "@/components/logo";
 import { StorageNote } from "@/components/storage-note";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
+import { FREE_EXERCISE_MESSAGE, FREE_EXERCISE_TITLE } from "@/lib/wellness/exercise-resources/copy";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -121,6 +122,14 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="page home-free-exercise" aria-labelledby="free-exercise-home">
+          <h2 id="free-exercise-home">{FREE_EXERCISE_TITLE}</h2>
+          <p>{FREE_EXERCISE_MESSAGE}</p>
+          <Link className="home-btn home-btn-secondary" href="/academy/move/resources">
+            Open in Movement
+          </Link>
+        </section>
+
         <section className="page home-works" aria-labelledby="home-works-title">
           <div className="home-section-head">
             <h2 id="home-works-title">HOW LIFEZOI WORKS</h2>
@@ -154,6 +163,7 @@ export default function HomePage() {
             <Link href="/academy">Academy</Link>
             <Link href="/academy/meals">Nutrition</Link>
             <Link href="/academy/move">Movement</Link>
+            <Link href="/academy/move/resources">Free exercise resources</Link>
             <Link href="/choices">Daily choices</Link>
             <Link href="/urges">Urges</Link>
             <Link href="/nature">Nature</Link>
