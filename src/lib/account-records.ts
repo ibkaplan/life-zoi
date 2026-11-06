@@ -1,5 +1,6 @@
 import { decideAccess } from "@/lib/access";
 import { isEmptyBrain } from "@/lib/brain-quiz/progress";
+import { isEmptyFoodPlan } from "@/lib/food-plan/types";
 import { isEmptyHabitJourney } from "@/lib/habit-transformation/model";
 import { SAMPLE_VISITOR_NAME } from "@/lib/sample";
 import { sanitizeSession } from "@/lib/session";
@@ -24,6 +25,7 @@ export type ProfileWrite = {
     weightEntries: UserSession["weightEntries"];
     brainQuiz: UserSession["brainQuiz"];
     habitJourney: UserSession["habitJourney"];
+    foodPlan: UserSession["foodPlan"];
   };
   updated_at: string;
 };
@@ -109,7 +111,8 @@ export function isBlankSession(session: UserSession): boolean {
     session.draft.goals.length === 0 &&
     session.draft.habitNote.trim() === "" &&
     isEmptyBrain(session.brainQuiz) &&
-    isEmptyHabitJourney(session.habitJourney)
+    isEmptyHabitJourney(session.habitJourney) &&
+    isEmptyFoodPlan(session.foodPlan)
   );
 }
 
@@ -156,6 +159,7 @@ export function sessionToRows(session: UserSession, actorUserId: string, updated
         weightEntries: session.weightEntries,
         brainQuiz: session.brainQuiz,
         habitJourney: session.habitJourney,
+        foodPlan: session.foodPlan,
       },
       updated_at: updatedAt,
     },
@@ -233,6 +237,7 @@ export function rowsToSession(input: AccountRead): UserSession {
     weightEntries: state.weightEntries,
     brainQuiz: state.brainQuiz,
     habitJourney: state.habitJourney,
+    foodPlan: state.foodPlan,
     history: input.assessments.map((row) => ({
       id: row.id,
       completedAt: row.completed_at,

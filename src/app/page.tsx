@@ -172,6 +172,7 @@ export default function HomePage() {
             <Link href="/change-lab">Change Lab</Link>
             <Link href="/brain-quiz">Brain & Habit Quiz</Link>
             <Link href="/habit-transformation">Habit Transformation</Link>
+            <Link href="/food-plan">Food & wellness</Link>
             <Link href="/settings">Settings</Link>
             <Link href="/profile">Profile</Link>
             <Link href="/privacy">Privacy</Link>

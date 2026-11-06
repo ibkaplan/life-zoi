@@ -2145,3 +2145,77 @@ button.assistant-send:focus-visible,
 @media (min-width: 1020px) {
   .quiz-cats { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+.food-nav {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.food-nav a {
+  flex: 0 0 auto;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 650;
+}
+
+.food-nav a[aria-current="page"] {
+  background: var(--lavender);
+  border-color: var(--primary);
+  color: var(--deep);
+}
+
+.food-card {
+  background: #f6f1e6;
+  border-color: #d5e4d4;
+}
+
+.food-card h2, .food-card h3 { color: #1f4d38; }
+
+.food-tagline {
+  font-family: var(--font-display-family), Georgia, serif;
+  font-size: 1.45rem;
+  color: var(--deep);
+}
+
+.food-mark { width: 4rem; height: 4rem; }
+
+.food-numbers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.food-numbers div {
+  background: #f7fbf6;
+  border: 1px solid #d5e4d4;
+  border-radius: 12px;
+  padding: 0.55rem 0.7rem;
+}
+
+.food-numbers dt { font-size: 0.85rem; color: var(--muted); }
+.food-numbers dd { margin: 0; font-weight: 750; color: var(--ink); }
+
+.food-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.food-simple { font-size: 1.125rem; }
+.food-simple h1 { font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1.15; }
+
+@media print {
+  .topbar, .bottom-nav, .banner, .footer-note, .food-nav, .no-print { display: none !important; }
+  .food-print-root { color: black; }
+}

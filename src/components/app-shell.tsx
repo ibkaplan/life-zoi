@@ -16,6 +16,7 @@ const primaryLinks = [
   { href: "/outlook", label: "Life outlook", short: "Outlook" },
   { href: "/what-if", label: "WHAT IF?", short: "What if" },
   { href: "/academy/meals", label: "Nutrition", short: "Food" },
+  { href: "/food-plan", label: "Food & wellness", short: "Meals" },
   { href: "/academy/move", label: "Movement", short: "Move" },
   { href: "/library", label: "Health Library", short: "Library" },
   { href: "/nature", label: "Nature", short: "Nature" },
@@ -59,6 +60,7 @@ const prefixes = [
   "/nature",
   "/brain-quiz",
   "/habit-transformation",
+  "/food-plan",
 ];
 
 function current(pathname: string, href: string) {

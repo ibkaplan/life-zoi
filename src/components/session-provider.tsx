@@ -13,6 +13,8 @@ import { clearAssistantThread } from "@/lib/assistant";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
 import { clearBrainLocal, sanitizeBrain, writeBrainLocal, type BrainProgress } from "@/lib/brain-quiz/progress";
+import { sanitizeFoodPlan } from "@/lib/food-plan/plan";
+import type { FoodPlanState } from "@/lib/food-plan/types";
 import { clearHabitLocal, sanitizeHabitJourney, writeHabitLocal, type HabitJourney } from "@/lib/habit-transformation/model";
 import { clearPurpose } from "@/lib/purpose";
 import { resetWellnessClient } from "@/lib/wellness/client-store";
@@ -76,6 +78,7 @@ type SessionApi = {
   clearUserData: () => void;
   saveBrain: (brainQuiz: BrainProgress) => void;
   saveHabit: (habitJourney: HabitJourney) => void;
+  saveFoodPlan: (foodPlan: FoodPlanState) => void;
   setSample: (on: boolean) => void;
   setReassessment: (days: ReassessDays) => string | null;
 };
@@ -238,6 +241,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         const clean = sanitizeHabitJourney(habitJourney);
         writeHabitLocal(typeof window === "undefined" ? null : window.localStorage, clean);
         commit({ ...stored, habitJourney: clean });
+      },
+      saveFoodPlan: (foodPlan) => {
+        if (sample) return;
+        commit({ ...stored, foodPlan: sanitizeFoodPlan(foodPlan) });
       },
       clearUserData: () => {
         clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
