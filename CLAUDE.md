@@ -8,7 +8,7 @@ Read `docs/claude-migration/INDEX.md` first, then the document that matches the 
 
 Next.js App Router, TypeScript, Tailwind CSS 4, React 19. `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers, scenarios, goals, and check-ins use the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are a real public config. The browser client reads those two names directly so Next can inline them (`src/lib/supabase-browser.ts`). Without that configuration, answers stay in `sessionStorage` for the current tab. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in the connected case.
 
-The AI Health Assistant is a local mock. `AI_PROVIDER` other than `mock` is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
+The Wellness Assistant at `/ai-assistant` is a prepared question library with browser speech. It is not a live chatbot. `AI_PROVIDER` other than `mock` is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
 
 Important paths on `main`:
 

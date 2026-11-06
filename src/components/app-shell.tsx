@@ -30,7 +30,7 @@ const moreLinks = [
   { href: "/choices", label: "Daily choices", short: "Choices" },
   { href: "/urges", label: "Urges", short: "Urges" },
   { href: "/habits", label: "Challenges", short: "Habits" },
-  { href: "/ai-assistant", label: "AI Health Assistant", short: "Assist" },
+  { href: "/ai-assistant", label: "Wellness Assistant", short: "Assist" },
   { href: "/settings", label: "Settings", short: "Settings" },
 ];
 

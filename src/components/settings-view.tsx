@@ -73,8 +73,8 @@ export function SettingsView() {
         <h2>{account.phase === "ready" ? "Clear saved answers" : "Delete data in this browser"}</h2>
         <p>
           {account.phase === "ready"
-            ? "This clears the saved assessment, scenarios, goals, and check-ins in your account, plus the AI assistant conversation, Change Lab record, Your Life Matters reflections, and wellness notes stored in this tab. It does not delete the login."
-            : "This clears the assessment, scenarios, goals, check-ins, AI assistant conversation, Change Lab record, Your Life Matters reflections, wellness check-ins, urge records, moment plans, if-then plans, and nature journal stored in this tab."}
+            ? "This clears the saved assessment, scenarios, goals, and check-ins in your account, plus the assistant conversation, recently selected wellness questions, Change Lab record, Your Life Matters reflections, and wellness notes stored in this tab. It does not delete the login."
+            : "This clears the assessment, scenarios, goals, check-ins, assistant conversation, recently selected wellness questions, Change Lab record, Your Life Matters reflections, wellness check-ins, urge records, moment plans, if-then plans, and nature journal stored in this tab."}
         </p>
         {cleared ? (
           <p className="alert alert-ok" role="status">

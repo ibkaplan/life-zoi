@@ -15,7 +15,7 @@ Email and password sign-in uses Supabase Auth when `NEXT_PUBLIC_SUPABASE_URL` an
 - That tab storage is not encrypted by lifeZoi and is not a secure health record.
 - Sample data is labeled “Sample visitor” and is not written into an account.
 - Suggestion and WHAT IF? requests go to this app’s own server for validation, then are discarded. They are not sent to an AI service.
-- The AI Health Assistant is a local development mock. `AI_PROVIDER=mock` is the only enabled mode. A different provider name is refused, and no paid model, payment service, or health-record database is contacted.
+- The Wellness Assistant at `/ai-assistant` shows prepared questions and answers stored in the app. It is not a live chatbot. Listening uses the browser’s speech synthesis and does not send answer text to a speech service. Ask by voice is optional and uses the browser’s speech recognition. LifeZoi does not receive that audio. `AI_PROVIDER=mock` is the only enabled mode on the unused development endpoint. A different provider name is refused, and no paid model, payment service, or health-record database is contacted.
 - Lab education can ask MedlinePlus Connect for a verified LOINC code only. Responses are cached for 12 hours. Personal results and documents are not sent. Real document upload is described in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active.
 - Your Life Matters reflections, Change Lab notes, the assistant conversation, and wellness notes stay in this browser tab. Your Life Matters notes are personal reflections about purpose and kindness. They are not a medical score, and positive karma is presented as a philosophical metaphor.
 

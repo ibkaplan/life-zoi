@@ -455,10 +455,10 @@ export function LifeMattersView() {
           </ul>
         )}
         <p className="hint">
-          The AI Health Assistant can discuss a personal goal in development mock mode. It does not see these private notes unless you type them yourself.
+          The wellness assistant offers prepared educational answers. It does not see these private notes.
         </p>
         <Link className="btn btn-secondary" href="/ai-assistant">
-          Ask the development assistant
+          Open the wellness assistant
         </Link>
       </section>
     </div>

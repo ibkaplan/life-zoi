@@ -34,12 +34,12 @@ export function DashboardView() {
         </p>
       </section>
       <article className="card assistant-card stack">
-        <p className="kicker">AI Health Assistant</p>
-        <h2>Meet Your Personal AI Health Assistant</h2>
-        <p>Get answers, explore healthier habits, and receive guidance as you work toward your wellness goals.</p>
-        <p className="hint">Development replies stay on this server. No paid AI service is contacted, and assessment answers are not sent.</p>
+        <p className="kicker">Wellness Assistant</p>
+        <h2>LIFEZOI WELLNESS ASSISTANT</h2>
+        <p>Choose a prepared question about everyday health. You can read the answer or listen to it.</p>
+        <p className="hint">This is a prepared wellness information assistant, not a live chatbot or medical care.</p>
         <Link className="btn assistant-send" href="/ai-assistant">
-          Start a Conversation
+          Open the wellness assistant
         </Link>
       </article>
       <article className="card stack">

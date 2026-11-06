@@ -25,7 +25,7 @@ These flows exist on `main`. Account storage applies only when the public Supaba
 | Change Lab experiments | Implemented, tab storage | `src/app/(app)/change-lab/page.tsx`, `src/lib/change-lab.ts` |
 | Nutrition, movement, nature, urges, habits, choices, wellness coach | Implemented | `src/app/(app)/academy/`, `nature/`, `urges/`, `habits/`, `choices/`, `wellness-coach/` |
 | Lab education and MedlinePlus by LOINC | Implemented. No file upload | `src/app/(app)/lab-results/page.tsx`, `src/lib/medlineplus.ts` |
-| AI Health Assistant | Development mock only | `src/app/(app)/ai-assistant/page.tsx`, `src/lib/ai/` |
+| Wellness Assistant | Prepared question library at `/ai-assistant`. Browser speech only. The `/api/ai-assistant` route stays a disabled local mock. | `src/app/(app)/ai-assistant/page.tsx`, `src/lib/wellness-assistant/`, `src/lib/ai/` |
 | Supabase email/password accounts and authenticator enrollment | Implemented when public env vars are set | `src/lib/account-store.ts`, `src/lib/mfa.ts`, `supabase/schema.sql` |
 | Desktop nav and a compact mobile bar | Implemented | `src/components/app-shell.tsx` |
 | `noindex` | Implemented | `src/app/layout.tsx`, `X-Robots-Tag` in `next.config.ts` |
