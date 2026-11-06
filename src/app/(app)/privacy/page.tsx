@@ -54,6 +54,24 @@ export default function PrivacyPage() {
         <Link href="/settings">Open settings</Link>
       </section>
       <section className="card stack">
+        <h2>Community</h2>
+        <p>
+          Community posts and comments are checked before anyone else can see them. Submitted message text may be processed by an external moderation provider. Do not post identifying information. Do not post health records or questionnaire answers. The check receives only the community message you type. It does not receive assessment answers, check-ins, lab notes, or other health information.
+        </p>
+        <p>
+          Other members see the community name you choose. They do not see your email, your legal name, the name from a lifestyle assessment, or your account id. You can report a message, block or mute another member, remove your own message, or appeal a message that was not published. An appeal asks a person to look again. It is not sent to the moderation provider.
+        </p>
+        <p>
+          Rejected messages, messages you remove, and closed reports are kept for 30 days so a review or appeal can finish, then deleted. A published message stays until you remove it. The moderation record keeps the chosen name, the message text while it still exists, a short category, the decision, and the time. It does not keep an email address, a legal name, a health record, or a questionnaire answer. The server keeps the signed-in account’s internal id so it can tell your own messages apart, apply a block or mute, and delete them with your account. That id is not shown to other members.
+        </p>
+        <p>
+          If the moderation service times out, returns an error, or reaches its quota, the message stays in review and is not published. One uncertain result does not permanently ban anyone. Repeated confirmed abuse can pause posting for 72 hours. That limit ends on its own.
+        </p>
+        <p>
+          When shared community storage is configured, the server stores those rows with a server-only key. That key is not used to read assessment or health rows, and it is not sent to the browser. Without it, messages stay in the server process and can disappear when that process restarts. They are still checked before they are public.
+        </p>
+      </section>
+      <section className="card stack">
         <h2>What this is not</h2>
         <p>
           lifeZoi does not claim HIPAA, GDPR, or any other compliance. It is not a medical device, it does not diagnose, and it does not predict how long someone will live. HTTPS and row level security do not by themselves make this a complete health record.
