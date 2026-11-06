@@ -4,6 +4,7 @@ const MAX_RECENT = 6;
 const listeners = new Set<() => void>();
 let recentCache: string[] = [];
 let ready = false;
+const serverRecentIds: string[] = [];
 
 function knownIds(ids: readonly string[]): Set<string> {
   return new Set(ids);
@@ -59,7 +60,7 @@ export function getRecentIds(allowed: readonly string[]): string[] {
 }
 
 export function getRecentServerIds(): string[] {
-  return [];
+  return serverRecentIds;
 }
 
 export function rememberRecentId(id: string, allowed: readonly string[]) {
