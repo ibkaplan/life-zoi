@@ -1729,3 +1729,106 @@ button.assistant-send:focus-visible,
     align-items: start;
   }
 }
+
+.studio {
+  display: grid;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+.studio h1,
+.studio h2,
+.studio h3 {
+  color: #5725A8;
+}
+
+.studio-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.studio-card {
+  min-width: 0;
+}
+
+.studio-card p,
+.studio-card li,
+.studio-safety p {
+  overflow-wrap: anywhere;
+}
+
+.studio-soon {
+  display: inline-flex;
+  width: fit-content;
+  margin: 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #E9DDFB;
+  color: #5725A8;
+  font-weight: 750;
+}
+
+.studio-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.studio-safety,
+.studio-safety-line {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: #DCEEFF;
+  border: 2px solid #5725A8;
+  color: #172554;
+}
+
+.studio-filters {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.studio-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.studio-filter button[aria-pressed="true"] {
+  background: #7136C8;
+  color: #F7F8FF;
+  border-color: #5725A8;
+}
+
+.studio-stats {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.studio-stats div {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #E9DDFB;
+}
+
+.studio-stats dt {
+  color: #3E4E80;
+}
+
+.studio-stats dd {
+  margin: 0;
+  color: #5725A8;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+@media (min-width: 800px) {
+  .studio-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .studio-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

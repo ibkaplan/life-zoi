@@ -32,7 +32,7 @@ export function AcademyHome() {
         </Link>
         <Link className="card learn-link" href="/academy/move">
           <h2>Movement library</h2>
-          <p>Walking, strength, balance, seated options, and free exercise resources.</p>
+          <p>Movement Studio, walking, strength, balance, seated options, and free exercise resources.</p>
         </Link>
         <Link className="card learn-link" href="/academy/coaching">
           <h2>Coaching from your assessment</h2>
@@ -207,7 +207,7 @@ export function MoveIndex() {
     <div className="learn stack-lg">
       <PagePhoto id="movement" />
       <p className="kicker">Nutrition & Fitness Academy</p>
-      <h1>Movement library</h1>
+      <h2>Movement library</h2>
       <p className="lede">
         Drawings on these pages were made for lifeZoi. They are not photographs or copied videos. Stop any move that hurts or does not fit your condition.
       </p>
