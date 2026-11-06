@@ -1,8 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
+import { useAccount } from "@/lib/account-store";
+import { isEmptyEmotional } from "@/lib/emotional-wellness/storage";
+import { CONTEXT_OPTIONS } from "@/lib/emotional-wellness/copy";
+import { getEmotionalServerSnapshot, getEmotionalStoreSnapshot, subscribeEmotionalStore } from "@/lib/emotional-wellness/store";
+import { isEmptyFoodPlan } from "@/lib/food-plan/types";
+import { habitMeta } from "@/lib/habit-transformation/catalog";
+import { isEmptyHabitJourney } from "@/lib/habit-transformation/model";
 import { formatTimestamp } from "@/lib/dates";
 import {
   ageLabels,
@@ -69,9 +77,34 @@ function rows(answers: Assessment) {
   );
 }
 
+const FOOD_GOAL: Record<string, string> = {
+  lose: "Lose weight",
+  maintain: "Maintain weight",
+  gain: "Gain weight",
+  balance: "Eat in a balanced way",
+  variety: "More variety",
+  seasonal: "Follow the season",
+  ayurveda: "Explore Ayurveda as inspiration",
+};
+
+const FOOD_PATTERN: Record<string, string> = {
+  omnivore: "Omnivore",
+  pescatarian: "Pescatarian",
+  vegetarian: "Vegetarian",
+  vegan: "Vegan",
+};
+
 export function ProfileView() {
-  const { ready, session } = useSession();
+  const { ready, sample, session } = useSession();
+  const account = useAccount();
+  const emotional = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
   if (!ready) return <LoadingState label="Loading your session…" />;
+  const food = sample || isEmptyFoodPlan(session.foodPlan) ? null : session.foodPlan;
+  const habits = sample || isEmptyHabitJourney(session.habitJourney) ? [] : session.habitJourney.picks;
+  const context = !sample && account.phase === "ready" && !isEmptyEmotional(emotional) ? emotional.context : "";
+  const contextLabel = CONTEXT_OPTIONS.find((item) => item.id === context)?.label ?? "";
+  const emotionalNotes = emotional.journal.length + emotional.joys.length + emotional.caregiverNotes.length;
+  const showEmotional = account.phase === "ready" && !sample && ((context !== "" && context !== "general") || emotionalNotes > 0);
   const latest = session.history[0] ?? null;
   const draftStarted = assessmentHasAnswers(session.draft);
 
@@ -102,6 +135,32 @@ export function ProfileView() {
           <Link className="btn btn-primary" href="/assessment">Start assessment</Link>
         </section>
       )}
+      {food || habits.length > 0 || showEmotional ? (
+        <section className="card stack">
+          <h2>Other saved answers</h2>
+          <p className="hint">These are answers you already saved. Nothing here is a diagnosis.</p>
+          {food?.profile.goal ? <p>Food goal you saved: {FOOD_GOAL[food.profile.goal] ?? ""}</p> : null}
+          {food?.profile.pattern ? <p>Eating pattern you saved: {FOOD_PATTERN[food.profile.pattern] ?? ""}</p> : null}
+          {food?.week ? (
+            <p>
+              <Link href="/food-plan/week">A week of meals is saved.</Link>
+            </p>
+          ) : null}
+          {habits.length > 0 ? (
+            <p>Habit journey you saved: {habits.map((pick) => habitMeta(pick.habitId).label).join(", ")}</p>
+          ) : null}
+          {context && context !== "general" ? (
+            <p>
+              Emotional context you selected: {contextLabel}. This is not a diagnosis, and that page has not been clinically reviewed.
+            </p>
+          ) : null}
+          {showEmotional && emotionalNotes > 0 ? (
+            <p>
+              <Link href="/emotional-wellness">Private emotional notes</Link> are saved in this browser. The words stay on that page.
+            </p>
+          ) : null}
+        </section>
+      ) : null}
     </div>
   );
 }

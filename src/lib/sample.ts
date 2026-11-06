@@ -1,5 +1,6 @@
 import { emptyBrainProgress } from "@/lib/brain-quiz/progress";
 import { emptyFoodPlan } from "@/lib/food-plan/types";
+import { emptyMyDay } from "@/lib/my-day/storage";
 import { emptyHabitJourney } from "@/lib/habit-transformation/model";
 import { monthKey } from "@/lib/dates";
 import { STEP_IDS, type Assessment, type UserSession } from "@/lib/types";
@@ -99,6 +100,7 @@ export function createSampleSession(today: string): UserSession {
     brainQuiz: emptyBrainProgress(),
     habitJourney: emptyHabitJourney(),
     foodPlan: emptyFoodPlan(),
+    myDay: emptyMyDay(),
   };
 }
 

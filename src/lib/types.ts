@@ -1,5 +1,6 @@
 import { emptyBrainProgress, type BrainProgress } from "@/lib/brain-quiz/progress";
 import { emptyFoodPlan, type FoodPlanState } from "@/lib/food-plan/types";
+import { emptyMyDay, type MyDayFile } from "@/lib/my-day/storage";
 import { emptyHabitJourney, type HabitJourney } from "@/lib/habit-transformation/model";
 
 export const AGE_RANGES = [
@@ -226,6 +227,7 @@ export type UserSession = {
   brainQuiz: BrainProgress;
   habitJourney: HabitJourney;
   foodPlan: FoodPlanState;
+  myDay: MyDayFile;
 };
 
 export type FieldErrors = Record<string, string>;
@@ -304,5 +306,6 @@ export function emptySession(): UserSession {
     brainQuiz: emptyBrainProgress(),
     habitJourney: emptyHabitJourney(),
     foodPlan: emptyFoodPlan(),
+    myDay: emptyMyDay(),
   };
 }

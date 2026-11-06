@@ -387,10 +387,10 @@ export function encouragement(correct: number, total: number): string {
   return "Thanks for playing. Use the notes to learn, and remember the score is only a game score.";
 }
 
-export function readBrainLocal(storage: Pick<Storage, "getItem"> | null): BrainProgress | null {
+export function readBrainLocal(storage: Pick<Storage, "getItem"> | null, key = BRAIN_STORAGE_KEY): BrainProgress | null {
   if (!storage) return null;
   try {
-    const raw = storage.getItem(BRAIN_STORAGE_KEY);
+    const raw = storage.getItem(key);
     if (!raw) return null;
     return sanitizeBrain(JSON.parse(raw) as unknown);
   } catch {
@@ -398,11 +398,11 @@ export function readBrainLocal(storage: Pick<Storage, "getItem"> | null): BrainP
   }
 }
 
-export function writeBrainLocal(storage: Pick<Storage, "setItem"> | null, progress: BrainProgress) {
+export function writeBrainLocal(storage: Pick<Storage, "setItem"> | null, progress: BrainProgress, key = BRAIN_STORAGE_KEY) {
   if (!storage) return;
-  storage.setItem(BRAIN_STORAGE_KEY, JSON.stringify(sanitizeBrain(progress)));
+  storage.setItem(key, JSON.stringify(sanitizeBrain(progress)));
 }
 
-export function clearBrainLocal(storage: Pick<Storage, "removeItem"> | null) {
-  storage?.removeItem(BRAIN_STORAGE_KEY);
+export function clearBrainLocal(storage: Pick<Storage, "removeItem"> | null, key = BRAIN_STORAGE_KEY) {
+  storage?.removeItem(key);
 }

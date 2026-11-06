@@ -167,6 +167,9 @@ begin
   delete from public.habit_goals where user_id = actor;
   delete from public.scenarios where user_id = actor;
   delete from public.assessments where user_id = actor;
+  if to_regclass('public.care_invitations') is not null then
+    delete from public.care_invitations where user_id = actor;
+  end if;
   delete from public.profiles where user_id = actor;
   delete from auth.users where id = actor;
 end;
@@ -204,3 +207,115 @@ create policy check_ins_own_rows on public.check_ins
   for all
   using (auth.uid() = user_id and public.auth_session_may_use_rows())
   with check (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+-- Share the Care invitation links.
+-- This definition is in the repository only. It has not been applied to
+-- production by the app, and the app does not run this file. Apply it in
+-- the Supabase SQL editor only when a person chooses to. Until then,
+-- invitation counts stay unavailable and no invitation row is written.
+-- A row stores a random token and three counts for the signed-in account.
+-- It does not store a recipient name, email address, contact, or health information.
+-- The token is the only invitation value placed in a shared URL.
+
+create table if not exists public.care_invitations (
+  token text primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  revoked_at timestamptz,
+  opened_count integer not null default 0,
+  registered_count integer not null default 0,
+  constraint care_invitations_token_shape check (token ~ '^[A-Za-z0-9_-]{43}$'),
+  constraint care_invitations_opened_count_nonnegative check (opened_count >= 0),
+  constraint care_invitations_registered_count_nonnegative check (registered_count >= 0)
+);
+
+create index if not exists care_invitations_user_id_idx
+  on public.care_invitations (user_id, created_at desc);
+
+create unique index if not exists care_invitations_one_active
+  on public.care_invitations (user_id)
+  where revoked_at is null;
+
+alter table public.care_invitations enable row level security;
+
+revoke all on table public.care_invitations from public, anon, authenticated;
+grant select, insert on table public.care_invitations to authenticated;
+
+drop policy if exists care_invitations_select_own on public.care_invitations;
+create policy care_invitations_select_own on public.care_invitations
+  for select
+  using (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+drop policy if exists care_invitations_insert_own on public.care_invitations;
+create policy care_invitations_insert_own on public.care_invitations
+  for insert
+  with check (
+    auth.uid() = user_id
+    and public.auth_session_may_use_rows()
+    and revoked_at is null
+    and opened_count = 0
+    and registered_count = 0
+  );
+
+create or replace function public.revoke_care_invitation(invite_token text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated integer;
+begin
+  if auth.uid() is null or not public.auth_session_may_use_rows() then
+    return false;
+  end if;
+  if invite_token is null or invite_token !~ '^[A-Za-z0-9_-]{43}$' then
+    return false;
+  end if;
+  update public.care_invitations
+    set revoked_at = coalesce(revoked_at, now())
+    where token = invite_token
+      and user_id = auth.uid()
+      and revoked_at is null;
+  get diagnostics updated = row_count;
+  return updated = 1;
+end;
+$$;
+
+revoke all on function public.revoke_care_invitation(text) from public;
+grant execute on function public.revoke_care_invitation(text) to authenticated;
+
+-- Returns whether a welcome visit or a new sign-in was counted.
+-- The result is only true or false. It does not return the account id.
+create or replace function public.note_care_invitation(invite_token text, event_kind text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated integer;
+begin
+  if invite_token is null or invite_token !~ '^[A-Za-z0-9_-]{43}$' then
+    return false;
+  end if;
+  if event_kind = 'open' then
+    update public.care_invitations
+      set opened_count = opened_count + 1
+      where token = invite_token
+        and revoked_at is null;
+  elsif event_kind = 'register' then
+    update public.care_invitations
+      set registered_count = registered_count + 1
+      where token = invite_token
+        and revoked_at is null;
+  else
+    return false;
+  end if;
+  get diagnostics updated = row_count;
+  return updated = 1;
+end;
+$$;
+
+revoke all on function public.note_care_invitation(text, text) from public;
+grant execute on function public.note_care_invitation(text, text) to anon, authenticated;

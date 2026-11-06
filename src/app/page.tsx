@@ -168,6 +168,7 @@ export default function HomePage() {
             <Link href="/urges">Urges</Link>
             <Link href="/nature">Nature</Link>
             <Link href="/ai-assistant">Wellness Assistant</Link>
+            <Link href="/emotional-wellness">Emotional Wellness</Link>
             <Link href="/life-matters">Your Life Matters</Link>
             <Link href="/change-lab">Change Lab</Link>
             <Link href="/brain-quiz">Brain & Habit Quiz</Link>

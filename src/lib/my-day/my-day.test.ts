@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { containsProhibitedClaim } from "@/lib/claims";
+import { emptyBrainProgress } from "@/lib/brain-quiz/progress";
+import { emptyFoodPlan } from "@/lib/food-plan/types";
 import { emptyFollowUp, emptyHabitJourney, type HabitJourney } from "@/lib/habit-transformation/model";
 import { plansFor } from "@/lib/habit-transformation/engine";
 import { lessonById } from "@/lib/wellness/movement-studio/catalog";
@@ -214,5 +216,39 @@ describe("my day personalization", () => {
     expect(next.days["2026-11-06"]?.items.water.status).toBe("open");
     const shown = presentDay(next.days["2026-11-06"] as DayRecord, {}, null, emptyHabitJourney());
     expect(shown.find((item) => item.id === "brain")?.href).toBe("/brain-quiz");
+  });
+
+  it("uses saved meals, quiz marks, and emotional notes without a new questionnaire", () => {
+    const food = emptyFoodPlan();
+    food.week = {
+      id: "11111111-1111-4111-8111-111111111111",
+      seed: 1,
+      season: "",
+      createdOn: "2026-11-02",
+      note: "",
+      days: [0, 1, 2, 3, 4, 5, 6].map((index) => ({
+        index,
+        seasonalFoodId: "",
+        meals: [{ slot: "breakfast", mealId: "eggs-vegetables", portions: 1, variant: 0 }],
+      })),
+    };
+    const brain = { ...emptyBrainProgress(), games: 1 };
+    const shown = presentDay(day("2026-11-06"), {}, answers({ sleepHours: "7" }), emptyHabitJourney(), {
+      date: "2026-11-06",
+      foodPlan: food,
+      brain,
+      emotionalNotes: true,
+    });
+    const breakfast = shown.find((item) => item.id === "breakfast");
+    const lunch = shown.find((item) => item.id === "lunch");
+    expect(breakfast?.title).toBe("Eggs and vegetables");
+    expect(breakfast?.why).toContain("already saved");
+    expect(lunch?.title).toBe("Lunch");
+    expect(shown.find((item) => item.id === "brain")?.why).toContain("not a health measure");
+    const relax = shown.find((item) => item.id === "relax");
+    expect(relax?.why).toContain("not been clinically reviewed");
+    expect(relax?.why.toLowerCase()).not.toContain("validated");
+    const text = shown.flatMap((item) => [item.title, item.detail, item.why]).join("\n");
+    expect(containsProhibitedClaim(text)).toBe(false);
   });
 });

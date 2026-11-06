@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useSyncExternalStore } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { clearAccountRecords, useAccount, writeAccountSession } from "@/lib/account-store";
 import {
   getBrowserStoreServerSnapshot,
@@ -12,12 +12,36 @@ import {
 import { clearAssistantThread } from "@/lib/assistant";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
-import { clearBrainLocal, sanitizeBrain, writeBrainLocal, type BrainProgress } from "@/lib/brain-quiz/progress";
+import {
+  BRAIN_STORAGE_KEY,
+  clearBrainLocal,
+  isEmptyBrain,
+  readBrainLocal,
+  sanitizeBrain,
+  writeBrainLocal,
+  type BrainProgress,
+} from "@/lib/brain-quiz/progress";
 import { sanitizeFoodPlan } from "@/lib/food-plan/plan";
 import type { FoodPlanState } from "@/lib/food-plan/types";
-import { clearHabitLocal, sanitizeHabitJourney, writeHabitLocal, type HabitJourney } from "@/lib/habit-transformation/model";
+import {
+  clearHabitLocal,
+  isEmptyHabitJourney,
+  readHabitLocal,
+  sanitizeHabitJourney,
+  writeHabitLocal,
+  type HabitJourney,
+} from "@/lib/habit-transformation/model";
+import { HABIT_STORAGE_KEY } from "@/lib/habit-transformation/catalog";
+import { EMOTIONAL_STORAGE_KEY } from "@/lib/emotional-wellness/storage";
+import { bindEmotionalOwner, clearEmotionalStore } from "@/lib/emotional-wellness/store";
 import { clearPurpose } from "@/lib/purpose";
-import { resetWellnessClient } from "@/lib/wellness/client-store";
+import { reloadGuestMyDay } from "@/lib/my-day/client";
+import { isEmptyMyDay, loadMyDay, MY_DAY_STORAGE_KEY, sanitizeMyDay, saveMyDay as writeMyDayFile } from "@/lib/my-day/storage";
+import { clearOwnedCopies, guestStorageKey, takeForAccount, userStorageKey } from "@/lib/owned-local";
+import { bindWellnessOwner, resetWellnessClient } from "@/lib/wellness/client-store";
+import { MOVEMENT_STUDIO_KEY } from "@/lib/wellness/movement-studio/progress";
+import { bindStudioOwner } from "@/lib/wellness/movement-studio/studio-store";
+import { WELLNESS_STORAGE_KEY } from "@/lib/wellness/storage";
 import { createSampleSession } from "@/lib/sample";
 import { mondayOf } from "@/lib/dates";
 import {
@@ -79,6 +103,7 @@ type SessionApi = {
   saveBrain: (brainQuiz: BrainProgress) => void;
   saveHabit: (habitJourney: HabitJourney) => void;
   saveFoodPlan: (foodPlan: FoodPlanState) => void;
+  saveMyDay: (myDay: UserSession["myDay"]) => void;
   setSample: (on: boolean) => void;
   setReassessment: (days: ReassessDays) => string | null;
 };
@@ -94,6 +119,57 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   );
   const account = useAccount();
   const signedIn = account.phase === "ready";
+  const adoptedFor = useRef<string | null>(null);
+  const sessionRef = useRef(account.session);
+  const storedRef = useRef(snapshot.stored);
+  const userId = signedIn ? account.userId : null;
+
+  useEffect(() => {
+    sessionRef.current = account.session;
+    storedRef.current = snapshot.stored;
+  });
+
+  useEffect(() => {
+    if (account.phase === "loading") return;
+    bindEmotionalOwner(userId, account.phase === "off");
+    bindStudioOwner(userId);
+    bindWellnessOwner(userId);
+    if (!userId) {
+      adoptedFor.current = null;
+      reloadGuestMyDay();
+      if (!snapshot.sample && isEmptyMyDay(storedRef.current.myDay)) {
+        const storage = window.localStorage;
+        const guest = loadMyDay(storage, guestStorageKey(MY_DAY_STORAGE_KEY));
+        const legacy = loadMyDay(storage, MY_DAY_STORAGE_KEY);
+        const found = !isEmptyMyDay(guest) ? guest : legacy;
+        if (!isEmptyMyDay(found)) writeBrowserStore({ ...storedRef.current, myDay: found }, false);
+      }
+      return;
+    }
+    if (snapshot.sample || adoptedFor.current === userId) return;
+    adoptedFor.current = userId;
+    const storage = window.localStorage;
+    let next = sessionRef.current;
+    const brainKey = userStorageKey(BRAIN_STORAGE_KEY, userId);
+    const brainRaw = takeForAccount(storage, BRAIN_STORAGE_KEY, userId, !isEmptyBrain(next.brainQuiz));
+    if (isEmptyBrain(next.brainQuiz) && brainRaw) {
+      const parsed = readBrainLocal(storage, brainKey);
+      if (parsed && !isEmptyBrain(parsed)) next = { ...next, brainQuiz: parsed };
+    }
+    const habitKey = userStorageKey(HABIT_STORAGE_KEY, userId);
+    const habitRaw = takeForAccount(storage, HABIT_STORAGE_KEY, userId, !isEmptyHabitJourney(next.habitJourney));
+    if (isEmptyHabitJourney(next.habitJourney) && habitRaw) {
+      const parsed = readHabitLocal(storage, habitKey);
+      if (parsed && !isEmptyHabitJourney(parsed)) next = { ...next, habitJourney: parsed };
+    }
+    const dayKey = userStorageKey(MY_DAY_STORAGE_KEY, userId);
+    const dayRaw = takeForAccount(storage, MY_DAY_STORAGE_KEY, userId, !isEmptyMyDay(next.myDay));
+    if (isEmptyMyDay(next.myDay) && dayRaw) {
+      const parsed = loadMyDay(storage, dayKey);
+      if (!isEmptyMyDay(parsed)) next = { ...next, myDay: parsed };
+    }
+    if (next !== sessionRef.current) writeAccountSession(next);
+  }, [account.phase, snapshot.sample, userId]);
   const session = useMemo(
     () => (snapshot.sample ? createSampleSession(todayDate()) : signedIn ? account.session : snapshot.stored),
     [account.session, signedIn, snapshot],
@@ -233,33 +309,55 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       saveBrain: (brainQuiz) => {
         if (sample) return;
         const clean = sanitizeBrain(brainQuiz);
-        writeBrainLocal(typeof window === "undefined" ? null : window.localStorage, clean);
+        const storage = typeof window === "undefined" ? null : window.localStorage;
+        const key = userId ? userStorageKey(BRAIN_STORAGE_KEY, userId) : guestStorageKey(BRAIN_STORAGE_KEY);
+        writeBrainLocal(storage, clean, key);
         commit({ ...stored, brainQuiz: clean });
       },
       saveHabit: (habitJourney) => {
         if (sample) return;
         const clean = sanitizeHabitJourney(habitJourney);
-        writeHabitLocal(typeof window === "undefined" ? null : window.localStorage, clean);
+        const storage = typeof window === "undefined" ? null : window.localStorage;
+        const key = userId ? userStorageKey(HABIT_STORAGE_KEY, userId) : guestStorageKey(HABIT_STORAGE_KEY);
+        writeHabitLocal(storage, clean, key);
         commit({ ...stored, habitJourney: clean });
       },
       saveFoodPlan: (foodPlan) => {
         if (sample) return;
         commit({ ...stored, foodPlan: sanitizeFoodPlan(foodPlan) });
       },
+      saveMyDay: (myDay) => {
+        if (sample) return;
+        const clean = sanitizeMyDay(myDay);
+        const storage = typeof window === "undefined" ? null : window.localStorage;
+        const key = userId ? userStorageKey(MY_DAY_STORAGE_KEY, userId) : guestStorageKey(MY_DAY_STORAGE_KEY);
+        writeMyDayFile(storage, clean, key);
+        commit({ ...stored, myDay: clean });
+      },
       clearUserData: () => {
+        const storage = typeof window === "undefined" ? null : window.localStorage;
         clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
         clearRecentQuestions(typeof window === "undefined" ? null : window.sessionStorage);
         clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
         clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
-        clearBrainLocal(typeof window === "undefined" ? null : window.localStorage);
-        clearHabitLocal(typeof window === "undefined" ? null : window.localStorage);
+        clearOwnedCopies(storage, BRAIN_STORAGE_KEY, userId);
+        clearOwnedCopies(storage, HABIT_STORAGE_KEY, userId);
+        clearOwnedCopies(storage, MY_DAY_STORAGE_KEY, userId);
+        clearOwnedCopies(storage, EMOTIONAL_STORAGE_KEY, userId);
+        const tab = typeof window === "undefined" ? null : window.sessionStorage;
+        clearOwnedCopies(tab, WELLNESS_STORAGE_KEY, userId);
+        clearOwnedCopies(tab, MOVEMENT_STUDIO_KEY, userId);
+        clearBrainLocal(storage);
+        clearHabitLocal(storage);
+        clearEmotionalStore();
         resetWellnessClient();
+        reloadGuestMyDay();
         if (signedIn) void clearAccountRecords();
         writeBrowserStore(emptySession(), false);
       },
       setSample: (on) => writeBrowserStore(snapshot.stored, on),
     };
-  }, [account.phase, account.session, session, signedIn, snapshot]);
+  }, [account.phase, account.session, session, signedIn, snapshot, userId]);
 
   return <SessionContext.Provider value={api}>{children}</SessionContext.Provider>;
 }
