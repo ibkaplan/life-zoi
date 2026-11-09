@@ -2,7 +2,7 @@
 
 Inspection date: 2026-11-09. Repository: https://github.com/ibkaplan/life-zoi. This file describes the tree as it is. It does not redesign the app.
 
-**Start at `main` commit `9872803fdfe6268b5f96544512e1c574b94b90a0`.** That commit is `origin/main` and `HEAD`. Subject: `Merge pull request #24 from ibkaplan/cursor/launch-readiness` (2026-11-06).
+**Start at `main` commit `22bc90c82ab8ce196cec0cf5b1f46614a31c45ff`.** That commit was `origin/main` and `HEAD` after `git pull origin main` on 2026-11-09. Subject: `Merge pull request #19 from ibkaplan/cursor/community-moderation`. Pull request #18 merged earlier as `c49beaad5649af5bf4cb01a65b256c5527a7cd4d`. Pull request #19 merged after `main` was merged into that branch, resolving conflicts in `.env.example`, `README.md`, the privacy page, `src/app/globals.css`, and `src/components/app-shell.tsx`. The launch-readiness merge remains `9872803fdfe6268b5f96544512e1c574b94b90a0`. This handoff file is the documentation commit on top of `22bc90c`.
 
 Product status: **READY FOR INTERNAL TESTING**. This is not a public launch.
 
@@ -12,41 +12,42 @@ Yes. Claude can clone `main` and work from that commit. The application tree was
 
 What a fresh clone will not have, and what is behind the code:
 
-- This handoff is **uncommitted on purpose**. A GitHub clone does not include `CLAUDE_HANDOFF.md` until a person commits it. A copy of this same file is at `/cursor/stores/self/docs/claude-handoff.md` in the Cursor project store.
-- `docs/claude-migration/` is a 2026-11-05 snapshot. `ACTIVE_WORK.md` still says there are no open pull requests and records `main` at `a857fce`. `INDEX.md` records the snapshot as `1d6a333`. Both are older than `9872803`.
-- The “Current priority” paragraph in `CLAUDE.md` still says LZ-3 is unanswered. That decision was already made: `main` is canonical, and pull request #1 stays closed. The index agrees. Trust this handoff and `docs/claude-migration/INDEX.md` over that one paragraph.
-- Those committed docs do not describe the 2026-11-06 product: My Day, the food plan, Emotional Wellness, Share the Care, the Brain & Habit Quiz, Movement Studio, Habit Transformation, the prepared wellness assistant, or the free exercise library.
+- This handoff is committed on `main`. A copy of the same file is at `/cursor/stores/self/docs/claude-handoff.md` in the Cursor project store. The first version landed in `9a88ce89c74f0c0dad65ffb313473fe860c77bf0`. This revision updates it after pull requests #18 and #19 merged.
+- `docs/claude-migration/ACTIVE_WORK.md` and `INDEX.md` are still a 2026-11-05 snapshot. `ACTIVE_WORK.md` records `main` at `a857fce` and, at that date, no open pull requests. `INDEX.md` records the snapshot as `1d6a333`. Both are older than `22bc90c`. `ENVIRONMENT_SETUP.md` gained a `GEMINI_API_KEY` row in the #18 merge and still says not to add `OPENAI_API_KEY` and that the service-role name is absent from `.env.example`. Those two sentences are behind #19.
+- The “Current priority” paragraph in `CLAUDE.md` still says LZ-3 is unanswered. That decision was already made: `main` is canonical, and pull request #1 stays closed. The index agrees. Trust this handoff and `docs/claude-migration/INDEX.md` over that one paragraph. The architecture paragraph in `CLAUDE.md` now mentions the Gemini wellness route.
+- `ACTIVE_WORK.md` and `INDEX.md` do not describe the 2026-11-06 product: My Day, the food plan, Emotional Wellness, Share the Care, the Brain & Habit Quiz, Movement Studio, Habit Transformation, the prepared wellness assistant, the free exercise library, or Community.
 - `package.json` has no `engines` field and there is no `.nvmrc`. Use Node.js 22 anyway.
 - There is no GitHub Actions workflow. Vercel is the only automated check, and it does not run `npm test`.
-- No secret values are in git. Account testing needs the public Supabase names set on the host by a person. This inspection did not call Supabase and did not re-run the test suite.
+- No secret values are in git. `GEMINI_API_KEY`, `OPENAI_API_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are unset in this environment, and the public Supabase names are unset here too. Account testing needs the public Supabase names set on the host by a person. This inspection did not call Supabase. `npm test` was re-run; typecheck, lint, and build were not.
 
 ## Git status at inspection
 
-Checked after `git fetch origin main` on 2026-11-09. The working tree was clean before this file was added. Afterward, the only change is untracked `CLAUDE_HANDOFF.md`. It must stay unstaged and uncommitted.
+Checked after `git pull origin main` on 2026-11-09. The working tree was clean. No pull requests were open. This revision changes only `CLAUDE_HANDOFF.md`.
 
 | Item | Value |
 | --- | --- |
 | Branch | `main` |
-| Upstream | `origin/main`, up to date |
-| Ahead / behind | 0 / 0 |
-| Unpushed commits | none |
-| Dirty files before this handoff | none |
-| Dirty files after this handoff | untracked `CLAUDE_HANDOFF.md` only |
-| Latest commit on `main` | `9872803fdfe6268b5f96544512e1c574b94b90a0` |
+| Upstream | `origin/main`, up to date before this documentation commit |
+| Ahead / behind | 0 / 0 before this documentation commit |
+| Unpushed commits | none before this documentation commit |
+| Dirty files before this revision | none |
+| App commit on `main` | `22bc90c82ab8ce196cec0cf5b1f46614a31c45ff` |
+| Open pull requests | none |
 | Remote | `https://github.com/ibkaplan/life-zoi` |
 
 ## Which branch to use
 
-Use **`main`**. New work branches from `9872803fdfe6268b5f96544512e1c574b94b90a0`.
+Use **`main`**. New work branches from `22bc90c82ab8ce196cec0cf5b1f46614a31c45ff`, or from the documentation commit directly on top of it. No pull requests are open.
 
-Also know these open pull requests. Leave them open. Do not merge them as part of starting work.
+Merged into `main`:
 
-| PR | Branch | Base | State on 2026-11-09 | What to do |
-| --- | --- | --- | --- | --- |
-| https://github.com/ibkaplan/life-zoi/pull/18 | `cursor/free-ai-assistant` | `main` | Open, mergeable | Free Gemini assistant. Leave open. See decisions below. |
-| https://github.com/ibkaplan/life-zoi/pull/19 | `cursor/community-moderation` | `main` | Open, **conflicting** with `main` | Community moderation. Leave open. It needs a rebase before it can merge, and it should not merge on cost and privacy grounds until a person decides. |
+| PR | Merge commit | What landed |
+| --- | --- | --- |
+| https://github.com/ibkaplan/life-zoi/pull/18 | `c49beaad5649af5bf4cb01a65b256c5527a7cd4d` | Free Gemini reply on the wellness assistant. Inactive until `GEMINI_API_KEY` is set. |
+| https://github.com/ibkaplan/life-zoi/pull/19 | `22bc90c82ab8ce196cec0cf5b1f46614a31c45ff` | Community moderation. Merged after `main` was merged into the branch. Inactive or in-memory until the key and SQL are applied. |
+| https://github.com/ibkaplan/life-zoi/pull/24 | `9872803fdfe6268b5f96544512e1c574b94b90a0` | Launch-readiness journey. #22 and #23 are on `main` because #24 included them. |
 
-Closed and not merged: pull request #1 (`cursor/lifezoi-app-ce49`). Do not reopen or merge it. Pull requests #4, #5, #6, and #7 were closed after their work landed through later integration. #22, #23, and #24 are merged; Emotional Wellness and Share the Care are on `main` because #24 included them.
+Closed and not merged: pull request #1 (`cursor/lifezoi-app-ce49`). Do not reopen or merge it. Pull requests #4, #5, #6, and #7 were closed after their work landed through later integration.
 
 ## Project overview
 
@@ -82,7 +83,7 @@ Source for the internal-testing status: the launch report at `/cursor/stores/sel
 /agent/repos/life-zoi
   AGENTS.md                 Next.js generated notice only
   CLAUDE.md                 committed Claude rules; one paragraph is stale (see above)
-  CLAUDE_HANDOFF.md         this file; leave uncommitted
+  CLAUDE_HANDOFF.md         this file; committed on main
   README.md                 setup, accounts, deploy, limitations
   .env.example              names only; no real values
   next.config.ts
@@ -98,13 +99,13 @@ Source for the internal-testing status: the launch report at `/cursor/stores/sel
   src/lib/                  validation, accounts, wellness modules, tests
 ```
 
-Primary navigation in `src/components/app-shell.tsx` includes Home (`/dashboard`), My Day, Your Life Matters, Life outlook, WHAT IF?, Nutrition, Food & wellness, Movement, Health Library, Nature, Habit Transformation, Progress, Profile, and a More menu (assessment, improvement plan, wellness coach, academy, daily choices, urges, challenges, Wellness Assistant, Emotional Wellness, Share the Care, Settings, Change Lab, lab education, Sugar Detective, food labels, balance challenge, Brain & Habit Quiz).
+Primary navigation in `src/components/app-shell.tsx` includes Home (`/dashboard`), My Day, Your Life Matters, Life outlook, WHAT IF?, Nutrition, Food & wellness, Movement, Health Library, Nature, Habit Transformation, Progress, Profile, and a More menu (assessment, improvement plan, wellness coach, academy, daily choices, urges, challenges, Wellness Assistant, Community, Emotional Wellness, Share the Care, Settings, Change Lab, lab education, Sugar Detective, food labels, balance challenge, Brain & Habit Quiz).
 
 There is no `/signup` route. Registration is **Create account** on `/settings`.
 
 ## How the frontend and backend communicate
 
-There is one Next.js app. There is no separate API server and no service-role client on `main`.
+There is one Next.js app. There is no separate API server. Account writes use the browser anon key. Community shared storage can use a server-only service role when `SUPABASE_SERVICE_ROLE_KEY` is set. That key is not sent to the browser and is not used to read assessment or health rows. It is unset, so community rows stay in the server process.
 
 **Browser to Supabase.** `src/lib/supabase-browser.ts` builds a browser client only when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are a real public https config. Those two names are read as direct `process.env` properties so Next can inline them. Passing `process.env` through an argument stays empty in the client bundle. The client uses the anon key, PKCE, and the signed-in session. Row level security requires `auth.uid()` to match `user_id`. A verified authenticator factor also requires an AAL2 session (`auth_session_may_use_rows` in `supabase/schema.sql`). Writes go through `src/lib/account-store.ts` into `profiles`, `assessments`, `scenarios`, `habit_goals`, and `check_ins`. `decideAccess` in `src/lib/access.ts` runs before an account write. Hiding a button is not authorization.
 
@@ -115,6 +116,8 @@ There is one Next.js app. There is no separate API server and no service-role cl
 | `GET /api/status` | Reports `authentication` and `persistence`. `supabase` / `account` only when the adapter is supabase and both public values pass `isPublicSupabaseConfig`. Otherwise `not-configured` / `development`. |
 | `GET /api/account` | Reads the `Authorization` header and returns whether that verified session is the allowlisted admin. It does not use a service-role key. |
 | `GET` and `POST /api/ai-assistant` | Development mock. `AI_PROVIDER` other than `mock` is refused and makes no network call. |
+| `GET` and `POST /api/ai-assistant/wellness` | Prepared answers. Calls Gemini `gemini-3.5-flash-lite` only when server-only `GEMINI_API_KEY` is set. Without the key, or when the free tier cannot answer, the prepared library is the reply. The key is unset. |
+| `GET` and `POST /api/community` | Community board. A local filter runs first. OpenAI Moderations runs only when server-only `OPENAI_API_KEY` is set. Without that key, a message that passes the local filter stays pending and is not published. |
 | `POST /api/what-if` | Validates the scenario on the server, returns an illustration, and discards the body. Not sent to an AI service. |
 | `POST /api/recommendations` | Validates the assessment and returns rule-based suggestions. Discarded after the response. Not sent to an AI service. |
 | `GET /api/references` | Curated public links. A `loinc` query calls MedlinePlus Connect only for a verified LOINC code. Personal results are not sent. Responses are cached in process memory for 12 hours. |
@@ -141,13 +144,11 @@ On `main` today:
 | `AI_COMPLETION_CENTS_PER_1K` | Planning estimate, not a bill | No |
 | `NODE_ENV` | `isProductionSite` for Share the Care link origin | Set by the runtime |
 | `VERCEL_ENV` | Same production-site check. `preview` and `development` are not the published origin | Set by Vercel |
+| `GEMINI_API_KEY` | Server-only. `POST /api/ai-assistant/wellness` calls `gemini-3.5-flash-lite` `generateContent` on the free tier, with no grounding or other paid tools. Empty keeps the 50 prepared answers | No. Unset. Must never be `NEXT_PUBLIC_` |
+| `OPENAI_API_KEY` | Server-only. `POST https://api.openai.com/v1/moderations` with model `omni-moderation-latest`. Does not call chat completions | No. Unset. Must never be `NEXT_PUBLIC_` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional. Server-only shared community storage. Not used to read assessment or health rows. Commented in `.env.example` | No. Unset. Must never be `NEXT_PUBLIC_` |
 
-Do not add `SUPABASE_SERVICE_ROLE_KEY` on `main`. It is not in `.env.example`. Do not put any service-role key in the browser or in a `NEXT_PUBLIC_` name.
-
-Not on `main`. Present only on the open pull requests, still names only:
-
-- Pull request #18 adds server-only `GEMINI_API_KEY` for the wellness assistant. It is not a `NEXT_PUBLIC_` name.
-- Pull request #19 adds server-only `OPENAI_API_KEY` for the moderations endpoint, and comments an optional `SUPABASE_SERVICE_ROLE_KEY` that must never be `NEXT_PUBLIC_`.
+Do not put any service-role key, `GEMINI_API_KEY`, or `OPENAI_API_KEY` in the browser or in a `NEXT_PUBLIC_` name. All three are unset here, and the example file has no secret values. Without them, the Gemini reply stays on the prepared library, community messages that pass the local filter stay pending, and community storage stays in the server process.
 
 ## Database and integrations
 
@@ -155,11 +156,15 @@ Not on `main`. Present only on the open pull requests, still names only:
 
 **`care_invitations` is repository-only.** The table, `revoke_care_invitation`, and `note_care_invitation` are in `supabase/schema.sql` with row security. The app does not run that file. Nothing in the launch work executed it. Until someone applies it in the Supabase SQL editor, Share the Care does not create a link and invitation counts stay unavailable. A row is a random token and counts. It does not store a recipient name, email, or health information.
 
+**Community tables are repository-only too.** `community_profiles`, `community_messages`, `community_reports`, `community_blocks`, and `community_mutes` are in the same `supabase/schema.sql`. Browser roles cannot read them. A server-only service role may write them. That SQL has not been applied, and `SUPABASE_SERVICE_ROLE_KEY` is unset, so community rows stay in process memory and can disappear when the process restarts. They are still checked before they are public. The tables store a chosen name and message text. They do not store an email address or a health record.
+
 **MedlinePlus Connect** (`https://connect.medlineplus.gov/service`) for a verified LOINC code only.
 
-**Not integrated on `main`:** paid model APIs, Stripe, transactional email, SMS, document upload, password recovery, GitHub Actions, cron. Document upload is a future plan in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active.
+**Not integrated on `main`:** Stripe, transactional email, SMS, document upload, password recovery, GitHub Actions, cron. Document upload is a future plan in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active. No paid chat model is called. The Gemini and OpenAI calls below are in the code and stay inactive while their keys are unset.
 
-The Wellness Assistant at `/ai-assistant` is a prepared question library with browser speech. Listening uses the browser’s speech synthesis. Optional speech recognition stays in the browser. lifeZoi does not receive that audio. The page is not a live chatbot. The separate `POST /api/ai-assistant` mock is a development endpoint and refuses any other provider.
+The Wellness Assistant at `/ai-assistant` keeps 50 prepared questions and answers, plus browser speech. Listening uses the browser’s speech synthesis. Optional speech recognition stays in the browser. lifeZoi does not receive that audio. Ask-in-your-own-words calls `POST /api/ai-assistant/wellness`. If `GEMINI_API_KEY` is set, the server sends that session’s questions to Google’s free-tier model `gemini-3.5-flash-lite` and does not send lab results, diagnoses, or account records. The key is unset, so the prepared answer is shown. The separate `POST /api/ai-assistant` mock still refuses any `AI_PROVIDER` other than `mock`.
+
+Community at `/community` checks posts and comments before they are public. A local filter runs on the server. When `OPENAI_API_KEY` is set, the server also calls the OpenAI Moderations endpoint only. The key is unset, so a message the local filter does not reject stays in review and is not published. Members see a chosen name only.
 
 ## Deployment
 
@@ -191,14 +196,14 @@ Also on `main` from earlier merged work, and not re-audited line by line for thi
 ### Partial
 
 - Share the Care. The page is in the app. Invitation counts stay unavailable, and no link is created, until `care_invitations` is applied in the Supabase SQL editor. If the table is missing, the page must not pretend a link was created. It says counts could not be loaded, and that it does not store a name, an email, or health information.
+- Free Gemini assistant (pull request #18, merged). The route and UI are on `main`. `GEMINI_API_KEY` is unset, so replies stay on the 50 prepared answers. When the key is set, the call is free only while the Google project stays on the free tier, and free-tier prompts may be used to improve Google’s products. That is a privacy gap for wellness text.
+- Community moderation (pull request #19, merged). The page, local filter, and moderations client are on `main`. `OPENAI_API_KEY` is unset, so automatic provider checking is not configured and messages stay in review. `SUPABASE_SERVICE_ROLE_KEY` is unset and the community SQL is not applied, so storage falls back to the server process. The moderations call sends member text off site. It does not call chat completions. Current pricing was not re-verified, so zero cost is not confirmed.
 
 ### Not implemented
 
 - Password recovery. There is no reset flow. It was not added. A search of `src` found no password-reset API.
-- Free Gemini assistant (pull request #18). Not on this branch. Left open.
-- Community moderation (pull request #19). Not on this branch. Left open. The branch conflicts with current `main`.
 - Document upload.
-- A live model on `main`. `AI_PROVIDER` other than `mock` does not call the network.
+- A live model on the development endpoint. `POST /api/ai-assistant` still refuses any `AI_PROVIDER` other than `mock` and does not call the network. The wellness route can call Gemini only when `GEMINI_API_KEY` is set. That key is unset.
 - Paid services of any kind. Budget for research, nutrition data, educational content, exercise libraries, and AI is $0: free public sources only.
 
 ### Known bugs and remaining gaps
@@ -213,7 +218,7 @@ Fixed on `main` by pull request #24. Do not undo these:
 Still true:
 
 - Emotional Wellness has not been clinically reviewed. Do not call that page validated. Habit Transformation copy also says it is not clinically validated.
-- `care_invitations` is not applied, so Share the Care does not create invitation links.
+- `care_invitations` is not applied, so Share the Care does not create invitation links. The community tables in the same file are not applied either.
 - Password recovery does not exist.
 - Live account persistence was not retested in the launch environment: register, sign-in, sign-out, session, completions on another device, or two-account isolation.
 - On a shared browser, the first signed-in account whose slice is empty still claims an old unscoped blob once. After that, the shared key is deleted.
@@ -222,12 +227,14 @@ Still true:
 - Tab storage and account storage are not encrypted by lifeZoi beyond what the browser, the host, and Supabase provide.
 - GitHub branch protection was reported off on 2026-11-05 (`protected: false`). Do not bypass a failed check if protection is later turned on. Run the scripts locally before merging.
 
-Tests the launch report actually ran, on the committed tree before the pull request, and not re-run for this handoff:
+Tests the launch report actually ran, on the committed tree before pull request #24, and not re-run as typecheck, lint, or build for this update:
 
 - `npm test` — 26 files, 193 tests passed.
 - `npm run typecheck` — passed.
 - `npm run build` — passed.
 - `npm run lint` — passed on the committed tree after the pull request was opened.
+
+On 2026-11-09, after `git pull` of `22bc90c82ab8ce196cec0cf5b1f46614a31c45ff`, this update re-ran `npm test` (Vitest): 28 files, 221 tests passed. `npm run typecheck`, `npm run lint`, and `npm run build` were not re-run.
 
 A browser pass on a local production server used a synthetic person only. Desktop 1280px and mobile 390px passed the flows named in the launch report. No real health data was used.
 
@@ -265,7 +272,7 @@ A production build may fetch Google font metadata. Unit tests generally do not n
 - Emotional Wellness is not clinically reviewed. The on-page sentence must stay.
 - Share the Care `care_invitations` SQL is not applied. Do not pretend a link was created. Apply the SQL only in the Supabase SQL editor when a person chooses to turn invitation tracking on.
 - Password recovery is absent. Do not imply it exists.
-- Pull requests #18 and #19 stay open. #18 reads `GEMINI_API_KEY` on the server. The call is free only while the Google project stays on the free tier, and free-tier prompts may be used to improve Google’s products. That is a privacy gap for wellness text. #19 calls OpenAI’s moderations endpoint with server-only `OPENAI_API_KEY` and does not call chat completions. It conflicts with `main`, needs a new key, and sends member text to OpenAI. Current pricing was not re-verified, so zero cost is not confirmed.
+- Pull requests #18 and #19 are merged. Their keys are not set, and the community SQL is not applied, so the Gemini reply falls back to prepared answers and community posts stay in review with in-process storage. `GEMINI_API_KEY` is server-only. The Gemini call is free only while the Google project stays on the free tier, and free-tier prompts may be used to improve Google’s products. That is a privacy gap for wellness text. `OPENAI_API_KEY` is server-only and calls the moderations endpoint only, not chat completions. That call sends member text off site. Current pricing was not re-verified, so zero cost is not confirmed. Optional `SUPABASE_SERVICE_ROLE_KEY` must never be `NEXT_PUBLIC_`.
 - `main` is canonical. Pull request #1 stays closed.
 - Empty Supabase variables stay `not-configured`. Do not fake authentication.
 - Do not describe the mock assistant as a live model.
@@ -277,11 +284,11 @@ A production build may fetch Google font metadata. Unit tests generally do not n
 ## Recommended next steps
 
 1. Read this handoff, then root `CLAUDE.md`, then the current code. Treat `docs/claude-migration/ACTIVE_WORK.md` as historical. Ignore the stale LZ-3 paragraph in `CLAUDE.md`.
-2. Branch new work from `main` at `9872803fdfe6268b5f96544512e1c574b94b90a0`. Do not start from pull request #1, #18, or #19.
+2. Branch new work from `main` at `22bc90c82ab8ce196cec0cf5b1f46614a31c45ff`, or from the documentation commit on top of it. Do not start from pull request #1. #18 and #19 are already on `main`.
 3. Run `npm ci`, `npm test`, `npm run typecheck`, and `npm run lint` before relying on the tree. Add `npm run build` when routing, config, or rendering changes. GitHub will not run those scripts for you.
 4. Keep the product in internal testing. Do not remove `noindex`, do not call Emotional Wellness validated, and do not announce a public launch.
-5. Leave #18 and #19 open until a person accepts the privacy and cost consequences. If #19 is resumed, rebase it onto current `main` first. It conflicts today.
-6. Apply `care_invitations` only when a person asks, and only in the Supabase SQL editor. Until then, Share the Care must keep saying that a link was not created.
+5. Leave `GEMINI_API_KEY` and `OPENAI_API_KEY` unset unless a person accepts the privacy and cost consequences. Gemini free-tier prompts may be used to improve Google’s products. OpenAI moderation sends member text off site, and its current price was not re-verified.
+6. Apply `care_invitations` or the community tables only when a person asks, and only in the Supabase SQL editor. Until then, Share the Care must keep saying that a link was not created, and community storage stays in the server process.
 7. Password recovery, a clinical review, a privacy notice that matches the real system, and a live two-account retest are human decisions. They are not implied by this handoff.
 8. Do not add a paid provider, document upload, or a service-role key in the client.
-9. If the committed Claude docs should catch up to `main`, do that as its own docs change. This handoff was left uncommitted so the app tree stays untouched.
+9. If `docs/claude-migration/` should catch up to `main`, including the stale “do not add `OPENAI_API_KEY`” line in `ENVIRONMENT_SETUP.md`, do that as its own docs change. This revision commits only `CLAUDE_HANDOFF.md`.
