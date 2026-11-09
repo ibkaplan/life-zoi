@@ -14,7 +14,21 @@ export const WELLNESS_ASSISTANT_EMERGENCY =
   "If you have emergency symptoms, contact emergency services. If a symptom persists, talk with a healthcare professional.";
 
 export const WELLNESS_ASSISTANT_KIND =
-  "This is a prepared wellness information assistant. The answers are written in advance. It is not a live chatbot.";
+  "Fifty prepared answers stay on this page. A free wellness model replies only when the server is configured, and only from this session.";
+
+export const MODEL_NOT_CONFIGURED =
+  "The wellness model is not configured. Prepared answers from the LifeZoi library are used.";
+
+export const MODEL_CONFIGURED_NOTE =
+  "A free wellness model can reply to general questions in this session. It does not see account records, lab results, or diagnoses. Prepared answers stay available when it cannot reply.";
+
+export const MODEL_QUOTA =
+  "The free wellness model has reached its limit for now. Here is a prepared answer instead.";
+
+export const MODEL_UNAVAILABLE =
+  "The free wellness model could not answer just now. Here is a prepared answer instead.";
+
+export const PREPARED_ANSWERS_REMAIN = "The 50 prepared answers stay available on this page.";
 
 export const LIMITED_SET_MESSAGE =
   "I don't have a prepared answer for that exact question yet. Please choose one of the topics below.";

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { adapterStatusLabel, completeWithModel, PREPARED_LIBRARY_ADAPTER } from "@/lib/wellness-assistant/adapter";
+import { adapterStatusLabel, PREPARED_LIBRARY_ADAPTER } from "@/lib/wellness-assistant/adapter";
 import {
   LIMITED_SET_MESSAGE,
   SPEECH_STARTS_ONLY_FROM_CLICK,
@@ -312,15 +312,12 @@ describe("prepared wellness assistant", () => {
     expect(JSON.stringify(storage)).not.toContain("localStorage");
   });
 
-  it("leaves the model adapter disabled and offline", async () => {
-    const fetchSpy = vi.fn();
-    vi.stubGlobal("fetch", fetchSpy);
-    expect(PREPARED_LIBRARY_ADAPTER.enabled).toBe(false);
-    expect(PREPARED_LIBRARY_ADAPTER.provider).toBe("none");
-    expect(adapterStatusLabel()).toContain("No language model");
-    const result = await completeWithModel("How can I sleep better?");
-    expect(result.ok).toBe(false);
-    expect(fetchSpy).not.toHaveBeenCalled();
+  it("keeps prepared answers when no model is configured", () => {
+    expect(PREPARED_LIBRARY_ADAPTER.name).toContain("prepared");
+    expect(PREPARED_LIBRARY_ADAPTER.provider).toBe("gemini");
+    expect(adapterStatusLabel()).toContain("not configured");
+    expect(adapterStatusLabel()).toContain("Prepared answers");
+    expect(adapterStatusLabel(true)).toContain("does not see account records");
     expect(questionById("sleep-better")?.answer).toContain("bedtime");
   });
 

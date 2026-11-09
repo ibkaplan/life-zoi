@@ -10,6 +10,7 @@ import {
   writeBrowserStore,
 } from "@/lib/browser-store";
 import { clearAssistantThread } from "@/lib/assistant";
+import { clearLiveSession } from "@/lib/wellness-assistant/live-session";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
 import {
@@ -338,6 +339,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         const storage = typeof window === "undefined" ? null : window.localStorage;
         clearAssistantThread(typeof window === "undefined" ? null : window.sessionStorage);
         clearRecentQuestions(typeof window === "undefined" ? null : window.sessionStorage);
+        clearLiveSession(typeof window === "undefined" ? null : window.sessionStorage);
         clearChangeLab(typeof window === "undefined" ? null : window.sessionStorage);
         clearPurpose(typeof window === "undefined" ? null : window.sessionStorage);
         clearOwnedCopies(storage, BRAIN_STORAGE_KEY, userId);
