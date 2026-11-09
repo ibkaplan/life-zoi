@@ -160,7 +160,7 @@ Do not put any service-role key, `GEMINI_API_KEY`, or `OPENAI_API_KEY` in the br
 
 **MedlinePlus Connect** (`https://connect.medlineplus.gov/service`) for a verified LOINC code only.
 
-**Not integrated on `main`:** Stripe, transactional email, SMS, document upload, password recovery, GitHub Actions, cron. Document upload is a future plan in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active. No paid chat model is called. The Gemini and OpenAI calls below are in the code and stay inactive while their keys are unset.
+**Not integrated on `main`:** Stripe, transactional email, SMS, document upload, GitHub Actions, cron. Password recovery was added after this handoff (see below). Document upload is a future plan in `docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md` and is not active. No paid chat model is called. The Gemini and OpenAI calls below are in the code and stay inactive while their keys are unset.
 
 The Wellness Assistant at `/ai-assistant` keeps 50 prepared questions and answers, plus browser speech. Listening uses the browser’s speech synthesis. Optional speech recognition stays in the browser. lifeZoi does not receive that audio. Ask-in-your-own-words calls `POST /api/ai-assistant/wellness`. If `GEMINI_API_KEY` is set, the server sends that session’s questions to Google’s free-tier model `gemini-3.5-flash-lite` and does not send lab results, diagnoses, or account records. The key is unset, so the prepared answer is shown. The separate `POST /api/ai-assistant` mock still refuses any `AI_PROVIDER` other than `mock`.
 
@@ -201,7 +201,7 @@ Also on `main` from earlier merged work, and not re-audited line by line for thi
 
 ### Not implemented
 
-- Password recovery. There is no reset flow. It was not added. A search of `src` found no password-reset API.
+- Password recovery was missing at this handoff. It was added afterwards: **Forgot password?** and **Change password** in Settings, and the `/reset-password` page. It uses Supabase Auth only and has not been tried against the live project. Setup steps: `docs/SUPABASE_SETUP.md`.
 - Document upload.
 - A live model on the development endpoint. `POST /api/ai-assistant` still refuses any `AI_PROVIDER` other than `mock` and does not call the network. The wellness route can call Gemini only when `GEMINI_API_KEY` is set. That key is unset.
 - Paid services of any kind. Budget for research, nutrition data, educational content, exercise libraries, and AI is $0: free public sources only.
@@ -219,7 +219,7 @@ Still true:
 
 - Emotional Wellness has not been clinically reviewed. Do not call that page validated. Habit Transformation copy also says it is not clinically validated.
 - `care_invitations` is not applied, so Share the Care does not create invitation links. The community tables in the same file are not applied either.
-- Password recovery does not exist.
+- Password recovery is in the code but has not been tried against the live project. Real emails need the redirect URL and a custom SMTP sender in Supabase (`docs/SUPABASE_SETUP.md`).
 - Live account persistence was not retested in the launch environment: register, sign-in, sign-out, session, completions on another device, or two-account isolation.
 - On a shared browser, the first signed-in account whose slice is empty still claims an old unscoped blob once. After that, the shared key is deleted.
 - The 988 wording is for the United States and still needs review before a public launch.
@@ -271,7 +271,7 @@ A production build may fetch Google font metadata. Unit tests generally do not n
 - `noindex` stays in the root layout and as `X-Robots-Tag: noindex, nofollow` until a public launch whose privacy notice matches the real system. A `robots.txt` disallow rule is not a substitute. Do not remove either mechanism before that review.
 - Emotional Wellness is not clinically reviewed. The on-page sentence must stay.
 - Share the Care `care_invitations` SQL is not applied. Do not pretend a link was created. Apply the SQL only in the Supabase SQL editor when a person chooses to turn invitation tracking on.
-- Password recovery is absent. Do not imply it exists.
+- Password recovery exists in the code (added after this handoff). Do not claim it works in production until someone has tried it there.
 - Pull requests #18 and #19 are merged. Their keys are not set, and the community SQL is not applied, so the Gemini reply falls back to prepared answers and community posts stay in review with in-process storage. `GEMINI_API_KEY` is server-only. The Gemini call is free only while the Google project stays on the free tier, and free-tier prompts may be used to improve Google’s products. That is a privacy gap for wellness text. `OPENAI_API_KEY` is server-only and calls the moderations endpoint only, not chat completions. That call sends member text off site. Current pricing was not re-verified, so zero cost is not confirmed. Optional `SUPABASE_SERVICE_ROLE_KEY` must never be `NEXT_PUBLIC_`.
 - `main` is canonical. Pull request #1 stays closed.
 - Empty Supabase variables stay `not-configured`. Do not fake authentication.

@@ -14,6 +14,7 @@ import {
   verifySignInCode,
 } from "@/lib/account-store";
 import { authenticatorQrMarkup } from "@/lib/mfa";
+import { EmailHelpForm, NewPasswordForm } from "@/components/password-forms";
 
 export function AccountPanel() {
   const account = useAccount();
@@ -24,6 +25,8 @@ export function AccountPanel() {
   const [confirmEmail, setConfirmEmail] = useState(false);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [help, setHelp] = useState<"reset" | "confirm" | null>(null);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   async function run(action: () => Promise<string | null>) {
     setBusy(true);
@@ -110,7 +113,15 @@ export function AccountPanel() {
               Set up authenticator app
             </button>
           )}
+          {changingPassword ? (
+            <NewPasswordForm heading="Change password" onDone={() => setChangingPassword(false)} />
+          ) : null}
           <div className="actions">
+            {changingPassword ? null : (
+              <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => setChangingPassword(true)}>
+                Change password
+              </button>
+            )}
             <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => void signOutAccount()}>
               Sign out
             </button>
@@ -174,7 +185,11 @@ export function AccountPanel() {
         </form>
       ) : null}
 
-      {account.phase === "signed-out" || account.phase === "error" ? (
+      {(account.phase === "signed-out" || account.phase === "error") && help ? (
+        <EmailHelpForm initialEmail={email} mode={help} onDone={() => setHelp(null)} />
+      ) : null}
+
+      {(account.phase === "signed-out" || account.phase === "error") && !help ? (
         <form
           className="stack"
           onSubmit={(event) => {
@@ -227,10 +242,18 @@ export function AccountPanel() {
               Create account
             </button>
           </div>
+          <div className="actions">
+            <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => setHelp("reset")}>
+              Forgot password?
+            </button>
+            <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => setHelp("confirm")}>
+              Resend confirmation email
+            </button>
+          </div>
         </form>
       ) : null}
 
-      {confirmEmail ? (
+      {confirmEmail && !help ? (
         <p className="alert alert-ok" role="status">
           Check your email and confirm this account, then sign in. Email confirmation stays on.
         </p>

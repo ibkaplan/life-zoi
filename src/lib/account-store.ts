@@ -18,6 +18,16 @@ import {
   publicAuthMessage,
   validateAccountCredentials,
 } from "@/lib/mfa";
+import {
+  CONFIRMATION_RESENT,
+  emailRequestMessage,
+  isEmailAddress,
+  PASSWORD_UPDATED,
+  passwordChangeMessage,
+  RESET_REQUEST_SENT,
+  resetRedirectUrl,
+  validateNewPassword,
+} from "@/lib/password-recovery";
 import { loadStoredSession } from "@/lib/session";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 import { emptySession, type UserSession } from "@/lib/types";
@@ -127,7 +137,10 @@ async function boot() {
       publish(signedOut());
       return;
     }
-    if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "MFA_CHALLENGE_VERIFIED") {
+    if (event === "INITIAL_SESSION" ||
+      event === "SIGNED_IN" ||
+      event === "PASSWORD_RECOVERY" ||
+      event === "MFA_CHALLENGE_VERIFIED") {
       queueRefresh();
     }
   });
@@ -538,6 +551,47 @@ export async function deleteSignedInAccount(): Promise<string | null> {
   await supabase.auth.signOut();
   publish(signedOut());
   return null;
+}
+
+export type AccountNotice = { ok: true; message: string } | { ok: false; message: string };
+
+const NOT_CONFIGURED = "Account sign-in is not configured in this environment.";
+
+/** Sends a reset link. The answer is the same whether or not the email has an account. */
+export async function requestPasswordReset(email: string): Promise<AccountNotice> {
+  if (!isEmailAddress(email)) return { ok: false, message: "Enter a valid email address." };
+  const supabase = getBrowserSupabase();
+  if (!supabase) return { ok: false, message: NOT_CONFIGURED };
+  const redirectTo = resetRedirectUrl(window.location.origin);
+  if (!redirectTo) return { ok: false, message: "The reset link could not be prepared on this page." };
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
+  const problem = emailRequestMessage(error);
+  return problem ? { ok: false, message: problem } : { ok: true, message: RESET_REQUEST_SENT };
+}
+
+/** Sends the sign-up confirmation email again. Neutral answer, like the reset request. */
+export async function resendConfirmationEmail(email: string): Promise<AccountNotice> {
+  if (!isEmailAddress(email)) return { ok: false, message: "Enter a valid email address." };
+  const supabase = getBrowserSupabase();
+  if (!supabase) return { ok: false, message: NOT_CONFIGURED };
+  const { error } = await supabase.auth.resend({ type: "signup", email: email.trim() });
+  const problem = emailRequestMessage(error);
+  return problem ? { ok: false, message: problem } : { ok: true, message: CONFIRMATION_RESENT };
+}
+
+/** Sets a new password for the signed-in account, including a session opened by a reset link. */
+export async function updateAccountPassword(password: string, confirm: string): Promise<AccountNotice> {
+  const invalid = validateNewPassword(password, confirm);
+  if (invalid) return { ok: false, message: invalid };
+  const supabase = getBrowserSupabase();
+  if (!supabase) return { ok: false, message: NOT_CONFIGURED };
+  if (snapshot.phase === "needs-mfa") {
+    return { ok: false, message: "Enter the code from your authenticator app first, then set the new password." };
+  }
+  if (snapshot.phase !== "ready") return { ok: false, message: "Sign in, or open a new reset link, before changing the password." };
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { ok: false, message: passwordChangeMessage(error) };
+  return { ok: true, message: PASSWORD_UPDATED };
 }
 
 export function retryAccountLoad() {
