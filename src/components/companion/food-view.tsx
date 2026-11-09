@@ -202,7 +202,7 @@ export function FoodPreferencesView() {
   );
 }
 
-function MealCard({ suggestion, showKcal }: { suggestion: MealSuggestion; showKcal: boolean }) {
+export function MealCard({ suggestion, showKcal }: { suggestion: MealSuggestion; showKcal: boolean }) {
   const { recipe, swaps, warnings } = suggestion;
   return (
     <div className="stack">

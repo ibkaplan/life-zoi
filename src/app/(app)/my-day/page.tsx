@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { MyDayView } from "@/components/my-day-view";
+import { CompanionDayView } from "@/components/companion/day-view";
 
 export const metadata: Metadata = {
   title: "My Day at LifeZoi",
-  description: "A local day plan with progress from activities you mark done. Educational only. Not a diagnosis.",
+  description: "A gentle plan for today: morning routine, meals, activity, brain, music, reading, relaxation, and sleep preparation. Educational only. Not a diagnosis.",
 };
 
 export default function MyDayPage() {
-  return <MyDayView />;
+  return <CompanionDayView />;
 }

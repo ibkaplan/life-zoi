@@ -109,6 +109,15 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 9. Next action: if the chat is empty or abandoned, no code action. Do not try to resume it from Claude.
 10. References: [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md).
 
+### Daily companion
+
+1. Name: Personalized daily wellness companion.
+2. Objective: the owner's final master specification (brand refresh, assessment health step, food protections, Wellness Library, music, books, brain games, plan, My Day, weekly check-in, reports).
+3. Branch: `claude/project-thread-4qoczn`.
+4. Status: implemented in code with unit tests, including the 12 acceptance scenarios (`src/lib/acceptance.test.ts`).
+5. Outstanding: the owner applies `supabase/migrations/2026-11-09-companion-state.sql` in Supabase. Until then signed-in companion data stays on the device. Videos other than the NIA films, the NHS pages, and pending sources were not checked from the build environment; run `npm run check:library` from a machine with internet access.
+6. Next action: approve or reject pending sources in `src/lib/wellness-library/catalog.ts` through a reviewed pull request.
+
 ## What is not in progress
 
 No GitHub issues were confirmed in this refresh. `main` is one product: accounts when configured, tab storage otherwise, mock assistant, and educational tools. Pull request #1 is closed historical work. Document upload and a paid model are not started.

@@ -22,7 +22,7 @@ function savePage(state: CompanionState, book: Book, page: number): CompanionSta
   };
 }
 
-function Reader({ book, onClose }: { book: Book; onClose: () => void }) {
+export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) {
   const { companion, sample } = useProfile();
   const key = `book:${book.id}`;
   const start = Math.min(book.pages.length - 1, companion.media.positions[key] ?? 0);
@@ -80,11 +80,20 @@ function Reader({ book, onClose }: { book: Book; onClose: () => void }) {
   const marked = bookmarks.includes(page);
   return (
     <article className="lz-reader stack" aria-label={book.title}>
-      <div className="lz-buttons">
-        <button className="btn btn-ghost" type="button" onClick={() => { stopSpeaking(); onClose(); }}>
-          Back to all books
-        </button>
-      </div>
+      {onClose ? (
+        <div className="lz-buttons">
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              onClose();
+            }}
+          >
+            Back to all books
+          </button>
+        </div>
+      ) : null}
       <h2>{book.title}</h2>
       <p className="hint">
         Page {page + 1} of {book.pages.length} · {book.credit}

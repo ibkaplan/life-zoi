@@ -156,7 +156,7 @@ function saveListening(trackId: string, seconds: number, position: number) {
   });
 }
 
-function MusicPlayer({ track }: { track: Track }) {
+export function MusicPlayer({ track }: { track: Track }) {
   const { companion, sample } = useProfile();
   const saved = companion.media.positions[`music:${track.id}`] ?? 0;
   const total = track.minutes * 60;
