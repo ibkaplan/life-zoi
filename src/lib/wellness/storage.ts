@@ -51,6 +51,32 @@ const emptyMotivation = (): WellnessMotivation => ({
   energyFor: "",
 });
 
+export function isEmptyWellnessLog(log: WellnessLog): boolean {
+  const motivation = log.motivation;
+  const routine = log.natureRoutine;
+  return (
+    log.checks.length === 0 &&
+    log.challengeStarts.length === 0 &&
+    log.reminders.length === 0 &&
+    log.reminderSeenOn === "" &&
+    log.urges.length === 0 &&
+    log.moments.length === 0 &&
+    log.habits.length === 0 &&
+    log.habitMarks.length === 0 &&
+    log.ifThen.length === 0 &&
+    log.natureEntries.length === 0 &&
+    log.naturePicks.length === 0 &&
+    routine.morning === "" &&
+    routine.afternoon === "" &&
+    routine.evening === "" &&
+    motivation.experience === "" &&
+    motivation.people === "" &&
+    motivation.activities === "" &&
+    motivation.accomplishments === "" &&
+    motivation.energyFor === ""
+  );
+}
+
 export function emptyWellnessLog(): WellnessLog {
   return {
     checks: [],
@@ -331,10 +357,10 @@ export function sanitizeWellness(input: unknown): WellnessLog {
   };
 }
 
-export function loadWellness(storage: Pick<Storage, "getItem"> | null): WellnessLog {
+export function loadWellness(storage: Pick<Storage, "getItem"> | null, key = WELLNESS_STORAGE_KEY): WellnessLog {
   if (!storage) return emptyWellnessLog();
   try {
-    const raw = storage.getItem(WELLNESS_STORAGE_KEY);
+    const raw = storage.getItem(key);
     if (!raw) return emptyWellnessLog();
     return sanitizeWellness(JSON.parse(raw) as unknown);
   } catch {
@@ -342,12 +368,12 @@ export function loadWellness(storage: Pick<Storage, "getItem"> | null): Wellness
   }
 }
 
-export function saveWellness(storage: Pick<Storage, "setItem">, log: WellnessLog) {
-  storage.setItem(WELLNESS_STORAGE_KEY, JSON.stringify(sanitizeWellness(log)));
+export function saveWellness(storage: Pick<Storage, "setItem">, log: WellnessLog, key = WELLNESS_STORAGE_KEY) {
+  storage.setItem(key, JSON.stringify(sanitizeWellness(log)));
 }
 
-export function clearWellness(storage: Pick<Storage, "removeItem"> | null) {
-  storage?.removeItem(WELLNESS_STORAGE_KEY);
+export function clearWellness(storage: Pick<Storage, "removeItem"> | null, key = WELLNESS_STORAGE_KEY) {
+  storage?.removeItem(key);
 }
 
 export function upsertCheck(log: WellnessLog, check: WellnessCheck): WellnessLog {

@@ -1,4 +1,6 @@
 import { sanitizeBrain } from "@/lib/brain-quiz/progress";
+import { sanitizeFoodPlan } from "@/lib/food-plan/plan";
+import { sanitizeMyDay } from "@/lib/my-day/storage";
 import { sanitizeHabitJourney } from "@/lib/habit-transformation/model";
 import { isRealISODate, mondayOf } from "@/lib/dates";
 import {
@@ -206,6 +208,8 @@ export function sanitizeSession(input: unknown): UserSession {
     reassessOn,
     brainQuiz: sanitizeBrain(record.brainQuiz),
     habitJourney: sanitizeHabitJourney(record.habitJourney),
+    foodPlan: sanitizeFoodPlan(record.foodPlan),
+    myDay: sanitizeMyDay(record.myDay),
   };
 }
 

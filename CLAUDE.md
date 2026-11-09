@@ -8,7 +8,7 @@ Read `docs/claude-migration/INDEX.md` first, then the document that matches the 
 
 Next.js App Router, TypeScript, Tailwind CSS 4, React 19. `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers, scenarios, goals, and check-ins use the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are a real public config. The browser client reads those two names directly so Next can inline them (`src/lib/supabase-browser.ts`). Without that configuration, answers stay in `sessionStorage` for the current tab. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in the connected case.
 
-The Wellness Assistant at `/ai-assistant` is a prepared question library with browser speech. It is not a live chatbot. `AI_PROVIDER` other than `mock` is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
+The Wellness Assistant at `/ai-assistant` keeps 50 prepared answers. `POST /api/ai-assistant/wellness` can call Google’s free-tier model `gemini-3.5-flash-lite` only when the server has `GEMINI_API_KEY`. That call sends the current assistant session, not lab values, diagnoses, or account records. Without the key, or when the free tier cannot answer, the prepared library is the reply. `AI_PROVIDER` other than `mock` on the separate development endpoint is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
 
 Important paths on `main`:
 
@@ -52,7 +52,7 @@ Require `npm test`, `npm run typecheck`, and `npm run lint` for application chan
 
 - Do not expose secrets, tokens, or service-role keys. Do not commit `.env` files.
 - Do not put a service-role key in the browser or in a `NEXT_PUBLIC_` variable. The anon key is public only with row level security.
-- Do not describe the mock assistant as a live model. Do not set `AI_PROVIDER` to anything but `mock` unless a person approves a real provider and the code is changed to allow it.
+- Do not describe the mock development endpoint as a live model. Do not set `AI_PROVIDER` to anything but `mock`. The wellness page may use `GEMINI_API_KEY` on the server for `gemini-3.5-flash-lite` only. Do not add a paid model, a browser key, or a `NEXT_PUBLIC_` copy of that key.
 - Do not fake authentication or secure storage. Empty Supabase variables must stay `not-configured`.
 - Do not claim HIPAA, GDPR, or other regulatory compliance.
 - Guidance stays qualitative. Do not invent citations, percentages, risk reductions, or a date of death. The Life outlook page may show a copied Social Security population figure only with the existing “not an individual prediction” label. Do not turn that figure into a personal lifespan.

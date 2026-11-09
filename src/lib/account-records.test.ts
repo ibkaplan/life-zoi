@@ -15,6 +15,7 @@ import {
 } from "@/lib/mfa";
 import { createSampleSession } from "@/lib/sample";
 import { emptySession, type UserSession } from "@/lib/types";
+import { freshDay, setItemStatus } from "@/lib/my-day/storage";
 import { validAnswers } from "@/lib/validation.test";
 
 const USER = "11111111-1111-4111-8111-111111111111";
@@ -82,6 +83,44 @@ describe("account records", () => {
     expect(loaded.history[0]?.answers.sleepHours).toBe("7.5");
     expect(loaded.scenarios[0]?.habitId).toBe("walk");
     expect(loaded.checkIns[0]?.done).toBe(true);
+    expect(loaded.myDay.days).toEqual({});
+  });
+
+  it("keeps a My Day completion on the account and drops it before the profile can grow past the size check", () => {
+    const marked = setItemStatus(
+      { savedTimes: {}, ayurvedaHidden: false, days: { "2026-11-06": freshDay("2026-11-06", {}) } },
+      "2026-11-06",
+      "water",
+      "done",
+    );
+    const session = { ...ownSession(), myDay: marked };
+    const prepared = prepareAccountWrite(session, USER, WHEN);
+    expect(prepared.ok).toBe(true);
+    if (!prepared.ok) return;
+    const loaded = rowsToSession({
+      profile: { display_name: "Ada", session_state: prepared.rows.profile.session_state },
+      assessments: prepared.rows.assessments,
+      scenarios: prepared.rows.scenarios,
+      goals: prepared.rows.goals,
+      checkIns: prepared.rows.checkIns,
+    });
+    expect(loaded.myDay.days["2026-11-06"]?.items.water.status).toBe("done");
+    expect(new TextEncoder().encode(JSON.stringify(prepared.rows.profile.session_state)).length).toBeLessThanOrEqual(20000);
+
+    const bulky = { ...marked, days: { ...marked.days } };
+    for (let index = 0; index < 14; index += 1) {
+      const date = `2026-10-${String(index + 1).padStart(2, "0")}`;
+      const day = freshDay(date, {});
+      for (const id of Object.keys(day.items) as (keyof typeof day.items)[]) {
+        day.items[id] = { ...day.items[id], note: "n".repeat(280), status: "done" };
+      }
+      bulky.days[date] = day;
+    }
+    const wide = prepareAccountWrite({ ...session, myDay: bulky }, USER, WHEN);
+    expect(wide.ok).toBe(true);
+    if (!wide.ok) return;
+    expect(new TextEncoder().encode(JSON.stringify(wide.rows.profile.session_state)).length).toBeLessThanOrEqual(20000);
+    expect(wide.rows.profile.session_state.draft.displayName).toBe("Ada");
   });
 
   it("refuses to copy sample data into an account", () => {

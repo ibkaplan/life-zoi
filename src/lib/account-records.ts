@@ -1,6 +1,8 @@
 import { decideAccess } from "@/lib/access";
 import { isEmptyBrain } from "@/lib/brain-quiz/progress";
+import { isEmptyFoodPlan } from "@/lib/food-plan/types";
 import { isEmptyHabitJourney } from "@/lib/habit-transformation/model";
+import { emptyMyDay, isEmptyMyDay, type MyDayFile } from "@/lib/my-day/storage";
 import { SAMPLE_VISITOR_NAME } from "@/lib/sample";
 import { sanitizeSession } from "@/lib/session";
 import {
@@ -24,6 +26,8 @@ export type ProfileWrite = {
     weightEntries: UserSession["weightEntries"];
     brainQuiz: UserSession["brainQuiz"];
     habitJourney: UserSession["habitJourney"];
+    foodPlan: UserSession["foodPlan"];
+    myDay: UserSession["myDay"];
   };
   updated_at: string;
 };
@@ -109,7 +113,9 @@ export function isBlankSession(session: UserSession): boolean {
     session.draft.goals.length === 0 &&
     session.draft.habitNote.trim() === "" &&
     isEmptyBrain(session.brainQuiz) &&
-    isEmptyHabitJourney(session.habitJourney)
+    isEmptyHabitJourney(session.habitJourney) &&
+    isEmptyFoodPlan(session.foodPlan) &&
+    isEmptyMyDay(session.myDay)
   );
 }
 
@@ -141,24 +147,67 @@ function emptyNote(note: string): string | null {
   return trimmed ? trimmed.slice(0, 280) : null;
 }
 
+const SESSION_STATE_BUDGET = 20000;
+
+function sessionStateBytes(state: ProfileWrite["session_state"]): number {
+  return new TextEncoder().encode(JSON.stringify(state)).length;
+}
+
+/** Drop the oldest My Day records before a save can exceed the existing profile size check. */
+export function fitSessionState(state: ProfileWrite["session_state"]): ProfileWrite["session_state"] {
+  let myDay: MyDayFile = state.myDay;
+  for (let guard = 0; guard < 40; guard += 1) {
+    const next = { ...state, myDay };
+    if (sessionStateBytes(next) <= SESSION_STATE_BUDGET) return next;
+    const dates = Object.keys(myDay.days).sort();
+    if (dates.length > 1) {
+      const days = { ...myDay.days };
+      delete days[dates[0] ?? ""];
+      myDay = { ...myDay, days };
+      continue;
+    }
+    let shortened = false;
+    const days = { ...myDay.days };
+    for (const date of Object.keys(days)) {
+      const day = days[date];
+      if (!day) continue;
+      const items = { ...day.items };
+      for (const id of Object.keys(items) as (keyof typeof items)[]) {
+        const item = items[id];
+        if (item.note.length > 40) {
+          items[id] = { ...item, note: item.note.slice(0, 40) };
+          shortened = true;
+        }
+      }
+      days[date] = { ...day, items };
+    }
+    if (!shortened) return { ...state, myDay: emptyMyDay() };
+    myDay = { ...myDay, days };
+  }
+  return { ...state, myDay: emptyMyDay() };
+}
+
 export function sessionToRows(session: UserSession, actorUserId: string, updatedAt: string): AccountWrite {
   const userId = actorUserId.trim();
+  const profile: ProfileWrite = {
+    user_id: userId,
+    display_name: profileName(session),
+    session_state: fitSessionState({
+      draft: session.draft,
+      draftStep: session.draftStep,
+      reassessDays: session.reassessDays,
+      reassessOn: session.reassessOn,
+      weeklyCheckIns: session.weeklyCheckIns,
+      weightEntries: session.weightEntries,
+      brainQuiz: session.brainQuiz,
+      habitJourney: session.habitJourney,
+      foodPlan: session.foodPlan,
+      myDay: session.myDay,
+    }),
+    updated_at: updatedAt,
+  };
   return {
-    profile: {
-      user_id: userId,
-      display_name: profileName(session),
-      session_state: {
-        draft: session.draft,
-        draftStep: session.draftStep,
-        reassessDays: session.reassessDays,
-        reassessOn: session.reassessOn,
-        weeklyCheckIns: session.weeklyCheckIns,
-        weightEntries: session.weightEntries,
-        brainQuiz: session.brainQuiz,
-        habitJourney: session.habitJourney,
-      },
-      updated_at: updatedAt,
-    },
+    profile,
     assessments: session.history.map((item) => ({
       id: item.id,
       user_id: userId,
@@ -233,6 +282,8 @@ export function rowsToSession(input: AccountRead): UserSession {
     weightEntries: state.weightEntries,
     brainQuiz: state.brainQuiz,
     habitJourney: state.habitJourney,
+    foodPlan: state.foodPlan,
+    myDay: state.myDay,
     history: input.assessments.map((row) => ({
       id: row.id,
       completedAt: row.completed_at,
