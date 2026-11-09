@@ -68,7 +68,8 @@ The live project already has `profiles`, `assessments`, `scenarios`, `habit_goal
 3. Authenticator enrollment is in Settings. Confirm a 6-digit code. Later sign-ins require that code before saved rows open.
 4. Account deletion calls `delete_own_account()`, which removes that person’s rows and login.
 5. `decideAccess` in `src/lib/access.ts` runs before an account write. Hiding a button is not authorization; row level security still applies.
-6. Password recovery: **Forgot password?** on Settings emails a link to `/reset-password`, where the person sets a new password. Signed-in people can use **Change password**, and **Resend confirmation email** sends the sign-up message again. Add `/reset-password` on each site to Supabase's redirect URLs, and set a custom SMTP sender before real people sign up.
+6. New accounts are closed. Only the allowlisted email can sign in: turn off **Allow new users to sign up** in Supabase, and the `auth_users_allowlist` trigger in `schema.sql` refuses any other email in the database. The one account is created in the Supabase dashboard (see the setup guide). The app has a **Sign in** page and no sign-up button.
+7. Password recovery: **Forgot password?** on the Sign in page emails a link to `/reset-password`, where the person sets a new password. Signed-in people can use **Change password** under Account. Add `/reset-password` on each site to Supabase's redirect URLs, and set a custom SMTP sender before real people sign up.
 
 Step-by-step dashboard setup, including the read-only check `supabase/verify.sql`, is in [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). `scripts/test-schema.sh` applies `supabase/schema.sql` twice to a throwaway local Postgres and checks the row level security rules. It never contacts Supabase.
 

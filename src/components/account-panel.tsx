@@ -9,7 +9,6 @@ import {
   retryAccountLoad,
   signInWithPassword,
   signOutAccount,
-  signUpWithPassword,
   useAccount,
   verifySignInCode,
 } from "@/lib/account-store";
@@ -22,7 +21,6 @@ export function AccountPanel() {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
-  const [confirmEmail, setConfirmEmail] = useState(false);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [help, setHelp] = useState<"reset" | "confirm" | null>(null);
@@ -31,7 +29,6 @@ export function AccountPanel() {
   async function run(action: () => Promise<string | null>) {
     setBusy(true);
     setMessage("");
-    setConfirmEmail(false);
     const error = await action();
     setMessage(error ?? "");
     setBusy(false);
@@ -197,7 +194,7 @@ export function AccountPanel() {
             void run(() => signInWithPassword(email, password));
           }}
         >
-          <p>Create an account or sign in with email and a password. Passwords stay with Supabase Auth.</p>
+          <p>Sign in with your email and password. New accounts are not open yet. Passwords stay with Supabase Auth.</p>
           {account.phase === "error" ? (
             <button className="btn btn-secondary" type="button" onClick={() => retryAccountLoad()}>
               Try loading saved answers again
@@ -227,37 +224,15 @@ export function AccountPanel() {
             <button className="btn btn-primary" type="submit" disabled={busy}>
               Sign in
             </button>
-            <button
-              className="btn btn-secondary"
-              type="button"
-              disabled={busy}
-              onClick={() =>
-                void run(async () => {
-                  const result = await signUpWithPassword(email, password);
-                  setConfirmEmail(result.confirmEmail);
-                  return result.error;
-                })
-              }
-            >
-              Create account
-            </button>
           </div>
           <div className="actions">
             <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => setHelp("reset")}>
               Forgot password?
             </button>
-            <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => setHelp("confirm")}>
-              Resend confirmation email
-            </button>
           </div>
         </form>
       ) : null}
 
-      {confirmEmail && !help ? (
-        <p className="alert alert-ok" role="status">
-          Check your email and confirm this account, then sign in. Email confirmation stays on.
-        </p>
-      ) : null}
       {message ? (
         <p className="alert alert-error" role="alert">
           {message}

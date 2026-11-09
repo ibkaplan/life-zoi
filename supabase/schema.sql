@@ -130,6 +130,47 @@ create trigger profiles_enforce_role
   before insert or update on public.profiles
   for each row execute function public.enforce_profile_role();
 
+-- New accounts are closed. Only the allowlisted email may have a login.
+-- This backs up the "Allow new users to sign up" switch in Supabase Auth: even if
+-- that switch is turned on by mistake, or someone adds a user in the dashboard,
+-- the database refuses any other email. To open accounts later, replace this
+-- function body with `select true` (or a longer list) and run the file again.
+create or replace function public.account_email_allowed(candidate text)
+returns boolean
+language sql
+immutable
+set search_path = public
+as $$
+  select lower(btrim(coalesce(candidate, ''))) in ('tatyanaserikovaru@gmail.com');
+$$;
+
+revoke all on function public.account_email_allowed(text) from public;
+
+create or replace function public.enforce_account_allowlist()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  -- Existing logins keep working. Only a new login or a changed email is checked.
+  if tg_op = 'UPDATE' and new.email is not distinct from old.email then
+    return new;
+  end if;
+  if not public.account_email_allowed(new.email) then
+    raise exception 'new accounts are not open';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function public.enforce_account_allowlist() from public;
+
+drop trigger if exists auth_users_allowlist on auth.users;
+create trigger auth_users_allowlist
+  before insert or update of email on auth.users
+  for each row execute function public.enforce_account_allowlist();
+
 create or replace function public.reject_sample_assessment()
 returns trigger
 language plpgsql

@@ -10,6 +10,7 @@ import {
   type AccountRead,
   type AccountWrite,
 } from "@/lib/account-records";
+import { isAdminEmail } from "@/lib/admin-allowlist";
 import { writeBrowserStore } from "@/lib/browser-store";
 import {
   authenticatorQrSrc,
@@ -448,6 +449,8 @@ export async function signUpWithPassword(
 ): Promise<{ error: string | null; confirmEmail: boolean }> {
   const invalid = validateAccountCredentials(email, password);
   if (invalid) return { error: invalid, confirmEmail: false };
+  // New accounts are closed. Supabase sign-ups are off and the database refuses other emails too.
+  if (!isAdminEmail(email)) return { error: "New accounts are not open yet.", confirmEmail: false };
   const supabase = getBrowserSupabase();
   if (!supabase) return { error: "Account sign-in is not configured in this environment.", confirmEmail: false };
   const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });

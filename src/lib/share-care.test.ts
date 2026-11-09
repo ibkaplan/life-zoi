@@ -290,12 +290,12 @@ describe("invitation visits", () => {
       expect(source).not.toContain("service_role");
       expect(source).not.toContain("account.email");
     }
-    const shell = readFileSync("src/components/app-shell.tsx", "utf8");
+    const shell = readFileSync("src/lib/navigation.ts", "utf8");
     expect(shell).toContain('href: "/share-the-care"');
     expect(shell).toContain("Share the Care");
     const welcome = readFileSync("src/components/welcome-view.tsx", "utf8");
     expect(welcome).toContain("WELCOME_HEADING");
-    expect(welcome).toContain('href="/settings"');
+    expect(welcome).toContain('href="/sign-in"');
     const page = readFileSync("src/app/(app)/welcome/page.tsx", "utf8");
     expect(page).toContain("WELCOME_HEADING");
     expect(page).toContain("WELCOME_BODY");

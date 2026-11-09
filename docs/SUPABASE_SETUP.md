@@ -31,9 +31,11 @@ Run `supabase/verify.sql` again. Every line should now say `ok = true`. If a lin
 
 ## 4. Authentication settings
 
+New accounts are closed for now. Only `tatyanaserikovaru@gmail.com` may have a login. Two things enforce that: the switch below, and the `auth_users_allowlist` trigger in `schema.sql`, which makes the database refuse a login for any other email even if the switch is turned back on or someone adds a user in the dashboard. The app has no "Create account" button.
+
 In **Authentication**:
 
-1. **Sign In / Providers → Email**: keep **Email** on and **Confirm email** on. The app expects confirmation and tells people to check their email.
+1. **Sign In / Providers**: turn **Allow new users to sign up** off. Keep the **Email** provider on so sign-in still works. Keep **Confirm email** on.
 2. **URL Configuration**:
    - **Site URL**: `https://life-zoi.vercel.app`
    - **Redirect URLs**: add `https://life-zoi.vercel.app/reset-password` and `http://localhost:3000/reset-password`. If you want reset links to work on Vercel preview deployments too, add a pattern for the preview addresses that ends in `/reset-password`.
@@ -43,7 +45,18 @@ In **Authentication**:
 4. **Emails → SMTP Settings**: Supabase's built-in sender is for testing. It sends only a few emails an hour, and only to addresses on your Supabase team. Real people will not get confirmation or reset emails until you set a custom SMTP sender. Choosing a provider is your call. Several have free tiers, but check the current terms before you sign up. Keep the sender address on a domain you control.
 5. **Emails → Templates**: the default **Reset Password** and **Confirm signup** templates work as they are. If you edit them, keep `{{ .ConfirmationURL }}` as the link.
 
-## 5. Vercel environment
+## 5. Create the one account
+
+The app cannot create this login itself, because sign-ups are closed. Create it in the dashboard:
+
+1. **Authentication → Users → Add user → Create new user**.
+2. Email: `tatyanaserikovaru@gmail.com`. Password: the temporary password you were given (or one you choose). Tick **Auto Confirm User**, so no confirmation email is needed.
+3. Open the site, choose **Sign in** at the top, and sign in.
+4. Go to **Account → Change password** and replace the temporary password right away.
+
+To open accounts to other people later, change the list in `public.account_email_allowed` in `schema.sql`, run the file again, turn **Allow new users to sign up** back on, and bring back a sign-up button in the app.
+
+## 6. Vercel environment
 
 In the Vercel project, under **Settings → Environment Variables**, make sure these two exist for **Production** (and **Preview** if you want accounts on previews):
 
@@ -56,18 +69,19 @@ Do not add the service-role key under a `NEXT_PUBLIC_` name. Next.js copies `NEX
 
 Afterwards, `https://life-zoi.vercel.app/api/status` should report `"authentication":"supabase"` and `"persistence":"account"`.
 
-## 6. Try it with a test account
+## 7. Try it
 
-Use a test email address you can read, with made-up answers.
+Use the one allowed account, with made-up answers.
 
-1. **Settings → Create account**. Confirm the email, then sign in.
+1. **Sign in** at the top of any page. The "My space" row appears under the main links.
 2. Take the assessment. Sign out, sign in again, and check that the answers are still there.
-3. **Settings → Forgot password?** (while signed out). Open the emailed link **in the same browser**. Choose a new password on the **Set a new password** page, then sign in with it.
-4. Signed in, use **Change password** in Settings.
+3. **Sign in → Forgot password?** (while signed out). Open the emailed link **in the same browser**. Choose a new password on the **Set a new password** page, then sign in with it.
+4. Signed in, use **Account → Change password**.
 5. Optional: **Set up authenticator app**, sign out, and sign in again with the 6-digit code. Then try **Forgot password?** again. The reset page asks for the code before it accepts a new password.
 6. Open a used or old reset link. The page should say the link expired and offer a new one.
-7. **Delete account**. The login and its rows are removed.
-8. With a second test account in another browser, check that neither account can see the other's answers.
+7. Do not use **Delete account** on this login unless you mean it: with sign-ups closed, it can only be re-created from the dashboard.
+
+`scripts/test-schema.sh` checks on a throwaway local database that people cannot see each other's rows and that other emails are refused.
 
 ## Notes
 

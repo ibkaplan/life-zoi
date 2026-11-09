@@ -23,7 +23,8 @@ expected_policies(tbl, name) as (
 expected_functions(name) as (
   values
     ('auth_session_may_use_rows'), ('enforce_profile_role'), ('reject_sample_assessment'),
-    ('delete_own_account'), ('revoke_care_invitation'), ('note_care_invitation')
+    ('delete_own_account'), ('revoke_care_invitation'), ('note_care_invitation'),
+    ('account_email_allowed'), ('enforce_account_allowlist')
 ),
 expected_triggers(tbl, name) as (
   values ('profiles', 'profiles_enforce_role'), ('assessments', 'assessments_reject_sample')
@@ -55,6 +56,12 @@ select 'trigger exists', g.tbl || '.' || g.name, exists (
   where c.relname = g.tbl and c.relnamespace = 'public'::regnamespace and tr.tgname = g.name and not tr.tgisinternal
 )
 from expected_triggers g
+union all
+select 'trigger exists', 'auth.users.auth_users_allowlist', exists (
+  select 1 from pg_trigger tr
+  join pg_class c on c.oid = tr.tgrelid
+  where c.relname = 'users' and c.relnamespace = 'auth'::regnamespace and tr.tgname = 'auth_users_allowlist' and not tr.tgisinternal
+)
 union all
 select 'column exists', e.tbl || '.' || e.col, exists (
   select 1 from information_schema.columns
