@@ -3,11 +3,15 @@ import { emptyFoodPlan } from "@/lib/food-plan/types";
 import { emptyMyDay } from "@/lib/my-day/storage";
 import { emptyHabitJourney } from "@/lib/habit-transformation/model";
 import { monthKey } from "@/lib/dates";
+import { emptyHealthProfile } from "@/lib/health-profile";
 import { STEP_IDS, type Assessment, type UserSession } from "@/lib/types";
 
 export const SAMPLE_VISITOR_NAME = "Sample visitor";
 
 const sampleAnswers: Assessment = {
+  ...emptyHealthProfile(),
+  wellnessGoals: ["sleep", "energy"],
+  primaryGoal: "sleep",
   displayName: SAMPLE_VISITOR_NAME,
   ageRange: "40-49",
   sleepHours: "6.5",

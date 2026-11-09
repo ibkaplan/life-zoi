@@ -126,6 +126,12 @@ export function LibraryHome() {
         <Link href="/library/lessons">Daily lessons</Link>
         {" · "}
         <Link href="/library/moments">Having a hard moment?</Link>
+        {" · "}
+        <Link href="/library/music">Relaxing music</Link>
+        {" · "}
+        <Link href="/library/books">Books and listening</Link>
+        {" · "}
+        <Link href="/academy/move/library">Wellness Library</Link>
       </p>
     </div>
   );

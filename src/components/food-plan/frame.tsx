@@ -6,6 +6,8 @@ import { storageLine, useFoodPlan } from "@/components/food-plan/use-food-plan";
 
 const LINKS = [
   ["/food-plan", "Overview"],
+  ["/food-plan/today", "Today's meals"],
+  ["/food-plan/preferences", "My food choices"],
   ["/food-plan/seasonal", "Seasonal"],
   ["/food-plan/modern", "Modern"],
   ["/food-plan/ayurveda", "Ayurveda"],
@@ -26,7 +28,7 @@ export function FoodMark({ label }: { label: string }) {
       <rect width="64" height="64" rx="16" fill="#f4efe4" />
       <circle cx="32" cy="34" r="14" fill="#d7ebdd" stroke="#2f6b4f" strokeWidth="2" />
       <path d="M32 14c2 6 2 10 0 16" fill="none" stroke="#2f6b4f" strokeWidth="2" />
-      <path d="M24 28c6 2 10 2 16 0" fill="none" stroke="#7136C8" strokeWidth="2" />
+      <path d="M24 28c6 2 10 2 16 0" fill="none" stroke="#6A3DA8" strokeWidth="2" />
     </svg>
   );
 }

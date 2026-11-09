@@ -56,6 +56,11 @@ export function ProgressView() {
         <p>
           <Link href="/plan">Your progress matters. Open My Life Improvement Plan.</Link>
         </p>
+        <p>
+          <Link className="btn btn-primary" href="/progress/weekly">
+            Weekly check-in and reports
+          </Link>
+        </p>
       </div>
       <WeeklyProgress />
       <section className="card stack">
@@ -77,7 +82,7 @@ export function ProgressView() {
           </ul>
         ) : (
           <p>
-            No My Day marks yet. <Link href="/my-day">Open My Day</Link>
+            No My Day marks yet. <Link href="/my-day/classic">Open My Day classic</Link>
           </p>
         )}
       </section>

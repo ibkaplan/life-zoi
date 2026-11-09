@@ -1,31 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CareInviteWatcher } from "@/components/care-invite-watcher";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
 import { useAccount } from "@/lib/account-store";
+import { useCompanion } from "@/lib/companion/store";
+import { departmentFor } from "@/lib/departments";
 import { FOOTER_LINKS } from "@/lib/navigation";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { sample, ready } = useSession();
   const account = useAccount();
+  const companion = useCompanion();
+  const pathname = usePathname() ?? "/";
 
   return (
     <>
       <SiteNav />
-      <main id="main" className="page app-main stack-lg">
+      <main id="main" className="page app-main stack-lg" data-dept={departmentFor(pathname)}>
         <p className="banner" role="status">
           {account.phase === "loading"
             ? "Checking sign-in…"
             : account.phase === "ready"
-              ? "Signed in. Saved assessment answers, habits, and progress are stored with this account. Sample data is not written to the account."
+              ? companion.saveMode === "device"
+                ? "Signed in. Your assessment, habits, and check-ins are saved to your account. Daily activities, reading, and games are saved on this device until the account's daily-progress table is set up."
+                : "Signed in. Your assessment, habits, plans, and daily progress are saved to your account. Sample data is never written to the account."
               : account.phase === "needs-mfa"
                 ? "Enter the authenticator code on the Sign in page to finish sign-in. Saved answers stay closed until then."
                 : account.phase === "off"
-                  ? "Account sign-in is not configured. Answers stay in this browser tab and are removed when the tab closes."
-                  : "You are not signed in. Answers stay in this browser tab until you sign in. Sample data is not written to an account."}
+                  ? "Account sign-in is not set up on this site. Assessment answers stay in this browser tab until it closes. Daily activities, reading, and games stay in this browser on this device."
+                  : "You are not signed in. Assessment answers stay in this browser tab until it closes. Daily activities, reading, and games stay in this browser on this device. Sign in to keep everything in your account."}
         </p>
         {account.error ? (
           <p className="banner" role="alert">

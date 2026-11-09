@@ -23,6 +23,8 @@ Running the whole file also creates:
 - `care_invitations`, so Share the Care can create invitation links and show counts. A row holds a random token and three counts. It does not hold a name, an email address, or health information.
 - The five Community tables. The browser cannot read them. Community keeps using in-process storage until `SUPABASE_SERVICE_ROLE_KEY` is set on the server, which is a separate decision. Applying the tables alone does not turn that on.
 
+- `companion_state`, one row per account for the daily companion: guidance mode, movement and food choices, personal goals, My Day marks, weekly check-ins, next-week plans, music and book positions, favorites, and game history. Row level security matches the other account tables, a size check keeps a row under 256 KB, and `delete_own_account()` removes it. The same definition is in [`supabase/migrations/2026-11-09-companion-state.sql`](../supabase/migrations/2026-11-09-companion-state.sql) if you prefer to run only that part. Until it exists, signed-in people see “Saved in this browser on this device” for daily activities, and nothing is lost.
+
 If you do not want Share the Care or Community tables yet, stop and say so before running the file. The account tables and the password changes in this guide do not depend on them.
 
 ## 3. Check again

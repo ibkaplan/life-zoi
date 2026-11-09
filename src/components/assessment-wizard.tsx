@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "@/components/session-provider";
+import { useAccount } from "@/lib/account-store";
 import { LoadingState } from "@/components/sources";
 import {
   ageLabels,
@@ -34,6 +35,141 @@ import {
   type StepId,
 } from "@/lib/types";
 import { firstInvalidStep, validateStep } from "@/lib/validation";
+import { ALLERGENS } from "@/lib/food-plan/types";
+import { FOOD_WORDS } from "@/lib/food-words";
+import {
+  allergenLabels,
+  BLOOD_PRESSURE_STATUSES,
+  BLOOD_SUGAR_STATUSES,
+  bloodPressureLabels,
+  bloodSugarLabels,
+  CHOLESTEROL_STATUSES,
+  cholesterolLabels,
+  DIET_PATTERNS,
+  DIET_REQUIREMENTS,
+  dietPatternLabels,
+  dietRequirementLabels,
+  ENERGY_LEVELS,
+  energyLabels,
+  REACTION_TYPES,
+  reactionLabels,
+  type ReactionType,
+  EATING_PATTERNS,
+  eatingPatternLabels,
+  MOBILITY_LIMITS,
+  mobilityLabels,
+  WELLNESS_GOALS,
+  wellnessGoalLabels,
+} from "@/lib/health-profile";
+
+function toggle<T extends string>(list: T[], value: T, on: boolean): T[] {
+  return on ? (list.includes(value) ? list : [...list, value]) : list.filter((item) => item !== value);
+}
+
+function CheckList<T extends string>({
+  legend,
+  hint,
+  values,
+  options,
+  onChange,
+}: {
+  legend: string;
+  hint?: string;
+  values: T[];
+  options: { value: T; label: string }[];
+  onChange: (values: T[]) => void;
+}) {
+  return (
+    <fieldset className="field">
+      <legend>{legend}</legend>
+      {hint ? <p className="hint">{hint}</p> : null}
+      <div className="check-grid">
+        {options.map((option) => (
+          <label className="check-row" key={option.value}>
+            <input
+              type="checkbox"
+              checked={values.includes(option.value)}
+              onChange={(event) => onChange(toggle(values, option.value, event.target.checked))}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function ReactionEditor({
+  reactions,
+  onChange,
+}: {
+  reactions: { food: string; type: ReactionType }[];
+  onChange: (next: { food: string; type: ReactionType }[]) => void;
+}) {
+  const [food, setFood] = useState("");
+  const [type, setType] = useState<ReactionType>("allergy");
+  function add() {
+    const clean = food.trim().toLowerCase().slice(0, 40);
+    if (!clean) return;
+    onChange([...reactions.filter((item) => item.food !== clean), { food: clean, type }]);
+    setFood("");
+  }
+  return (
+    <fieldset className="field">
+      <legend>Other allergies, intolerances, or sensitivities</legend>
+      <p className="hint">
+        For example a specific fruit, vegetable, or ingredient. Start typing to search, or type your own. A diagnosed allergy is a strict exclusion. Intolerances and sensitivities are also left out of meal ideas.
+      </p>
+      <div className="inline-form">
+        <input
+          aria-label="Food"
+          list="assessment-food-words"
+          value={food}
+          maxLength={40}
+          onChange={(event) => setFood(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              add();
+            }
+          }}
+        />
+        <datalist id="assessment-food-words">
+          {FOOD_WORDS.map((word) => (
+            <option key={word} value={word} />
+          ))}
+        </datalist>
+        <select aria-label="Kind of reaction" value={type} onChange={(event) => setType(event.target.value as ReactionType)}>
+          {REACTION_TYPES.map((value) => (
+            <option key={value} value={value}>
+              {reactionLabels[value]}
+            </option>
+          ))}
+        </select>
+        <button className="btn btn-secondary" type="button" onClick={add}>
+          Add
+        </button>
+      </div>
+      {reactions.length > 0 ? (
+        <ul className="chip-list">
+          {reactions.map((item) => (
+            <li key={item.food} className="chip">
+              {item.food} · {reactionLabels[item.type]}
+              <button
+                type="button"
+                className="chip-remove"
+                aria-label={`Remove ${item.food}`}
+                onClick={() => onChange(reactions.filter((other) => other.food !== item.food))}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </fieldset>
+  );
+}
 
 const stepCopy: Record<StepId, { title: string; why: string }> = {
   about: {
@@ -59,6 +195,10 @@ const stepCopy: Record<StepId, { title: string; why: string }> = {
   mind: {
     title: "Stress, mood, and people",
     why: "A simple description helps the suggestions stay relevant. It is not a mental health screening.",
+  },
+  health: {
+    title: "Health information",
+    why: "Every question here is optional, and \u201cI don't know\u201d or \u201cPrefer not to answer\u201d are fine. LifeZoi uses these answers only to keep suggestions safe, for example skipping your allergens or offering seated movement. It never fills in a missing measurement and does not diagnose.",
   },
   goals: {
     title: "What you want to work on",
@@ -163,6 +303,7 @@ function NumberField({
 
 export function AssessmentWizard() {
   const { ready, sample, session, setDraft, setDraftStep, completeAssessment } = useSession();
+  const accountReady = useAccount().phase === "ready";
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
   if (!ready) return <LoadingState label="Loading your assessment…" />;
@@ -238,7 +379,8 @@ export function AssessmentWizard() {
       ) : null}
       {saved ? (
         <p className="alert alert-ok" role="status">
-          Saved in this browser tab. It is not stored in an account.{" "}
+          {accountReady ? "Saved to your account as a new assessment. Earlier assessments are kept." : "Saved in this browser tab as a new assessment. Sign in to keep it in your account."}{" "}
+          <Link href="/plan">Open My Life Improvement Plan</Link>,
           <Link href="/outlook">See the educational outlook</Link>, <Link href="/dashboard">go to the dashboard</Link>, or <Link href="/what-if">open WHAT IF?</Link>
         </p>
       ) : null}
@@ -318,6 +460,15 @@ export function AssessmentWizard() {
                 max={300}
                 error={errors.weightKg}
                 onChange={(weightKg) => update({ weightKg })}
+              />
+              <NumberField
+                id="desiredWeightKg"
+                label="Desired weight in kilograms"
+                hint="Optional. Only used if one of your goals is about weight. It is your own target, not a medical recommendation."
+                value={draft.desiredWeightKg}
+                max={300}
+                error={errors.desiredWeightKg}
+                onChange={(desiredWeightKg) => update({ desiredWeightKg })}
               />
             </>
           ) : null}
@@ -410,6 +561,13 @@ export function AssessmentWizard() {
                   label: hydrationLabels[value],
                 }))}
                 onChange={(hydration) => update({ hydration })}
+              />
+              <Choice
+                legend="How do you usually eat?"
+                name="eatingPattern"
+                value={draft.eatingPattern}
+                options={EATING_PATTERNS.map((value) => ({ value, label: eatingPatternLabels[value] }))}
+                onChange={(eatingPattern) => update({ eatingPattern })}
               />
               <p className="hint">Fruit, fiber, protein, and added sugar are optional. Natural sugar in fruit is not treated as the same thing as sugary drinks.</p>
               {([
@@ -509,6 +667,98 @@ export function AssessmentWizard() {
               </label>
             </>
           ) : null}
+          {step === "health" ? (
+            <>
+              <Choice
+                legend="How is your energy on a typical day?"
+                name="energyLevel"
+                value={draft.energyLevel}
+                options={ENERGY_LEVELS.map((value) => ({ value, label: energyLabels[value] }))}
+                onChange={(energyLevel) => update({ energyLevel })}
+              />
+              <Choice
+                legend="Blood sugar"
+                name="bloodSugarStatus"
+                value={draft.bloodSugarStatus}
+                options={BLOOD_SUGAR_STATUSES.map((value) => ({ value, label: bloodSugarLabels[value] }))}
+                onChange={(bloodSugarStatus) => update({ bloodSugarStatus })}
+              />
+              <Choice
+                legend="Cholesterol"
+                name="cholesterolStatus"
+                value={draft.cholesterolStatus}
+                options={CHOLESTEROL_STATUSES.map((value) => ({ value, label: cholesterolLabels[value] }))}
+                onChange={(cholesterolStatus) => update({ cholesterolStatus })}
+              />
+              <Choice
+                legend="Blood pressure"
+                name="bloodPressureStatus"
+                value={draft.bloodPressureStatus}
+                options={BLOOD_PRESSURE_STATUSES.map((value) => ({ value, label: bloodPressureLabels[value] }))}
+                onChange={(bloodPressureStatus) => update({ bloodPressureStatus })}
+              />
+              <p className="hint">
+                If you have actual lab numbers, you can type them on the previous step (blood pressure, glucose, HbA1c, cholesterol). Leave them blank if you do not have them. LifeZoi never guesses a number.
+              </p>
+              <CheckList
+                legend="Diagnosed food allergies"
+                hint="Optional. These are treated as strict exclusions: no recipe with them is suggested."
+                values={draft.foodAllergies}
+                options={ALLERGENS.map((value) => ({ value, label: allergenLabels[value] }))}
+                onChange={(foodAllergies) => update({ foodAllergies })}
+              />
+              <ReactionEditor
+                reactions={draft.foodReactions}
+                onChange={(foodReactions) => update({ foodReactions })}
+              />
+              <CheckList
+                legend="Do you follow any religious, cultural, or personal dietary requirements?"
+                hint="Optional. Choose all that apply. LifeZoi only uses what you choose here and never guesses."
+                values={draft.dietRequirements}
+                options={DIET_REQUIREMENTS.map((value) => ({ value, label: dietRequirementLabels[value] }))}
+                onChange={(dietRequirements) => {
+                  const added = dietRequirements.find((item) => !draft.dietRequirements.includes(item));
+                  update({
+                    dietRequirements:
+                      added === "prefer-not" ? ["prefer-not"] : dietRequirements.filter((item) => item !== "prefer-not"),
+                  });
+                }}
+              />
+              <CheckList
+                legend="How do you eat?"
+                hint="Choose any combination."
+                values={draft.dietPatterns}
+                options={DIET_PATTERNS.map((value) => ({ value, label: dietPatternLabels[value] }))}
+                onChange={(dietPatterns) => {
+                  const added = dietPatterns.find((item) => !draft.dietPatterns.includes(item));
+                  update({ dietPatterns: added === "none" ? ["none"] : dietPatterns.filter((item) => item !== "none") });
+                }}
+              />
+              <label className="field" htmlFor="dietNote">
+                <span>Other requirements or preferences</span>
+                <input id="dietNote" maxLength={140} value={draft.dietNote} onChange={(event) => update({ dietNote: event.target.value })} />
+              </label>
+              <CheckList
+                legend="Mobility"
+                hint="Optional. This helps LifeZoi offer seated or supported movement first."
+                values={draft.mobilityLimits}
+                options={MOBILITY_LIMITS.map((value) => ({ value, label: mobilityLabels[value] }))}
+                onChange={(mobilityLimits) => {
+                  const added = mobilityLimits.find((item) => !draft.mobilityLimits.includes(item));
+                  if (added === "none" || added === "prefer-not") update({ mobilityLimits: [added] });
+                  else update({ mobilityLimits: mobilityLimits.filter((item) => item !== "none" && item !== "prefer-not") });
+                }}
+              />
+              <label className="field" htmlFor="exerciseRestrictions">
+                <span>Current injuries or exercise restrictions</span>
+                <span className="hint">Optional. For example, &ldquo;no kneeling after knee surgery&rdquo;.</span>
+                <textarea id="exerciseRestrictions" maxLength={280} value={draft.exerciseRestrictions} onChange={(event) => update({ exerciseRestrictions: event.target.value })} />
+              </label>
+              <button className="btn btn-ghost" type="button" onClick={() => goTo(session.draftStep + 1)}>
+                Skip this step
+              </button>
+            </>
+          ) : null}
           {step === "results" ? (
             <div className="upload-placeholder" role="note">
               <p>
@@ -524,8 +774,34 @@ export function AssessmentWizard() {
           ) : null}
           {step === "goals" ? (
             <>
+              <CheckList
+                legend="Your personal goals"
+                hint="Choose as many as you like. You can change them at any time."
+                values={draft.wellnessGoals}
+                options={WELLNESS_GOALS.map((value) => ({ value, label: wellnessGoalLabels[value] }))}
+                onChange={(wellnessGoals) => {
+                  const added = wellnessGoals.find((goal) => !draft.wellnessGoals.includes(goal));
+                  const weight = ["lose-weight", "gain-weight", "maintain-weight"];
+                  const next = added && weight.includes(added)
+                    ? wellnessGoals.filter((goal) => goal === added || !weight.includes(goal))
+                    : wellnessGoals;
+                  update({
+                    wellnessGoals: next,
+                    primaryGoal: next.includes(draft.primaryGoal as never) ? draft.primaryGoal : next[0] ?? "",
+                  });
+                }}
+              />
+              {draft.wellnessGoals.length > 1 ? (
+                <Choice
+                  legend="Which goal matters most right now?"
+                  name="primaryGoal"
+                  value={draft.primaryGoal}
+                  options={draft.wellnessGoals.map((value) => ({ value, label: wellnessGoalLabels[value] }))}
+                  onChange={(primaryGoal) => update({ primaryGoal })}
+                />
+              ) : null}
               <fieldset className="field">
-                <legend>Choose one or more</legend>
+                <legend>Habits to track day by day (choose one or more)</legend>
                 <div className="stack">
                   {GOAL_IDS.map((goal) => (
                     <label className="check-row" key={goal}>
@@ -580,7 +856,7 @@ export function AssessmentWizard() {
           ) : null}
           {step === "review" ? (
             <div className="stack">
-              <p>Saving keeps this version in the browser tab and adds it to your progress history.</p>
+              <p>Saving adds this as a new assessment in your history. Earlier assessments are never overwritten.</p>
               <Review draft={draft} onEdit={(index) => goTo(index)} />
             </div>
           ) : null}
@@ -641,6 +917,7 @@ function Review({
     { label: "Population note", value: draft.populationNote || "Not provided", step: "about" },
     { label: "Height", value: draft.heightCm ? `${draft.heightCm} cm` : "Not provided", step: "about" },
     { label: "Weight", value: draft.weightKg ? `${draft.weightKg} kg` : "Not provided", step: "about" },
+    { label: "Desired weight", value: draft.desiredWeightKg ? `${draft.desiredWeightKg} kg` : "Not provided", step: "about" },
     {
       label: "Sleep",
       value: draft.sleepHours
@@ -709,6 +986,39 @@ function Review({
     { label: "Glucose you typed", value: draft.glucose || "Not provided", step: "mind" },
     { label: "HbA1c you typed", value: draft.hba1c || "Not provided", step: "mind" },
     { label: "Cholesterol you typed", value: draft.cholesterol || "Not provided", step: "mind" },
+    { label: "Eating pattern", value: draft.eatingPattern ? eatingPatternLabels[draft.eatingPattern] : "Not provided", step: "nourishment" },
+    { label: "Blood sugar", value: draft.bloodSugarStatus ? bloodSugarLabels[draft.bloodSugarStatus] : "Not provided", step: "health" },
+    { label: "Cholesterol status", value: draft.cholesterolStatus ? cholesterolLabels[draft.cholesterolStatus] : "Not provided", step: "health" },
+    { label: "Blood pressure status", value: draft.bloodPressureStatus ? bloodPressureLabels[draft.bloodPressureStatus] : "Not provided", step: "health" },
+    {
+      label: "Food allergies",
+      value: [...draft.foodAllergies.map((item) => allergenLabels[item]), draft.allergyNote].filter(Boolean).join(", ") || "Not provided",
+      step: "health",
+    },
+    {
+      label: "Other food reactions",
+      value: draft.foodReactions.map((item) => `${item.food} (${reactionLabels[item.type].toLowerCase()})`).join(", ") || "Not provided",
+      step: "health",
+    },
+    {
+      label: "Dietary requirements",
+      value: draft.dietRequirements.map((item) => dietRequirementLabels[item]).join(", ") || "Not provided",
+      step: "health",
+    },
+    {
+      label: "Eating pattern choices",
+      value: [...draft.dietPatterns.map((item) => dietPatternLabels[item]), draft.dietNote].filter(Boolean).join(", ") || "Not provided",
+      step: "health",
+    },
+    { label: "Energy", value: draft.energyLevel ? energyLabels[draft.energyLevel] : "Not provided", step: "health" },
+    { label: "Mobility", value: draft.mobilityLimits.map((item) => mobilityLabels[item]).join(", ") || "Not provided", step: "health" },
+    { label: "Injuries or exercise restrictions", value: draft.exerciseRestrictions || "Not provided", step: "health" },
+    {
+      label: "Personal goals",
+      value: draft.wellnessGoals.map((goal) => wellnessGoalLabels[goal]).join(", ") || "Not provided",
+      step: "goals",
+    },
+    { label: "Primary goal", value: draft.primaryGoal ? wellnessGoalLabels[draft.primaryGoal] : "Not provided", step: "goals" },
     {
       label: "Focus",
       value: draft.goals.length ? draft.goals.map((goal) => goalLabels[goal]).join(", ") : "Not provided",

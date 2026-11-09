@@ -158,61 +158,61 @@ function useMarks() {
 function FoodDraw({ kind, label }: { kind: DrawKind; label: string }) {
   return (
     <svg className="nz-draw" viewBox="0 0 320 240" role="img" aria-label={label}>
-      <rect width="320" height="240" rx="28" fill="#F7F8FF" />
+      <rect width="320" height="240" rx="28" fill="#F9F7F2" />
       {kind === "egg" ? (
         <>
-          <ellipse cx="160" cy="124" rx="62" ry="78" fill="#ffffff" stroke="#5725A8" strokeWidth="8" />
-          <ellipse cx="160" cy="132" rx="24" ry="28" fill="#E9DDFB" stroke="#7136C8" strokeWidth="6" />
+          <ellipse cx="160" cy="124" rx="62" ry="78" fill="#ffffff" stroke="#52288A" strokeWidth="8" />
+          <ellipse cx="160" cy="132" rx="24" ry="28" fill="#EFE5FA" stroke="#6A3DA8" strokeWidth="6" />
         </>
       ) : null}
       {kind === "fish" ? (
         <>
-          <ellipse cx="150" cy="120" rx="78" ry="42" fill="#DCEEFF" stroke="#4295E8" strokeWidth="8" />
-          <path d="M220 120 l48 -36 v72 z" fill="#4295E8" />
+          <ellipse cx="150" cy="120" rx="78" ry="42" fill="#F3ECFB" stroke="#23706A" strokeWidth="8" />
+          <path d="M220 120 l48 -36 v72 z" fill="#23706A" />
           <circle cx="112" cy="112" r="6" fill="#172554" />
         </>
       ) : null}
       {kind === "chicken" ? (
-        <path d="M118 150c40-70 90-70 90-20 0 28-20 40-20 40h-48s-8 28-36 28c-22 0-30-18-22-36 8-16 22-12 36-12z" fill="#E9DDFB" stroke="#7136C8" strokeWidth="8" />
+        <path d="M118 150c40-70 90-70 90-20 0 28-20 40-20 40h-48s-8 28-36 28c-22 0-30-18-22-36 8-16 22-12 36-12z" fill="#EFE5FA" stroke="#6A3DA8" strokeWidth="8" />
       ) : null}
       {kind === "cheese" ? (
         <>
-          <ellipse cx="160" cy="150" rx="78" ry="28" fill="#ffffff" stroke="#5725A8" strokeWidth="8" />
-          <path d="M82 150c0-40 34-70 78-70s78 30 78 70" fill="#E9DDFB" stroke="#5725A8" strokeWidth="8" />
+          <ellipse cx="160" cy="150" rx="78" ry="28" fill="#ffffff" stroke="#52288A" strokeWidth="8" />
+          <path d="M82 150c0-40 34-70 78-70s78 30 78 70" fill="#EFE5FA" stroke="#52288A" strokeWidth="8" />
         </>
       ) : null}
       {kind === "tofu" ? (
         <>
-          <rect x="78" y="78" width="70" height="54" rx="8" fill="#ffffff" stroke="#5725A8" strokeWidth="7" />
-          <rect x="150" y="96" width="78" height="58" rx="8" fill="#F7F8FF" stroke="#7136C8" strokeWidth="7" />
-          <rect x="110" y="132" width="64" height="42" rx="8" fill="#DCEEFF" stroke="#4295E8" strokeWidth="7" />
+          <rect x="78" y="78" width="70" height="54" rx="8" fill="#ffffff" stroke="#52288A" strokeWidth="7" />
+          <rect x="150" y="96" width="78" height="58" rx="8" fill="#F9F7F2" stroke="#6A3DA8" strokeWidth="7" />
+          <rect x="110" y="132" width="64" height="42" rx="8" fill="#F3ECFB" stroke="#23706A" strokeWidth="7" />
         </>
       ) : null}
       {kind === "oil" ? (
         <>
-          <rect x="132" y="48" width="56" height="28" rx="8" fill="#5725A8" />
-          <path d="M118 84h84l18 112H100z" fill="#DCEEFF" stroke="#4295E8" strokeWidth="8" />
+          <rect x="132" y="48" width="56" height="28" rx="8" fill="#52288A" />
+          <path d="M118 84h84l18 112H100z" fill="#F3ECFB" stroke="#23706A" strokeWidth="8" />
         </>
       ) : null}
       {kind === "avocado" ? (
         <>
           <ellipse cx="160" cy="120" rx="70" ry="86" fill="#3d6b4f" />
           <ellipse cx="160" cy="126" rx="42" ry="58" fill="#d5e38a" />
-          <circle cx="160" cy="132" r="16" fill="#5725A8" />
+          <circle cx="160" cy="132" r="16" fill="#52288A" />
         </>
       ) : null}
       {kind === "nuts" ? (
         <>
-          <ellipse cx="120" cy="130" rx="36" ry="28" fill="#E9DDFB" stroke="#5725A8" strokeWidth="7" />
-          <ellipse cx="176" cy="118" rx="40" ry="30" fill="#DCEEFF" stroke="#4295E8" strokeWidth="7" />
-          <ellipse cx="196" cy="156" rx="32" ry="24" fill="#ffffff" stroke="#7136C8" strokeWidth="7" />
+          <ellipse cx="120" cy="130" rx="36" ry="28" fill="#EFE5FA" stroke="#52288A" strokeWidth="7" />
+          <ellipse cx="176" cy="118" rx="40" ry="30" fill="#F3ECFB" stroke="#23706A" strokeWidth="7" />
+          <ellipse cx="196" cy="156" rx="32" ry="24" fill="#ffffff" stroke="#6A3DA8" strokeWidth="7" />
         </>
       ) : null}
       {kind === "seed" ? (
         <>
-          <ellipse cx="110" cy="120" rx="16" ry="28" fill="#7136C8" />
-          <ellipse cx="160" cy="132" rx="16" ry="28" fill="#5725A8" />
-          <ellipse cx="208" cy="116" rx="16" ry="28" fill="#4295E8" />
+          <ellipse cx="110" cy="120" rx="16" ry="28" fill="#6A3DA8" />
+          <ellipse cx="160" cy="132" rx="16" ry="28" fill="#52288A" />
+          <ellipse cx="208" cy="116" rx="16" ry="28" fill="#23706A" />
         </>
       ) : null}
     </svg>

@@ -37,6 +37,7 @@ export function BrainQuizHub() {
         <div className="actions">
           <Link className="btn btn-primary" href="/brain-quiz/daily">START DAILY CHALLENGE</Link>
           <Link className="btn btn-secondary" href="/brain-quiz/journey">My Brain Journey</Link>
+          <Link className="btn btn-secondary" href="/brain-quiz/games">Sudoku, memory, and logic games</Link>
         </div>
       </section>
       <p className={"quiz-notice"}>{QUIZ_NOTICE}</p>

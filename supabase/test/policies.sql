@@ -42,6 +42,19 @@ do $$ begin
 end $$;
 insert into public.check_ins (user_id, habit_id, entry_date, done)
   values ('00000000-0000-0000-0000-00000000000a', 'walk', '2026-11-01', true);
+insert into public.companion_state (user_id, state) values ('00000000-0000-0000-0000-00000000000a', '{"version":1}');
+
+-- A cannot write companion data for B, and the size check holds.
+do $$ begin
+  insert into public.companion_state (user_id, state) values ('00000000-0000-0000-0000-00000000000b', '{}');
+  raise exception 'FAIL: wrote companion data for another user';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  update public.companion_state set state = jsonb_build_object('x', repeat('a', 300000)) where user_id = '00000000-0000-0000-0000-00000000000a';
+  raise exception 'FAIL: oversized companion state was saved';
+exception when check_violation then null;
+end $$;
 
 -- A cannot write a row for B.
 do $$ begin
@@ -73,6 +86,7 @@ insert into public.profiles (user_id, display_name) values ('00000000-0000-0000-
 do $$ begin
   if (select count(*) from public.profiles) <> 1 then raise exception 'FAIL: B can see other profiles'; end if;
   if (select count(*) from public.check_ins) <> 0 then raise exception 'FAIL: B can see A check-ins'; end if;
+  if (select count(*) from public.companion_state) <> 0 then raise exception 'FAIL: B can see A companion data'; end if;
 end $$;
 
 -- Browser roles cannot read community tables.
@@ -99,6 +113,9 @@ do $$ begin
   end if;
   if exists (select 1 from public.check_ins where user_id = '00000000-0000-0000-0000-00000000000a') then
     raise exception 'FAIL: rows were left behind';
+  end if;
+  if exists (select 1 from public.companion_state where user_id = '00000000-0000-0000-0000-00000000000a') then
+    raise exception 'FAIL: companion data was left behind';
   end if;
   if (select count(*) from auth.users) <> 2 then raise exception 'FAIL: other logins were touched'; end if;
 end $$;
