@@ -6,6 +6,8 @@ import { storageLine, useFoodPlan } from "@/components/food-plan/use-food-plan";
 
 const LINKS = [
   ["/food-plan", "Overview"],
+  ["/food-plan/today", "Today's meals"],
+  ["/food-plan/preferences", "My food choices"],
   ["/food-plan/seasonal", "Seasonal"],
   ["/food-plan/modern", "Modern"],
   ["/food-plan/ayurveda", "Ayurveda"],
