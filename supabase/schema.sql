@@ -151,6 +151,97 @@ create trigger assessments_reject_sample
   before insert or update on public.assessments
   for each row execute function public.reject_sample_assessment();
 
+-- Community moderation records.
+-- Rejected messages, removed messages, and closed reports are kept for 30 days,
+-- then deleted by the app. Published messages stay until the author removes them.
+-- These tables store a chosen name and message text. They do not store an email
+-- address or a health record. user_id is the account key and is not shown to members.
+-- The browser roles cannot read these tables. A server-only service role may write
+-- them. It is not used to read assessment or health rows.
+
+create table if not exists public.community_profiles (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  display_name text not null,
+  restricted_until timestamptz,
+  violations jsonb not null default '[]'::jsonb,
+  provider_calls jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now(),
+  constraint community_profiles_name_length check (char_length(display_name) between 2 and 24),
+  constraint community_profiles_violations_size check (octet_length(violations::text) <= 8000),
+  constraint community_profiles_calls_size check (octet_length(provider_calls::text) <= 2000)
+);
+
+create table if not exists public.community_messages (
+  id uuid primary key default gen_random_uuid(),
+  author_id uuid not null references auth.users (id) on delete cascade,
+  author_name text not null,
+  parent_id uuid references public.community_messages (id) on delete cascade,
+  body text not null default '',
+  redacted boolean not null default false,
+  status text not null,
+  category text not null default 'none',
+  source text not null,
+  content_hash text not null,
+  client_request_id text,
+  created_at timestamptz not null default now(),
+  decided_at timestamptz not null default now(),
+  removed_at timestamptz,
+  appeal_used boolean not null default false,
+  violation_counted boolean not null default false,
+  constraint community_messages_status check (status in ('approved', 'pending', 'rejected')),
+  constraint community_messages_body_length check (char_length(body) <= 1000),
+  constraint community_messages_name_length check (char_length(author_name) between 2 and 24),
+  constraint community_messages_category_length check (char_length(category) <= 40),
+  constraint community_messages_source_length check (char_length(source) <= 40)
+);
+
+create table if not exists public.community_reports (
+  id uuid primary key default gen_random_uuid(),
+  message_id uuid not null references public.community_messages (id) on delete cascade,
+  reporter_id uuid not null references auth.users (id) on delete cascade,
+  reason text not null,
+  created_at timestamptz not null default now(),
+  status text not null default 'open',
+  resolved_at timestamptz,
+  constraint community_reports_reason check (reason in ('harassment', 'hate', 'spam', 'other')),
+  constraint community_reports_status check (status in ('open', 'dismissed'))
+);
+
+create table if not exists public.community_blocks (
+  blocker_id uuid not null references auth.users (id) on delete cascade,
+  blocked_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (blocker_id, blocked_id),
+  constraint community_blocks_not_self check (blocker_id <> blocked_id)
+);
+
+create table if not exists public.community_mutes (
+  muter_id uuid not null references auth.users (id) on delete cascade,
+  muted_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (muter_id, muted_id),
+  constraint community_mutes_not_self check (muter_id <> muted_id)
+);
+
+create unique index if not exists community_messages_client_request
+  on public.community_messages (author_id, client_request_id)
+  where client_request_id is not null;
+
+create index if not exists community_messages_author_idx
+  on public.community_messages (author_id, created_at desc);
+
+alter table public.community_profiles enable row level security;
+alter table public.community_messages enable row level security;
+alter table public.community_reports enable row level security;
+alter table public.community_blocks enable row level security;
+alter table public.community_mutes enable row level security;
+
+revoke all on table public.community_profiles from public, anon, authenticated;
+revoke all on table public.community_messages from public, anon, authenticated;
+revoke all on table public.community_reports from public, anon, authenticated;
+revoke all on table public.community_blocks from public, anon, authenticated;
+revoke all on table public.community_mutes from public, anon, authenticated;
+
 create or replace function public.delete_own_account()
 returns void
 language plpgsql
@@ -163,6 +254,13 @@ begin
   if actor is null or not public.auth_session_may_use_rows() then
     raise exception 'account deletion is not available for this sign-in';
   end if;
+  delete from public.community_reports
+  where reporter_id = actor
+     or message_id in (select id from public.community_messages where author_id = actor);
+  delete from public.community_messages where author_id = actor;
+  delete from public.community_blocks where blocker_id = actor or blocked_id = actor;
+  delete from public.community_mutes where muter_id = actor or muted_id = actor;
+  delete from public.community_profiles where user_id = actor;
   delete from public.check_ins where user_id = actor;
   delete from public.habit_goals where user_id = actor;
   delete from public.scenarios where user_id = actor;

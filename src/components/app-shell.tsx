@@ -35,6 +35,7 @@ const moreLinks = [
   { href: "/urges", label: "Urges", short: "Urges" },
   { href: "/habits", label: "Challenges", short: "Habits" },
   { href: "/ai-assistant", label: "Wellness Assistant", short: "Assist" },
+  { href: "/community", label: "Community", short: "People" },
   { href: "/emotional-wellness", label: "Emotional Wellness", short: "Feelings" },
   { href: "/share-the-care", label: "Share the Care", short: "Share" },
   { href: "/settings", label: "Settings", short: "Settings" },

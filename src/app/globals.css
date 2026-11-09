@@ -2188,6 +2188,17 @@ button.assistant-send:focus-visible,
   .quiz-cats { grid-template-columns: 1fr 1fr 1fr; }
 }
 
+.community-message { display: grid; gap: 0.75rem; }
+.community-comment {
+  margin-left: 0.75rem;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--lavender);
+  display: grid;
+  gap: 0.55rem;
+}
+.community-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: end; }
+.community-actions .field { min-width: 9rem; }
+
 .food-nav {
   display: flex;
   gap: 0.45rem;
