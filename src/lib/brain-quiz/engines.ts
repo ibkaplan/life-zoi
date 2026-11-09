@@ -87,11 +87,11 @@ export type SceneShape = {
 };
 
 const BASE_SCENE: readonly SceneShape[] = [
-  { id: "sun", shape: "circle", x: 18, y: 24, color: "#4295E8" },
-  { id: "hill", shape: "triangle", x: 72, y: 30, color: "#7136C8" },
+  { id: "sun", shape: "circle", x: 18, y: 24, color: "#23706A" },
+  { id: "hill", shape: "triangle", x: 72, y: 30, color: "#6A3DA8" },
   { id: "tree", shape: "tree", x: 32, y: 68, color: "#0E7490" },
-  { id: "house", shape: "house", x: 58, y: 66, color: "#5725A8" },
-  { id: "box", shape: "square", x: 84, y: 58, color: "#E9DDFB" },
+  { id: "house", shape: "house", x: 58, y: 66, color: "#52288A" },
+  { id: "box", shape: "square", x: 84, y: 58, color: "#EFE5FA" },
 ];
 
 const ALT_COLORS = ["#172554", "#8a2f28", "#3E4E80", "#C4B5FD"];
@@ -117,7 +117,7 @@ export type OddCell = { shape: string; color: string; odd: boolean };
 export function buildOdd(id: string, difficulty: Difficulty): { cells: OddCell[] } {
   const rand = mulberry32(hashSeed(`${id}:odd`));
   const shapes = ["circle", "square", "triangle"];
-  const colors = ["#4295E8", "#7136C8", "#0E7490"];
+  const colors = ["#23706A", "#6A3DA8", "#0E7490"];
   const shape = shapes[Math.floor(rand() * shapes.length)] ?? "circle";
   const color = colors[Math.floor(rand() * colors.length)] ?? colors[0];
   const oddIndex = Math.floor(rand() * 9);
@@ -144,11 +144,11 @@ export function buildPattern(id: string, difficulty: Difficulty): {
   const sequence: PatternToken[] =
     difficulty === "easy"
       ? [
-          { shape: "circle", color: "#4295E8" },
-          { shape: "square", color: "#7136C8" },
-          { shape: "circle", color: "#4295E8" },
-          { shape: "square", color: "#7136C8" },
-          { shape: "circle", color: "#4295E8" },
+          { shape: "circle", color: "#23706A" },
+          { shape: "square", color: "#6A3DA8" },
+          { shape: "circle", color: "#23706A" },
+          { shape: "square", color: "#6A3DA8" },
+          { shape: "circle", color: "#23706A" },
         ]
       : difficulty === "medium"
         ? [
@@ -159,17 +159,17 @@ export function buildPattern(id: string, difficulty: Difficulty): {
             { shape: "square", color: "#0E7490" },
           ]
         : [
-            { shape: "circle", color: "#4295E8" },
-            { shape: "square", color: "#7136C8" },
+            { shape: "circle", color: "#23706A" },
+            { shape: "square", color: "#6A3DA8" },
             { shape: "triangle", color: "#0E7490" },
-            { shape: "star", color: "#5725A8" },
-            { shape: "circle", color: "#4295E8" },
+            { shape: "star", color: "#52288A" },
+            { shape: "circle", color: "#23706A" },
           ];
   const answer = sequence[4] as PatternToken;
   const decoys: PatternToken[] = [
     { shape: "triangle", color: "#8a2f28" },
     { shape: "square", color: "#172554" },
-    { shape: "star", color: "#E9DDFB" },
+    { shape: "star", color: "#EFE5FA" },
     { shape: "circle", color: "#3E4E80" },
   ].filter((item) => item.shape !== answer.shape || item.color !== answer.color);
   const options = shuffle([answer, decoys[0] as PatternToken, decoys[1] as PatternToken, decoys[2] as PatternToken], rand);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
+import { useAccount } from "@/lib/account-store";
 import { SourceList, LoadingState } from "@/components/sources";
 import { formatTimestamp } from "@/lib/dates";
 import { habitLabels } from "@/lib/labels";
@@ -25,6 +26,7 @@ const examples: { habitId: HabitId; label: string; note: string }[] = [
 
 export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
   const { ready, sample, session, saveScenario } = useSession();
+  const accountReady = useAccount().phase === "ready";
   const [override, setOverride] = useState<{
     scenarioId: string;
     habitId: HabitId;
@@ -245,7 +247,7 @@ export function WhatIfView({ scenarioId }: { scenarioId?: string }) {
             result={result}
             onSave={() => {
               const error = saveScenario(result.habitId, result.yourNote || note);
-              setSavedMessage(error ?? "Saved in this browser tab.");
+              setSavedMessage(error ?? (accountReady ? "Saved to your account." : "Saved in this browser tab."));
             }}
             savedMessage={savedMessage}
             sample={sample}

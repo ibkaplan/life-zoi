@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomeGauge } from "@/components/home-gauge";
+import { Art, type ArtName } from "@/components/companion/art";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
 import { StorageNote } from "@/components/storage-note";
@@ -42,6 +43,17 @@ const cards = [
   },
 ] as const;
 
+const companion: { href: string; title: string; text: string; art: ArtName }[] = [
+  { href: "/plan", title: "My Life Improvement Plan", text: "Nine areas of daily life, with activities you can start right here.", art: "plan" },
+  { href: "/my-day", title: "My Day", text: "A fresh, gentle schedule each day. Change anything you like.", art: "day" },
+  { href: "/academy/move/library", title: "Wellness Library", text: "Pilates, yoga, chair exercise, tai chi and more, from 10 to 60 minutes.", art: "yoga" },
+  { href: "/food-plan/today", title: "Today's meals", text: "Meals that respect your allergies, requirements, and the foods you avoid.", art: "meal" },
+  { href: "/library/music", title: "Relaxing music", text: "Calm sounds for breathing, focus, and sleep, played in the app.", art: "music" },
+  { href: "/library/books", title: "Books and listening", text: "Short reads you can read or listen to, with bookmarks.", art: "book" },
+  { href: "/brain-quiz/games", title: "Brain games", text: "Sudoku, memory, words, and logic, just for enjoyment.", art: "brain" },
+  { href: "/progress/weekly", title: "Weekly check-in", text: "Look back at your week and choose what comes next.", art: "checkin" },
+];
+
 const steps = [
   { href: "/assessment", number: "01", title: "Fill out your assessment" },
   { href: "/outlook", number: "02", title: "Get your life outlook" },
@@ -58,6 +70,7 @@ export default function HomePage() {
           <div className="home-copy">
             <p className="home-kicker">LIFEZOI</p>
             <p className="home-brand">LIVE BETTER. MAKE LIFE MATTER.</p>
+            <p className="script brand-line">Live Joy. Live Better.</p>
             <h1>YOUR LIFE. YOUR HEALTH. YOUR FUTURE.</h1>
             <p className="home-support">Have you ever wondered what your future health might look like?</p>
             <p className="home-intro">
@@ -87,6 +100,23 @@ export default function HomePage() {
         </section>
 
         <HomeGauge />
+
+        <section className="page home-companion" aria-labelledby="home-companion-title">
+          <div className="home-section-head">
+            <p className="script brand-line">New Beginnings. More Energy. A Healthier You.</p>
+            <h2 id="home-companion-title">Your daily wellness companion</h2>
+            <p>Make Life Better, one small step at a time. Everything below follows the answers you choose to give, and you can change them any time.</p>
+          </div>
+          <div className="lz-grid home-companion-grid">
+            {companion.map((item) => (
+              <Link key={item.href} className="lz-card home-companion-card" href={item.href}>
+                <Art name={item.art} />
+                <strong>{item.title}</strong>
+                <span>{item.text}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="page home-features" aria-labelledby="home-paths-title">
           <div className="home-section-head">
@@ -155,6 +185,11 @@ export default function HomePage() {
             <Link href="/brain-quiz">Brain & Habit Quiz</Link>
             <Link href="/habit-transformation">Habit Transformation</Link>
             <Link href="/food-plan">Food & wellness</Link>
+            <Link href="/academy/move/library">Wellness Library</Link>
+            <Link href="/library/music">Relaxing music</Link>
+            <Link href="/library/books">Books and listening</Link>
+            <Link href="/brain-quiz/games">Brain games</Link>
+            <Link href="/my-day">My Day</Link>
             <Link href="/settings">Settings</Link>
             <Link href="/profile">Profile</Link>
             <Link href="/privacy">Privacy</Link>

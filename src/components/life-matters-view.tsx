@@ -49,30 +49,30 @@ function MatterArt() {
     <svg className="matter-art" viewBox="0 0 640 360" role="img" aria-label="Sunrise over the Earth, with trees and three people of different ages">
       <defs>
         <linearGradient id="matter-sky" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#E9DDFB" />
-          <stop offset="55%" stopColor="#DCEEFF" />
-          <stop offset="100%" stopColor="#F7F8FF" />
+          <stop offset="0%" stopColor="#EFE5FA" />
+          <stop offset="55%" stopColor="#F3ECFB" />
+          <stop offset="100%" stopColor="#F9F7F2" />
         </linearGradient>
         <linearGradient id="matter-sun" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F7F8FF" />
-          <stop offset="100%" stopColor="#4295E8" />
+          <stop offset="0%" stopColor="#F9F7F2" />
+          <stop offset="100%" stopColor="#23706A" />
         </linearGradient>
       </defs>
       <rect width="640" height="360" fill="url(#matter-sky)" />
       <circle className="matter-sun" cx="470" cy="118" r="54" fill="url(#matter-sun)" />
-      <circle cx="250" cy="210" r="78" fill="#DCEEFF" />
-      <circle cx="228" cy="198" r="22" fill="#4295E8" />
+      <circle cx="250" cy="210" r="78" fill="#F3ECFB" />
+      <circle cx="228" cy="198" r="22" fill="#23706A" />
       <circle cx="276" cy="214" r="16" fill="#0E7490" opacity="0.35" />
       <path d="M86 250c18-46 28-46 46 0" fill="#0E7490" />
-      <rect x="104" y="250" width="10" height="36" fill="#5725A8" />
-      <path d="M150 236c22-58 34-58 56 0" fill="#4295E8" />
-      <rect x="172" y="236" width="12" height="50" fill="#5725A8" />
-      <circle cx="392" cy="214" r="16" fill="#7136C8" />
-      <rect x="382" y="230" width="20" height="42" rx="8" fill="#5725A8" />
-      <circle cx="440" cy="228" r="13" fill="#4295E8" />
+      <rect x="104" y="250" width="10" height="36" fill="#52288A" />
+      <path d="M150 236c22-58 34-58 56 0" fill="#23706A" />
+      <rect x="172" y="236" width="12" height="50" fill="#52288A" />
+      <circle cx="392" cy="214" r="16" fill="#6A3DA8" />
+      <rect x="382" y="230" width="20" height="42" rx="8" fill="#52288A" />
+      <circle cx="440" cy="228" r="13" fill="#23706A" />
       <rect x="431" y="242" width="18" height="34" rx="8" fill="#0E7490" />
       <circle cx="486" cy="206" r="18" fill="#172554" />
-      <rect x="474" y="224" width="24" height="48" rx="8" fill="#7136C8" />
+      <rect x="474" y="224" width="24" height="48" rx="8" fill="#6A3DA8" />
     </svg>
   );
 }

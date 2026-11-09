@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "@/components/session-provider";
+import { useAccount } from "@/lib/account-store";
 import { LoadingState } from "@/components/sources";
 import {
   ageLabels,
@@ -302,6 +303,7 @@ function NumberField({
 
 export function AssessmentWizard() {
   const { ready, sample, session, setDraft, setDraftStep, completeAssessment } = useSession();
+  const accountReady = useAccount().phase === "ready";
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
   if (!ready) return <LoadingState label="Loading your assessment…" />;
@@ -377,7 +379,8 @@ export function AssessmentWizard() {
       ) : null}
       {saved ? (
         <p className="alert alert-ok" role="status">
-          Saved in this browser tab. It is not stored in an account.{" "}
+          {accountReady ? "Saved to your account as a new assessment. Earlier assessments are kept." : "Saved in this browser tab as a new assessment. Sign in to keep it in your account."}{" "}
+          <Link href="/plan">Open My Life Improvement Plan</Link>,
           <Link href="/outlook">See the educational outlook</Link>, <Link href="/dashboard">go to the dashboard</Link>, or <Link href="/what-if">open WHAT IF?</Link>
         </p>
       ) : null}
@@ -853,7 +856,7 @@ export function AssessmentWizard() {
           ) : null}
           {step === "review" ? (
             <div className="stack">
-              <p>Saving keeps this version in the browser tab and adds it to your progress history.</p>
+              <p>Saving adds this as a new assessment in your history. Earlier assessments are never overwritten.</p>
               <Review draft={draft} onEdit={(index) => goTo(index)} />
             </div>
           ) : null}

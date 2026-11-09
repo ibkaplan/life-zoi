@@ -11,6 +11,7 @@ describe("site navigation", () => {
   it("gives signed-in people the requested pages once each", () => {
     expect(MEMBER_LINKS.map((link) => link.label)).toEqual([
       "My Day",
+      "My Plan",
       "Progress",
       "Food & Wellness",
       "Health Library",

@@ -249,9 +249,9 @@ export function MoveDetail({ slug }: { slug: string }) {
 function ActivitySketch({ kind }: { kind: "walk" | "chair" | "balance" | "band" | "stretch" }) {
   return (
     <svg className="learn-sketch" viewBox="0 0 240 140" role="img" aria-label="Simple original sketch of the movement">
-      <rect width="240" height="140" rx="18" fill="#E9DDFB" />
-      <circle cx="78" cy="36" r="12" fill="#7136C8" />
-      <path d="M78 48 v34" stroke="#5725A8" strokeWidth="4" strokeLinecap="round" />
+      <rect width="240" height="140" rx="18" fill="#EFE5FA" />
+      <circle cx="78" cy="36" r="12" fill="#6A3DA8" />
+      <path d="M78 48 v34" stroke="#52288A" strokeWidth="4" strokeLinecap="round" />
       {kind === "walk" ? <path d="M78 82 l-16 28 M78 82 l18 26 M78 62 l20 10" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
       {kind === "chair" ? <path d="M70 110 h40 M78 82 v28 M60 70 h28" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}
       {kind === "balance" ? <path d="M78 82 l-8 30 M70 112 l22 0 M120 20 v100" stroke="#0E7490" strokeWidth="4" strokeLinecap="round" /> : null}

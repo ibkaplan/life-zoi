@@ -14,6 +14,7 @@ export const PUBLIC_LINKS: readonly NavLink[] = [
 
 export const MEMBER_LINKS: readonly NavLink[] = [
   { href: "/my-day", label: "My Day" },
+  { href: "/plan", label: "My Plan" },
   { href: "/progress", label: "Progress" },
   { href: "/food-plan", label: "Food & Wellness" },
   { href: "/library", label: "Health Library" },
@@ -31,7 +32,12 @@ export function isCurrentLink(pathname: string, href: string): boolean {
 export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/assessment", label: "Lifestyle assessment" },
-  { href: "/plan", label: "Improvement plan" },
+  { href: "/academy/move/library", label: "Wellness Library" },
+  { href: "/library/music", label: "Relaxing music" },
+  { href: "/library/books", label: "Books and listening" },
+  { href: "/brain-quiz/games", label: "Brain games" },
+  { href: "/progress/weekly", label: "Weekly check-in" },
+  { href: "/food-plan/today", label: "Today's meals" },
   { href: "/profile", label: "Profile" },
   { href: "/life-matters", label: "Your Life Matters" },
   { href: "/wellness-coach", label: "Wellness coach" },
