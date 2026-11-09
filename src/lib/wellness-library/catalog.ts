@@ -10,7 +10,7 @@ import { CATEGORY_INFO, type Intensity, type LibraryCategory } from "@/lib/welln
  * and items that are not "approved" themselves, are never shown to members.
  * An administrator approves by changing the status in a reviewed pull request.
  *
- * Nothing here is fetched from the web at run time. `scripts/check-library-links.mts`
+ * Nothing here is fetched from the web at run time. `npm run check:library (src/lib/wellness-library/link-check.ts)`
  * checks availability and embedding through YouTube oEmbed when a person runs it.
  */
 

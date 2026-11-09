@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:library": "LIFEZOI_LINK_CHECK=1 vitest run src/lib/wellness-library/link-check.live.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
