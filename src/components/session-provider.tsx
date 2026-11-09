@@ -10,6 +10,7 @@ import {
   writeBrowserStore,
 } from "@/lib/browser-store";
 import { clearAssistantThread } from "@/lib/assistant";
+import { bindCompanionOwner, clearCompanionAccount, clearCompanionLocal } from "@/lib/companion/store";
 import { clearLiveSession } from "@/lib/wellness-assistant/live-session";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
@@ -135,6 +136,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     bindEmotionalOwner(userId, account.phase === "off");
     bindStudioOwner(userId);
     bindWellnessOwner(userId);
+    bindCompanionOwner(userId, { sample: snapshot.sample });
     if (!userId) {
       adoptedFor.current = null;
       reloadGuestMyDay();
@@ -354,7 +356,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         clearEmotionalStore();
         resetWellnessClient();
         reloadGuestMyDay();
-        if (signedIn) void clearAccountRecords();
+        if (signedIn) {
+          void clearAccountRecords();
+          void clearCompanionAccount();
+        } else {
+          clearCompanionLocal();
+        }
         writeBrowserStore(emptySession(), false);
       },
       setSample: (on) => writeBrowserStore(snapshot.stored, on),

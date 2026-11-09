@@ -46,6 +46,17 @@ describe("health profile", () => {
     expect(coerceHealthProfile({ wellnessGoals: ["sleep", "stress"], primaryGoal: "stress" }).primaryGoal).toBe("stress");
   });
 
+  it("keeps reaction types and exclusive answers", () => {
+    const profile = coerceHealthProfile({
+      foodReactions: [{ food: "Avocado", type: "allergy" }, { food: "avocado", type: "intolerance" }, { food: "milk", type: "guess" }],
+      dietRequirements: ["halal", "prefer-not"],
+      dietPatterns: ["none"],
+    });
+    expect(profile.foodReactions).toEqual([{ food: "avocado", type: "allergy" }]);
+    expect(profile.dietRequirements).toEqual(["halal"]);
+    expect(profile.dietPatterns).toEqual(["none"]);
+  });
+
   it("checks desired weight only when typed", () => {
     expect(validateHealthProfile(coerceHealthProfile({}))).toEqual({});
     expect(validateHealthProfile(coerceHealthProfile({ desiredWeightKg: "10" })).desiredWeightKg).toBeTruthy();
@@ -62,7 +73,7 @@ describe("health profile", () => {
 
   it("keeps older saved assessments valid without the new fields", () => {
     const old = { ...complete } as Record<string, unknown>;
-    for (const key of ["wellnessGoals", "primaryGoal", "foodAllergies", "mobilityLimits", "dietRestrictions"]) delete old[key];
+    for (const key of ["wellnessGoals", "primaryGoal", "foodAllergies", "mobilityLimits", "dietRequirements", "foodReactions"]) delete old[key];
     expect(validateComplete(old).ok).toBe(true);
     const session = sanitizeSession({ history: [{ id: "abcdefgh-1234", completedAt: "2026-11-01T10:00:00Z", answers: old }] });
     expect(session.history).toHaveLength(1);

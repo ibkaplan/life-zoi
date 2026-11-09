@@ -6,7 +6,9 @@ import { ALLERGENS, type Allergen } from "@/lib/food-plan/types";
  * are never replaced by a guessed value.
  */
 
-export const BLOOD_SUGAR_STATUSES = ["normal", "high", "low", "diabetes", "unknown", "prefer-not"] as const;
+export const BLOOD_SUGAR_STATUSES = ["normal", "high", "low", "diabetes", "prediabetes", "unknown", "prefer-not"] as const;
+export const ENERGY_LEVELS = ["low", "moderate", "good", "prefer-not"] as const;
+export const REACTION_TYPES = ["allergy", "intolerance", "sensitivity"] as const;
 export const CHOLESTEROL_STATUSES = ["normal", "high", "unknown", "prefer-not"] as const;
 export const BLOOD_PRESSURE_STATUSES = ["normal", "high", "low", "unknown", "prefer-not"] as const;
 
@@ -19,16 +21,21 @@ export const EATING_PATTERNS = [
   "prefer-not",
 ] as const;
 
-export const DIET_RESTRICTIONS = [
+/** Religious, cultural, or personal requirements. Only ever what the person chose; never inferred. */
+export const DIET_REQUIREMENTS = ["halal", "kosher", "no-pork", "no-beef", "no-meat", "vegetarian", "vegan", "other", "prefer-not"] as const;
+
+export const DIET_PATTERNS = [
+  "none",
   "vegetarian",
   "vegan",
   "pescatarian",
+  "flexitarian",
+  "dairy-free",
   "gluten-free",
-  "lactose-free",
-  "halal",
-  "kosher",
+  "low-lactose",
   "low-salt-advised",
   "texture-soft",
+  "other",
 ] as const;
 
 export const MOBILITY_LIMITS = [
@@ -46,12 +53,14 @@ export const WELLNESS_GOALS = [
   "lose-weight",
   "gain-weight",
   "maintain-weight",
+  "nutrition",
   "blood-sugar",
   "cholesterol",
   "energy",
-  "memory",
   "sleep",
+  "memory",
   "flexibility-balance",
+  "fitness",
   "stress",
   "well-being",
 ] as const;
@@ -60,7 +69,13 @@ export type BloodSugarStatus = (typeof BLOOD_SUGAR_STATUSES)[number];
 export type CholesterolStatus = (typeof CHOLESTEROL_STATUSES)[number];
 export type BloodPressureStatus = (typeof BLOOD_PRESSURE_STATUSES)[number];
 export type EatingPattern = (typeof EATING_PATTERNS)[number];
-export type DietRestriction = (typeof DIET_RESTRICTIONS)[number];
+export type DietRequirement = (typeof DIET_REQUIREMENTS)[number];
+export type DietPattern = (typeof DIET_PATTERNS)[number];
+export type EnergyLevel = (typeof ENERGY_LEVELS)[number];
+export type ReactionType = (typeof REACTION_TYPES)[number];
+
+/** A food the person reacts to, in their own words, with the kind of reaction. */
+export type FoodReaction = { food: string; type: ReactionType };
 export type MobilityLimit = (typeof MOBILITY_LIMITS)[number];
 export type WellnessGoal = (typeof WELLNESS_GOALS)[number];
 
@@ -70,9 +85,14 @@ export type HealthProfileFields = {
   bloodSugarStatus: BloodSugarStatus | "";
   cholesterolStatus: CholesterolStatus | "";
   bloodPressureStatus: BloodPressureStatus | "";
+  energyLevel: EnergyLevel | "";
+  /** Diagnosed allergies among the nine major allergen groups. Strict exclusions. */
   foodAllergies: Allergen[];
+  /** Other foods: specific fruits, vegetables, or ingredients, each with its reaction type. */
+  foodReactions: FoodReaction[];
   allergyNote: string;
-  dietRestrictions: DietRestriction[];
+  dietRequirements: DietRequirement[];
+  dietPatterns: DietPattern[];
   dietNote: string;
   mobilityLimits: MobilityLimit[];
   exerciseRestrictions: string;
@@ -86,9 +106,12 @@ export const EMPTY_HEALTH_PROFILE: HealthProfileFields = {
   bloodSugarStatus: "",
   cholesterolStatus: "",
   bloodPressureStatus: "",
+  energyLevel: "",
   foodAllergies: [],
+  foodReactions: [],
   allergyNote: "",
-  dietRestrictions: [],
+  dietRequirements: [],
+  dietPatterns: [],
   dietNote: "",
   mobilityLimits: [],
   exerciseRestrictions: "",
@@ -100,7 +123,9 @@ export function emptyHealthProfile(): HealthProfileFields {
   return {
     ...EMPTY_HEALTH_PROFILE,
     foodAllergies: [],
-    dietRestrictions: [],
+    foodReactions: [],
+    dietRequirements: [],
+    dietPatterns: [],
     mobilityLimits: [],
     wellnessGoals: [],
   };
@@ -110,7 +135,8 @@ export const bloodSugarLabels: Record<BloodSugarStatus, string> = {
   normal: "Normal, as far as I know",
   high: "High",
   low: "Low (I have had low blood sugar)",
-  diabetes: "Diabetes or prediabetes",
+  diabetes: "Diagnosed diabetes",
+  prediabetes: "Prediabetes",
   unknown: "I don't know",
   "prefer-not": "Prefer not to answer",
 };
@@ -151,16 +177,43 @@ export const allergenLabels: Record<Allergen, string> = {
   sesame: "Sesame",
 };
 
-export const dietRestrictionLabels: Record<DietRestriction, string> = {
+export const dietRequirementLabels: Record<DietRequirement, string> = {
+  halal: "Halal",
+  kosher: "Kosher",
+  "no-pork": "No pork",
+  "no-beef": "No beef",
+  "no-meat": "No meat",
+  vegetarian: "Vegetarian",
+  vegan: "Vegan",
+  other: "Other requirements (describe below)",
+  "prefer-not": "Prefer not to answer",
+};
+
+export const dietPatternLabels: Record<DietPattern, string> = {
+  none: "No restrictions",
   vegetarian: "Vegetarian",
   vegan: "Vegan",
   pescatarian: "Pescatarian",
+  flexitarian: "Flexitarian",
+  "dairy-free": "Dairy-free",
   "gluten-free": "Gluten-free",
-  "lactose-free": "Lactose-free",
-  halal: "Halal",
-  kosher: "Kosher",
+  "low-lactose": "Low-lactose",
   "low-salt-advised": "Low salt, as advised by a clinician",
   "texture-soft": "Soft foods or easy to chew",
+  other: "Other personal preferences (describe below)",
+};
+
+export const energyLabels: Record<EnergyLevel, string> = {
+  low: "Low most days",
+  moderate: "Up and down",
+  good: "Good most days",
+  "prefer-not": "Prefer not to answer",
+};
+
+export const reactionLabels: Record<ReactionType, string> = {
+  allergy: "Diagnosed allergy",
+  intolerance: "Intolerance",
+  sensitivity: "Sensitivity",
 };
 
 export const mobilityLabels: Record<MobilityLimit, string> = {
@@ -178,12 +231,14 @@ export const wellnessGoalLabels: Record<WellnessGoal, string> = {
   "lose-weight": "Lose weight",
   "gain-weight": "Gain weight",
   "maintain-weight": "Maintain weight",
+  nutrition: "Improve nutrition",
   "blood-sugar": "Improve blood sugar management",
   cholesterol: "Improve cholesterol management",
   energy: "Improve energy",
   memory: "Improve memory",
   sleep: "Sleep better",
   "flexibility-balance": "Improve flexibility and balance",
+  fitness: "Improve physical fitness",
   stress: "Reduce stress",
   "well-being": "Improve general well-being",
 };
@@ -214,6 +269,25 @@ function listOf<T extends string>(value: unknown, allowed: readonly T[]): T[] {
   return picked;
 }
 
+function exclusive<T extends string>(list: T[], alone: T): T[] {
+  if (!list.includes(alone)) return list;
+  return list.length === 1 ? list : list.filter((item) => item !== alone);
+}
+
+function cleanReactions(value: unknown): FoodReaction[] {
+  if (!Array.isArray(value)) return [];
+  const out: FoodReaction[] = [];
+  for (const item of value) {
+    const row = asRecord(item);
+    if (!row) continue;
+    const food = cleanText(row.food, 40).toLowerCase();
+    const type = oneOf(row.type, REACTION_TYPES);
+    if (!food || !type || out.some((existing) => existing.food === food)) continue;
+    out.push({ food, type });
+  }
+  return out.slice(0, 40);
+}
+
 /** Clean the health profile part of a stored or submitted assessment. */
 export function coerceHealthProfile(input: unknown): HealthProfileFields {
   const record = asRecord(input) ?? {};
@@ -236,9 +310,12 @@ export function coerceHealthProfile(input: unknown): HealthProfileFields {
     bloodSugarStatus: oneOf(record.bloodSugarStatus, BLOOD_SUGAR_STATUSES),
     cholesterolStatus: oneOf(record.cholesterolStatus, CHOLESTEROL_STATUSES),
     bloodPressureStatus: oneOf(record.bloodPressureStatus, BLOOD_PRESSURE_STATUSES),
+    energyLevel: oneOf(record.energyLevel, ENERGY_LEVELS),
     foodAllergies: listOf(record.foodAllergies, ALLERGENS),
+    foodReactions: cleanReactions(record.foodReactions),
     allergyNote: cleanText(record.allergyNote, 140),
-    dietRestrictions: listOf(record.dietRestrictions, DIET_RESTRICTIONS),
+    dietRequirements: exclusive(listOf(record.dietRequirements, DIET_REQUIREMENTS), "prefer-not"),
+    dietPatterns: exclusive(listOf(record.dietPatterns, DIET_PATTERNS), "none"),
     dietNote: cleanText(record.dietNote, 140),
     mobilityLimits,
     exerciseRestrictions: cleanText(record.exerciseRestrictions, 280),
@@ -288,9 +365,10 @@ export function safetyFlags(profile: HealthProfileFields): SafetyFlags {
   const fallRisk = limits.includes("balance-concerns") || limits.includes("walking-aid");
   const injuryNote = INJURY.test(profile.exerciseRestrictions);
   return {
-    bloodSugarCare: profile.bloodSugarStatus === "diabetes" || profile.bloodSugarStatus === "low",
+    bloodSugarCare: ["diabetes", "prediabetes", "low"].includes(profile.bloodSugarStatus),
     lowBloodSugar: profile.bloodSugarStatus === "low",
-    allergies: profile.foodAllergies.length > 0 || profile.allergyNote.length > 0,
+    allergies:
+      profile.foodAllergies.length > 0 || profile.allergyNote.length > 0 || profile.foodReactions.some((item) => item.type === "allergy"),
     gentleMovement:
       seatedFirst ||
       fallRisk ||
@@ -299,7 +377,7 @@ export function safetyFlags(profile: HealthProfileFields): SafetyFlags {
       injuryNote,
     seatedFirst,
     fallRisk,
-    clinicianDiet: profile.dietRestrictions.includes("low-salt-advised"),
+    clinicianDiet: profile.dietPatterns.includes("low-salt-advised"),
     injuryNote,
   };
 }
