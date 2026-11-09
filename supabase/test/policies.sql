@@ -3,10 +3,29 @@
 \set ON_ERROR_STOP 1
 \o /dev/null
 
+-- Only the allowlisted email can get a login.
+do $$ begin
+  insert into auth.users values ('00000000-0000-0000-0000-0000000000ff', 'stranger@example.org');
+  raise exception 'FAIL: a login was created for an email that is not allowlisted';
+exception when raise_exception then
+  if sqlerrm like 'FAIL%' then raise; end if;
+end $$;
+insert into auth.users values ('00000000-0000-0000-0000-00000000000c', ' TatyanaSerikovaRU@gmail.com ');
+do $$ begin
+  update auth.users set email = 'stranger@example.org' where id = '00000000-0000-0000-0000-00000000000c';
+  raise exception 'FAIL: the allowlisted login was moved to another email';
+exception when raise_exception then
+  if sqlerrm like 'FAIL%' then raise; end if;
+end $$;
+update auth.users set email = 'tatyanaserikovaru@gmail.com' where id = '00000000-0000-0000-0000-00000000000c';
+
+-- The policy checks below need more than one person, so this throwaway database
+-- lifts the allowlist trigger while it adds two test logins.
+alter table auth.users disable trigger auth_users_allowlist;
 insert into auth.users values
   ('00000000-0000-0000-0000-00000000000a', 'a@example.org'),
-  ('00000000-0000-0000-0000-00000000000b', 'b@example.org'),
-  ('00000000-0000-0000-0000-00000000000c', 'tatyanaserikovaru@gmail.com');
+  ('00000000-0000-0000-0000-00000000000b', 'b@example.org');
+alter table auth.users enable trigger auth_users_allowlist;
 insert into auth.mfa_factors (user_id, status) values ('00000000-0000-0000-0000-00000000000b', 'verified');
 
 create function pg_temp.as_user(sub text, aal text) returns void language sql as $$

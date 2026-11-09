@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       <section className="card stack">
         <h2>Accounts</h2>
         <p>
-          When account sign-in is configured, you can create an account with an email address and a password. Supabase Auth stores that login. After you sign in, assessment answers, WHAT IF? scenarios, habit goals, check-ins, the in-progress assessment, and the reassessment choice are saved in your rows in profiles, assessments, scenarios, habit_goals, and check_ins. A weekly check-in and any weight measurements you choose to enter are saved in the same profile session. They are not a diagnosis.
+          When account sign-in is configured, an account uses an email address and a password. New accounts are not open yet. Supabase Auth stores that login. After you sign in, assessment answers, WHAT IF? scenarios, habit goals, check-ins, the in-progress assessment, and the reassessment choice are saved in your rows in profiles, assessments, scenarios, habit_goals, and check_ins. A weekly check-in and any weight measurements you choose to enter are saved in the same profile session. They are not a diagnosis.
         </p>
         <p>
           Row level security allows a row only when auth.uid() matches user_id. If an authenticator app is confirmed for the account, those rows also stay closed until the sign-in includes that 6-digit code. The browser uses the public anon key and your session. It does not use the service role key.

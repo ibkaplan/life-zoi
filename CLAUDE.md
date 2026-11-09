@@ -18,7 +18,7 @@ Important paths on `main`:
 - `supabase/schema.sql` — account tables, row level security, authenticator-aware policies, admin role trigger, and account deletion
 - `README.md` — setup, deployment notes, and limitations
 
-Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/reset-password`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(app)/`. API routes: `GET /api/status`, `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `POST /api/recommendations`, `POST /api/what-if`.
+Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/sign-in`, `/reset-password`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(app)/`. API routes: `GET /api/status`, `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `POST /api/recommendations`, `POST /api/what-if`.
 
 ## Development standards
 

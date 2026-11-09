@@ -2,20 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomeGauge } from "@/components/home-gauge";
 import { Logo } from "@/components/logo";
+import { SiteNav } from "@/components/site-nav";
 import { StorageNote } from "@/components/storage-note";
 import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
 import { FREE_EXERCISE_MESSAGE, FREE_EXERCISE_TITLE } from "@/lib/wellness/exercise-resources/copy";
-
-const nav = [
-  { href: "/", label: "Home" },
-  { href: "/outlook", label: "Life outlook" },
-  { href: "/what-if", label: "WHAT IF" },
-  { href: "/academy/meals", label: "Nutrition" },
-  { href: "/academy/move", label: "Movement" },
-  { href: "/nature", label: "Nature" },
-  { href: "/progress", label: "Progress" },
-  { href: "/profile", label: "Profile" },
-] as const;
 
 const cards = [
   {
@@ -62,16 +52,7 @@ const steps = [
 export default function HomePage() {
   return (
     <div className="home">
-      <header className="page home-bar">
-        <Logo tone="violet" />
-        <nav className="home-nav" aria-label="Homepage">
-          {nav.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </header>
+      <SiteNav />
       <main id="main">
         <section className="page home-hero">
           <div className="home-copy">

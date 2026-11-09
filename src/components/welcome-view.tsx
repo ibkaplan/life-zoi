@@ -75,18 +75,18 @@ export function WelcomeView() {
       </div>
       <section className="card stack">
         <h2>Your own account</h2>
-        <p>Create an account when you want one. It is separate, and you set the pace.</p>
+        <p>New accounts are not open yet. You can still explore LifeZoi now. Without an account, answers stay in this browser tab.</p>
         <p>LifeZoi is free. The welcome link does not show a name, an email address, or health information.</p>
         {invite && !isInviteToken(invite) ? (
-          <p role="status">This link does not include a LifeZoi invitation code. You can still explore and create your own account.</p>
+          <p role="status">This link does not include a LifeZoi invitation code. You can still explore LifeZoi.</p>
         ) : null}
         {storedNote ? <p role="status">{storedNote}</p> : null}
         <div className="actions">
-          <Link className="btn btn-primary" href="/settings">
-            Create your account in Settings
-          </Link>
-          <Link className="btn btn-secondary" href="/dashboard">
+          <Link className="btn btn-primary" href="/dashboard">
             Explore LifeZoi
+          </Link>
+          <Link className="btn btn-secondary" href="/sign-in">
+            Sign in
           </Link>
         </div>
       </section>
