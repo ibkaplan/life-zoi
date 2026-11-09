@@ -2,6 +2,7 @@ import { emptyBrainProgress, type BrainProgress } from "@/lib/brain-quiz/progres
 import { emptyFoodPlan, type FoodPlanState } from "@/lib/food-plan/types";
 import { emptyMyDay, type MyDayFile } from "@/lib/my-day/storage";
 import { emptyHabitJourney, type HabitJourney } from "@/lib/habit-transformation/model";
+import { EMPTY_HEALTH_PROFILE, type HealthProfileFields } from "@/lib/health-profile";
 
 export const AGE_RANGES = [
   "18-29",
@@ -122,7 +123,7 @@ export type Assessment = {
   glucose: string;
   hba1c: string;
   cholesterol: string;
-};
+} & HealthProfileFields;
 
 export type NormalizedAssessment = {
   displayName: string;
@@ -161,7 +162,7 @@ export type NormalizedAssessment = {
   glucose: string;
   hba1c: string;
   cholesterol: string;
-};
+} & HealthProfileFields;
 
 export type CompletedAssessment = {
   id: string;
@@ -245,6 +246,7 @@ export const STEP_IDS = [
   "nourishment",
   "substances",
   "mind",
+  "health",
   "goals",
   "results",
   "review",
@@ -253,6 +255,7 @@ export const STEP_IDS = [
 export type StepId = (typeof STEP_IDS)[number];
 
 export const EMPTY_ASSESSMENT: Assessment = {
+  ...EMPTY_HEALTH_PROFILE,
   displayName: "",
   ageRange: "",
   sleepHours: "",
@@ -293,7 +296,14 @@ export const EMPTY_ASSESSMENT: Assessment = {
 
 export function emptySession(): UserSession {
   return {
-    draft: { ...EMPTY_ASSESSMENT, goals: [] },
+    draft: {
+      ...EMPTY_ASSESSMENT,
+      goals: [],
+      foodAllergies: [],
+      dietRestrictions: [],
+      mobilityLimits: [],
+      wellnessGoals: [],
+    },
     draftStep: 0,
     history: [],
     scenarios: [],

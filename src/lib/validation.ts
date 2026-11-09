@@ -1,4 +1,5 @@
 import { isRealISODate } from "@/lib/dates";
+import { coerceHealthProfile, emptyHealthProfile, validateHealthProfile } from "@/lib/health-profile";
 import { SAMPLE_VISITOR_NAME } from "@/lib/sample";
 import {
   AGE_RANGES,
@@ -53,7 +54,7 @@ function parseNumber(value: string): number | null {
 
 export function coerceAssessment(input: unknown): Assessment {
   const record = asRecord(input);
-  if (!record) return { ...EMPTY_ASSESSMENT, goals: [] };
+  if (!record) return { ...EMPTY_ASSESSMENT, ...emptyHealthProfile(), goals: [] };
   const goals = Array.isArray(record.goals)
     ? record.goals.filter(
         (goal): goal is GoalId =>
@@ -97,6 +98,7 @@ export function coerceAssessment(input: unknown): Assessment {
     glucose: cleanText(record.glucose, 40),
     hba1c: cleanText(record.hba1c, 40),
     cholesterol: cleanText(record.cholesterol, 40),
+    ...coerceHealthProfile(record),
   };
 }
 
@@ -187,6 +189,9 @@ export function validateStep(step: StepId, draft: Assessment): FieldErrors {
     if (!draft.mood) errors.mood = "Choose the option that fits best.";
     if (!draft.social) errors.social = "Choose the option that fits best.";
   }
+  if (step === "health") {
+    Object.assign(errors, validateHealthProfile(draft));
+  }
   if (step === "goals") {
     if (draft.goals.length === 0) errors.goals = "Choose at least one focus.";
     if (draft.habitNote.length > NOTE_LIMIT) {
@@ -265,6 +270,7 @@ export function validateComplete(
       glucose: draft.glucose,
       hba1c: draft.hba1c,
       cholesterol: draft.cholesterol,
+      ...coerceHealthProfile(draft),
     },
   };
 }
