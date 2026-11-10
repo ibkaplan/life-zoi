@@ -4,18 +4,28 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AccountPanel } from "@/components/account-panel";
 import { LanguageChoice } from "@/components/language-choice";
-import { useMessages } from "@/components/locale-provider";
+import { useMessages, useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import { fmt } from "@/lib/i18n/config";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
 import { useAccount } from "@/lib/account-store";
 import type { AppStatus } from "@/lib/status";
 
+/** Plain words for the technical status values reported by /api/status. */
+const STATUS_WORDS: Record<string, string> = {
+  "not-configured": msg("not set up"),
+  supabase: msg("Supabase account"),
+  development: msg("this browser tab only"),
+  account: msg("your account"),
+};
+
 export function SettingsView() {
   const { ready, sample, setSample, clearUserData } = useSession();
   const account = useAccount();
   const m = useMessages();
   const t = m.settings;
+  const tr = useT();
   const [status, setStatus] = useState<AppStatus | null>(null);
   const [statusError, setStatusError] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
@@ -55,8 +65,8 @@ export function SettingsView() {
           <p role="alert">{t.statusFailed}</p>
         ) : status ? (
           <>
-            <p>{status.detail}</p>
-            <p className="hint">{fmt(t.statusLine, { authentication: status.authentication, persistence: status.persistence })}</p>
+            <p>{tr(status.detail)}</p>
+            <p className="hint">{fmt(t.statusLine, { authentication: tr(STATUS_WORDS[status.authentication]), persistence: tr(STATUS_WORDS[status.persistence]) })}</p>
           </>
         ) : (
           <p role="status">{t.checking}</p>
