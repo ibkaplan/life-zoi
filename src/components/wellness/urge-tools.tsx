@@ -138,7 +138,7 @@ function UrgeCapture({
         <TextField id="urge-feeling" label={t("Feeling")} value={draft.feeling} onChange={(feeling) => setDraft({ ...draft, feeling })} />
         <TextField id="urge-before" label={t("What happened just before")} value={draft.before} onChange={(before) => setDraft({ ...draft, before })} />
         <label className="field" htmlFor="urge-intensity">
-          <span>Intensity, 1 to 10</span>
+          <span>{t("Intensity, 1 to 10")}</span>
           <input id="urge-intensity" inputMode="numeric" value={draft.intensity} onChange={(event) => setDraft({ ...draft, intensity: event.target.value })} />
         </label>
         <CheckGroup

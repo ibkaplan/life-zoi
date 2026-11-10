@@ -87,7 +87,7 @@ export function NatureWeek() {
   const month = challengeById("nature-30");
   return (
     <div className="learn stack-lg">
-      <p className="kicker">7 days closer to nature</p>
+      <p className="kicker">{t("7 days closer to nature")}</p>
       <h1>{t("Choose the moments that fit")}</h1>
       <p className="lede">
         {t("Select any activities. There is no required distance and no promised medical result. Window time is daylight. It is stored as its own activity, not as outdoor time.")}
