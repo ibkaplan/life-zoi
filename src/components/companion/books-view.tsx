@@ -12,6 +12,11 @@ import { addRecent, withDay, type CompanionState } from "@/lib/companion/state";
 import { BOOKS, bookById, PUBLIC_DOMAIN_LIBRARIES, type Book } from "@/lib/companion/books";
 import { localISODate } from "@/lib/dates";
 
+// Read the clock only from event handlers (listening time).
+function nowMs(): number {
+  return Date.now();
+}
+
 function savePage(state: CompanionState, book: Book, page: number): CompanionState {
   const key = `book:${book.id}`;
   const furthest = state.media.positions[`${key}:max`] ?? -1;
@@ -46,7 +51,7 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
     window.speechSynthesis.cancel();
     setSpeaking(false);
     if (spokeSince.current !== null) {
-      const minutes = Math.round((Date.now() - spokeSince.current) / 60000);
+      const minutes = Math.round((nowMs() - spokeSince.current) / 60000);
       spokeSince.current = null;
       if (minutes > 0) commit((state) => withDay(state, localISODate(), (day) => ({ ...day, listeningMinutes: day.listeningMinutes + minutes })));
     }
@@ -68,7 +73,7 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
     utterance.onend = () => {
       stopSpeaking();
     };
-    spokeSince.current = Date.now();
+    spokeSince.current = nowMs();
     setSpeaking(true);
     window.speechSynthesis.speak(utterance);
   }
