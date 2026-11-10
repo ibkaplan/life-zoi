@@ -156,6 +156,11 @@ function blockedIngredient(item: { name: string; kind: IngredientKind; allergens
   return null;
 }
 
+/** Can a single food be named in a suggestion? Same allergy, diet, and exclusion checks as a recipe ingredient, with no swap. */
+export function ingredientAllowed(item: { name: string; kind: IngredientKind; allergens: Allergen[]; aliases: string[] }, rules: FoodRules): boolean {
+  return blockedIngredient(item, rules, false) === null;
+}
+
 const CROSS_CONTACT: Partial<Record<Allergen, string>> = {
   wheat: "Oats and grains can be processed with wheat. Choose products labeled gluten-free if needed.",
   peanut: "Seeds, granola, and dried fruit can carry a may-contain warning for peanuts. Read the label.",
@@ -229,8 +234,8 @@ export const PORTION_GUIDANCE: Record<NutritionGoal, string[]> = {
   ],
 };
 
-function score(recipe: Recipe, goal: NutritionGoal, liked: string[]): number {
-  let total = 0;
+function score(recipe: Recipe, goal: NutritionGoal, liked: string[], boost?: (recipe: Recipe) => number): number {
+  let total = boost ? boost(recipe) : 0;
   for (const tag of GOAL_TAGS[goal]) if (recipe.tags.includes(tag)) total += 2;
   if (goal === "lose" && recipe.tags.includes("energy-dense")) total -= 1;
   if (liked.some((word) => recipe.ingredients.some((item) => mentions(item, word)))) total += 3;
@@ -261,6 +266,8 @@ export function mealsForDay(
   seed: string,
   existing: ExistingFoodProfile | null = null,
   recipes: Recipe[] = RECIPES,
+  /** Optional extra ranking, such as Women's Care. It only reorders meals that already passed every check. */
+  boost?: (recipe: Recipe) => number,
 ): DayMeals {
   const rules = foodRules(answers, prefs, existing);
   const liked = prefs.liked;
@@ -277,7 +284,7 @@ export function mealsForDay(
   const base = hash(seed);
   for (const slot of Object.keys(slots) as MealSlot[]) {
     slots[slot].sort((a, b) => {
-      const diff = score(b.recipe, goal, liked) - score(a.recipe, goal, liked);
+      const diff = score(b.recipe, goal, liked, boost) - score(a.recipe, goal, liked, boost);
       if (diff !== 0) return diff;
       return ((hash(a.recipe.id) ^ base) >>> 0) - ((hash(b.recipe.id) ^ base) >>> 0);
     });

@@ -12,7 +12,8 @@ import { useSession } from "@/components/session-provider";
 import { bookById } from "@/lib/companion/books";
 import type { PlanActivity } from "@/lib/companion/day-plan";
 import { trackById } from "@/lib/companion/music";
-import { mealsForDay, nutritionGoalFor } from "@/lib/companion/nutrition";
+import { nutritionGoalFor } from "@/lib/companion/nutrition";
+import { plannedMeals } from "@/lib/companion/womens-care";
 import { commitCompanion } from "@/lib/companion/store";
 import { withDay } from "@/lib/companion/state";
 import { localISODate } from "@/lib/dates";
@@ -22,7 +23,7 @@ function TodayMeal({ slot }: { slot: "breakfast" | "lunch" | "dinner" | "snack" 
   const { session } = useSession();
   const today = localISODate();
   const goal = nutritionGoalFor(answers?.primaryGoal ?? "", answers?.wellnessGoals ?? []);
-  const day = mealsForDay(answers, companion.food, goal, today, session.foodPlan.profile);
+  const { day } = plannedMeals(answers, companion.food, goal, today, session.foodPlan.profile, companion.womensCare);
   const pick = day.slots[slot][0];
   if (!pick) return <p className="hint">No idea passes all of your exclusions for this meal. <Link href="/food-plan/preferences">Check your food choices</Link>.</p>;
   return (

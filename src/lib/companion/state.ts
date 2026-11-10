@@ -49,6 +49,46 @@ export type YesNo = (typeof YES_NO)[number];
 export const MEAL_STYLES = ["quick", "home-cooked", "light", "hearty", "no-cook", "batch", "warm", "cold"] as const;
 export type MealStyle = (typeof MEAL_STYLES)[number];
 
+/**
+ * Women's Care (inside Food & Wellness). Every field is the person's own
+ * answer. Nothing here is inferred from a name, the assessment, or any other
+ * data, and it is never sent to an AI or other outside service.
+ */
+export const LIFE_STAGES = ["cycle", "perimenopause", "menopause"] as const;
+export type LifeStage = (typeof LIFE_STAGES)[number];
+
+export const CYCLE_PHASES = ["period", "follicular", "ovulation", "luteal", "unsure"] as const;
+export type CyclePhase = (typeof CYCLE_PHASES)[number];
+
+export const CARE_SYMPTOMS = [
+  "tired",
+  "cramps",
+  "bloating",
+  "sweet-cravings",
+  "salty-cravings",
+  "big-appetite",
+  "low-mood",
+  "headache",
+  "hot-flushes",
+  "poor-sleep",
+  "heavy-bleeding",
+  "severe",
+] as const;
+export type CareSymptom = (typeof CARE_SYMPTOMS)[number];
+
+export type WomensCarePrefs = {
+  /** The person said she identifies as a woman. Never set automatically. */
+  identifiesAsWoman: boolean;
+  /** The person said cycle or menopause nutrition is relevant to her. Never set automatically. */
+  relevant: boolean;
+  stage: LifeStage | "";
+  /** Only used when stage is "cycle". */
+  phase: CyclePhase | "";
+  symptoms: CareSymptom[];
+  /** The person is worried about low iron. Shown as a reason to see a clinician, not a diagnosis. */
+  ironConcern: boolean;
+  updatedOn: string;
+};
 
 export type MovementPrefs = {
   enjoyed: ActivityKind[];
@@ -188,6 +228,7 @@ export type CompanionState = {
   plans: WeeklyPlan[];
   media: MediaState;
   games: GameRecord[];
+  womensCare: WomensCarePrefs;
 };
 
 export const LIMITS = {
@@ -221,6 +262,10 @@ export function emptyFoodPrefs(): FoodPrefs {
   };
 }
 
+export function emptyWomensCare(): WomensCarePrefs {
+  return { identifiesAsWoman: false, relevant: false, stage: "", phase: "", symptoms: [], ironConcern: false, updatedOn: "" };
+}
+
 export function emptyCompanion(): CompanionState {
   return {
     version: 1,
@@ -236,6 +281,7 @@ export function emptyCompanion(): CompanionState {
     plans: [],
     media: { favorites: [], recent: [], positions: {}, bookmarks: {}, ratings: {} },
     games: [],
+    womensCare: emptyWomensCare(),
   };
 }
 
@@ -269,7 +315,9 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     state.movement.enjoyed.length === 0 &&
     state.food.exclusions.length === 0 &&
     state.food.liked.length === 0 &&
-    state.food.disliked.length === 0
+    state.food.disliked.length === 0 &&
+    !state.womensCare.identifiesAsWoman &&
+    !state.womensCare.relevant
   );
 }
 
@@ -421,6 +469,20 @@ function sanitizeNumberMap(value: unknown, max: number): Record<string, number> 
   return out;
 }
 
+export function sanitizeWomensCare(value: unknown): WomensCarePrefs {
+  const row = asRecord(value);
+  const stage = oneOf(row.stage, LIFE_STAGES);
+  return {
+    identifiesAsWoman: row.identifiesAsWoman === true,
+    relevant: row.relevant === true,
+    stage,
+    phase: stage === "cycle" ? oneOf(row.phase, CYCLE_PHASES) : "",
+    symptoms: listOf(row.symptoms, CARE_SYMPTOMS),
+    ironConcern: row.ironConcern === true,
+    updatedOn: typeof row.updatedOn === "string" && isRealISODate(row.updatedOn) ? row.updatedOn : "",
+  };
+}
+
 export function sanitizeCompanion(input: unknown): CompanionState {
   const record = asRecord(input);
   const movement = asRecord(record.movement);
@@ -538,6 +600,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
       })
       .filter((item): item is GameRecord => item !== null)
       .slice(0, LIMITS.games),
+    womensCare: sanitizeWomensCare(record.womensCare),
   };
 }
 
