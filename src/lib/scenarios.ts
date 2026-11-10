@@ -11,8 +11,11 @@ import {
   vegetableLabels,
   weeklyActivityMinutes,
 } from "@/lib/labels";
+import { fmt } from "@/lib/i18n/config";
+import { msg } from "@/lib/i18n/translate";
+import { englishT, localizeBuilt, type Translate } from "@/lib/page-format";
 import { PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
-import type { HabitId, NormalizedAssessment, Source } from "@/lib/types";
+import { HABIT_IDS, type HabitId, type NormalizedAssessment, type Source } from "@/lib/types";
 
 export type ScenarioIllustration = {
   habitId: HabitId;
@@ -30,11 +33,13 @@ export type ScenarioIllustration = {
   withheld: boolean;
 };
 
-const NO_ASSESSMENT =
-  "No completed assessment is available, so this illustration does not describe your current routine.";
+const NO_ASSESSMENT = msg(
+  "No completed assessment is available, so this illustration does not describe your current routine.",
+);
 
-const UNCERTAIN =
-  "What changes for you personally is uncertain. This is an educational illustration, not a medical prediction, and it does not estimate a personal health outcome.";
+const UNCERTAIN = msg(
+  "What changes for you personally is uncertain. This is an educational illustration, not a medical prediction, and it does not estimate a personal health outcome.",
+);
 
 function withheldScenario(
   habitId: HabitId,
@@ -51,8 +56,9 @@ function withheldScenario(
     challenges: [],
     nextSteps: [],
     established: "",
-    uncertain:
+    uncertain: msg(
       "The detailed illustration was withheld because it did not pass an internal wording check. No personal prediction is available.",
+    ),
     sources: sourcesForHabit,
     notice: PROFESSIONAL_NOTICE,
     withheld: true,
@@ -75,49 +81,115 @@ function finish(
   return { ...scenario, notice: PROFESSIONAL_NOTICE, withheld: false };
 }
 
+const MOVEMENT_CURRENT = msg(
+  "You reported activity on {days} days in a typical week, about {minutes} minutes on those days ({weekly} minutes a week), and about {sitting} hours of sitting or reclining. WHO describes a recommendation of at least 150 minutes of moderate-intensity activity a week, and says any amount is better than none.",
+);
+const SLEEP_CURRENT = msg(
+  "You reported about {hours} hours of sleep and described the quality as “{quality}.” The National Heart, Lung, and Blood Institute says experts recommend that adults sleep between 7 and 9 hours a night.",
+);
+const SMOKING_NONE = msg(
+  "Your assessment did not include a tobacco answer, so this illustration does not describe your tobacco use.",
+);
+const SMOKING_CURRENT = msg(
+  "You reported: {answer}. WHO says all forms of tobacco use are harmful and that there is no safe level of exposure to tobacco.",
+);
+const EATING_CURRENT = msg(
+  "You reported vegetables or fruit: {vegetables}. You reported water: {water}. The Dietary Guidelines for Americans describe vegetables, fruits, and other whole foods as part of a nutritious pattern.",
+);
+const STRESS_CURRENT = msg(
+  "You described stress as “{stress}” and mood as “{mood}.” The National Institute of Mental Health describes stress as a response to an external cause, and lists simple practices people can try.",
+);
+const ALCOHOL_NONE = msg(
+  "Your assessment did not include an alcohol answer, so this illustration does not describe your drinking.",
+);
+const ALCOHOL_CURRENT = msg(
+  "You reported drinking: {answer}. NIAAA describes effects of alcohol on the body, including a higher chance of some diseases and injuries. This is not a diagnosis.",
+);
+const CONNECTION_CURRENT = msg(
+  "You described social connection as “{answer}.” WHO describes high-quality social connections as important for mental and physical health and well-being.",
+);
+const STRENGTH_CURRENT = msg("{movement} Strength practice: “{answer}.”");
+const SUGARY_CURRENT = msg(
+  "You reported added-sugar drinks as “{answer}.” Sugary drinks are a common source of added sugars. Naturally occurring sugars in milk and fruit are a different question.",
+);
+const FIBER_CURRENT = msg("You reported fiber-containing foods as “{answer}.” Vegetables or fruit: {vegetables}.");
+const NOT_ANSWERED = msg("not answered");
+const COMBINED_ONE = msg("{title}. {change}");
+const COMBINED_TOGETHER = msg(
+  "{title} together with {other}. {change} Each change stays educational. lifeZoi does not merge them into a personal forecast.",
+);
+
+/**
+ * English templates the WHAT IF? route fills in. The page matches the route's English
+ * against these to show the same sentence in the chosen language.
+ */
+export const SCENARIO_TEMPLATES: readonly string[] = [
+  MOVEMENT_CURRENT,
+  SLEEP_CURRENT,
+  SMOKING_CURRENT,
+  EATING_CURRENT,
+  STRESS_CURRENT,
+  ALCOHOL_CURRENT,
+  CONNECTION_CURRENT,
+  STRENGTH_CURRENT,
+  SUGARY_CURRENT,
+  FIBER_CURRENT,
+];
+
 function movementCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
   const weekly = weeklyActivityMinutes(
     assessment.activityDays,
     assessment.activityMinutes,
   );
-  return `You reported activity on ${assessment.activityDays} days in a typical week, about ${assessment.activityMinutes} minutes on those days (${weekly} minutes a week), and about ${assessment.sedentaryHours} hours of sitting or reclining. WHO describes a recommendation of at least 150 minutes of moderate-intensity activity a week, and says any amount is better than none.`;
+  return fmt(MOVEMENT_CURRENT, {
+    days: assessment.activityDays,
+    minutes: assessment.activityMinutes,
+    weekly,
+    sitting: assessment.sedentaryHours,
+  });
 }
 
 function sleepCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
-  return `You reported about ${assessment.sleepHours} hours of sleep and described the quality as “${sleepQualityLabels[assessment.sleepQuality]}.” The National Heart, Lung, and Blood Institute says experts recommend that adults sleep between 7 and 9 hours a night.`;
+  return fmt(SLEEP_CURRENT, {
+    hours: assessment.sleepHours,
+    quality: sleepQualityLabels[assessment.sleepQuality],
+  });
 }
 
 function smokingCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
   if (!assessment.smoking || assessment.smoking === "prefer-not") {
-    return "Your assessment did not include a tobacco answer, so this illustration does not describe your tobacco use.";
+    return SMOKING_NONE;
   }
-  return `You reported: ${smokingLabels[assessment.smoking]}. WHO says all forms of tobacco use are harmful and that there is no safe level of exposure to tobacco.`;
+  return fmt(SMOKING_CURRENT, { answer: smokingLabels[assessment.smoking] });
 }
 
 function eatingCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
-  return `You reported vegetables or fruit: ${vegetableLabels[assessment.vegetables]}. You reported water: ${hydrationLabels[assessment.hydration]}. The Dietary Guidelines for Americans describe vegetables, fruits, and other whole foods as part of a nutritious pattern.`;
+  return fmt(EATING_CURRENT, {
+    vegetables: vegetableLabels[assessment.vegetables],
+    water: hydrationLabels[assessment.hydration],
+  });
 }
 
 function stressCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
-  return `You described stress as “${stressLabels[assessment.stress]}” and mood as “${moodLabels[assessment.mood]}.” The National Institute of Mental Health describes stress as a response to an external cause, and lists simple practices people can try.`;
+  return fmt(STRESS_CURRENT, { stress: stressLabels[assessment.stress], mood: moodLabels[assessment.mood] });
 }
 
 function alcoholCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
   if (!assessment.alcohol || assessment.alcohol === "prefer-not") {
-    return "Your assessment did not include an alcohol answer, so this illustration does not describe your drinking.";
+    return ALCOHOL_NONE;
   }
-  return `You reported drinking: ${alcoholLabels[assessment.alcohol]}. NIAAA describes effects of alcohol on the body, including a higher chance of some diseases and injuries. This is not a diagnosis.`;
+  return fmt(ALCOHOL_CURRENT, { answer: alcoholLabels[assessment.alcohol] });
 }
 
 function connectionCurrent(assessment: NormalizedAssessment | null): string {
   if (!assessment) return NO_ASSESSMENT;
-  return `You described social connection as “${socialLabels[assessment.social]}.” WHO describes high-quality social connections as important for mental and physical health and well-being.`;
+  return fmt(CONNECTION_CURRENT, { answer: socialLabels[assessment.social] });
 }
 
 export function buildScenario(
@@ -131,7 +203,7 @@ export function buildScenario(
       title: habitTitle(habitId),
       yourNote: note,
       currentRoutine: assessment
-        ? "A completed assessment is on file, but a custom note does not have its own reviewed evidence summary."
+        ? msg("A completed assessment is on file, but a custom note does not have its own reviewed evidence summary.")
         : NO_ASSESSMENT,
       proposedChange: "You described a change in your own words. It is saved with your note and is not turned into a medical claim.",
       likelyBenefits: [],
@@ -308,7 +380,10 @@ export function buildScenario(
     },
     strength: {
       currentRoutine: assessment
-        ? `${movementCurrent(assessment)} Strength practice: “${assessment.strength ? vegetableLabels[assessment.strength] : "not answered"}.”`
+        ? fmt(STRENGTH_CURRENT, {
+            movement: movementCurrent(assessment),
+            answer: assessment.strength ? vegetableLabels[assessment.strength] : NOT_ANSWERED,
+          })
         : NO_ASSESSMENT,
       proposedChange:
         "Hypothetical: add muscle-strengthening movements on two days a week, starting with a familiar motion such as sit-to-stand. A chair version counts, only if it feels safe.",
@@ -356,7 +431,7 @@ export function buildScenario(
     },
     "sugary-drinks": {
       currentRoutine: assessment
-        ? `You reported added-sugar drinks as “${assessment.addedSugar ? vegetableLabels[assessment.addedSugar] : "not answered"}.” Sugary drinks are a common source of added sugars. Naturally occurring sugars in milk and fruit are a different question.`
+        ? fmt(SUGARY_CURRENT, { answer: assessment.addedSugar ? vegetableLabels[assessment.addedSugar] : NOT_ANSWERED })
         : NO_ASSESSMENT,
       proposedChange: "Hypothetical: choose water or an unsweetened drink more often, if fluids are not restricted for you.",
       likelyBenefits: [
@@ -371,7 +446,10 @@ export function buildScenario(
     },
     fiber: {
       currentRoutine: assessment
-        ? `You reported fiber-containing foods as “${assessment.fiber ? vegetableLabels[assessment.fiber] : "not answered"}.” Vegetables or fruit: ${vegetableLabels[assessment.vegetables]}.`
+        ? fmt(FIBER_CURRENT, {
+            answer: assessment.fiber ? vegetableLabels[assessment.fiber] : NOT_ANSWERED,
+            vegetables: vegetableLabels[assessment.vegetables],
+          })
         : NO_ASSESSMENT,
       proposedChange: "Hypothetical: add a small amount of beans, oats, fruit, or a whole grain, and increase slowly with the fluids you are allowed.",
       likelyBenefits: [
@@ -386,7 +464,7 @@ export function buildScenario(
     },
     outdoors: {
       currentRoutine: assessment
-        ? "Time outside is not a required field. Your movement and stress answers are the closest notes already saved."
+        ? msg("Time outside is not a required field. Your movement and stress answers are the closest notes already saved.")
         : NO_ASSESSMENT,
       proposedChange: "Hypothetical: spend a few adaptable minutes outside, at a window, or on a balcony. There is no fixed distance.",
       likelyBenefits: [
@@ -410,13 +488,46 @@ export function buildScenario(
   });
 }
 
-export function buildCombination(primary: ScenarioIllustration, secondary: ScenarioIllustration) {
+export function buildCombination(
+  primary: ScenarioIllustration,
+  secondary: ScenarioIllustration,
+  t: Translate = englishT,
+) {
   return {
-    label: "Hypothetical",
+    label: t("Hypothetical"),
     current: primary.currentRoutine,
-    oneChange: `${primary.title}. ${primary.proposedChange}`,
-    together: `${primary.title} together with ${secondary.title}. ${secondary.proposedChange} Each change stays educational. lifeZoi does not merge them into a personal forecast.`,
+    oneChange: t(COMBINED_ONE, { title: primary.title, change: primary.proposedChange }),
+    together: t(COMBINED_TOGETHER, { title: primary.title, other: secondary.title, change: secondary.proposedChange }),
   };
+}
+
+/** The same illustration with every sentence in the chosen language. The person's own note stays as typed. */
+export function localizeScenario(scenario: ScenarioIllustration, t: Translate): ScenarioIllustration {
+  const local = (text: string) => localizeBuilt(t, text, SCENARIO_TEMPLATES);
+  return {
+    ...scenario,
+    title: t(scenario.title),
+    currentRoutine: local(scenario.currentRoutine),
+    proposedChange: local(scenario.proposedChange),
+    likelyBenefits: scenario.likelyBenefits.map(local),
+    challenges: scenario.challenges.map(local),
+    nextSteps: scenario.nextSteps.map(local),
+    established: local(scenario.established),
+    uncertain: local(scenario.uncertain),
+    notice: t(scenario.notice),
+  };
+}
+
+/** Every fixed sentence an illustration can show, for the translation check. */
+export function scenarioCatalogText(): unknown[] {
+  return HABIT_IDS.flatMap((habitId) => {
+    const { proposedChange, likelyBenefits, challenges, nextSteps, established, uncertain, notice } = buildScenario(
+      habitId,
+      null,
+      "",
+    );
+    return [proposedChange, likelyBenefits, challenges, nextSteps, established, uncertain, notice];
+  });
 }
 
 export function scenarioText(scenario: ScenarioIllustration): string {

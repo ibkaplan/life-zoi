@@ -39,14 +39,24 @@ const STOP = new Set([
   "not",
 ]);
 
+/**
+ * Lower case, without accents or punctuation. Letters of every script are kept, so a
+ * question typed in Ukrainian, Russian, or Greek can be compared with its translation.
+ */
 export function normalizeQuestionText(text: string): string {
   return text
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/ς/g, "σ")
     .replace(/&/g, " and ")
-    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
+
+/** The question and answer as shown in the chosen language, when that is not English. */
+export type LocalQuestionText = (item: WellnessQuestion) => { question: string; answer: string } | null;
 
 function distinctiveTokens(text: string): string[] {
   return normalizeQuestionText(text)
@@ -82,10 +92,17 @@ export type PreparedMatch = {
   selectedId: string | null;
 };
 
-export function matchPreparedQuestions(query: string): PreparedMatch {
+function bestScore(query: string, item: WellnessQuestion, local?: LocalQuestionText): number {
+  const english = scorePreparedQuestion(query, item.question);
+  const translated = local?.(item);
+  if (!translated || translated.question === item.question) return english;
+  return Math.max(english, scorePreparedQuestion(query, translated.question));
+}
+
+export function matchPreparedQuestions(query: string, local?: LocalQuestionText): PreparedMatch {
   const ranked = WELLNESS_QUESTIONS.map((item) => ({
     item,
-    score: scorePreparedQuestion(query, item.question),
+    score: bestScore(query, item, local),
   }))
     .filter((row) => row.score > 0)
     .sort((a, b) => b.score - a.score || a.item.question.localeCompare(b.item.question));
@@ -99,12 +116,19 @@ export function matchPreparedQuestions(query: string): PreparedMatch {
   return { confident, matches, selectedId };
 }
 
-export function searchPreparedQuestions(query: string): WellnessQuestion[] {
+export function searchPreparedQuestions(query: string, local?: LocalQuestionText): WellnessQuestion[] {
   const trimmed = query.trim();
   if (!trimmed) return [...WELLNESS_QUESTIONS];
   const normalized = normalizeQuestionText(trimmed);
   return WELLNESS_QUESTIONS.filter((item) => {
-    if (scorePreparedQuestion(trimmed, item.question) > 0) return true;
-    return normalizeQuestionText(item.answer).includes(normalized);
+    if (bestScore(trimmed, item, local) > 0) return true;
+    if (normalizeQuestionText(item.answer).includes(normalized)) return true;
+    const translated = local?.(item);
+    return Boolean(translated && normalizeQuestionText(translated.answer).includes(normalized));
   });
+}
+
+/** Compares a question with the prepared questions as a page shows them through `t`. */
+export function localQuestionText(t: (english: string) => string): LocalQuestionText {
+  return (item) => ({ question: t(item.question), answer: t(item.answer) });
 }

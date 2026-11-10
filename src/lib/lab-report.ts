@@ -1,3 +1,5 @@
+import { msg } from "@/lib/i18n/translate";
+
 export type RangeMark = "below" | "within" | "above";
 
 export type SyntheticResult = {
@@ -30,9 +32,9 @@ export function markAgainstSuppliedRange(value: number, low: number, high: numbe
 }
 
 export function rangeSentence(mark: RangeMark): string {
-  if (mark === "below") return "Below the range printed on this example report.";
-  if (mark === "above") return "Above the range printed on this example report.";
-  return "Inside the range printed on this example report.";
+  if (mark === "below") return msg("Below the range printed on this example report.");
+  if (mark === "above") return msg("Above the range printed on this example report.");
+  return msg("Inside the range printed on this example report.");
 }
 
 export const SYNTHETIC_REPORT: SyntheticReport = {

@@ -1,3 +1,5 @@
+import { msg } from "@/lib/i18n/translate";
+
 import type { Source } from "@/lib/types";
 
 export const sources = {
@@ -84,7 +86,7 @@ export const sources = {
 } as const satisfies Record<string, Source>;
 
 export const PROFESSIONAL_NOTICE =
-  "lifeZoi offers general wellness education. It does not diagnose conditions, recommend changing prescription medication, or predict how long you will live. Talk with a qualified clinician about personal medical decisions.";
+  msg("lifeZoi offers general wellness education. It does not diagnose conditions, recommend changing prescription medication, or predict how long you will live. Talk with a qualified clinician about personal medical decisions.");
 
 export const CRISIS_NOTICE =
-  "If you are in immediate distress in the United States, call or text 988. SAMHSA describes the 988 Suicide & Crisis Lifeline.";
+  msg("If you are in immediate distress in the United States, call or text 988. SAMHSA describes the 988 Suicide & Crisis Lifeline.");

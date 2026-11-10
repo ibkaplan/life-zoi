@@ -3,18 +3,15 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BreatheProgressCard } from "@/components/breathe/progress-card";
+import { useLocale } from "@/components/locale-provider";
+import { usePageFormat } from "@/components/page-format";
 import { PagePhoto } from "@/components/page-photo";
 import { WeeklyProgress } from "@/components/weekly-progress";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
-import {
-  formatLongDate,
-  formatMonth,
-  formatTimestamp,
-  isFutureDate,
-  localISODate,
-  monthKey,
-} from "@/lib/dates";
+import { isFutureDate, localISODate, monthKey } from "@/lib/dates";
+import { msg } from "@/lib/i18n/translate";
+import { translateError } from "@/lib/i18n/translate-error";
 import { habitLabels } from "@/lib/labels";
 import { ITEM_IDS } from "@/lib/my-day/plan";
 import { TRACKABLE_HABIT_IDS, type TrackableHabitId } from "@/lib/types";
@@ -22,6 +19,9 @@ import { TRACKABLE_HABIT_IDS, type TrackableHabitId } from "@/lib/types";
 export function ProgressView() {
   const { ready, sample, session, setGoal, removeGoal, saveCheckIn, removeCheckIn } =
     useSession();
+  const { t, longDate, month: monthName, timestamp } = usePageFormat();
+  const { messages: m } = useLocale();
+  const showError = (text: string) => t(translateError(text, m) ?? text);
   const today = localISODate();
   const [month, setMonth] = useState(monthKey(today));
   const [habitId, setHabitId] = useState<TrackableHabitId>("walk");
@@ -39,7 +39,7 @@ export function ProgressView() {
     return [...keys].sort().reverse();
   }, [session.checkIns, today]);
 
-  if (!ready) return <LoadingState label="Loading progress…" />;
+  if (!ready) return <LoadingState label={t("Loading progress…")} />;
 
   const monthItems = session.checkIns
     .filter((item) => item.date.startsWith(month))
@@ -49,25 +49,26 @@ export function ProgressView() {
     <div className="stack-lg">
       <PagePhoto id="progress" />
       <div className="narrow stack">
-        <p className="kicker">Progress</p>
-        <h1>A record of what you try</h1>
+        <p className="kicker">{t("Progress")}</p>
+        <h1>{t("A record of what you try")}</h1>
         <p className="lede">
-          A missed day is information, not a failure. lifeZoi does not claim a habit change caused a health result. Check-ins here are user-reported. Measured clinic values are not stored.           Estimates stay on the outlook page, and WHAT IF? stays hypothetical.
+          {t("A missed day is information, not a failure. lifeZoi does not claim a habit change caused a health result. Check-ins here are user-reported. Measured clinic values are not stored.")}{"           "}
+          {t("Estimates stay on the outlook page, and WHAT IF? stays hypothetical.")}
         </p>
         <p>
-          <Link href="/plan">Your progress matters. Open My Life Improvement Plan.</Link>
+          <Link href="/plan">{t("Your progress matters. Open My Life Improvement Plan.")}</Link>
         </p>
         <p>
           <Link className="btn btn-primary" href="/progress/weekly">
-            Weekly check-in and reports
+            {t("Weekly check-in and reports")}
           </Link>
         </p>
       </div>
       <WeeklyProgress />
       <BreatheProgressCard />
       <section className="card stack">
-        <h2>My Day marks</h2>
-        <p>Activities you marked done. This is a count of those marks, not a health result.</p>
+        <h2>{t("My Day marks")}</h2>
+        <p>{t("Activities you marked done. This is a count of those marks, not a health result.")}</p>
         {session.myDay && Object.keys(session.myDay.days).length > 0 ? (
           <ul className="record-list">
             {Object.values(session.myDay.days)
@@ -76,36 +77,36 @@ export function ProgressView() {
                 const done = ITEM_IDS.filter((id) => day.items[id]?.status === "done").length;
                 return (
                   <li key={day.date}>
-                    <strong>{formatLongDate(day.date)}</strong>
-                    <p>{done} {done === 1 ? "activity" : "activities"} marked done</p>
+                    <strong>{longDate(day.date)}</strong>
+                    <p>{done === 1 ? t("1 activity marked done") : t("{count} activities marked done", { count: done })}</p>
                   </li>
                 );
               })}
           </ul>
         ) : (
           <p>
-            No My Day marks yet. <Link href="/my-day/classic">Open My Day classic</Link>
+            {t("No My Day marks yet.")} <Link href="/my-day/classic">{t("Open My Day classic")}</Link>
           </p>
         )}
       </section>
       <section className="card stack">
-        <h2>Habit goals</h2>
-        <p>Choose a habit and how many days a week you want to aim for. This is your goal, not a prescription.</p>
+        <h2>{t("Habit goals")}</h2>
+        <p>{t("Choose a habit and how many days a week you want to aim for. This is your goal, not a prescription.")}</p>
         {session.goals.length === 0 ? (
-          <p>No goals yet. Add one when you are ready.</p>
+          <p>{t("No goals yet. Add one when you are ready.")}</p>
         ) : (
           <ul className="record-list">
             {session.goals.map((goal) => (
               <li key={goal.habitId}>
-                <strong>{habitLabels[goal.habitId]}</strong>
-                <p>{goal.daysPerWeek} days a week</p>
+                <strong>{t(habitLabels[goal.habitId])}</strong>
+                <p>{t("{count} days a week", { count: goal.daysPerWeek })}</p>
                 <button
                   className="btn btn-ghost"
                   type="button"
                   disabled={sample}
                   onClick={() => removeGoal(goal.habitId)}
                 >
-                  Remove goal
+                  {t("Remove goal")}
                 </button>
               </li>
             ))}
@@ -117,11 +118,11 @@ export function ProgressView() {
             event.preventDefault();
             const result = setGoal(habitId, daysPerWeek);
             setError(result ?? "");
-            setMessage(result ? "" : "Goal saved in this tab.");
+            setMessage(result ? "" : msg("Goal saved in this tab."));
           }}
         >
           <label className="field" htmlFor="goal-habit">
-            <span>Goal habit</span>
+            <span>{t("Goal habit")}</span>
             <select
               id="goal-habit"
               value={habitId}
@@ -129,13 +130,13 @@ export function ProgressView() {
             >
               {TRACKABLE_HABIT_IDS.map((id) => (
                 <option key={id} value={id}>
-                  {habitLabels[id]}
+                  {t(habitLabels[id])}
                 </option>
               ))}
             </select>
           </label>
           <label className="field" htmlFor="goal-days">
-            <span>Days per week</span>
+            <span>{t("Days per week")}</span>
             <input
               id="goal-days"
               type="number"
@@ -146,46 +147,53 @@ export function ProgressView() {
             />
           </label>
           <button className="btn btn-primary" type="submit" disabled={sample}>
-            Save goal
+            {t("Save goal")}
           </button>
         </form>
       </section>
       <section className="card stack">
         <div className="actions" style={{ justifyContent: "space-between" }}>
-          <h2>Check-ins</h2>
+          <h2>{t("Check-ins")}</h2>
           <label className="field" htmlFor="month">
-            <span className="sr-only">Month</span>
+            <span className="sr-only">{t("Month")}</span>
             <select id="month" value={month} onChange={(event) => setMonth(event.target.value)}>
               {months.map((value) => (
                 <option key={value} value={value}>
-                  {formatMonth(value)}
+                  {monthName(value)}
                 </option>
               ))}
             </select>
           </label>
         </div>
         <p>
-          {formatMonth(month)}. {monthItems.length === 0
-            ? "No check-ins in this month yet."
-            : `${monthItems.filter((item) => item.done).length} of ${monthItems.length} recorded check-ins were marked done.`}
+          {monthName(month)}.{" "}
+          {monthItems.length === 0
+            ? t("No check-ins in this month yet.")
+            : t("{done} of {total} recorded check-ins were marked done.", {
+                done: monthItems.filter((item) => item.done).length,
+                total: monthItems.length,
+              })}
         </p>
         {session.goals.map((goal) => {
           const rows = monthItems.filter((item) => item.habitId === goal.habitId);
           if (rows.length < 2) {
             return (
               <p key={goal.habitId}>
-                {habitLabels[goal.habitId]} needs at least two check-ins in {formatMonth(month)} before a chart is shown.
+                {t("{habit} needs at least two check-ins in {month} before a chart is shown.", {
+                  habit: t(habitLabels[goal.habitId]),
+                  month: monthName(month),
+                })}
               </p>
             );
           }
-          return <CheckChart key={goal.habitId} label={habitLabels[goal.habitId]} rows={rows} />;
+          return <CheckChart key={goal.habitId} label={t(habitLabels[goal.habitId])} rows={rows} />;
         })}
         <form
           className="stack"
           onSubmit={(event) => {
             event.preventDefault();
             if (isFutureDate(checkDate, today)) {
-              setError("Choose today or an earlier date.");
+              setError(msg("Choose today or an earlier date."));
               setMessage("");
               return;
             }
@@ -196,14 +204,14 @@ export function ProgressView() {
               note: checkNote,
             });
             setError(result ?? "");
-            setMessage(result ? "" : "Check-in saved in this tab.");
+            setMessage(result ? "" : msg("Check-in saved in this tab."));
             if (!result) setCheckNote("");
           }}
         >
-          <h3>Record or update a check-in</h3>
+          <h3>{t("Record or update a check-in")}</h3>
           <div className="grid-2">
             <label className="field" htmlFor="check-date">
-              <span>Date</span>
+              <span>{t("Date")}</span>
               <input
                 id="check-date"
                 type="date"
@@ -213,7 +221,7 @@ export function ProgressView() {
               />
             </label>
             <label className="field" htmlFor="check-habit">
-              <span>Check-in habit</span>
+              <span>{t("Check-in habit")}</span>
               <select
                 id="check-habit"
                 value={checkHabit}
@@ -233,11 +241,11 @@ export function ProgressView() {
               checked={checkDone}
               onChange={(event) => setCheckDone(event.target.checked)}
             />
-            <span>Marked done</span>
+            <span>{t("Marked done")}</span>
           </label>
           <label className="field" htmlFor="check-note">
-            <span>Note</span>
-            <span className="hint">Optional.</span>
+            <span>{t("Note")}</span>
+            <span className="hint">{t("Optional.")}</span>
             <input
               id="check-note"
               type="text"
@@ -247,17 +255,17 @@ export function ProgressView() {
             />
           </label>
           <button className="btn btn-primary" type="submit" disabled={sample}>
-            Save check-in
+            {t("Save check-in")}
           </button>
         </form>
         {error ? (
           <p className="field-error" role="alert">
-            {error}
+            {showError(error)}
           </p>
         ) : null}
         {message ? (
           <p className="alert alert-ok" role="status">
-            {message}
+            {t(message)}
           </p>
         ) : null}
         {monthItems.length > 0 ? (
@@ -265,9 +273,9 @@ export function ProgressView() {
             {monthItems.map((item) => (
               <li key={item.id}>
                 <strong>
-                  {formatLongDate(item.date)} · {habitLabels[item.habitId]}
+                  {longDate(item.date)} · {t(habitLabels[item.habitId])}
                 </strong>
-                <p>{item.done ? "Done" : "Not done"}</p>
+                <p>{item.done ? t("Done") : t("Not done")}</p>
                 {item.note ? <p>{item.note}</p> : null}
                 <div className="actions">
                   <button
@@ -283,7 +291,7 @@ export function ProgressView() {
                       })
                     }
                   >
-                    {item.done ? "Mark not done" : "Mark done"}
+                    {item.done ? t("Mark not done") : t("Mark done")}
                   </button>
                   <button
                     className="btn btn-ghost"
@@ -291,7 +299,7 @@ export function ProgressView() {
                     disabled={sample}
                     onClick={() => removeCheckIn(item.id)}
                   >
-                    Remove
+                    {t("Remove")}
                   </button>
                 </div>
               </li>
@@ -301,19 +309,21 @@ export function ProgressView() {
       </section>
       <section className="grid-2">
         <article className="card stack">
-          <h2>Assessments</h2>
+          <h2>{t("Assessments")}</h2>
           {session.history.length === 0 ? (
             <p>
-              Completed assessments will be listed here. <Link href="/assessment">Start one</Link>
+              {t("Completed assessments will be listed here.")} <Link href="/assessment">{t("Start one")}</Link>
             </p>
           ) : (
             <ul className="record-list">
               {session.history.map((item) => (
                 <li key={item.id}>
-                  <p>{formatTimestamp(item.completedAt)}</p>
+                  <p>{timestamp(item.completedAt)}</p>
                   <p className="hint">
-                    {item.answers.displayName || "Assessment"} · {item.answers.goals.length} focus
-                    {item.answers.goals.length === 1 ? "" : "es"}
+                    {item.answers.displayName || t("Assessment")} ·{" "}
+                    {item.answers.goals.length === 1
+                      ? t("1 focus")
+                      : t("{count} focuses", { count: item.answers.goals.length })}
                   </p>
                 </li>
               ))}
@@ -321,17 +331,17 @@ export function ProgressView() {
           )}
         </article>
         <article className="card stack">
-          <h2>WHAT IF? scenarios</h2>
+          <h2>{t("WHAT IF? scenarios")}</h2>
           {session.scenarios.length === 0 ? (
             <p>
-              Saved illustrations will be listed here. <Link href="/what-if">Explore one</Link>
+              {t("Saved illustrations will be listed here.")} <Link href="/what-if">{t("Explore one")}</Link>
             </p>
           ) : (
             <ul className="record-list">
               {session.scenarios.map((item) => (
                 <li key={item.id}>
-                  <Link href={`/what-if/${item.id}`}>{habitLabels[item.habitId]}</Link>
-                  <p className="hint">{formatTimestamp(item.savedAt)}</p>
+                  <Link href={`/what-if/${item.id}`}>{t(habitLabels[item.habitId])}</Link>
+                  <p className="hint">{timestamp(item.savedAt)}</p>
                 </li>
               ))}
             </ul>
@@ -349,36 +359,41 @@ function CheckChart({
   label: string;
   rows: { date: string; done: boolean }[];
 }) {
+  const { t, longDate } = usePageFormat();
   const done = rows.filter((row) => row.done).length;
   return (
     <figure className="stack">
       <figcaption>
-        {label} in this month. {done} of {rows.length} recorded days were marked done. Bars use the words Done and Not done, not color alone.
+        {t("{habit} in this month. {done} of {total} recorded days were marked done. Bars use the words Done and Not done, not color alone.", {
+          habit: label,
+          done,
+          total: rows.length,
+        })}
       </figcaption>
       <div className="day-grid" aria-hidden="true">
         {rows.map((row) => (
           <div className={row.done ? "day is-done" : "day"} key={row.date}>
-            <span className="day-num">{formatLongDate(row.date)}</span>
-            <span>{row.done ? "Done" : "Not done"}</span>
+            <span className="day-num">{longDate(row.date)}</span>
+            <span>{row.done ? t("Done") : t("Not done")}</span>
           </div>
         ))}
       </div>
       <details>
-        <summary>View {label} as a table</summary>
+        <summary>{t("View {habit} as a table", { habit: label })}</summary>
         <div className="table-wrap">
           <table className="data-table">
-            <caption className="sr-only">{label} check-ins</caption>
+            <caption className="sr-only">{t("{habit} check-ins", { habit: label })}</caption>
             <thead>
               <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Status</th>
+                <th scope="col">{t("Date")}</th>
+                <th scope="col">{t("Status")}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
                 <tr key={row.date}>
-                  <td>{formatLongDate(row.date)}</td>
-                  <td>{row.done ? "Done" : "Not done"}</td>
+                  <td>{longDate(row.date)}</td>
+                  <td>{row.done ? t("Done") : t("Not done")}</td>
                 </tr>
               ))}
             </tbody>

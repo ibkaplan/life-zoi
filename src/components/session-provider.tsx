@@ -1,5 +1,6 @@
 "use client";
 
+import { msg } from "@/lib/i18n/translate";
 import { createContext, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { clearAccountRecords, useAccount, writeAccountSession } from "@/lib/account-store";
 import {
@@ -111,7 +112,7 @@ type SessionApi = {
 };
 
 const SessionContext = createContext<SessionApi | null>(null);
-const READ_ONLY = "Sample data is read-only. Turn off the sample to record your own answers.";
+const READ_ONLY = msg("Sample data is read-only. Turn off the sample to record your own answers.");
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const snapshot = useSyncExternalStore(
@@ -207,7 +208,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       },
       saveScenario: (habitId, note) => {
         if (sample) return READ_ONLY;
-        if (habitId === "custom" && !note.trim()) return "Describe the change before saving.";
+        if (habitId === "custom" && !note.trim()) return msg("Describe the change before saving.");
         commit(
           saveScenario(stored, {
             id: crypto.randomUUID(),
@@ -258,13 +259,13 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       saveWeeklyCheckIn: (input) => {
         if (sample) return READ_ONLY;
         const weekStart = mondayOf(todayDate());
-        if (!weekStart) return "This week could not be saved.";
+        if (!weekStart) return msg("This week could not be saved.");
         const energy =
           input.energy === null ||
           (Number.isInteger(input.energy) && input.energy >= 1 && input.energy <= 5)
             ? input.energy
             : null;
-        if (input.energy !== null && energy === null) return "Choose an energy from 1 to 5, or leave it unset.";
+        if (input.energy !== null && energy === null) return msg("Choose an energy from 1 to 5, or leave it unset.");
         const accomplishments = selectedAccomplishments(
           Object.fromEntries(WEEKLY_ACCOMPLISHMENT_IDS.map((id) => [id, input.accomplishments.includes(id)])),
         );
@@ -285,10 +286,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (sample) return READ_ONLY;
         const dateError = validateCheckInDate(input.date, todayDate());
         if (dateError) return dateError;
-        if (input.unit !== "lb" && input.unit !== "kg") return "Choose pounds or kilograms.";
-        if (typeof input.value !== "number" || !Number.isFinite(input.value)) return "Enter a weight greater than 0.";
+        if (input.unit !== "lb" && input.unit !== "kg") return msg("Choose pounds or kilograms.");
+        if (typeof input.value !== "number" || !Number.isFinite(input.value)) return msg("Enter a weight greater than 0.");
         const value = Math.round(input.value * 100) / 100;
-        if (value <= 0 || value > 1000) return "Enter a weight greater than 0 and up to 1000.";
+        if (value <= 0 || value > 1000) return msg("Enter a weight greater than 0 and up to 1000.");
         const existing = stored.weightEntries.find((item) => item.date === input.date && item.unit === input.unit);
         commit(
           upsertWeightEntry(stored, {

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePageFormat } from "@/components/page-format";
 import { SourceList } from "@/components/sources";
-import type { RecommendationResult } from "@/lib/recommendations";
+import { localizeRecommendations, type RecommendationResult } from "@/lib/recommendations";
 import type { Assessment } from "@/lib/types";
 
 export function RecommendationsPanel({
@@ -10,6 +11,7 @@ export function RecommendationsPanel({
 }: {
   answers: Assessment | null;
 }) {
+  const { t, locale } = usePageFormat();
   const [attempt, setAttempt] = useState(0);
   const key = answers ? `${JSON.stringify(answers)}#${attempt}` : "";
   const [loaded, setLoaded] = useState<{
@@ -47,31 +49,32 @@ export function RecommendationsPanel({
         ? "error"
         : "ready"
       : "loading";
-  const result = loaded?.key === key ? loaded.result : null;
+  const loadedResult = loaded?.key === key ? loaded.result : null;
+  const result = loadedResult ? localizeRecommendations(loadedResult, t) : null;
 
   if (!answers) {
     return (
       <section className="card empty">
-        <h2>Suggestions</h2>
-        <p>Complete the lifestyle assessment before lifeZoi offers suggestions. Nothing is assumed from an empty profile.</p>
+        <h2>{t("Suggestions")}</h2>
+        <p>{t("Complete the lifestyle assessment before lifeZoi offers suggestions. Nothing is assumed from an empty profile.")}</p>
       </section>
     );
   }
   if (status === "loading") {
     return (
       <section className="card" role="status">
-        <h2>Suggestions</h2>
-        <p>Preparing suggestions from your answers…</p>
+        <h2>{t("Suggestions")}</h2>
+        <p>{t("Preparing suggestions from your answers…")}</p>
       </section>
     );
   }
   if (status === "error" || !result) {
     return (
       <section className="card" role="alert">
-        <h2>Suggestions</h2>
-        <p>Suggestions could not be prepared. Nothing was saved.</p>
+        <h2>{t("Suggestions")}</h2>
+        <p>{t("Suggestions could not be prepared. Nothing was saved.")}</p>
         <button className="btn btn-secondary" type="button" onClick={() => setAttempt((value) => value + 1)}>
-          Try again
+          {t("Try again")}
         </button>
       </section>
     );
@@ -79,8 +82,8 @@ export function RecommendationsPanel({
   if (result.withheld || result.items.length === 0) {
     return (
       <section className="card" role="status">
-        <h2>Suggestions</h2>
-        <p>Suggestions were withheld by an internal wording check. No personal prediction is shown.</p>
+        <h2>{t("Suggestions")}</h2>
+        <p>{t("Suggestions were withheld by an internal wording check. No personal prediction is shown.")}</p>
         <p>{result.notice}</p>
       </section>
     );
@@ -88,8 +91,8 @@ export function RecommendationsPanel({
   return (
     <section className="stack">
       <div>
-        <p className="kicker">Suggestions</p>
-        <h2>Ideas based on what you entered</h2>
+        <p className="kicker">{t("Suggestions")}</p>
+        <h2>{t("Ideas based on what you entered")}</h2>
       </div>
       {result.items.map((item) => (
         <article className="card stack" key={item.id}>
@@ -101,6 +104,7 @@ export function RecommendationsPanel({
             ))}
           </ul>
           <SourceList sources={item.sources} />
+          {locale !== "en" && item.sources.length > 0 ? <p className="hint">{t("The linked sources are in English.")}</p> : null}
         </article>
       ))}
       <p className="footer-note">{result.notice}</p>
