@@ -9,6 +9,10 @@ import {
   type StudioSection,
   type StudioVideoSeed,
 } from "@/lib/wellness-library/chair-yoga-videos";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+/** English with placeholders filled. Pages pass their own `t` to get the chosen language. */
+const ENGLISH: Translate = makeTranslate(null);
 
 /**
  * Wellness Library content catalog.
@@ -326,35 +330,35 @@ function normalizeUrl(url: string): string {
 }
 
 /** Duplicate detection: two items with the same underlying video or address. */
-export function findDuplicates(items: VideoItem[] = VIDEOS): CatalogIssue[] {
+export function findDuplicates(items: VideoItem[] = VIDEOS, t: Translate = ENGLISH): CatalogIssue[] {
   const seen = new Map<string, string>();
   const issues: CatalogIssue[] = [];
   for (const item of items) {
     const key = normalizeUrl(item.originalUrl);
     const first = seen.get(key);
-    if (first) issues.push({ id: item.id, problem: `Same video as ${first}.` });
+    if (first) issues.push({ id: item.id, problem: t("Same video as {id}.", { id: first }) });
     else seen.set(key, item.id);
   }
   return issues;
 }
 
 /** Items that need a person before members rely on them. */
-export function reviewQueue(items: VideoItem[] = VIDEOS, sources: ContentSource[] = SOURCES): CatalogIssue[] {
+export function reviewQueue(items: VideoItem[] = VIDEOS, sources: ContentSource[] = SOURCES, t: Translate = ENGLISH): CatalogIssue[] {
   const issues: CatalogIssue[] = [];
   for (const source of sources) {
-    if (source.approval === "pending") issues.push({ id: source.id, problem: "Source waiting for administrator approval." });
+    if (source.approval === "pending") issues.push({ id: source.id, problem: t("Source waiting for administrator approval.") });
     if (source.approval === "approved" && source.platform !== "LifeZoi" && !source.lastChecked) {
-      issues.push({ id: source.id, problem: "Approved source has never had an availability check." });
+      issues.push({ id: source.id, problem: t("Approved source has never had an availability check.") });
     }
   }
   for (const item of items) {
-    if (item.approval === "pending") issues.push({ id: item.id, problem: "Video waiting for approval." });
-    if (item.cost === "free-unverified") issues.push({ id: item.id, problem: "Free status not verified." });
-    if (!item.lastChecked) issues.push({ id: item.id, problem: "Availability and embedding not checked yet." });
+    if (item.approval === "pending") issues.push({ id: item.id, problem: t("Video waiting for approval.") });
+    if (item.cost === "free-unverified") issues.push({ id: item.id, problem: t("Free status not verified.") });
+    if (!item.lastChecked) issues.push({ id: item.id, problem: t("Availability and embedding not checked yet.") });
     if (item.embedUrl && !/^https:\/\/www\.youtube(-nocookie)?\.com\/embed\/[A-Za-z0-9_-]{11}$/.test(item.embedUrl)) {
-      issues.push({ id: item.id, problem: "Embed address is not an official YouTube player address." });
+      issues.push({ id: item.id, problem: t("Embed address is not an official YouTube player address.") });
     }
-    if (!sourceById(item.sourceId)) issues.push({ id: item.id, problem: "Unknown source." });
+    if (!sourceById(item.sourceId)) issues.push({ id: item.id, problem: t("Unknown source.") });
   }
-  return [...issues, ...findDuplicates(items)];
+  return [...issues, ...findDuplicates(items, t)];
 }
