@@ -118,6 +118,15 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 5. Outstanding: the owner applies `supabase/migrations/2026-11-09-companion-state.sql` in Supabase. Until then signed-in companion data stays on the device. Videos other than the NIA films, the NHS pages, and pending sources were not checked from the build environment; run `npm run check:library` from a machine with internet access.
 6. Next action: approve or reject pending sources in `src/lib/wellness-library/catalog.ts` through a reviewed pull request.
 
+### Movement breaks, hydration, and the calf muscle pump
+
+1. Name: Water + movement education, the 30-minute movement break, and daily tracking.
+2. Objective: the owner's hydration, lymphatic, calf-pump, and "why move every 30 minutes" requests, folded into Movement (`/academy/move/breaks`), My Day, My Plan, Food & Wellness, and the assessment.
+3. Branch: `claude/project-thread-u6xrqp`.
+4. Status: implemented with unit tests (`src/lib/movement-breaks/movement-breaks.test.ts`). The assessment gained an optional "Work and daily activity" question (`dailySetting`). Day logs gained `movementBreaks`; older saved data reads as 0. The reminder is per device (localStorage) and works only while a LifeZoi tab is open.
+5. Outstanding: only two of the listed sources (Pinto et al. 2023 in PMC, and the ADA 2016 position statement in PMC) could be read from the build environment. StatPearls lymphatic physiology, PubMed 21486777, the calf-pump article in Advances in Physiology Education, PMC6985064, and PubMed 39630056 are marked in `src/lib/movement-breaks/content.ts` as still to be read by a person. All copy is English in one object (`MB`) ready for translation keys. The breathing section links to the existing breathing sounds until the Breathe for Life program lands.
+6. Next action: a person reads the five unread sources and the medical copy, then the owner reviews the pull request.
+
 ## What is not in progress
 
 No GitHub issues were confirmed in this refresh. `main` is one product: accounts when configured, tab storage otherwise, mock assistant, and educational tools. Pull request #1 is closed historical work. Document upload and a paid model are not started.
@@ -128,3 +137,12 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 2. Re-run the required scripts before every merge, because GitHub enforces no checks.
 3. Leave paid AI, document upload, and launch claims until a person asks.
 4. Keep `noindex`.
+
+### Women's Care in Food & Wellness
+
+1. Name: Women's Care inside the daily meal plan.
+2. Objective: adapt the existing Today's meals plan for menstrual cycle phase, symptoms, perimenopause, and menopause, without a separate plan.
+3. Status: implemented on branch `claude/project-thread-5j56b9`, pull request open and unmerged (2026-11-10).
+4. Rules: used only after the person ticks both "I identify as a woman" and "cycle or menopause nutrition is relevant". Never inferred. Answers live in the companion state (browser, or the account `companion_state` row) and are not sent to an AI or outside service. Extra recipe ideas go through the same `checkRecipe` allergy, diet, religious, and exclusion checks; example foods use `ingredientAllowed`. Qualitative wording only; clinician pointer for heavy bleeding, severe symptoms, or iron worries.
+5. Files: `src/lib/companion/womens-care.ts`, `src/components/companion/womens-care-view.tsx`, tests in `src/lib/companion/womens-care.test.ts`.
+6. Outstanding: translation keys once the four-language work lands (all copy is in `womens-care.ts` and the view); medical copy review before launch.

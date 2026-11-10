@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { BreatheProgressCard } from "@/components/breathe/progress-card";
 import { PagePhoto } from "@/components/page-photo";
 import { WeeklyProgress } from "@/components/weekly-progress";
 import { useSession } from "@/components/session-provider";
@@ -63,6 +64,7 @@ export function ProgressView() {
         </p>
       </div>
       <WeeklyProgress />
+      <BreatheProgressCard />
       <section className="card stack">
         <h2>My Day marks</h2>
         <p>Activities you marked done. This is a count of those marks, not a health result.</p>

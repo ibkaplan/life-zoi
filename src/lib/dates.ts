@@ -23,12 +23,13 @@ export function monthKey(isoDate: string): string {
   return isoDate.slice(0, 7);
 }
 
-export function formatMonth(isoMonth: string): string {
+/** `locale` is a BCP 47 tag such as "uk"; English (US) is the default. */
+export function formatMonth(isoMonth: string, locale = "en-US"): string {
   const match = /^(\d{4})-(\d{2})$/.exec(isoMonth);
   if (!match) return isoMonth;
   const year = Number(match[1]);
   const month = Number(match[2]);
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
     timeZone: "UTC",

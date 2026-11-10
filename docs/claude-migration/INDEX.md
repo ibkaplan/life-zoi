@@ -38,6 +38,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [AGENT_ARCHITECTURE.md](AGENT_ARCHITECTURE.md) | Cursor coordinator and agents that were visible |
 | [CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md) | Coordinator and worker workflow in Claude Code |
 | [AUTOMATIONS.md](AUTOMATIONS.md) | Schedules and triggers, including those that do not exist |
+| [CHAIR_YOGA_LIBRARY.md](CHAIR_YOGA_LIBRARY.md) | Chair Yoga Studio videos, what was verified, and how to add more |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |
 

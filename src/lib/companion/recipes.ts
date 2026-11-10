@@ -21,7 +21,7 @@ export type Ingredient = {
   swap?: { name: string; kind: IngredientKind; allergens: Allergen[] };
 };
 
-export type RecipeTag = "fiber" | "protein" | "unsaturated-fat" | "energy-dense" | "light" | "vegetables" | "whole-grain" | "low-added-sugar";
+export type RecipeTag = "fiber" | "protein" | "unsaturated-fat" | "energy-dense" | "light" | "vegetables" | "whole-grain" | "low-added-sugar" | "dessert";
 
 export type Recipe = {
   id: string;

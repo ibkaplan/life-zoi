@@ -2,29 +2,33 @@
 
 import Link from "next/link";
 import { AccountPanel } from "@/components/account-panel";
+import { useMessages } from "@/components/locale-provider";
+import { fmt } from "@/lib/i18n/config";
+import { navLabel } from "@/lib/i18n/nav";
 import { useAccount } from "@/lib/account-store";
 import { MEMBER_LINKS } from "@/lib/navigation";
 
 export function SignInView() {
   const account = useAccount();
+  const m = useMessages();
 
   return (
     <div className="stack-lg narrow">
       <div>
-        <p className="kicker">Account</p>
-        <h1>{account.phase === "ready" ? "You are signed in" : "Sign in"}</h1>
+        <p className="kicker">{m.signIn.kicker}</p>
+        <h1>{account.phase === "ready" ? m.signIn.signedInTitle : m.signIn.title}</h1>
       </div>
       {account.phase === "ready" ? (
         <section className="card stack">
-          <p>Signed in as {account.email ?? "your account"}. Your space is in the menu at the top of every page.</p>
+          <p>{fmt(m.signIn.signedInAs, { email: account.email ?? m.common.yourAccount })}</p>
           <div className="actions">
             {MEMBER_LINKS.slice(0, 2).map((link) => (
               <Link key={link.href} className="btn btn-primary" href={link.href}>
-                {link.label}
+                {navLabel(m, link)}
               </Link>
             ))}
             <Link className="btn btn-ghost" href="/settings">
-              Account settings
+              {m.common.accountSettings}
             </Link>
           </div>
         </section>

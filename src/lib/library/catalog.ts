@@ -167,6 +167,7 @@ export const libraryCategories: LibraryCategory[] = [
       { href: "/library/lessons/muscle-with-age", label: "Muscle as you get older" },
       { href: "/academy/move/chair-stand", label: "Stand from a chair" },
       { href: "/library/move", label: "Movement library" },
+      { href: "/breathe", label: "Breathe for Life: nitric oxide and healthy aging" },
     ],
   },
   {
@@ -245,6 +246,30 @@ export const healthCards = [
 export function cardBySlug(slug: string) {
   return healthCards.find((card) => card.slug === slug) ?? null;
 }
+
+const breatheHits: SearchHit[] = [
+  {
+    id: "breathe-learn",
+    title: "What is nitric oxide?",
+    text: "Breathe for Life: how nitric oxide helps blood vessels relax, its two pathways, and how it changes with age.",
+    href: "/breathe/learn",
+    kinds: ["article"],
+  },
+  {
+    id: "breathe-session",
+    title: "Guided breathing session: nasal, humming, and belly breathing",
+    text: "A 5 to 10 minute session with an animated guide. No breath holding. Stop at any time.",
+    href: "/breathe/practice",
+    kinds: ["exercise"],
+  },
+  {
+    id: "breathe-foods",
+    title: "Nitrate-rich vegetables and simple recipes",
+    text: "Beetroot, arugula, spinach, kale, and Swiss chard, with meal ideas and a note on mouthwash.",
+    href: "/breathe/foods",
+    kinds: ["recipe", "article"],
+  },
+];
 
 const recipeHits: SearchHit[] = [
   {
@@ -327,7 +352,7 @@ export function searchHits(): SearchHit[] {
     href: `/library/programs/${item.slug}`,
     kinds: ["exercise"],
   }));
-  return [...guides, ...recipeHits, ...lessons, ...moments, ...exercises, ...programs];
+  return [...guides, ...recipeHits, ...breatheHits, ...lessons, ...moments, ...exercises, ...programs];
 }
 
 export function filterLibrary(query: string, kind: SearchKind | "all"): SearchHit[] {

@@ -60,6 +60,16 @@ Copy `.env.example` and set the public Supabase URL and anon key to use accounts
 - Today's meals and My food choices under Food & Wellness. Every ingredient, including sauces and swaps, is checked against allergies, requirements, and exclusions. LifeZoi never says a recipe is safe for an allergy.
 - Relaxing music synthesized in the browser (original or public-domain melodies), short original books with reading and device read-aloud, and brain games (Sudoku, memory, words, attention, logic) that are never presented as a test.
 
+## Languages
+
+The header has a 🌐 LANGUAGE button with English (default), Українська, Русский, and Ελληνικά. Switching re-renders in place: no reload, no navigation, and the assessment draft and progress are untouched. The choice is saved in this browser under `lifezoi.locale.v1` (a language code only). A first visit follows the browser's language list when it names one of the four, otherwise English. Settings has the same choice.
+
+Translations are typed TypeScript files in `src/lib/i18n/messages/` (`en.ts` is the source). No library, service, or API is used, so there is no cost. `src/lib/i18n/i18n.test.ts` fails if any key, placeholder, or answer option is missing in any language. To translate a new page, add keys to `en.ts`, then to `uk.ts`, `ru.ts`, and `el.ts` (the typecheck will list what is missing), and read them with `useMessages()`.
+
+Server validation stays in English; `translateError` maps those known messages on the client. Headings in Cyrillic and Greek use Noto Serif Display because Fraunces has no such letters.
+
+What is translated so far: header, menus, footer, notices, homepage, sign-in and password pages, invitation welcome, the full lifestyle assessment (questions, answers, review, validation), dashboard, and settings. Other sections still show English and are listed in the pull request that added this. The health wording in Ukrainian, Russian, and Greek needs a native-speaker review before launch.
+
 ## Sources
 
 Factual health statements are tied to pages that were reachable while this app was written, including WHO, NHLBI, NIMH, NIAAA, Nutrition.gov, the Dietary Guidelines for Americans, Smokefree.gov, ODPHP’s Physical Activity Guidelines page, and SAMHSA’s 988 page. The app does not calculate a lifespan or a date of death.

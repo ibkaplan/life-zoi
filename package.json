@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "check:library": "LIFEZOI_LINK_CHECK=1 vitest run src/lib/wellness-library/link-check.live.test.ts"
+    "check:library": "LIFEZOI_LINK_CHECK=1 vitest run src/lib/wellness-library/link-check.live.test.ts",
+    "video:add": "node scripts/add-video.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

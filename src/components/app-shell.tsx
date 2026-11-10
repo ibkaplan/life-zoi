@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SittingReminder } from "@/components/movement-breaks/tracker";
 import { CareInviteWatcher } from "@/components/care-invite-watcher";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
@@ -9,13 +10,16 @@ import { useAccount } from "@/lib/account-store";
 import { useCompanion } from "@/lib/companion/store";
 import { departmentFor } from "@/lib/departments";
 import { FOOTER_LINKS } from "@/lib/navigation";
-import { CRISIS_NOTICE, PROFESSIONAL_NOTICE, sources } from "@/lib/sources";
+import { useMessages } from "@/components/locale-provider";
+import { navLabel } from "@/lib/i18n/nav";
+import { sources } from "@/lib/sources";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { sample, ready } = useSession();
   const account = useAccount();
   const companion = useCompanion();
   const pathname = usePathname() ?? "/";
+  const m = useMessages();
 
   return (
     <>
@@ -23,16 +27,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main id="main" className="page app-main stack-lg" data-dept={departmentFor(pathname)}>
         <p className="banner" role="status">
           {account.phase === "loading"
-            ? "Checking sign-in…"
+            ? m.common.checkingSignIn
             : account.phase === "ready"
               ? companion.saveMode === "device"
-                ? "Signed in. Your assessment, habits, and check-ins are saved to your account. Daily activities, reading, and games are saved on this device until the account's daily-progress table is set up."
-                : "Signed in. Your assessment, habits, plans, and daily progress are saved to your account. Sample data is never written to the account."
+                ? m.shell.bannerReadyDevice
+                : m.shell.bannerReady
               : account.phase === "needs-mfa"
-                ? "Enter the authenticator code on the Sign in page to finish sign-in. Saved answers stay closed until then."
+                ? m.shell.bannerNeedsMfa
                 : account.phase === "off"
-                  ? "Account sign-in is not set up on this site. Assessment answers stay in this browser tab until it closes. Daily activities, reading, and games stay in this browser on this device."
-                  : "You are not signed in. Assessment answers stay in this browser tab until it closes. Daily activities, reading, and games stay in this browser on this device. Sign in to keep everything in your account."}
+                  ? m.shell.bannerOff
+                  : m.shell.bannerSignedOut}
         </p>
         {account.error ? (
           <p className="banner" role="alert">
@@ -41,21 +45,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
         {ready && sample ? (
           <p className="banner banner-sample" role="status">
-            Sample data. This is an example, not your information, and it is not saved as your record.
+            {m.shell.sampleBanner}
           </p>
         ) : null}
         <CareInviteWatcher />
+        <SittingReminder />
         {children}
         <footer className="footer-note">
-          <p>{PROFESSIONAL_NOTICE}</p>
+          <p>{m.shell.professionalNotice}</p>
           <p>
-            {CRISIS_NOTICE}{" "}
-            <a href={sources.samhsa988.url}>SAMHSA: 988 Suicide & Crisis Lifeline</a>
+            {m.shell.crisisNotice}{" "}
+            <a href={sources.samhsa988.url}>{m.shell.crisisLink}</a>
           </p>
-          <nav className="footer-links" aria-label="All pages">
+          <nav className="footer-links" aria-label={m.shell.allPages}>
             {FOOTER_LINKS.map((link) => (
               <Link key={link.href} href={link.href}>
-                {link.label}
+                {navLabel(m, link)}
               </Link>
             ))}
           </nav>

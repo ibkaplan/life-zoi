@@ -8,7 +8,7 @@ const RULES: [RegExp, Department][] = [
   [/^\/brain-quiz/, "brain"],
   [/^\/library\/(music|books)/, "reading"],
   [/^\/(library|academy)/, "reading"],
-  [/^\/(emotional-wellness|wellness-coach|nature|urges|life-matters|ai-assistant|habit-transformation|habits|choices)/, "wellness"],
+  [/^\/(breathe|emotional-wellness|wellness-coach|nature|urges|life-matters|ai-assistant|habit-transformation|habits|choices)/, "wellness"],
   [/^\/(progress|outlook)/, "progress"],
   [/^\/(plan|my-day|assessment|what-if|change-lab)/, "plan"],
 ];

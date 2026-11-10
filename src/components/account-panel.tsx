@@ -14,9 +14,13 @@ import {
 } from "@/lib/account-store";
 import { authenticatorQrMarkup } from "@/lib/mfa";
 import { EmailHelpForm, NewPasswordForm } from "@/components/password-forms";
+import { useMessages } from "@/components/locale-provider";
+import { fmt } from "@/lib/i18n/config";
 
 export function AccountPanel() {
   const account = useAccount();
+  const m = useMessages();
+  const a = m.accountPanel;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -37,8 +41,8 @@ export function AccountPanel() {
   if (account.phase === "loading") {
     return (
       <section className="card stack">
-        <h2>Account</h2>
-        <p role="status">Checking sign-in…</p>
+        <h2>{a.title}</h2>
+        <p role="status">{m.common.checkingSignIn}</p>
       </section>
     );
   }
@@ -46,42 +50,42 @@ export function AccountPanel() {
   if (account.phase === "off") {
     return (
       <section className="card stack">
-        <h2>Account</h2>
-        <p>Account sign-in is not configured in this environment. Answers stay in this browser tab.</p>
+        <h2>{a.title}</h2>
+        <p>{a.off}</p>
       </section>
     );
   }
 
   return (
     <section className="card stack">
-      <h2>Account</h2>
+      <h2>{a.title}</h2>
       {account.phase === "ready" ? (
         <>
           <p>
-            Signed in as {account.email ?? "your account"}. Assessment answers, habits, and progress save to this account.
-            {account.isAdmin ? " This is the admin account." : ""}
+            {fmt(a.signedInAs, { email: account.email ?? m.common.yourAccount })}
+            {account.isAdmin ? a.admin : ""}
           </p>
           {account.factorVerified ? (
-            <p>An authenticator app is on. The next sign-in will ask for a 6-digit code.</p>
+            <p>{a.mfaOn}</p>
           ) : (
-            <p>You can add an authenticator app. Google Authenticator and other TOTP apps work. No paid add-on is used.</p>
+            <p>{a.mfaOffer}</p>
           )}
           {account.enrollment ? (
             <div className="stack">
-              <p>Scan this QR code or enter the secret in your authenticator app, then confirm the 6-digit code.</p>
+              <p>{a.scan}</p>
               {authenticatorQrMarkup(account.enrollment.qr) ? (
                 <div
                   className="auth-qr"
                   role="img"
-                  aria-label="QR code for the authenticator app"
+                  aria-label={a.qrLabel}
                   dangerouslySetInnerHTML={{ __html: authenticatorQrMarkup(account.enrollment.qr) }}
                 />
               ) : (
-                <p>The QR code could not be shown. Enter the secret in your authenticator app.</p>
+                <p>{a.qrFailed}</p>
               )}
               <p className="secret-value">{account.enrollment.secret}</p>
               <label className="field" htmlFor="authenticator-confirm">
-                <span>6-digit code</span>
+                <span>{m.common.sixDigitCode}</span>
                 <input
                   id="authenticator-confirm"
                   inputMode="numeric"
@@ -98,29 +102,29 @@ export function AccountPanel() {
                   disabled={busy}
                   onClick={() => void run(() => confirmAuthenticatorSetup(code))}
                 >
-                  Confirm authenticator
+                  {a.confirmAuthenticator}
                 </button>
                 <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => void cancelAuthenticatorSetup()}>
-                  Cancel
+                  {m.common.cancel}
                 </button>
               </div>
             </div>
           ) : account.factorVerified ? null : (
             <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void run(beginAuthenticatorSetup)}>
-              Set up authenticator app
+              {a.setupAuthenticator}
             </button>
           )}
           {changingPassword ? (
-            <NewPasswordForm heading="Change password" onDone={() => setChangingPassword(false)} />
+            <NewPasswordForm heading={a.changePassword} onDone={() => setChangingPassword(false)} />
           ) : null}
           <div className="actions">
             {changingPassword ? null : (
               <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => setChangingPassword(true)}>
-                Change password
+                {a.changePassword}
               </button>
             )}
             <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => void signOutAccount()}>
-              Sign out
+              {m.common.signOut}
             </button>
             {confirmDelete ? (
               <>
@@ -136,15 +140,15 @@ export function AccountPanel() {
                     })
                   }
                 >
-                  Confirm delete account
+                  {a.confirmDelete}
                 </button>
                 <button className="btn btn-ghost" type="button" onClick={() => setConfirmDelete(false)}>
-                  Cancel
+                  {m.common.cancel}
                 </button>
               </>
             ) : (
               <button className="btn btn-danger" type="button" onClick={() => setConfirmDelete(true)}>
-                Delete account
+                {a.deleteAccount}
               </button>
             )}
           </div>
@@ -159,9 +163,9 @@ export function AccountPanel() {
             void run(() => verifySignInCode(code));
           }}
         >
-          <p>Enter the 6-digit code from your authenticator app. Saved answers stay closed until this code is accepted.</p>
+          <p>{a.mfaPrompt}</p>
           <label className="field" htmlFor="sign-in-code">
-            <span>6-digit code</span>
+            <span>{m.common.sixDigitCode}</span>
             <input
               id="sign-in-code"
               inputMode="numeric"
@@ -173,10 +177,10 @@ export function AccountPanel() {
           </label>
           <div className="actions">
             <button className="btn btn-primary" type="submit" disabled={busy}>
-              Verify code
+              {m.common.verifyCode}
             </button>
             <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => void signOutAccount()}>
-              Sign out
+              {m.common.signOut}
             </button>
           </div>
         </form>
@@ -194,14 +198,14 @@ export function AccountPanel() {
             void run(() => signInWithPassword(email, password));
           }}
         >
-          <p>Sign in with your email and password. New accounts are not open yet. Passwords stay with Supabase Auth.</p>
+          <p>{a.signInIntro}</p>
           {account.phase === "error" ? (
             <button className="btn btn-secondary" type="button" onClick={() => retryAccountLoad()}>
-              Try loading saved answers again
+              {a.retry}
             </button>
           ) : null}
           <label className="field" htmlFor="account-email">
-            <span>Email</span>
+            <span>{m.common.email}</span>
             <input
               id="account-email"
               type="email"
@@ -211,7 +215,7 @@ export function AccountPanel() {
             />
           </label>
           <label className="field" htmlFor="account-password">
-            <span>Password</span>
+            <span>{m.common.password}</span>
             <input
               id="account-password"
               type="password"
@@ -222,12 +226,12 @@ export function AccountPanel() {
           </label>
           <div className="actions">
             <button className="btn btn-primary" type="submit" disabled={busy}>
-              Sign in
+              {m.common.signIn}
             </button>
           </div>
           <div className="actions">
             <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => setHelp("reset")}>
-              Forgot password?
+              {a.forgot}
             </button>
           </div>
         </form>

@@ -147,6 +147,18 @@ const A = {
   },
   calmMoment: { id: "calm-moment", title: "A calm moment", minutes: 5, instructions: ["Sit, place a hand on your chest, and breathe slowly for a few breaths."], view: { type: "link", href: "/emotional-wellness", label: "Open Emotional Wellness" }, counts: null, kinds: ["relaxation"] },
   meditation: { id: "meditation", title: "Quiet meditation", minutes: 10, instructions: ["Sit comfortably. Let the tone and slow bell keep you company."], view: { type: "music", trackId: "still-point" }, counts: "listeningMinutes", kinds: ["meditation"] },
+  breatheSession: {
+    id: "breathe-for-life",
+    title: "Breathe for Life session",
+    minutes: 9,
+    instructions: [
+      "Relaxed nasal breathing, soft Bhramari humming, and gentle belly breathing, with an animated guide.",
+      "Keep it comfortable. No breath holding. Stop if you feel dizzy or unwell.",
+    ],
+    view: { type: "link", href: "/breathe/practice", label: "Open the breathing guide" },
+    counts: null,
+    kinds: ["breathing"],
+  },
 } satisfies Record<string, PlanActivity>;
 
 function movement(category: LibraryCategory, title: string, minutes: number, kinds: ActivityKind[]): PlanActivity {
@@ -247,7 +259,7 @@ export function planSections(ctx: PlanContext): Record<SectionId, PlanActivity[]
     movement: moves.slice(0, 4),
     brain: [A.sudoku, A.dailyQuiz],
     outdoors: preferred(outdoors, ctx),
-    music: preferred([A.relaxMusic, A.breathing, A.positiveMusic, A.meditation], ctx),
+    music: preferred([A.relaxMusic, A.breathing, A.positiveMusic, A.meditation, A.breatheSession], ctx),
     books: [A.reading, A.readingGuide],
     sleep: [A.windDown, A.sleepSounds],
     emotional: preferred([A.eveningReview, A.connect, A.calmMoment], ctx),
@@ -304,7 +316,7 @@ export function slotOptions(slot: DaySlot, ctx: PlanContext): PlanActivity[] {
     case "dinner":
       return [A.dinner];
     case "relaxation":
-      return preferred([A.calmMoment, A.breathing, A.meditation, A.natureSit, A.connect], ctx);
+      return preferred([A.calmMoment, A.breathing, A.meditation, A.natureSit, A.connect, A.breatheSession], ctx);
     case "evening-routine":
       return [A.eveningReview, A.connect];
     case "sleep-prep":
