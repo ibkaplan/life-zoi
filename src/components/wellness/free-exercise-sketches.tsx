@@ -1,17 +1,22 @@
+"use client";
+
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import type { SketchKind } from "@/lib/wellness/exercise-resources/routines";
 
 const labels: Record<SketchKind, string> = {
-  chair: "Simple original drawing of a person seated and lifting one foot.",
-  morning: "Simple original drawing of a seated person lifting one arm in the morning.",
-  balance: "Simple original drawing of a person holding a chair while standing.",
-  hands: "Simple original drawing of two open hands.",
-  feet: "Simple original drawing of two feet and ankles.",
-  strength: "Simple original drawing of a seated arm raise beside a wall.",
+  chair: msg("Simple original drawing of a person seated and lifting one foot."),
+  morning: msg("Simple original drawing of a seated person lifting one arm in the morning."),
+  balance: msg("Simple original drawing of a person holding a chair while standing."),
+  hands: msg("Simple original drawing of two open hands."),
+  feet: msg("Simple original drawing of two feet and ankles."),
+  strength: msg("Simple original drawing of a seated arm raise beside a wall."),
 };
 
 export function RoutineSketch({ kind }: { kind: SketchKind }) {
+  const t = useT();
   return (
-    <svg className="free-sketch" viewBox="0 0 320 180" role="img" aria-label={labels[kind]}>
+    <svg className="free-sketch" viewBox="0 0 320 180" role="img" aria-label={t(labels[kind])}>
       <rect width="320" height="180" rx="24" fill="#EFE5FA" />
       <circle cx="40" cy="28" r="10" fill="#F3ECFB" />
       <circle cx="150" cy="36" r="16" fill="#172554" />
