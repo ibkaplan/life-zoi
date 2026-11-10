@@ -128,3 +128,12 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 2. Re-run the required scripts before every merge, because GitHub enforces no checks.
 3. Leave paid AI, document upload, and launch claims until a person asks.
 4. Keep `noindex`.
+
+### Women's Care in Food & Wellness
+
+1. Name: Women's Care inside the daily meal plan.
+2. Objective: adapt the existing Today's meals plan for menstrual cycle phase, symptoms, perimenopause, and menopause, without a separate plan.
+3. Status: implemented on branch `claude/project-thread-5j56b9`, pull request open and unmerged (2026-11-10).
+4. Rules: used only after the person ticks both "I identify as a woman" and "cycle or menopause nutrition is relevant". Never inferred. Answers live in the companion state (browser, or the account `companion_state` row) and are not sent to an AI or outside service. Extra recipe ideas go through the same `checkRecipe` allergy, diet, religious, and exclusion checks; example foods use `ingredientAllowed`. Qualitative wording only; clinician pointer for heavy bleeding, severe symptoms, or iron worries.
+5. Files: `src/lib/companion/womens-care.ts`, `src/components/companion/womens-care-view.tsx`, tests in `src/lib/companion/womens-care.test.ts`.
+6. Outstanding: translation keys once the four-language work lands (all copy is in `womens-care.ts` and the view); medical copy review before launch.

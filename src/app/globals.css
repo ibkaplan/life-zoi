@@ -2711,3 +2711,28 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .bf-quote { margin: 0; padding: 0.8rem 1rem; border-left: 5px solid var(--lavender-brand); background: var(--sky); border-radius: 0 12px 12px 0; }
 .bf-sources { display: grid; gap: 0.8rem; padding-left: 1.3rem; }
 .bf-sources p { margin: 0.2rem 0 0; }
+/* Women's Care, inside Food & Wellness: purple and lavender on any department page */
+.wc-care {
+  background: linear-gradient(160deg, #F6EEFD 0%, var(--lavender) 60%, #E7D8F7 100%);
+  border: 1px solid #D4C4F5;
+  border-left: 6px solid var(--royal);
+  border-radius: var(--radius);
+  padding: clamp(1rem, 3vw, 1.6rem);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.wc-care h2, .wc-care h3 { color: var(--royal); }
+.wc-care h2 { font-size: clamp(1.35rem, 3.2vw, 1.9rem); line-height: 1.2; overflow-wrap: anywhere; }
+.wc-care .kicker { color: var(--deep); }
+.wc-care a { color: var(--deep); font-weight: 600; }
+.wc-care summary { cursor: pointer; font-weight: 700; color: var(--deep); }
+.wc-head { display: grid; gap: 0.35rem; }
+.wc-message { font-family: var(--font-display); font-size: clamp(1.1rem, 2.4vw, 1.3rem); color: var(--deep); margin: 0; }
+.wc-stage { display: inline-block; background: var(--surface); color: var(--royal); border: 1px solid #D4C4F5; border-radius: 999px; padding: 0.25rem 0.9rem; font-weight: 700; margin: 0; justify-self: start; }
+.wc-grid { display: grid; gap: 0.8rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+.wc-focus { background: var(--surface); border: 1px solid #DCCDF4; border-top: 4px solid var(--lavender-brand); border-radius: 14px; padding: 0.9rem; }
+.wc-focus h3 { font-size: 1.1rem; margin: 0 0 0.3rem; }
+.wc-focus p { margin: 0.3rem 0 0; }
+.wc-care-footer { border-top: 1px solid #D4C4F5; padding-top: 0.8rem; display: grid; gap: 0.3rem; }
+.wc-care-footer p { margin: 0; }
+.app-main .wc-care.card { border-top: 1px solid #D4C4F5; }

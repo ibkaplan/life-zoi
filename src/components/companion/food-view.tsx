@@ -8,7 +8,9 @@ import { useProfile } from "@/components/companion/use-profile";
 import { useSession } from "@/components/session-provider";
 import { commitCompanion } from "@/lib/companion/store";
 import { cleanFoodWords, MEAL_STYLES, YES_NO, type FoodPrefs, type MealStyle, type YesNo } from "@/lib/companion/state";
-import { mealsForDay, nutritionGoalFor, nutritionGoalLabels, NUTRITION_GOALS, shoppingList, type MealSuggestion, type NutritionGoal } from "@/lib/companion/nutrition";
+import { WomensCareSection, WomensCareSettings } from "@/components/companion/womens-care-view";
+import { plannedMeals } from "@/lib/companion/womens-care";
+import { nutritionGoalFor, nutritionGoalLabels, NUTRITION_GOALS, shoppingList, type MealSuggestion, type NutritionGoal } from "@/lib/companion/nutrition";
 import { localISODate } from "@/lib/dates";
 import { CUISINES, FOOD_WORDS } from "@/lib/food-words";
 import { allergenLabels, dietRequirementLabels } from "@/lib/health-profile";
@@ -195,6 +197,10 @@ export function FoodPreferencesView() {
           <span>Show calories where LifeZoi has USDA figures (optional)</span>
         </label>
       </section>
+      <section className="wc-care stack" aria-labelledby="wc-pref-title">
+        <h2 id="wc-pref-title">Women&apos;s Care</h2>
+        <WomensCareSettings care={companion.womensCare} sample={sample} />
+      </section>
       <Link className="btn btn-primary" href="/food-plan/today">
         See today&apos;s meals
       </Link>
@@ -253,7 +259,7 @@ export function TodayMealsView() {
   const today = localISODate();
   const profile = session.foodPlan.profile;
   const goal = goalOverride || nutritionGoalFor(answers?.primaryGoal ?? "", answers?.wellnessGoals ?? []);
-  const day = mealsForDay(answers, companion.food, goal, today, profile);
+  const { day, care } = plannedMeals(answers, companion.food, goal, today, profile, companion.womensCare);
   const showKcal = companion.food.calorieTracking && !profile.eatingDisorder;
   const chosen: MealSuggestion[] = [];
   return (
@@ -296,6 +302,7 @@ export function TodayMealsView() {
           </p>
         ))}
       </section>
+      <WomensCareSection care={companion.womensCare} adaptation={care} sample={sample} />
       {(Object.keys(SLOT_LABEL) as MealSlot[]).map((slot) => {
         const options = day.slots[slot];
         if (options.length === 0) {
