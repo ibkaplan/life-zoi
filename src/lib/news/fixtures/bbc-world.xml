@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+<channel><title><![CDATA[BBC News]]></title>
+<item>
+  <title><![CDATA[Fixture: Leaders meet for climate talks]]></title>
+  <description><![CDATA[Delegates from many countries gathered on Monday. Talks continue all week. A third sentence that should not appear.]]></description>
+  <link>https://www.bbc.co.uk/news/articles/fixture-1</link>
+  <guid isPermaLink="false">https://www.bbc.co.uk/news/articles/fixture-1#0</guid>
+  <pubDate>Tue, 10 Nov 2026 06:30:00 GMT</pubDate>
+</item>
+<item>
+  <title>Fixture: Port reopens after storm</title>
+  <description>Ships returned to the harbour &amp; trade resumed.</description>
+  <link>https://www.bbc.co.uk/news/articles/fixture-2</link>
+  <pubDate>Mon, 09 Nov 2026 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Fixture: Last week's story</title>
+  <description>This is too old to show as today's news.</description>
+  <link>https://www.bbc.co.uk/news/articles/fixture-old</link>
+  <pubDate>Mon, 02 Nov 2026 10:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Fixture: Undated story</title>
+  <description>No date, so it cannot be shown as current.</description>
+  <link>https://www.bbc.co.uk/news/articles/fixture-undated</link>
+</item>
+</channel></rss>
