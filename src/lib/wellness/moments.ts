@@ -1,4 +1,8 @@
 import type { MomentCategory, MomentFilter, MomentMinutes, MomentPlan } from "@/lib/wellness/types";
+import { makeTranslate, msg, type Translate } from "@/lib/i18n/translate";
+
+/** English with placeholders filled. Pages pass their own `t` to get the chosen language. */
+const ENGLISH: Translate = makeTranslate(null);
 
 export type MomentIdea = {
   id: string;
@@ -193,11 +197,15 @@ export const MOMENT_IDEAS: MomentIdea[] = [
 export const EXAMPLE_MOMENT_STORY =
   "Example only, not your record: felt bored, wanted chocolate, chose learning, 10 minutes on five English words.";
 
-export function buildMomentPlan(input: {
-  minutes: MomentMinutes;
-  filters: MomentFilter[];
-  categories: MomentCategory[];
-}): { title: string; detail: string; prompt: string } {
+/** With `t`, the plan text is written in the chosen language before it is saved. */
+export function buildMomentPlan(
+  input: {
+    minutes: MomentMinutes;
+    filters: MomentFilter[];
+    categories: MomentCategory[];
+  },
+  t: Translate = ENGLISH,
+): { title: string; detail: string; prompt: string } {
   const filters = input.filters.length > 0 ? input.filters : MOMENT_FILTER_COPY.map((item) => item.id);
   const categories = input.categories;
   const matches = MOMENT_IDEAS.filter((idea) => {
@@ -209,12 +217,18 @@ export function buildMomentPlan(input: {
 
   const chosen = matches.length > 0 ? matches : [MOMENT_IDEAS.find((idea) => idea.id === "quiet-rest")!];
   const labels = [
-    ...input.categories.map((id) => MOMENT_CATEGORY_COPY.find((item) => item.id === id)?.label ?? id),
-    ...input.filters.map((id) => MOMENT_FILTER_COPY.find((item) => item.id === id)?.label ?? id),
+    ...input.categories.map((id) => {
+      const label = MOMENT_CATEGORY_COPY.find((item) => item.id === id)?.label;
+      return label ? t(label) : id;
+    }),
+    ...input.filters.map((id) => {
+      const label = MOMENT_FILTER_COPY.find((item) => item.id === id)?.label;
+      return label ? t(label) : id;
+    }),
   ];
   return {
-    title: chosen[0]?.title ?? "A short rest",
-    detail: chosen.map((idea) => `${idea.title}. ${idea.detail}`).join(" "),
+    title: t(chosen[0]?.title ?? msg("A short rest")),
+    detail: chosen.map((idea) => `${t(idea.title)}. ${t(idea.detail)}`).join(" "),
     prompt: labels.join(", "),
   };
 }
