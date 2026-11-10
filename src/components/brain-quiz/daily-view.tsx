@@ -9,8 +9,12 @@ import { localISODate } from "@/lib/dates";
 import { completeDaily, encouragement, saveDailyPick, QUIZ_NOTICE, type BrainProgress, type DailyPick } from "@/lib/brain-quiz/progress";
 import { QuizActivity } from "@/components/brain-quiz/quiz-activity";
 import { useBrainProgress } from "@/components/brain-quiz/use-brain-progress";
+import { useLocale } from "@/components/locale-provider";
+import { localizeActivity, noteText, titleText } from "@/lib/brain-quiz/localize";
+import { msg } from "@/lib/i18n/translate";
 
 export function DailyChallenge() {
+  const { locale, t } = useLocale();
   const { progress, save, ready } = useBrainProgress();
   const today = localISODate();
   const [step, setStep] = useState(0);
@@ -24,7 +28,7 @@ export function DailyChallenge() {
     if (!result.already && result.gained > 0) save(result.progress);
   }, [finished, picks.length, progress, round, save, today]);
 
-  if (!ready) return <p className="card" role="status">Loading today’s challenge…</p>;
+  if (!ready) return <p className="card" role="status">{t("Loading today’s challenge…")}</p>;
 
   const score = progress.dailyScores.find((item) => item.date === today);
   const correct = picks.filter((pick) => pick.correct).length;
@@ -33,36 +37,36 @@ export function DailyChallenge() {
 
   return (
     <div className="stack-lg">
-      <p><Link href="/brain-quiz">Back to Brain & Habit Quiz</Link></p>
+      <p><Link href="/brain-quiz">{t("Back to Brain & Habit Quiz")}</Link></p>
       <section className="stack">
-        <p className="kicker">Daily challenge</p>
-        <h1>Five parts for today</h1>
-        <p>One logic puzzle, one memory game, one picture rebus, one word or number item, and one habit question. About 5 to 10 minutes.</p>
-        <p className="hint">{QUIZ_NOTICE}</p>
+        <p className="kicker">{t("Daily challenge")}</p>
+        <h1>{t("Five parts for today")}</h1>
+        <p>{t("One logic puzzle, one memory game, one picture rebus, one word or number item, and one habit question. About 5 to 10 minutes.")}</p>
+        <p className="hint">{t(QUIZ_NOTICE)}</p>
       </section>
       <div className="card stack">
-        <p className="progress-label"><span>{showReview ? "Complete" : `Part ${step + 1} of ${round.items.length}`}</span><span>{correct} correct so far</span></p>
+        <p className="progress-label"><span>{showReview ? t("Complete") : t("Part {current} of {total}", { current: step + 1, total: round.items.length })}</span><span>{t("{count} correct so far", { count: correct })}</span></p>
         <div className="progress-track" aria-hidden><span style={{ width: `${(Math.min(picks.length, round.items.length) / round.items.length) * 100}%` }} /></div>
       </div>
       {showReview ? (
         <section className="card stack">
-          <h2>Today’s review</h2>
-          <p>{encouragement(score?.correct ?? correct, round.items.length)}</p>
-          <p>{score ? `Daily score ${score.score}, including the 25-point finish bonus when it was new.` : "Finish every part to add the 25-point bonus once."}</p>
+          <h2>{t("Today’s review")}</h2>
+          <p>{t(encouragement(score?.correct ?? correct, round.items.length))}</p>
+          <p>{score ? t("Daily score {score}, including the 25-point finish bonus when it was new.", { score: score.score }) : t("Finish every part to add the 25-point bonus once.")}</p>
           <ol className="record-list">
             {round.items.map((item) => {
               const pick = picks.find((entry) => entry.id === item.id);
               return (
                 <li key={item.id}>
-                  <strong>{item.title}</strong>
-                  <p>{pick ? (pick.correct ? "Correct" : "Not this time") : "Not answered"}{pick ? ` · ${pick.note}` : ""}</p>
+                  <strong>{titleText(localizeActivity(item, locale).title, t)}</strong>
+                  <p>{pick ? (pick.correct ? t("Correct") : t("Not this time")) : t("Not answered")}{pick ? ` · ${noteText(pick.note, t)}` : ""}</p>
                 </li>
               );
             })}
           </ol>
           <div className="actions">
-            <Link className="btn btn-primary" href="/brain-quiz">Play more</Link>
-            <Link className="btn btn-secondary" href="/brain-quiz/journey">My Brain Journey</Link>
+            <Link className="btn btn-primary" href="/brain-quiz">{t("Play more")}</Link>
+            <Link className="btn btn-secondary" href="/brain-quiz/journey">{t("My Brain Journey")}</Link>
           </div>
         </section>
       ) : current ? (
@@ -79,7 +83,7 @@ export function DailyChallenge() {
                 setStep((value) => value + 1);
               }}
             >
-              {step + 1 === round.items.length ? "See results" : "Next"}
+              {step + 1 === round.items.length ? t("See results") : t("Next")}
             </button>
           ) : null}
         </article>
@@ -98,7 +102,7 @@ function rememberedPick(progress: BrainProgress, activity: Activity): DailyPick 
   return {
     id: activity.id,
     correct,
-    note: correct ? "Already counted. This activity does not score again." : "Already answered. No new points.",
+    note: correct ? msg("Already counted. This activity does not score again.") : msg("Already answered. No new points."),
     gained: 0,
     picked: [],
   };

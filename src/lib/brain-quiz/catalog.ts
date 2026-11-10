@@ -22,7 +22,7 @@ export const CATEGORIES: readonly { id: CategoryId; title: string; blurb: string
   { id: "habits", title: "Habits & health", blurb: "Everyday learning about sleep, food, movement, and habits." },
 ];
 
-const MEMORY_MODES: readonly { mode: MemoryMode; title: string; prompt: string }[] = [
+export const MEMORY_MODES: readonly { mode: MemoryMode; title: string; prompt: string }[] = [
   { mode: "sequence", title: "Color sequence", prompt: "Watch the colors, then tap them in the same order." },
   { mode: "numbers", title: "Number span", prompt: "Watch the digits, then enter them in the same order." },
   { mode: "words", title: "Word list", prompt: "Study the words, then select every word you saw. The full set is required." },
@@ -30,7 +30,7 @@ const MEMORY_MODES: readonly { mode: MemoryMode; title: string; prompt: string }
   { mode: "order", title: "Picture order", prompt: "Remember the picture order, then tap the pictures in that order." },
 ];
 
-const ATTENTION_MODES: readonly { mode: AttentionMode; title: string; prompt: string }[] = [
+export const ATTENTION_MODES: readonly { mode: AttentionMode; title: string; prompt: string }[] = [
   { mode: "differences", title: "Find the differences", prompt: "The right picture changed. Select every shape that differs, then check." },
   { mode: "missing", title: "Missing object", prompt: "Look at the first set. One object is missing from the second set. Choose it." },
   { mode: "odd", title: "Odd one out", prompt: "Tap the shape that does not match the others." },
