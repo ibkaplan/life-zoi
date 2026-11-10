@@ -231,7 +231,7 @@ export function FocusView() {
         <div className="focus-clock">
           <svg viewBox="0 0 240 240" aria-hidden="true" focusable="false">
             <circle className="focus-ring-bg" cx="120" cy="120" r="108" />
-            <circle
+            {progress > 0.005 ? <circle
               className="focus-ring"
               cx="120"
               cy="120"
@@ -239,7 +239,7 @@ export function FocusView() {
               strokeDasharray={ring}
               strokeDashoffset={ring * (1 - progress)}
               transform="rotate(-90 120 120)"
-            />
+            /> : null}
           </svg>
           <div className="focus-time" role="timer" aria-live="off" aria-label={t("Time left: {time}", { time: formatClock(left) })}>
             {formatClock(left)}
