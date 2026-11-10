@@ -40,7 +40,7 @@ import {
 } from "@/lib/types";
 import { firstInvalidStep, validateStep } from "@/lib/validation";
 import { ALLERGENS } from "@/lib/food-plan/types";
-import { FOOD_WORDS } from "@/lib/food-words";
+import { foodWordFromInput, foodWordLabel, foodWordOptions } from "@/lib/food-words";
 import {
   allergenLabels,
   BLOOD_PRESSURE_STATUSES,
@@ -79,7 +79,7 @@ function ReactionEditor({
   const [food, setFood] = useState("");
   const [type, setType] = useState<ReactionType>("allergy");
   function add() {
-    const clean = food.trim().toLowerCase().slice(0, 40);
+    const clean = foodWordFromInput(food, t).trim().toLowerCase().slice(0, 40);
     if (!clean) return;
     onChange([...reactions.filter((item) => item.food !== clean), { food: clean, type }]);
     setFood("");
@@ -112,7 +112,7 @@ function ReactionEditor({
             }}
           />
           <datalist id="assessment-food-words">
-            {FOOD_WORDS.map((word) => (
+            {foodWordOptions(t).map((word) => (
               <option key={word} value={word} />
             ))}
           </datalist>
@@ -137,11 +137,11 @@ function ReactionEditor({
         <ul className="chip-list">
           {reactions.map((item) => (
             <li key={item.food} className="chip">
-              {item.food} · {t(reactionLabels[item.type])}
+              {foodWordLabel(item.food, t)} · {t(reactionLabels[item.type])}
               <button
                 type="button"
                 className="chip-remove"
-                aria-label={t("Remove {food}", { food: item.food })}
+                aria-label={t("Remove {food}", { food: foodWordLabel(item.food, t) })}
                 onClick={() => onChange(reactions.filter((other) => other.food !== item.food))}
               >
                 ×
@@ -1049,7 +1049,7 @@ function Review({
     },
     {
       label: t("Other food reactions"),
-      value: draft.foodReactions.map((item) => `${item.food} (${t(reactionLabels[item.type]).toLocaleLowerCase()})`).join(", ") || none,
+      value: draft.foodReactions.map((item) => `${foodWordLabel(item.food, t)} (${t(reactionLabels[item.type]).toLocaleLowerCase()})`).join(", ") || none,
       step: "health",
     },
     {
