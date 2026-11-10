@@ -1,5 +1,6 @@
 "use client";
 
+import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import { useEffect, useRef, useState } from "react";
 import { localISODate } from "@/lib/dates";
 import { addRecent, clearEntry, recordEntry, toggleFavorite, type DayLog, type EntryStatus } from "@/lib/companion/state";
@@ -148,6 +149,7 @@ export function VideoPlayer({ video, autoStart = false }: { video: VideoItem; au
       </p>
       {playing && video.embedUrl ? (
         <div className="video-frame">
+          <AudioFocusClaim id="video-player" />
           <iframe
             src={video.embedUrl}
             title={video.title}

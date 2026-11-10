@@ -1,5 +1,6 @@
 "use client";
 
+import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import Link from "next/link";
 import { STUDIO_PATH } from "@/lib/wellness-library/chair-yoga";
 import { useState, useSyncExternalStore } from "react";
@@ -132,6 +133,7 @@ export function LessonCard({ lesson }: { lesson: StudioLesson }) {
           </p>
           {playing && src ? (
             <div className="video-frame">
+              <AudioFocusClaim id="video-player" />
               <iframe
                 src={src}
                 title={lesson.title}

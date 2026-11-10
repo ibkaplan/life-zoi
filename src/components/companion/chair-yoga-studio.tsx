@@ -1,5 +1,6 @@
 "use client";
 
+import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FavoriteButton, SaveNote, SessionPlayer } from "@/components/companion/shared";
@@ -184,6 +185,7 @@ function PlayerDialog({ video, onClose }: { video: StudioVideo | null; onClose: 
           </p>
           {video.embedUrl ? (
             <div className="video-frame cy-frame">
+              <AudioFocusClaim id="video-player" />
               <iframe
                 src={`${video.embedUrl}?autoplay=1&rel=0`}
                 title={video.title}

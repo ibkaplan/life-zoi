@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLocale } from "@/components/locale-provider";
+import { MorningWelcome } from "@/components/background-music/morning-welcome";
 import { RecommendationsPanel } from "@/components/recommendations-panel";
 import { fmt, LOCALE_META } from "@/lib/i18n/config";
 import { useSession } from "@/components/session-provider";
@@ -26,6 +27,7 @@ export function DashboardView() {
 
   return (
     <div className="stack-lg">
+      <MorningWelcome />
       <section className="stack">
         <p className="kicker">{d.kicker}</p>
         <h1>{name ? fmt(d.welcomeName, { name }) : d.welcome}</h1>

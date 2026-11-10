@@ -2908,3 +2908,143 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 }
 .cy-thumb[data-section="standing"] .cy-thumb-fallback { background: linear-gradient(135deg, var(--teal), var(--teal-brand)); }
 .cy-thumb[data-section="gentle"] .cy-thumb-fallback { background: linear-gradient(135deg, #B0731A, var(--gold)); }
+
+/* Background music: the ♪ header button, its panel, and the dashboard welcome. */
+.music-switch { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; }
+
+.site-account .music-button {
+  position: relative;
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+  border-color: var(--lavender-brand);
+  background: var(--ivory);
+  color: var(--royal);
+}
+.site-account .music-button:hover,
+.site-account .music-button[aria-expanded="true"] { background: var(--lavender); border-color: var(--royal); }
+.site-account .music-button[data-state="on"] { background: var(--royal); border-color: var(--royal); color: #ffffff; }
+.site-account .music-button[data-state="off"] { color: var(--muted); }
+
+.music-bars {
+  position: absolute;
+  right: 5px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 9px;
+}
+.music-bars i {
+  display: block;
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--lavender-brand);
+  animation: music-bar 1.2s ease-in-out infinite;
+}
+.music-bars i:nth-child(2) { animation-delay: 0.3s; }
+.music-bars i:nth-child(3) { animation-delay: 0.6s; }
+@keyframes music-bar { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+
+.site-account .music-blocked-play {
+  gap: 0.35rem;
+  border-color: var(--teal-brand);
+  background: var(--teal-brand);
+  color: #ffffff;
+  letter-spacing: 0.03em;
+}
+.site-account .music-blocked-play:hover { background: var(--teal); }
+
+.music-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 50;
+  width: min(22rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--ivory);
+  box-shadow: 0 12px 32px rgba(23, 37, 84, 0.18);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+.music-panel h2 { margin: 0; font-size: 1.2rem; color: var(--royal); }
+.music-panel p { margin: 0; }
+.music-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.music-now { color: var(--ink); font-weight: 600; }
+.music-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.music-volume input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--royal); }
+.music-credits summary { cursor: pointer; font-weight: 700; color: var(--royal); min-height: 44px; display: flex; align-items: center; }
+.music-credits ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
+.music-off { border-top: 1px solid var(--line); padding-top: 0.75rem; }
+
+.site-account .music-panel .btn,
+.site-account .music-panel .music-close { border-radius: 12px; font-weight: 700; }
+.site-account .music-panel .btn-primary { background: var(--royal); border-color: var(--royal); color: #ffffff; }
+.site-account .music-panel .btn-primary:hover { background: var(--deep); }
+.site-account .music-panel .btn-secondary { background: var(--surface); border-color: var(--lavender-brand); color: var(--royal); }
+.site-account .music-panel .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+.site-account .music-panel .music-close { width: 44px; justify-content: center; padding: 0; font-size: 1.5rem; line-height: 1; }
+
+.morning-welcome {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--ivory) 0%, #F1E8FB 55%, #E3F1EE 100%);
+  box-shadow: var(--shadow);
+}
+.morning-welcome p { margin: 0; max-width: 40rem; font-size: 1.1rem; }
+.morning-glow {
+  position: absolute;
+  top: -3.5rem;
+  right: -3.5rem;
+  width: 11rem;
+  height: 11rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 182, 93, 0.45), rgba(185, 142, 229, 0.15) 60%, transparent 72%);
+  pointer-events: none;
+}
+.morning-welcome .morning-title {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  line-height: 1.2;
+  font-weight: 650;
+  color: var(--royal);
+}
+.morning-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+.morning-note {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--lavender-brand);
+  color: var(--ivory);
+}
+.btn.morning-play {
+  min-height: 52px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  background: var(--royal);
+  color: #ffffff;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 18px rgba(106, 61, 168, 0.28);
+}
+.btn.morning-play:hover { background: var(--deep); color: #ffffff; }
+.btn.morning-play[aria-pressed="true"] { background: var(--teal); }
+
+@media (max-width: 480px) {
+  .site-account .music-blocked-play { padding: 0.4rem 0.6rem; font-size: 0.9rem; }
+  .btn.morning-play { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-bars i { animation: none; transform: scaleY(0.7); }
+}

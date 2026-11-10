@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Caveat, Fraunces, Noto_Serif_Display, Source_Sans_3 } from "next/font/google";
+import { BackgroundMusicProvider } from "@/components/background-music/provider";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SkipLink } from "@/components/localized-text";
 import { SessionProvider } from "@/components/session-provider";
@@ -58,7 +59,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <LocaleProvider>
           <SkipLink />
-          <SessionProvider>{children}</SessionProvider>
+          <BackgroundMusicProvider>
+            <SessionProvider>{children}</SessionProvider>
+          </BackgroundMusicProvider>
         </LocaleProvider>
       </body>
     </html>

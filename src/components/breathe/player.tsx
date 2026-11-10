@@ -8,6 +8,7 @@ import { STOP_SIGNS } from "@/lib/breathe/content";
 import { buildSession, focusFor, MIN_SAVED_SECONDS, PACES, PHASE_WORD, phaseAt, sessionSeconds, type SessionFocus } from "@/lib/breathe/program";
 import { rateSession } from "@/lib/breathe/state";
 import { localISODate } from "@/lib/dates";
+import { useAudioFocus } from "@/components/background-music/use-audio-focus";
 
 type Status = "ready" | "running" | "paused" | "finished" | "stopped";
 
@@ -51,6 +52,8 @@ export function BreathingPlayer() {
   const total = sessionSeconds(steps);
 
   const [status, setStatus] = useState<Status>("ready");
+  // Background music pauses for the whole guided session, spoken cues or not.
+  useAudioFocus(status === "running" || status === "paused", "guided-breathing");
   const [elapsed, setElapsed] = useState(0);
   const [breathCues, setBreathCues] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
