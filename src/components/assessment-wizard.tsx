@@ -1,13 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import { useAccount } from "@/lib/account-store";
 import { LoadingState } from "@/components/sources";
-import { useMessages } from "@/components/locale-provider";
-import { fmt } from "@/lib/i18n/config";
-import { translateError } from "@/lib/i18n/translate-error";
+import { CheckQuestion, ChoiceQuestion, TextQuestion } from "@/components/assessment/question-fields";
+import { fieldLabel, fieldStep, friendlyError, orderedErrorFields } from "@/lib/assessment-fields";
+import {
+  ageLabels,
+  alcoholLabels,
+  goalLabels,
+  hydrationLabels,
+  moodLabels,
+  sleepQualityLabels,
+  smokingLabels,
+  socialLabels,
+  stressLabels,
+  vegetableLabels,
+} from "@/lib/labels";
 import {
   AGE_RANGES,
   ALCOHOL_PATTERNS,
@@ -22,62 +33,35 @@ import {
   TABLE_SEX,
   VEGETABLE_PATTERNS,
   type Assessment,
-  type GoalId,
   type StepId,
 } from "@/lib/types";
 import { firstInvalidStep, validateStep } from "@/lib/validation";
 import { ALLERGENS } from "@/lib/food-plan/types";
 import { FOOD_WORDS } from "@/lib/food-words";
 import {
+  allergenLabels,
   BLOOD_PRESSURE_STATUSES,
   BLOOD_SUGAR_STATUSES,
+  bloodPressureLabels,
+  bloodSugarLabels,
   CHOLESTEROL_STATUSES,
+  cholesterolLabels,
   DIET_PATTERNS,
   DIET_REQUIREMENTS,
+  dietPatternLabels,
+  dietRequirementLabels,
   ENERGY_LEVELS,
+  energyLabels,
   REACTION_TYPES,
+  reactionLabels,
   type ReactionType,
   EATING_PATTERNS,
+  eatingPatternLabels,
   MOBILITY_LIMITS,
+  mobilityLabels,
   WELLNESS_GOALS,
+  wellnessGoalLabels,
 } from "@/lib/health-profile";
-
-function toggle<T extends string>(list: T[], value: T, on: boolean): T[] {
-  return on ? (list.includes(value) ? list : [...list, value]) : list.filter((item) => item !== value);
-}
-
-function CheckList<T extends string>({
-  legend,
-  hint,
-  values,
-  options,
-  onChange,
-}: {
-  legend: string;
-  hint?: string;
-  values: T[];
-  options: { value: T; label: string }[];
-  onChange: (values: T[]) => void;
-}) {
-  return (
-    <fieldset className="field">
-      <legend>{legend}</legend>
-      {hint ? <p className="hint">{hint}</p> : null}
-      <div className="check-grid">
-        {options.map((option) => (
-          <label className="check-row" key={option.value}>
-            <input
-              type="checkbox"
-              checked={values.includes(option.value)}
-              onChange={(event) => onChange(toggle(values, option.value, event.target.checked))}
-            />
-            <span>{option.label}</span>
-          </label>
-        ))}
-      </div>
-    </fieldset>
-  );
-}
 
 function ReactionEditor({
   reactions,
@@ -88,8 +72,6 @@ function ReactionEditor({
 }) {
   const [food, setFood] = useState("");
   const [type, setType] = useState<ReactionType>("allergy");
-  const m = useMessages();
-  const h = m.assessment.health;
   function add() {
     const clean = food.trim().toLowerCase().slice(0, 40);
     if (!clean) return;
@@ -97,48 +79,63 @@ function ReactionEditor({
     setFood("");
   }
   return (
-    <fieldset className="field">
-      <legend>{h.reactions}</legend>
-      <p className="hint">{h.reactionsHint}</p>
-      <div className="inline-form">
-        <input
-          aria-label={h.food}
-          list="assessment-food-words"
-          value={food}
-          maxLength={40}
-          onChange={(event) => setFood(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              add();
-            }
-          }}
-        />
-        <datalist id="assessment-food-words">
-          {FOOD_WORDS.map((word) => (
-            <option key={word} value={word} />
-          ))}
-        </datalist>
-        <select aria-label={h.reactionKind} value={type} onChange={(event) => setType(event.target.value as ReactionType)}>
-          {REACTION_TYPES.map((value) => (
-            <option key={value} value={value}>
-              {m.labels.reaction[value]}
-            </option>
-          ))}
-        </select>
-        <button className="btn btn-secondary" type="button" onClick={add}>
-          {m.common.add}
+    <fieldset className="qz-field qz-group">
+      <legend className="qz-label">Other allergies, intolerances, or sensitivities</legend>
+      <p className="qz-hint">
+        For example a specific fruit, vegetable, or ingredient. Start typing to search, or type your own. A diagnosed allergy is a strict exclusion. Intolerances and sensitivities are also left out of meal ideas.
+      </p>
+      <div className="qz-reaction">
+        <div className="qz-subfield">
+          <label className="qz-sublabel" htmlFor="reaction-food">
+            Food
+          </label>
+          <input
+            id="reaction-food"
+            className="qz-input"
+            type="text"
+            list="assessment-food-words"
+            placeholder="For example: strawberries"
+            value={food}
+            maxLength={40}
+            onChange={(event) => setFood(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                add();
+              }
+            }}
+          />
+          <datalist id="assessment-food-words">
+            {FOOD_WORDS.map((word) => (
+              <option key={word} value={word} />
+            ))}
+          </datalist>
+        </div>
+        <div className="qz-subfield">
+          <label className="qz-sublabel" htmlFor="reaction-type">
+            Kind of reaction
+          </label>
+          <select id="reaction-type" className="qz-input qz-select" value={type} onChange={(event) => setType(event.target.value as ReactionType)}>
+            {REACTION_TYPES.map((value) => (
+              <option key={value} value={value}>
+                {reactionLabels[value]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button className="btn btn-secondary qz-add" type="button" onClick={add}>
+          + Add this food
         </button>
       </div>
       {reactions.length > 0 ? (
         <ul className="chip-list">
           {reactions.map((item) => (
             <li key={item.food} className="chip">
-              {item.food} · {m.labels.reaction[item.type]}
+              {item.food} · {reactionLabels[item.type]}
               <button
                 type="button"
                 className="chip-remove"
-                aria-label={fmt(m.common.remove, { item: item.food })}
+                aria-label={`Remove ${item.food}`}
                 onClick={() => onChange(reactions.filter((other) => other.food !== item.food))}
               >
                 ×
@@ -151,92 +148,63 @@ function ReactionEditor({
   );
 }
 
-function Choice<T extends string>({
-  legend,
-  name,
-  value,
-  options,
-  onChange,
-  error,
-}: {
-  legend: string;
-  name: string;
-  value: T | "";
-  options: { value: T; label: string }[];
-  onChange: (value: T) => void;
-  error?: string;
-}) {
-  const errorId = `${name}-error`;
-  const selected = useMessages().common.selected;
-  return (
-    <fieldset
-      className="field"
-      aria-invalid={error ? true : undefined}
-      aria-describedby={error ? errorId : undefined}
-    >
-      <legend>{legend}</legend>
-      <div className="choices">
-        {options.map((option) => (
-          <label className="choice" key={option.value}>
-            <input
-              type="radio"
-              name={name}
-              value={option.value}
-              checked={value === option.value}
-              onChange={() => onChange(option.value)}
-            />
-            <span>{option.label}</span>
-            <span className="choice-mark">{value === option.value ? selected : ""}</span>
-          </label>
-        ))}
-      </div>
-      {error ? (
-        <p className="field-error" id={errorId} role="alert">
-          {error}
-        </p>
-      ) : null}
-    </fieldset>
-  );
-}
+const stepCopy: Record<StepId, { title: string; why: string }> = {
+  about: {
+    title: "About you",
+    why: "Name and age range are optional. An exact age and the female or male column are asked only because the official population table is organized that way. Height, weight, and a country note are optional context. They are not identifiers, and they are not a score.",
+  },
+  sleep: {
+    title: "Sleep",
+    why: "Sleep is one of the habits the suggestions and WHAT IF? illustrations can talk about. A rough answer is enough.",
+  },
+  movement: {
+    title: "Movement",
+    why: "These questions describe a typical week, not a test. Sitting time is included because public guidance talks about both activity and sedentary time.",
+  },
+  nourishment: {
+    title: "Food and water",
+    why: "This is a pattern, not a food diary and not a diet score.",
+  },
+  substances: {
+    title: "Tobacco and alcohol",
+    why: "These are optional. You can skip them. They are here because public health sources discuss both, and because some people want them in the picture.",
+  },
+  mind: {
+    title: "Stress, mood, and people",
+    why: "A simple description helps the suggestions stay relevant. It is not a mental health screening.",
+  },
+  health: {
+    title: "Health information",
+    why: "Every question here is optional, and \u201cI don't know\u201d or \u201cPrefer not to answer\u201d are fine. LifeZoi uses these answers only to keep suggestions safe, for example skipping your allergens or offering seated movement. It never fills in a missing measurement and does not diagnose.",
+  },
+  goals: {
+    title: "What you want to work on",
+    why: "Choose at least one focus. lifeZoi uses this, with your other answers, to decide what to emphasize.",
+  },
+  results: {
+    title: "UPLOAD YOUR HEALTH RESULTS (OPTIONAL)",
+    why: "Nothing is uploaded or analyzed. This step does not send a file anywhere.",
+  },
+  review: {
+    title: "Review",
+    why: "Check the answers before saving them in this browser tab. You can come back and change them.",
+  },
+};
 
-function NumberField({
-  id,
-  label,
-  hint,
-  value,
-  onChange,
-  error,
-  max,
-}: {
-  id: string;
-  label: string;
-  hint: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-  max: number;
-}) {
-  const errorId = `${id}-error`;
-  return (
-    <label className="field" htmlFor={id}>
-      <span>{label}</span>
-      <span className="hint" id={`${id}-hint`}>{hint}</span>
-      <input
-        id={id}
-        inputMode="decimal"
-        value={value}
-        max={max}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-hint ${errorId}` : `${id}-hint`}
-        onChange={(event) => onChange(event.target.value)}
-      />
-      {error ? (
-        <span className="field-error" id={errorId} role="alert">
-          {error}
-        </span>
-      ) : null}
-    </label>
-  );
+const OPTIONAL_ONE = "Optional. Choose one.";
+
+/** Moves the person to a question that needs attention: scroll it into view and put the cursor there. */
+function focusField(field: string) {
+  const target = document.getElementById(field === "form" ? "assessment-form-error" : field);
+  if (!target) return false;
+  const control =
+    target instanceof HTMLFieldSetElement
+      ? (target.querySelector<HTMLInputElement>("input:checked") ?? target.querySelector<HTMLInputElement>("input"))
+      : target;
+  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  (control ?? target).focus({ preventScroll: true });
+  return true;
 }
 
 export function AssessmentWizard() {
@@ -244,15 +212,20 @@ export function AssessmentWizard() {
   const accountReady = useAccount().phase === "ready";
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
-  const m = useMessages();
-  const a = m.assessment;
-  const l = m.labels;
-  const err = (key: string) => translateError(errors[key], m);
-  if (!ready) return <LoadingState label={a.loading} />;
+  // Which question to move to after the next render. A new object each time, so the same field can be requested twice.
+  const [focusTarget, setFocusTarget] = useState<{ field: string } | null>(null);
+
+  useEffect(() => {
+    if (focusTarget) focusField(focusTarget.field);
+  }, [focusTarget]);
+
+  if (!ready) return <LoadingState label="Loading your assessment…" />;
 
   const step = STEP_IDS[session.draftStep] ?? "about";
   const draft = session.draft;
-  const copy = a.steps[step];
+  const copy = stepCopy[step];
+  const errorFields = orderedErrorFields(errors);
+  const err = (field: string) => (errors[field] ? friendlyError(field, errors[field]) : undefined);
 
   function update(partial: Partial<Assessment>) {
     setSaved(false);
@@ -264,10 +237,19 @@ export function AssessmentWizard() {
     setDraftStep(index);
   }
 
+  /** Show errors, open the step that holds the first one, and move the person to it. */
+  function showErrors(nextErrors: Record<string, string>, fallbackStep: StepId) {
+    setErrors(nextErrors);
+    const first = orderedErrorFields(nextErrors)[0];
+    const target = (first && fieldStep(first)) || fallbackStep;
+    if (target !== step) setDraftStep(STEP_IDS.indexOf(target));
+    setFocusTarget({ field: first ?? "form" });
+  }
+
   function continueStep() {
     const nextErrors = validateStep(step, draft);
     if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
+      showErrors(nextErrors, step);
       return;
     }
     goTo(Math.min(session.draftStep + 1, STEP_IDS.length - 1));
@@ -276,29 +258,36 @@ export function AssessmentWizard() {
   function save() {
     const invalid = firstInvalidStep(draft);
     if (invalid) {
-      setErrors(validateStep(invalid, draft));
-      setDraftStep(STEP_IDS.indexOf(invalid));
+      showErrors(validateStep(invalid, draft), invalid);
       return;
     }
     const result = completeAssessment();
     if (!result.ok) {
-      setErrors(result.fields);
+      showErrors(result.fields, step);
       return;
     }
     setErrors({});
     setSaved(true);
   }
 
+  function jumpTo(field: string) {
+    const target = fieldStep(field);
+    if (target && target !== step) setDraftStep(STEP_IDS.indexOf(target));
+    setFocusTarget({ field });
+  }
+
   return (
-    <div className="stack-lg narrow">
+    <div className="stack-lg narrow qz">
       <div>
-        <p className="kicker">{a.kicker}</p>
+        <p className="kicker">Lifestyle assessment</p>
         <h1>{copy.title}</h1>
         <p className="lede">{copy.why}</p>
       </div>
       <div>
         <div className="progress-label">
-          <span>{fmt(a.stepOf, { step: session.draftStep + 1, total: STEP_IDS.length })}</span>
+          <span>
+            Step {session.draftStep + 1} of {STEP_IDS.length}
+          </span>
           <span>{copy.title}</span>
         </div>
         <div
@@ -307,104 +296,143 @@ export function AssessmentWizard() {
           aria-valuemin={1}
           aria-valuemax={STEP_IDS.length}
           aria-valuenow={session.draftStep + 1}
-          aria-label={a.progressLabel}
+          aria-label="Assessment progress"
         >
           <span style={{ width: `${((session.draftStep + 1) / STEP_IDS.length) * 100}%` }} />
         </div>
       </div>
       {sample ? (
         <p className="banner banner-sample">
-          {a.sampleNote}
+          You are viewing sample answers. They cannot be edited. Turn the sample off in Settings to use your own.
         </p>
       ) : null}
       {saved ? (
         <p className="alert alert-ok" role="status">
-          {accountReady ? a.savedAccount : a.savedTab}{" "}
-          <Link href="/plan">{a.openPlan}</Link>,{" "}
-          <Link href="/outlook">{a.seeOutlook}</Link>, <Link href="/dashboard">{a.goDashboard}</Link>, {a.or}{" "}
-          <Link href="/what-if">{a.openWhatIf}</Link>
+          {accountReady ? "Saved to your account as a new assessment. Earlier assessments are kept." : "Saved in this browser tab as a new assessment. Sign in to keep it in your account."}{" "}
+          <Link href="/plan">Open My Life Improvement Plan</Link>,
+          <Link href="/outlook">See the educational outlook</Link>, <Link href="/dashboard">go to the dashboard</Link>, or <Link href="/what-if">open WHAT IF?</Link>
         </p>
       ) : null}
       {errors.form ? (
-        <p className="alert alert-error" role="alert">
-          {err("form")}
+        <p className="alert alert-error" role="alert" id="assessment-form-error" tabIndex={-1}>
+          {errors.form}
         </p>
       ) : null}
       <form
-        className="card stack"
+        className="card stack qz-form"
+        noValidate
         onSubmit={(event) => {
           event.preventDefault();
           if (step === "review") save();
           else continueStep();
         }}
       >
-        <fieldset disabled={sample} className="stack">
+        <p className="qz-instructions">
+          Type your answer in the white boxes. Tap or click a card to choose it. A purple card with a check mark is selected.
+        </p>
+        {errorFields.length > 0 ? (
+          <div className="qz-summary" role="alert" aria-labelledby="qz-summary-title">
+            <p id="qz-summary-title" className="qz-summary-title">
+              {errorFields.length === 1 ? "One answer needs attention:" : `${errorFields.length} answers need attention:`}
+            </p>
+            <ul>
+              {errorFields.map((field) => (
+                <li key={field}>
+                  <button type="button" className="qz-summary-link" onClick={() => jumpTo(field)}>
+                    {friendlyError(field, errors[field])}
+                    {fieldStep(field) && fieldStep(field) !== step ? ` (on ${stepCopy[fieldStep(field) as StepId].title})` : ""}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        <fieldset disabled={sample} className="stack qz-body">
           {step === "about" ? (
             <>
-              <label className="field" htmlFor="displayName">
-                <span>{a.about.name}</span>
-                <span className="hint">{a.about.nameHint}</span>
-                <input
-                  id="displayName"
-                  type="text"
-                  maxLength={40}
-                  value={draft.displayName}
-                  onChange={(event) => update({ displayName: event.target.value })}
-                />
-              </label>
-              <Choice
-                legend={a.about.ageRange}
+              <TextQuestion
+                id="displayName"
+                label={fieldLabel("displayName")}
+                hint="Optional. Leave blank to skip."
+                placeholder="Enter your name"
+                maxLength={40}
+                value={draft.displayName}
+                error={err("displayName")}
+                onChange={(displayName) => update({ displayName })}
+              />
+              <ChoiceQuestion
+                legend="Age range"
                 name="ageRange"
+                hint={OPTIONAL_ONE}
                 value={draft.ageRange}
-                options={AGE_RANGES.map((value) => ({ value, label: l.age[value] }))}
+                options={AGE_RANGES.map((value) => ({ value, label: ageLabels[value] }))}
                 onChange={(ageRange) => update({ ageRange })}
               />
-              <NumberField
+              <TextQuestion
                 id="exactAge"
-                label={a.about.exactAge}
-                hint={a.about.exactAgeHint}
+                label={fieldLabel("exactAge")}
+                hint="Optional. Used only to look up one published population row. Leave blank to skip the number."
+                placeholder="Enter your age"
+                unit="years"
+                inputMode="numeric"
+                maxLength={3}
                 value={draft.exactAge}
-                max={100}
                 error={err("exactAge")}
                 onChange={(exactAge) => update({ exactAge })}
               />
-              <Choice
-                legend={a.about.tableSex}
+              <ChoiceQuestion
+                legend="Which published column should the population table use?"
                 name="tableSex"
+                hint="Optional. The official table has female and male columns only. Another answer will not be assigned a column."
                 value={draft.tableSex}
-                options={TABLE_SEX.map((value) => ({ value, label: l.tableSex[value] }))}
+                options={TABLE_SEX.map((value) => ({
+                  value,
+                  label: value === "prefer-not" ? "Prefer not to say" : value === "another" ? "Another or not listed" : value === "female" ? "Female column" : "Male column",
+                }))}
                 onChange={(tableSex) => update({ tableSex })}
               />
-              <p className="hint">{a.about.tableSexHint}</p>
-              <label className="field" htmlFor="populationNote">
-                <span>{a.about.population}</span>
-                <span className="hint">{a.about.populationHint}</span>
-                <input id="populationNote" value={draft.populationNote} maxLength={280} onChange={(event) => update({ populationNote: event.target.value })} />
-              </label>
-              <NumberField
+              <TextQuestion
+                id="populationNote"
+                label="Country or population you want noted"
+                hint="Optional. The embedded table is the Social Security area, not a substitute for another country."
+                placeholder="For example: Canada"
+                maxLength={280}
+                value={draft.populationNote}
+                onChange={(populationNote) => update({ populationNote })}
+              />
+              <TextQuestion
                 id="heightCm"
-                label={a.about.height}
-                hint={a.about.measureHint}
+                label={fieldLabel("heightCm")}
+                hint="Optional. Stored as what you report. Not used to invent a result."
+                placeholder="Enter your height"
+                unit="cm"
+                inputMode="numeric"
+                maxLength={3}
                 value={draft.heightCm}
-                max={250}
                 error={err("heightCm")}
                 onChange={(heightCm) => update({ heightCm })}
               />
-              <NumberField
+              <TextQuestion
                 id="weightKg"
-                label={a.about.weight}
-                hint={a.about.measureHint}
+                label={fieldLabel("weightKg")}
+                hint="Optional. Stored as what you report. Not used to invent a result."
+                placeholder="Enter your weight"
+                unit="kg"
+                inputMode="numeric"
+                maxLength={3}
                 value={draft.weightKg}
-                max={300}
                 error={err("weightKg")}
                 onChange={(weightKg) => update({ weightKg })}
               />
-              <NumberField
+              <TextQuestion
                 id="desiredWeightKg"
-                label={a.about.desiredWeight}
-                hint={a.about.desiredWeightHint}
+                label={fieldLabel("desiredWeightKg")}
+                hint="Optional. Only used if one of your goals is about weight. It is your own target, not a medical recommendation."
+                placeholder="Enter your goal weight"
+                unit="kg"
+                inputMode="numeric"
+                maxLength={3}
                 value={draft.desiredWeightKg}
-                max={300}
                 error={err("desiredWeightKg")}
                 onChange={(desiredWeightKg) => update({ desiredWeightKg })}
               />
@@ -412,23 +440,27 @@ export function AssessmentWizard() {
           ) : null}
           {step === "sleep" ? (
             <>
-              <NumberField
+              <TextQuestion
                 id="sleepHours"
-                label={a.sleep.hours}
-                hint={a.sleep.hoursHint}
+                label={fieldLabel("sleepHours")}
+                hint="Required. A rough number from 0 to 24 is enough."
+                placeholder="Enter hours of sleep"
+                unit="hours"
+                inputMode="decimal"
+                maxLength={5}
                 value={draft.sleepHours}
-                max={24}
                 error={err("sleepHours")}
                 onChange={(sleepHours) => update({ sleepHours })}
               />
-              <Choice
-                legend={a.sleep.quality}
+              <ChoiceQuestion
+                legend={fieldLabel("sleepQuality")}
                 name="sleepQuality"
+                hint="Required. Choose one."
                 value={draft.sleepQuality}
                 error={err("sleepQuality")}
                 options={SLEEP_QUALITIES.map((value) => ({
                   value,
-                  label: l.sleepQuality[value],
+                  label: sleepQualityLabels[value],
                 }))}
                 onChange={(sleepQuality) => update({ sleepQuality })}
               />
@@ -436,41 +468,51 @@ export function AssessmentWizard() {
           ) : null}
           {step === "movement" ? (
             <>
-              <NumberField
+              <TextQuestion
                 id="activityDays"
-                label={a.movement.days}
-                hint={a.movement.daysHint}
+                label={fieldLabel("activityDays")}
+                hint="Required. Count brisk walking and anything of similar effort. Whole days from 0 to 7."
+                placeholder="Enter number of days"
+                unit="days"
+                inputMode="numeric"
+                maxLength={2}
                 value={draft.activityDays}
-                max={7}
                 error={err("activityDays")}
                 onChange={(activityDays) => update({ activityDays })}
               />
-              <NumberField
+              <TextQuestion
                 id="activityMinutes"
-                label={a.movement.minutes}
-                hint={a.movement.minutesHint}
+                label={fieldLabel("activityMinutes")}
+                hint="If you chose 0 days, you can leave this blank. Otherwise enter 0 to 300."
+                placeholder="Enter number of minutes"
+                unit="minutes"
+                inputMode="numeric"
+                maxLength={3}
                 value={draft.activityMinutes}
-                max={300}
                 error={err("activityMinutes")}
                 onChange={(activityMinutes) => update({ activityMinutes })}
               />
-              <NumberField
+              <TextQuestion
                 id="sedentaryHours"
-                label={a.movement.sitting}
-                hint={a.movement.sittingHint}
+                label={fieldLabel("sedentaryHours")}
+                hint="Required. A typical day, from 0 to 24. This is an estimate."
+                placeholder="Enter hours of sitting"
+                unit="hours"
+                inputMode="decimal"
+                maxLength={5}
                 value={draft.sedentaryHours}
-                max={24}
                 error={err("sedentaryHours")}
                 onChange={(sedentaryHours) => update({ sedentaryHours })}
               />
-              <p className="hint">{a.movement.kindsHint}</p>
+              <p className="qz-hint">Walking, strength, balance, and flexibility are optional. They help the plan name a kind of movement. There is no required distance.</p>
               {(["walking", "strength", "balance", "flexibility"] as const).map((name) => (
-                <Choice
+                <ChoiceQuestion
                   key={name}
-                  legend={a.movement[name]}
+                  legend={name === "walking" ? "Walking" : name === "strength" ? "Strength" : name === "balance" ? "Balance" : "Flexibility"}
                   name={name}
+                  hint={OPTIONAL_ONE}
                   value={draft[name]}
-                  options={VEGETABLE_PATTERNS.map((value) => ({ value, label: l.frequency[value] }))}
+                  options={VEGETABLE_PATTERNS.map((value) => ({ value, label: vegetableLabels[value] }))}
                   onChange={(value) => update({ [name]: value })}
                 />
               ))}
@@ -478,43 +520,52 @@ export function AssessmentWizard() {
           ) : null}
           {step === "nourishment" ? (
             <>
-              <Choice
-                legend={a.nourishment.vegetables}
+              <ChoiceQuestion
+                legend={fieldLabel("vegetables")}
                 name="vegetables"
+                hint="Required. Choose one."
                 value={draft.vegetables}
                 error={err("vegetables")}
                 options={VEGETABLE_PATTERNS.map((value) => ({
                   value,
-                  label: l.frequency[value],
+                  label: vegetableLabels[value],
                 }))}
                 onChange={(vegetables) => update({ vegetables })}
               />
-              <Choice
-                legend={a.nourishment.water}
+              <ChoiceQuestion
+                legend={fieldLabel("hydration")}
                 name="hydration"
+                hint="Required. Choose one."
                 value={draft.hydration}
                 error={err("hydration")}
                 options={HYDRATION_PATTERNS.map((value) => ({
                   value,
-                  label: l.hydration[value],
+                  label: hydrationLabels[value],
                 }))}
                 onChange={(hydration) => update({ hydration })}
               />
-              <Choice
-                legend={a.nourishment.eating}
+              <ChoiceQuestion
+                legend="How do you usually eat?"
                 name="eatingPattern"
+                hint={OPTIONAL_ONE}
                 value={draft.eatingPattern}
-                options={EATING_PATTERNS.map((value) => ({ value, label: l.eatingPattern[value] }))}
+                options={EATING_PATTERNS.map((value) => ({ value, label: eatingPatternLabels[value] }))}
                 onChange={(eatingPattern) => update({ eatingPattern })}
               />
-              <p className="hint">{a.nourishment.kindsHint}</p>
-              {(["fruit", "fiber", "protein", "addedSugar"] as const).map((name) => (
-                <Choice
+              <p className="qz-hint">Fruit, fiber, protein, and added sugar are optional. Natural sugar in fruit is not treated as the same thing as sugary drinks.</p>
+              {([
+                ["fruit", "Fruit"],
+                ["fiber", "Fiber foods"],
+                ["protein", "Protein foods"],
+                ["addedSugar", "Added sugar or sugary drinks"],
+              ] as const).map(([name, label]) => (
+                <ChoiceQuestion
                   key={name}
-                  legend={a.nourishment[name]}
+                  legend={label}
                   name={name}
+                  hint={OPTIONAL_ONE}
                   value={draft[name]}
-                  options={VEGETABLE_PATTERNS.map((value) => ({ value, label: l.frequency[value] }))}
+                  options={VEGETABLE_PATTERNS.map((value) => ({ value, label: vegetableLabels[value] }))}
                   onChange={(value) => update({ [name]: value })}
                 />
               ))}
@@ -522,131 +573,176 @@ export function AssessmentWizard() {
           ) : null}
           {step === "substances" ? (
             <>
-              <Choice
-                legend={a.substances.tobacco}
+              <ChoiceQuestion
+                legend="Tobacco"
                 name="smoking"
+                hint={OPTIONAL_ONE}
                 value={draft.smoking}
                 options={SMOKING_PATTERNS.map((value) => ({
                   value,
-                  label: l.smoking[value],
+                  label: smokingLabels[value],
                 }))}
                 onChange={(smoking) => update({ smoking })}
               />
-              <Choice
-                legend={a.substances.alcohol}
+              <ChoiceQuestion
+                legend="Alcohol"
                 name="alcohol"
+                hint={OPTIONAL_ONE}
                 value={draft.alcohol}
                 options={ALCOHOL_PATTERNS.map((value) => ({
                   value,
-                  label: l.alcohol[value],
+                  label: alcoholLabels[value],
                 }))}
                 onChange={(alcohol) => update({ alcohol })}
               />
-              <button className="btn btn-ghost" type="button" onClick={() => goTo(session.draftStep + 1)}>
-                {m.common.skipStep}
+              <button className="btn btn-secondary qz-skip" type="button" onClick={() => goTo(session.draftStep + 1)}>
+                Skip this step
               </button>
             </>
           ) : null}
           {step === "mind" ? (
             <>
-              <Choice
-                legend={a.mind.stress}
+              <ChoiceQuestion
+                legend={fieldLabel("stress")}
                 name="stress"
+                hint="Required. Choose one."
                 value={draft.stress}
                 error={err("stress")}
-                options={STRESS_LEVELS.map((value) => ({ value, label: l.stress[value] }))}
+                options={STRESS_LEVELS.map((value) => ({ value, label: stressLabels[value] }))}
                 onChange={(stress) => update({ stress })}
               />
-              <Choice
-                legend={a.mind.mood}
+              <ChoiceQuestion
+                legend={fieldLabel("mood")}
                 name="mood"
+                hint="Required. Choose one."
                 value={draft.mood}
                 error={err("mood")}
-                options={MOOD_LEVELS.map((value) => ({ value, label: l.mood[value] }))}
+                options={MOOD_LEVELS.map((value) => ({ value, label: moodLabels[value] }))}
                 onChange={(mood) => update({ mood })}
               />
-              <Choice
-                legend={a.mind.social}
+              <ChoiceQuestion
+                legend={fieldLabel("social")}
                 name="social"
+                hint="Required. Choose one."
                 value={draft.social}
                 error={err("social")}
-                options={SOCIAL_LEVELS.map((value) => ({ value, label: l.social[value] }))}
+                options={SOCIAL_LEVELS.map((value) => ({ value, label: socialLabels[value] }))}
                 onChange={(social) => update({ social })}
               />
-              <p className="hint">{a.mind.notesHint}</p>
-              <label className="field" htmlFor="conditionsNote">
-                <span>{a.mind.conditions}</span>
-                <textarea id="conditionsNote" maxLength={280} value={draft.conditionsNote} onChange={(event) => update({ conditionsNote: event.target.value })} />
-              </label>
-              <label className="field" htmlFor="familyNote">
-                <span>{a.mind.family}</span>
-                <textarea id="familyNote" maxLength={280} value={draft.familyNote} onChange={(event) => update({ familyNote: event.target.value })} />
-              </label>
-              <label className="field" htmlFor="bloodPressure">
-                <span>{a.mind.bloodPressure}</span>
-                <input id="bloodPressure" value={draft.bloodPressure} maxLength={40} onChange={(event) => update({ bloodPressure: event.target.value })} />
-              </label>
-              <label className="field" htmlFor="glucose">
-                <span>{a.mind.glucose}</span>
-                <input id="glucose" value={draft.glucose} maxLength={40} onChange={(event) => update({ glucose: event.target.value })} />
-              </label>
-              <label className="field" htmlFor="hba1c">
-                <span>{a.mind.hba1c}</span>
-                <input id="hba1c" value={draft.hba1c} maxLength={40} onChange={(event) => update({ hba1c: event.target.value })} />
-              </label>
-              <label className="field" htmlFor="cholesterol">
-                <span>{a.mind.cholesterol}</span>
-                <input id="cholesterol" value={draft.cholesterol} maxLength={40} onChange={(event) => update({ cholesterol: event.target.value })} />
-              </label>
+              <p className="qz-hint">These notes are optional and sensitive. They are asked so you can remember what to discuss with a clinician. lifeZoi does not diagnose from them and does not need your name, address, or record number.</p>
+              <TextQuestion
+                id="conditionsNote"
+                label="Conditions you want to mention"
+                hint="Optional."
+                placeholder="Type any conditions you want to remember, or leave blank"
+                multiline
+                maxLength={280}
+                value={draft.conditionsNote}
+                onChange={(conditionsNote) => update({ conditionsNote })}
+              />
+              <TextQuestion
+                id="familyNote"
+                label="Family history you want to mention"
+                hint="Optional."
+                placeholder="Type any family history you want to remember, or leave blank"
+                multiline
+                maxLength={280}
+                value={draft.familyNote}
+                onChange={(familyNote) => update({ familyNote })}
+              />
+              <TextQuestion
+                id="bloodPressure"
+                label="Blood pressure, if you already know it"
+                hint="Optional. Copy it as written on your own record."
+                placeholder="For example: 128/82"
+                maxLength={40}
+                value={draft.bloodPressure}
+                onChange={(bloodPressure) => update({ bloodPressure })}
+              />
+              <TextQuestion
+                id="glucose"
+                label="Glucose, if you already know it"
+                hint="Optional. Copy the number and unit as written on your own record."
+                placeholder="Type the number and unit, or leave blank"
+                maxLength={40}
+                value={draft.glucose}
+                onChange={(glucose) => update({ glucose })}
+              />
+              <TextQuestion
+                id="hba1c"
+                label="HbA1c, if you already know it"
+                hint="Optional. Copy the number and unit as written on your own record."
+                placeholder="Type the number and unit, or leave blank"
+                maxLength={40}
+                value={draft.hba1c}
+                onChange={(hba1c) => update({ hba1c })}
+              />
+              <TextQuestion
+                id="cholesterol"
+                label="Cholesterol, if you already know it"
+                hint="Optional. Copy the number and unit as written on your own record."
+                placeholder="Type the number and unit, or leave blank"
+                maxLength={40}
+                value={draft.cholesterol}
+                onChange={(cholesterol) => update({ cholesterol })}
+              />
             </>
           ) : null}
           {step === "health" ? (
             <>
-              <Choice
-                legend={a.health.energy}
+              <ChoiceQuestion
+                legend="How is your energy on a typical day?"
                 name="energyLevel"
+                hint={OPTIONAL_ONE}
                 value={draft.energyLevel}
-                options={ENERGY_LEVELS.map((value) => ({ value, label: l.energy[value] }))}
+                options={ENERGY_LEVELS.map((value) => ({ value, label: energyLabels[value] }))}
                 onChange={(energyLevel) => update({ energyLevel })}
               />
-              <Choice
-                legend={a.health.bloodSugar}
+              <ChoiceQuestion
+                legend="Blood sugar"
                 name="bloodSugarStatus"
+                hint={OPTIONAL_ONE}
                 value={draft.bloodSugarStatus}
-                options={BLOOD_SUGAR_STATUSES.map((value) => ({ value, label: l.bloodSugar[value] }))}
+                options={BLOOD_SUGAR_STATUSES.map((value) => ({ value, label: bloodSugarLabels[value] }))}
                 onChange={(bloodSugarStatus) => update({ bloodSugarStatus })}
               />
-              <Choice
-                legend={a.health.cholesterol}
+              <ChoiceQuestion
+                legend="Cholesterol"
                 name="cholesterolStatus"
+                hint={OPTIONAL_ONE}
                 value={draft.cholesterolStatus}
-                options={CHOLESTEROL_STATUSES.map((value) => ({ value, label: l.cholesterol[value] }))}
+                options={CHOLESTEROL_STATUSES.map((value) => ({ value, label: cholesterolLabels[value] }))}
                 onChange={(cholesterolStatus) => update({ cholesterolStatus })}
               />
-              <Choice
-                legend={a.health.bloodPressure}
+              <ChoiceQuestion
+                legend="Blood pressure"
                 name="bloodPressureStatus"
+                hint={OPTIONAL_ONE}
                 value={draft.bloodPressureStatus}
-                options={BLOOD_PRESSURE_STATUSES.map((value) => ({ value, label: l.bloodPressure[value] }))}
+                options={BLOOD_PRESSURE_STATUSES.map((value) => ({ value, label: bloodPressureLabels[value] }))}
                 onChange={(bloodPressureStatus) => update({ bloodPressureStatus })}
               />
-              <p className="hint">{a.health.labHint}</p>
-              <CheckList
-                legend={a.health.allergies}
-                hint={a.health.allergiesHint}
+              <p className="qz-hint">
+                If you have actual lab numbers, you can type them on the previous step (blood pressure, glucose, HbA1c, cholesterol). Leave them blank if you do not have them. LifeZoi never guesses a number.
+              </p>
+              <CheckQuestion
+                id="foodAllergies"
+                legend="Diagnosed food allergies"
+                hint="Optional. Choose all that apply. These are treated as strict exclusions: no recipe with them is suggested."
                 values={draft.foodAllergies}
-                options={ALLERGENS.map((value) => ({ value, label: l.allergen[value] }))}
+                options={ALLERGENS.map((value) => ({ value, label: allergenLabels[value] }))}
                 onChange={(foodAllergies) => update({ foodAllergies })}
               />
               <ReactionEditor
                 reactions={draft.foodReactions}
                 onChange={(foodReactions) => update({ foodReactions })}
               />
-              <CheckList
-                legend={a.health.requirements}
-                hint={a.health.requirementsHint}
+              <CheckQuestion
+                id="dietRequirements"
+                legend="Do you follow any religious, cultural, or personal dietary requirements?"
+                hint="Optional. Choose all that apply. LifeZoi only uses what you choose here and never guesses."
                 values={draft.dietRequirements}
-                options={DIET_REQUIREMENTS.map((value) => ({ value, label: l.dietRequirement[value] }))}
+                options={DIET_REQUIREMENTS.map((value) => ({ value, label: dietRequirementLabels[value] }))}
                 onChange={(dietRequirements) => {
                   const added = dietRequirements.find((item) => !draft.dietRequirements.includes(item));
                   update({
@@ -655,57 +751,74 @@ export function AssessmentWizard() {
                   });
                 }}
               />
-              <CheckList
-                legend={a.health.patterns}
-                hint={a.health.patternsHint}
+              <CheckQuestion
+                id="dietPatterns"
+                legend="How do you eat?"
+                hint="Optional. Choose any combination."
                 values={draft.dietPatterns}
-                options={DIET_PATTERNS.map((value) => ({ value, label: l.dietPattern[value] }))}
+                options={DIET_PATTERNS.map((value) => ({ value, label: dietPatternLabels[value] }))}
                 onChange={(dietPatterns) => {
                   const added = dietPatterns.find((item) => !draft.dietPatterns.includes(item));
                   update({ dietPatterns: added === "none" ? ["none"] : dietPatterns.filter((item) => item !== "none") });
                 }}
               />
-              <label className="field" htmlFor="dietNote">
-                <span>{a.health.dietNote}</span>
-                <input id="dietNote" maxLength={140} value={draft.dietNote} onChange={(event) => update({ dietNote: event.target.value })} />
-              </label>
-              <CheckList
-                legend={a.health.mobility}
-                hint={a.health.mobilityHint}
+              <TextQuestion
+                id="dietNote"
+                label="Other requirements or preferences"
+                hint="Optional."
+                placeholder="For example: no pork, low salt"
+                maxLength={140}
+                value={draft.dietNote}
+                onChange={(dietNote) => update({ dietNote })}
+              />
+              <CheckQuestion
+                id="mobilityLimits"
+                legend="Mobility"
+                hint="Optional. Choose all that apply. This helps LifeZoi offer seated or supported movement first."
                 values={draft.mobilityLimits}
-                options={MOBILITY_LIMITS.map((value) => ({ value, label: l.mobility[value] }))}
+                options={MOBILITY_LIMITS.map((value) => ({ value, label: mobilityLabels[value] }))}
                 onChange={(mobilityLimits) => {
                   const added = mobilityLimits.find((item) => !draft.mobilityLimits.includes(item));
                   if (added === "none" || added === "prefer-not") update({ mobilityLimits: [added] });
                   else update({ mobilityLimits: mobilityLimits.filter((item) => item !== "none" && item !== "prefer-not") });
                 }}
               />
-              <label className="field" htmlFor="exerciseRestrictions">
-                <span>{a.health.restrictions}</span>
-                <span className="hint">{a.health.restrictionsHint}</span>
-                <textarea id="exerciseRestrictions" maxLength={280} value={draft.exerciseRestrictions} onChange={(event) => update({ exerciseRestrictions: event.target.value })} />
-              </label>
-              <button className="btn btn-ghost" type="button" onClick={() => goTo(session.draftStep + 1)}>
-                {m.common.skipStep}
+              <TextQuestion
+                id="exerciseRestrictions"
+                label="Current injuries or exercise restrictions"
+                hint="Optional. For example, “no kneeling after knee surgery”."
+                placeholder="Type any injuries or restrictions, or leave blank"
+                multiline
+                maxLength={280}
+                value={draft.exerciseRestrictions}
+                onChange={(exerciseRestrictions) => update({ exerciseRestrictions })}
+              />
+              <button className="btn btn-secondary qz-skip" type="button" onClick={() => goTo(session.draftStep + 1)}>
+                Skip this step
               </button>
             </>
           ) : null}
           {step === "results" ? (
             <div className="upload-placeholder" role="note">
               <p>
-                <strong>{a.results.nothing}</strong>
+                <strong>Nothing is uploaded or analyzed.</strong>
               </p>
-              <p>{a.results.noFile}</p>
-              <p>{a.results.typed}</p>
+              <p>
+                There is no file control here. A lab report, photo, or other document is not received, stored, or read.
+              </p>
+              <p>
+                Blood pressure, glucose, HbA1c, and cholesterol can still be typed by hand on Stress, mood, and people. Those notes stay in this browser tab. They are not a diagnosis.
+              </p>
             </div>
           ) : null}
           {step === "goals" ? (
             <>
-              <CheckList
-                legend={a.goals.personal}
-                hint={a.goals.personalHint}
+              <CheckQuestion
+                id="wellnessGoals"
+                legend="Your personal goals"
+                hint="Optional. Choose as many as you like. You can change them at any time."
                 values={draft.wellnessGoals}
-                options={WELLNESS_GOALS.map((value) => ({ value, label: l.wellnessGoal[value] }))}
+                options={WELLNESS_GOALS.map((value) => ({ value, label: wellnessGoalLabels[value] }))}
                 onChange={(wellnessGoals) => {
                   const added = wellnessGoals.find((goal) => !draft.wellnessGoals.includes(goal));
                   const weight = ["lose-weight", "gain-weight", "maintain-weight"];
@@ -719,92 +832,73 @@ export function AssessmentWizard() {
                 }}
               />
               {draft.wellnessGoals.length > 1 ? (
-                <Choice
-                  legend={a.goals.primary}
+                <ChoiceQuestion
+                  legend="Which goal matters most right now?"
                   name="primaryGoal"
                   value={draft.primaryGoal}
-                  options={draft.wellnessGoals.map((value) => ({ value, label: l.wellnessGoal[value] }))}
+                  options={draft.wellnessGoals.map((value) => ({ value, label: wellnessGoalLabels[value] }))}
                   onChange={(primaryGoal) => update({ primaryGoal })}
                 />
               ) : null}
-              <fieldset className="field">
-                <legend>{a.goals.track}</legend>
-                <div className="stack">
-                  {GOAL_IDS.map((goal) => (
-                    <label className="check-row" key={goal}>
-                      <input
-                        type="checkbox"
-                        checked={draft.goals.includes(goal)}
-                        onChange={(event) => {
-                          const goals: GoalId[] = event.target.checked
-                            ? [...draft.goals, goal]
-                            : draft.goals.filter((item) => item !== goal);
-                          update({ goals });
-                        }}
-                      />
-                      <span>{l.goal[goal]}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.goals ? (
-                  <p className="field-error" role="alert">
-                    {err("goals")}
-                  </p>
-                ) : null}
-              </fieldset>
-              <label className="field" htmlFor="habitNote">
-                <span>{a.goals.note}</span>
-                <span className="hint">{a.goals.noteHint}</span>
-                <textarea
-                  id="habitNote"
-                  maxLength={280}
-                  value={draft.habitNote}
-                  onChange={(event) => update({ habitNote: event.target.value })}
-                />
-              </label>
-              <label className="field" htmlFor="purposeHope">
-                <span>{a.goals.hope}</span>
-                <span className="hint">{a.goals.hopeHint}</span>
-                <textarea
-                  id="purposeHope"
-                  maxLength={280}
-                  value={draft.purposeHope}
-                  onChange={(event) => update({ purposeHope: event.target.value })}
-                />
-                {errors.purposeHope ? (
-                  <p className="field-error" role="alert">
-                    {err("purposeHope")}
-                  </p>
-                ) : null}
-              </label>
+              <CheckQuestion
+                id="goals"
+                legend={fieldLabel("goals")}
+                hint="Required. Choose at least one."
+                values={draft.goals}
+                options={GOAL_IDS.map((value) => ({ value, label: goalLabels[value] }))}
+                error={err("goals")}
+                onChange={(goals) => update({ goals })}
+              />
+              <TextQuestion
+                id="habitNote"
+                label={fieldLabel("habitNote")}
+                hint="Optional. 280 characters or fewer."
+                placeholder="Type a note to yourself, or leave blank"
+                multiline
+                maxLength={280}
+                value={draft.habitNote}
+                error={err("habitNote")}
+                onChange={(habitNote) => update({ habitNote })}
+              />
+              <TextQuestion
+                id="purposeHope"
+                label={fieldLabel("purposeHope")}
+                hint="Optional, and separate from the health answers above. This is a personal hope, not a medical score. 280 characters or fewer."
+                placeholder="For example: keep gardening, travel, play with my grandchildren"
+                multiline
+                maxLength={280}
+                value={draft.purposeHope}
+                error={err("purposeHope")}
+                onChange={(purposeHope) => update({ purposeHope })}
+              />
             </>
           ) : null}
           {step === "review" ? (
             <div className="stack">
-              <p>{a.review.intro}</p>
+              <p>Saving adds this as a new assessment in your history. Earlier assessments are never overwritten.</p>
               <Review draft={draft} onEdit={(index) => goTo(index)} />
             </div>
           ) : null}
         </fieldset>
-        <div className="actions">
+        <div className="qz-nav">
           {session.draftStep > 0 ? (
-            <button className="btn btn-ghost" type="button" onClick={() => goTo(session.draftStep - 1)}>
-              {m.common.back}
+            <button className="btn btn-secondary qz-nav-btn" type="button" onClick={() => goTo(session.draftStep - 1)}>
+              <span aria-hidden="true">←</span> Back
             </button>
           ) : null}
           {step === "review" ? (
-            <button className="btn btn-primary" type="submit" disabled={sample}>
-              {a.save}
+            <button className="btn btn-primary qz-nav-btn qz-nav-next" type="submit" disabled={sample}>
+              <span aria-hidden="true">✓</span> Save answers
             </button>
           ) : (
-            <button className="btn btn-primary" type="submit" disabled={sample}>
-              {m.common.continue}
+            <button className="btn btn-primary qz-nav-btn qz-nav-next" type="submit" disabled={sample}>
+              Continue <span aria-hidden="true">→</span>
             </button>
           )}
         </div>
       </form>
       <p className="footer-note">
-        {a.footer}
+        This assessment is not a diagnosis and not a substitute for professional care.
       </p>
     </div>
   );
@@ -817,78 +911,144 @@ function Review({
   draft: Assessment;
   onEdit: (index: number) => void;
 }) {
-  const m = useMessages();
-  const r = m.assessment.review;
-  const l = m.labels;
-  const none = m.common.notProvided;
-  const pick = <K extends string>(value: K | "", labels: Record<K, string>) => (value ? labels[value] : none);
-  const list = (values: string[]) => values.filter(Boolean).join(", ") || none;
   const items: { label: string; value: string; step: StepId }[] = [
-    { label: r.name, value: draft.displayName || none, step: "about" },
-    { label: r.ageRange, value: pick(draft.ageRange, l.age), step: "about" },
-    { label: r.exactAge, value: draft.exactAge || none, step: "about" },
-    { label: r.tableColumn, value: pick(draft.tableSex, l.tableSex), step: "about" },
-    { label: r.population, value: draft.populationNote || none, step: "about" },
-    { label: r.height, value: draft.heightCm ? fmt(r.cm, { value: draft.heightCm }) : none, step: "about" },
-    { label: r.weight, value: draft.weightKg ? fmt(r.kg, { value: draft.weightKg }) : none, step: "about" },
-    { label: r.desiredWeight, value: draft.desiredWeightKg ? fmt(r.kg, { value: draft.desiredWeightKg }) : none, step: "about" },
+    { label: "Name", value: draft.displayName || "Not provided", step: "about" },
     {
-      label: r.sleep,
+      label: "Age range",
+      value: draft.ageRange ? ageLabels[draft.ageRange] : "Not provided",
+      step: "about",
+    },
+    { label: "Exact age", value: draft.exactAge || "Not provided", step: "about" },
+    {
+      label: "Life table column",
+      value:
+        draft.tableSex === "female"
+          ? "Female column"
+          : draft.tableSex === "male"
+            ? "Male column"
+            : draft.tableSex === "another"
+              ? "Another or not listed"
+              : draft.tableSex === "prefer-not"
+                ? "Prefer not to say"
+                : "Not provided",
+      step: "about",
+    },
+    { label: "Population note", value: draft.populationNote || "Not provided", step: "about" },
+    { label: "Height", value: draft.heightCm ? `${draft.heightCm} cm` : "Not provided", step: "about" },
+    { label: "Weight", value: draft.weightKg ? `${draft.weightKg} kg` : "Not provided", step: "about" },
+    { label: "Desired weight", value: draft.desiredWeightKg ? `${draft.desiredWeightKg} kg` : "Not provided", step: "about" },
+    {
+      label: "Sleep",
       value: draft.sleepHours
-        ? fmt(r.sleepValue, {
-            hours: draft.sleepHours,
-            quality: draft.sleepQuality ? l.sleepQuality[draft.sleepQuality] : r.qualityNotSet,
-          })
-        : none,
+        ? `${draft.sleepHours} hours, ${draft.sleepQuality ? sleepQualityLabels[draft.sleepQuality] : "quality not set"}`
+        : "Not provided",
       step: "sleep",
     },
     {
-      label: r.activity,
-      value: draft.activityDays ? fmt(r.activityValue, { days: draft.activityDays, minutes: draft.activityMinutes || "0" }) : none,
+      label: "Activity",
+      value: draft.activityDays
+        ? `${draft.activityDays} days, ${draft.activityMinutes || "0"} minutes`
+        : "Not provided",
       step: "movement",
     },
-    { label: r.sitting, value: draft.sedentaryHours ? fmt(r.hoursValue, { hours: draft.sedentaryHours }) : none, step: "movement" },
-    { label: r.walking, value: pick(draft.walking, l.frequency), step: "movement" },
-    { label: r.strength, value: pick(draft.strength, l.frequency), step: "movement" },
-    { label: r.balance, value: pick(draft.balance, l.frequency), step: "movement" },
-    { label: r.flexibility, value: pick(draft.flexibility, l.frequency), step: "movement" },
-    { label: r.vegetables, value: pick(draft.vegetables, l.frequency), step: "nourishment" },
-    { label: r.fruit, value: pick(draft.fruit, l.frequency), step: "nourishment" },
-    { label: r.fiber, value: pick(draft.fiber, l.frequency), step: "nourishment" },
-    { label: r.protein, value: pick(draft.protein, l.frequency), step: "nourishment" },
-    { label: r.addedSugar, value: pick(draft.addedSugar, l.frequency), step: "nourishment" },
-    { label: r.water, value: pick(draft.hydration, l.hydration), step: "nourishment" },
-    { label: r.tobacco, value: pick(draft.smoking, l.smoking), step: "substances" },
-    { label: r.alcohol, value: pick(draft.alcohol, l.alcohol), step: "substances" },
-    { label: r.stress, value: pick(draft.stress, l.stress), step: "mind" },
-    { label: r.mood, value: pick(draft.mood, l.mood), step: "mind" },
-    { label: r.social, value: pick(draft.social, l.social), step: "mind" },
-    { label: r.conditions, value: draft.conditionsNote || none, step: "mind" },
-    { label: r.family, value: draft.familyNote || none, step: "mind" },
-    { label: r.bloodPressureTyped, value: draft.bloodPressure || none, step: "mind" },
-    { label: r.glucoseTyped, value: draft.glucose || none, step: "mind" },
-    { label: r.hba1cTyped, value: draft.hba1c || none, step: "mind" },
-    { label: r.cholesterolTyped, value: draft.cholesterol || none, step: "mind" },
-    { label: r.eatingPattern, value: pick(draft.eatingPattern, l.eatingPattern), step: "nourishment" },
-    { label: r.bloodSugar, value: pick(draft.bloodSugarStatus, l.bloodSugar), step: "health" },
-    { label: r.cholesterolStatus, value: pick(draft.cholesterolStatus, l.cholesterol), step: "health" },
-    { label: r.bloodPressureStatus, value: pick(draft.bloodPressureStatus, l.bloodPressure), step: "health" },
-    { label: r.allergies, value: list([...draft.foodAllergies.map((item) => l.allergen[item]), draft.allergyNote]), step: "health" },
     {
-      label: r.reactions,
-      value: list(draft.foodReactions.map((item) => `${item.food} (${l.reaction[item.type].toLocaleLowerCase()})`)),
+      label: "Sitting or reclining",
+      value: draft.sedentaryHours ? `${draft.sedentaryHours} hours` : "Not provided",
+      step: "movement",
+    },
+    { label: "Walking", value: draft.walking ? vegetableLabels[draft.walking] : "Not provided", step: "movement" },
+    { label: "Strength", value: draft.strength ? vegetableLabels[draft.strength] : "Not provided", step: "movement" },
+    { label: "Balance", value: draft.balance ? vegetableLabels[draft.balance] : "Not provided", step: "movement" },
+    { label: "Flexibility", value: draft.flexibility ? vegetableLabels[draft.flexibility] : "Not provided", step: "movement" },
+    {
+      label: "Vegetables and fruit",
+      value: draft.vegetables ? vegetableLabels[draft.vegetables] : "Not provided",
+      step: "nourishment",
+    },
+    { label: "Fruit", value: draft.fruit ? vegetableLabels[draft.fruit] : "Not provided", step: "nourishment" },
+    { label: "Fiber", value: draft.fiber ? vegetableLabels[draft.fiber] : "Not provided", step: "nourishment" },
+    { label: "Protein", value: draft.protein ? vegetableLabels[draft.protein] : "Not provided", step: "nourishment" },
+    { label: "Added sugar or sugary drinks", value: draft.addedSugar ? vegetableLabels[draft.addedSugar] : "Not provided", step: "nourishment" },
+    {
+      label: "Water",
+      value: draft.hydration ? hydrationLabels[draft.hydration] : "Not provided",
+      step: "nourishment",
+    },
+    {
+      label: "Tobacco",
+      value: draft.smoking ? smokingLabels[draft.smoking] : "Not provided",
+      step: "substances",
+    },
+    {
+      label: "Alcohol",
+      value: draft.alcohol ? alcoholLabels[draft.alcohol] : "Not provided",
+      step: "substances",
+    },
+    {
+      label: "Stress",
+      value: draft.stress ? stressLabels[draft.stress] : "Not provided",
+      step: "mind",
+    },
+    {
+      label: "Mood",
+      value: draft.mood ? moodLabels[draft.mood] : "Not provided",
+      step: "mind",
+    },
+    {
+      label: "Social connection",
+      value: draft.social ? socialLabels[draft.social] : "Not provided",
+      step: "mind",
+    },
+    { label: "Conditions you reported", value: draft.conditionsNote || "Not provided", step: "mind" },
+    { label: "Family history you reported", value: draft.familyNote || "Not provided", step: "mind" },
+    { label: "Blood pressure you typed", value: draft.bloodPressure || "Not provided", step: "mind" },
+    { label: "Glucose you typed", value: draft.glucose || "Not provided", step: "mind" },
+    { label: "HbA1c you typed", value: draft.hba1c || "Not provided", step: "mind" },
+    { label: "Cholesterol you typed", value: draft.cholesterol || "Not provided", step: "mind" },
+    { label: "Eating pattern", value: draft.eatingPattern ? eatingPatternLabels[draft.eatingPattern] : "Not provided", step: "nourishment" },
+    { label: "Blood sugar", value: draft.bloodSugarStatus ? bloodSugarLabels[draft.bloodSugarStatus] : "Not provided", step: "health" },
+    { label: "Cholesterol status", value: draft.cholesterolStatus ? cholesterolLabels[draft.cholesterolStatus] : "Not provided", step: "health" },
+    { label: "Blood pressure status", value: draft.bloodPressureStatus ? bloodPressureLabels[draft.bloodPressureStatus] : "Not provided", step: "health" },
+    {
+      label: "Food allergies",
+      value: [...draft.foodAllergies.map((item) => allergenLabels[item]), draft.allergyNote].filter(Boolean).join(", ") || "Not provided",
       step: "health",
     },
-    { label: r.requirements, value: list(draft.dietRequirements.map((item) => l.dietRequirement[item])), step: "health" },
-    { label: r.patterns, value: list([...draft.dietPatterns.map((item) => l.dietPattern[item]), draft.dietNote]), step: "health" },
-    { label: r.energy, value: pick(draft.energyLevel, l.energy), step: "health" },
-    { label: r.mobility, value: list(draft.mobilityLimits.map((item) => l.mobility[item])), step: "health" },
-    { label: r.restrictions, value: draft.exerciseRestrictions || none, step: "health" },
-    { label: r.personalGoals, value: list(draft.wellnessGoals.map((goal) => l.wellnessGoal[goal])), step: "goals" },
-    { label: r.primaryGoal, value: pick(draft.primaryGoal, l.wellnessGoal), step: "goals" },
-    { label: r.focus, value: list(draft.goals.map((goal) => l.goal[goal])), step: "goals" },
-    { label: r.note, value: draft.habitNote || none, step: "goals" },
-    { label: r.hope, value: draft.purposeHope || none, step: "goals" },
+    {
+      label: "Other food reactions",
+      value: draft.foodReactions.map((item) => `${item.food} (${reactionLabels[item.type].toLowerCase()})`).join(", ") || "Not provided",
+      step: "health",
+    },
+    {
+      label: "Dietary requirements",
+      value: draft.dietRequirements.map((item) => dietRequirementLabels[item]).join(", ") || "Not provided",
+      step: "health",
+    },
+    {
+      label: "Eating pattern choices",
+      value: [...draft.dietPatterns.map((item) => dietPatternLabels[item]), draft.dietNote].filter(Boolean).join(", ") || "Not provided",
+      step: "health",
+    },
+    { label: "Energy", value: draft.energyLevel ? energyLabels[draft.energyLevel] : "Not provided", step: "health" },
+    { label: "Mobility", value: draft.mobilityLimits.map((item) => mobilityLabels[item]).join(", ") || "Not provided", step: "health" },
+    { label: "Injuries or exercise restrictions", value: draft.exerciseRestrictions || "Not provided", step: "health" },
+    {
+      label: "Personal goals",
+      value: draft.wellnessGoals.map((goal) => wellnessGoalLabels[goal]).join(", ") || "Not provided",
+      step: "goals",
+    },
+    { label: "Primary goal", value: draft.primaryGoal ? wellnessGoalLabels[draft.primaryGoal] : "Not provided", step: "goals" },
+    {
+      label: "Focus",
+      value: draft.goals.length ? draft.goals.map((goal) => goalLabels[goal]).join(", ") : "Not provided",
+      step: "goals",
+    },
+    { label: "Note", value: draft.habitNote || "Not provided", step: "goals" },
+    {
+      label: "Hope for what health could support",
+      value: draft.purposeHope || "Not provided",
+      step: "goals",
+    },
   ];
   return (
     <dl className="review-list">
@@ -898,7 +1058,7 @@ function Review({
           <dd>
             {item.value}{" "}
             <button className="btn btn-ghost" type="button" onClick={() => onEdit(STEP_IDS.indexOf(item.step))}>
-              {fmt(m.common.edit, { label: item.label })}
+              Edit {item.label}
             </button>
           </dd>
         </div>
