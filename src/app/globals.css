@@ -164,6 +164,99 @@ a { color: var(--forest); }
   cursor: pointer;
 }
 
+/* Language selector. Stays in the top row on every screen size. */
+.lang-switch { position: relative; }
+
+.site-account .lang-button {
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-color: var(--lavender-brand);
+  background: var(--ivory);
+  color: var(--royal);
+  letter-spacing: 0.04em;
+}
+
+.site-account .lang-button:hover { background: var(--lavender); }
+.site-account .lang-button[aria-expanded="true"] { background: var(--lavender); border-color: var(--royal); }
+
+.lang-button-code {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--royal);
+  color: #ffffff;
+}
+
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 50;
+  min-width: 12.5rem;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(23, 37, 84, 0.16);
+}
+
+.site-account .lang-option {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font-weight: 600;
+  text-align: left;
+}
+
+.site-account .lang-option:hover, .site-account .lang-option:focus-visible { background: var(--lavender); }
+.site-account .lang-option[aria-checked="true"] { background: var(--sky); color: var(--royal); box-shadow: inset 3px 0 0 var(--teal-brand); }
+.lang-flag { font-size: 1.15rem; line-height: 1; }
+.lang-check { margin-left: auto; color: var(--teal); font-weight: 800; }
+
+@media (max-width: 480px) {
+  .site-account { flex-wrap: wrap; row-gap: 0.35rem; }
+  .site-account a, .site-account button { padding: 0.4rem 0.7rem; }
+  .site-account .lang-button { padding: 0.4rem 0.55rem; letter-spacing: 0.02em; }
+}
+
+/* Very narrow phones keep the globe and the language code. */
+@media (max-width: 339px) {
+  .lang-button-word { display: none; }
+}
+
+/* Cyrillic and Greek: Fraunces has no such letters, so headings switch to Noto Serif Display. */
+html:lang(uk), html:lang(ru), html:lang(el) {
+  --font-display-family: var(--font-display-intl-family);
+}
+
+/* Cyrillic and Greek words run longer. On phones, let headings hyphenate and shrink a little
+   so a single long word (for example "конфиденциальность") cannot push the page sideways. */
+@media (max-width: 480px) {
+  html:lang(uk) :where(h1, h2), html:lang(ru) :where(h1, h2), html:lang(el) :where(h1, h2) {
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+  html:lang(uk) h1, html:lang(ru) h1, html:lang(el) h1 { font-size: 2rem; }
+}
+
+/* Caveat has Cyrillic but not Greek. */
+html:lang(el) {
+  --font-script-family: var(--font-display-intl-family);
+}
+
+/* Longer words in Ukrainian, Russian, and Greek must wrap instead of overflowing cards and buttons. */
+html:lang(uk) :where(h1, h2, h3, .btn, .home-btn, .card, .lz-card, dt, dd, legend, label),
+html:lang(ru) :where(h1, h2, h3, .btn, .home-btn, .card, .lz-card, dt, dd, legend, label),
+html:lang(el) :where(h1, h2, h3, .btn, .home-btn, .card, .lz-card, dt, dd, legend, label) {
+  overflow-wrap: break-word;
+}
+
 .site-account a.site-signin {
   background: var(--forest);
   border-color: var(--forest);

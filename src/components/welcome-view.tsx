@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { CareWelcomeArt } from "@/components/care-illustrations";
+import { useLocale } from "@/components/locale-provider";
 import { useAccount } from "@/lib/account-store";
 import {
   isInviteToken,
@@ -25,10 +26,15 @@ function subscribeNoop() {
 
 export function WelcomeView() {
   const searchParams = useSearchParams();
+  const { locale, messages: m } = useLocale();
+  const w = m.welcome;
+  // English keeps the approved invitation wording from share-care.ts.
+  const heading = locale === "en" ? WELCOME_HEADING : w.heading;
+  const body = locale === "en" ? WELCOME_BODY : w.body;
   const account = useAccount();
   const phase = account.phase;
   const invite = searchParams.get("invite")?.trim() ?? "";
-  const [visitNote, setVisitNote] = useState("");
+  const [visitNote, setVisitNote] = useState<"" | "inactive" | "checkFailed">("");
   const browserReady = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const countsStored = browserReady && getBrowserSupabase() !== null;
 
@@ -47,11 +53,7 @@ export function WelcomeView() {
         return;
       }
       openAttempts.delete(invite);
-      setVisitNote(
-        result === "inactive"
-          ? "This invitation link is no longer active. You can still explore LifeZoi and create your own account."
-          : "This browser could not check the invitation link. You can still explore LifeZoi and create your own account.",
-      );
+      setVisitNote(result === "inactive" ? "inactive" : "checkFailed");
     });
     return () => {
       cancelled = true;
@@ -60,36 +62,52 @@ export function WelcomeView() {
 
   const storedNote =
     browserReady && isInviteToken(invite) && !countsStored
-      ? "Invitation counts are not stored in this browser. You can still explore LifeZoi and create your own account."
-      : visitNote;
+      ? w.notStored
+      : visitNote === "inactive"
+        ? w.inactive
+        : visitNote === "checkFailed"
+          ? w.checkFailed
+          : "";
 
   return (
     <article className="stack-lg">
       <figure className="page-photo care-art">
         <CareWelcomeArt />
-        <figcaption>Original lifeZoi illustration.</figcaption>
+        <figcaption>{w.artCaption}</figcaption>
       </figure>
       <div>
-        <h1>{WELCOME_HEADING}</h1>
-        <p className="lede">{WELCOME_BODY}</p>
+        <h1>{heading}</h1>
+        <p className="lede">{body}</p>
       </div>
       <section className="card stack">
-        <h2>Your own account</h2>
-        <p>New accounts are not open yet. You can still explore LifeZoi now. Without an account, answers stay in this browser tab.</p>
-        <p>LifeZoi is free. The welcome link does not show a name, an email address, or health information.</p>
+        <h2>{w.ownAccount}</h2>
+        <p>{w.notOpen}</p>
+        <p>{w.free}</p>
         {invite && !isInviteToken(invite) ? (
-          <p role="status">This link does not include a LifeZoi invitation code. You can still explore LifeZoi.</p>
+          <p role="status">{w.noCode}</p>
         ) : null}
         {storedNote ? <p role="status">{storedNote}</p> : null}
         <div className="actions">
           <Link className="btn btn-primary" href="/dashboard">
-            Explore LifeZoi
+            {w.explore}
           </Link>
           <Link className="btn btn-secondary" href="/sign-in">
-            Sign in
+            {m.common.signIn}
           </Link>
         </div>
       </section>
+    </article>
+  );
+}
+
+export function WelcomeFallback({ heading, body }: { heading: string; body: string }) {
+  const { locale, messages } = useLocale();
+  const w = messages.welcome;
+  return (
+    <article className="stack-lg">
+      <h1>{locale === "en" ? heading : w.heading}</h1>
+      <p className="lede">{locale === "en" ? body : w.body}</p>
+      <p role="status">{w.opening}</p>
     </article>
   );
 }

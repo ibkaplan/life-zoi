@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { EmailHelpForm, NewPasswordForm } from "@/components/password-forms";
+import { useMessages } from "@/components/locale-provider";
+import { fmt } from "@/lib/i18n/config";
 import { signOutAccount, useAccount, verifySignInCode } from "@/lib/account-store";
 import { hasRecoveryParams, recoveryLinkProblem } from "@/lib/password-recovery";
 
@@ -25,6 +27,8 @@ function noSubscription() {
 
 export function ResetPasswordView() {
   const account = useAccount();
+  const m = useMessages();
+  const r = m.reset;
   const link = useSyncExternalStore(noSubscription, readArrival, () => null);
   const [saved, setSaved] = useState(false);
   const [code, setCode] = useState("");
@@ -40,21 +44,21 @@ export function ResetPasswordView() {
 
   let body: React.ReactNode;
   if (account.phase === "loading" || link === null) {
-    body = <p role="status">Checking the reset link…</p>;
+    body = <p role="status">{r.checking}</p>;
   } else if (account.phase === "off") {
-    body = <p>Account sign-in is not configured in this environment, so there is no password to reset.</p>;
+    body = <p>{r.off}</p>;
   } else if (saved) {
     body = (
       <>
         <p className="alert alert-ok" role="status">
-          Your password was changed. You are signed in on this browser.
+          {r.changed}
         </p>
         <div className="actions">
           <Link className="btn btn-primary" href="/dashboard">
-            Go to Home
+            {r.goHome}
           </Link>
           <Link className="btn btn-ghost" href="/settings">
-            Account settings
+            {m.common.accountSettings}
           </Link>
         </div>
       </>
@@ -73,9 +77,9 @@ export function ResetPasswordView() {
           });
         }}
       >
-        <p>This account uses an authenticator app. Enter its 6-digit code, then choose the new password.</p>
+        <p>{r.mfa}</p>
         <label className="field" htmlFor="reset-mfa-code">
-          <span>6-digit code</span>
+          <span>{m.common.sixDigitCode}</span>
           <input
             id="reset-mfa-code"
             inputMode="numeric"
@@ -87,10 +91,10 @@ export function ResetPasswordView() {
         </label>
         <div className="actions">
           <button className="btn btn-primary" type="submit" disabled={busy}>
-            Verify code
+            {m.common.verifyCode}
           </button>
           <button className="btn btn-ghost" type="button" disabled={busy} onClick={() => void signOutAccount()}>
-            Cancel
+            {m.common.cancel}
           </button>
         </div>
         {codeError ? (
@@ -103,7 +107,7 @@ export function ResetPasswordView() {
   } else if (account.phase === "ready") {
     body = (
       <>
-        <p>Signed in as {account.email ?? "your account"}. Choose a new password for this account.</p>
+        <p>{fmt(r.signedInAs, { email: account.email ?? m.common.yourAccount })}</p>
         <NewPasswordForm onSaved={() => setSaved(true)} />
       </>
     );
@@ -113,8 +117,8 @@ export function ResetPasswordView() {
         <p className="alert alert-error" role="alert">
           {link.problem ??
             (link.fromLink
-              ? "This reset link could not be opened. It may have expired, been used already, or been opened in a different browser from the one that asked for it."
-              : "Open the reset link from your email to set a new password, or request a new link below.")}
+              ? r.linkFailed
+              : r.openLink)}
         </p>
         <EmailHelpForm mode="reset" />
       </>
@@ -124,12 +128,12 @@ export function ResetPasswordView() {
   return (
     <div className="stack-lg narrow">
       <div>
-        <p className="kicker">Account</p>
-        <h1>Set a new password</h1>
+        <p className="kicker">{m.signIn.kicker}</p>
+        <h1>{r.title}</h1>
       </div>
       <section className="card stack">{body}</section>
       <p className="hint">
-        Passwords stay with Supabase Auth. lifeZoi never sees or stores them. <Link href="/settings">Back to Settings</Link>
+        {r.footer} <Link href="/settings">{r.backToSettings}</Link>
       </p>
     </div>
   );
