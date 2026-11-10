@@ -1,5 +1,6 @@
 "use client";
 
+import { SessionMusicControls } from "@/components/background-music/controls";
 import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import { useEffect, useRef, useState } from "react";
 import { localISODate } from "@/lib/dates";
@@ -175,6 +176,7 @@ export function VideoPlayer({ video, autoStart = false }: { video: VideoItem; au
       {playing && !video.lastChecked ? (
         <p className="hint">If the player shows an error, the video may have moved. An administrator will check it.</p>
       ) : null}
+      {playing && video.embedUrl ? <SessionMusicControls /> : null}
       <p className="studio-safety-line">{videoSafety(video)}</p>
     </div>
   );

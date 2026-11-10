@@ -708,5 +708,6 @@
  "{hours} hours, {quality}": "{hours} ώρες, {quality}",
  "{value} cm": "{value} εκ.",
  "{value} hours": "{value} ώρες",
- "{value} kg": "{value} κιλά"
+ "{value} kg": "{value} κιλά",
+ "Music library": "Μουσική βιβλιοθήκη"
 }

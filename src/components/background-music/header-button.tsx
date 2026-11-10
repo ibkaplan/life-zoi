@@ -3,9 +3,10 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { isSounding, useBackgroundMusic } from "@/components/background-music/provider";
-import { controlProps, MusicNoteIcon, pieceTitle, PlayPauseButton, statusText } from "@/components/background-music/shared";
+import Link from "next/link";
+import { CategorySelect, MusicProgress, MusicVolume, NowPlaying, TransportControls } from "@/components/background-music/controls";
+import { controlProps, MusicNoteIcon } from "@/components/background-music/shared";
 import { fmt } from "@/lib/i18n/config";
-import { RECORDINGS } from "@/lib/background-music/tracks";
 
 /** The small ♪ button in the header. It opens the controls for the one background player. */
 export function HeaderMusicButton() {
@@ -15,8 +16,7 @@ export function HeaderMusicButton() {
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
-  const volumeId = useId();
-
+  
   useEffect(() => {
     if (!open) return;
     const onPointer = (event: PointerEvent) => {
@@ -41,8 +41,6 @@ export function HeaderMusicButton() {
   const on = isSounding(music.status);
   const off = music.prefs.choice === "off";
   const label = off ? m.music.headerOff : on ? m.music.headerPlaying : m.music.headerPaused;
-  const title = pieceTitle(m, music.piece);
-  const percent = Math.round((music.prefs.muted ? 0 : music.prefs.volume) * 100);
 
   return (
     <div className="music-switch" ref={rootRef} {...controlProps}>
@@ -84,53 +82,32 @@ export function HeaderMusicButton() {
           ) : (
             <>
               <p className="hint">{m.music.panelIntro}</p>
-              <p className="music-now" aria-live="polite">
-                {title ? fmt(on ? m.music.nowPlaying : m.music.upNext, { title }) : null}
-                <br />
-                <span className="hint">{statusText(m, music.status, music.holdReason)}</span>
-              </p>
+              <NowPlaying />
+              <TransportControls />
+              <MusicProgress />
               <div className="music-row">
-                <PlayPauseButton label={m.music.play} />
                 <button type="button" className="btn btn-secondary" aria-pressed={music.prefs.muted} onClick={() => music.toggleMute()}>
                   <span aria-hidden="true">{music.prefs.muted ? "🔇" : "🔊"}</span> {music.prefs.muted ? m.music.unmute : m.music.mute}
                 </button>
-                <button type="button" className="btn btn-ghost" onClick={() => music.next()}>
-                  {m.music.next} <span aria-hidden="true">⏭</span>
-                </button>
               </div>
-              <label className="field music-volume" htmlFor={volumeId}>
-                <span>
-                  {m.music.volume} <span className="hint">{percent}%</span>
-                </span>
-                <input
-                  id={volumeId}
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={music.prefs.muted ? 0 : music.prefs.volume}
-                  aria-valuetext={`${percent}%`}
-                  onChange={(event) => music.setVolume(Number(event.target.value))}
-                />
-              </label>
+              <MusicVolume session={music.ducked} />
+              <CategorySelect />
+              <p>
+                <Link className="btn btn-ghost" href="/library/music" onClick={() => setOpen(false)}>
+                  {m.music.openLibrary}
+                </Link>
+              </p>
               <details className="music-credits">
                 <summary>{m.music.credits}</summary>
-                {music.usesRecordings ? (
-                  <>
-                    <p className="hint">{m.music.creditsFiles}</p>
-                    <ul>
-                      {RECORDINGS.map((recording) => (
-                        <li key={recording.id}>
-                          {recording.title}. {recording.attribution}. {fmt(m.music.licence, { licence: recording.license })}.{" "}
-                          <a href={recording.sourceUrl} target="_blank" rel="noopener noreferrer">
-                            {m.music.source}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
+                {music.piece?.kind === "file" ? (
+                  <p className="hint">
+                    {m.music.creditsFiles} {fmt(m.music.licence, { licence: music.piece.license })}.{" "}
+                    <a href={music.piece.sourceUrl} target="_blank" rel="noopener noreferrer">
+                      {m.music.source}
+                    </a>
+                  </p>
                 ) : (
-                  <p className="hint">{m.music.creditsSynth}</p>
+                  <p className="hint">{m.music.library.aboutBuiltIn}</p>
                 )}
               </details>
               <div className="music-off stack-sm">

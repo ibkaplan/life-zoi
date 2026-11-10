@@ -709,5 +709,6 @@
  "{hours} hours, {quality}": "{hours} год, {quality}",
  "{value} cm": "{value} см",
  "{value} hours": "{value} год",
- "{value} kg": "{value} кг"
+ "{value} kg": "{value} кг",
+ "Music library": "Музична бібліотека"
 }

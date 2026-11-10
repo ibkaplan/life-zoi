@@ -1,11 +1,17 @@
 /**
- * Audio focus: any part of LifeZoi that makes its own sound (a yoga video,
- * guided breathing, spoken instructions, the music library) claims focus, and
- * background music pauses until every claim is released.
+ * Audio focus: any part of LifeZoi that makes its own sound claims focus while
+ * it plays. The music player reads the claims (see `sessionEffect` in `prefs.ts`):
+ * - `video`: an exercise video is on screen. Music plays quietly underneath, or pauses.
+ * - `voice`: spoken instructions (read aloud, guided breathing, a timer's voice).
+ *   Music plays quietly underneath, or pauses.
+ * - `sound`: another tune or player. Music pauses until it ends.
+ *
+ * Any new feature that speaks or plays sound (for example a focus timer) should
+ * claim focus with `useAudioFocus` from `src/components/background-music/use-audio-focus.ts`.
  *
  * This is an in-page signal only. It never inspects what the other audio is.
  */
-export type FocusKind = "sound" | "video";
+export type FocusKind = "sound" | "video" | "voice";
 
 type Claim = { id: string; kind: FocusKind };
 type Listener = (claims: readonly Claim[]) => void;
