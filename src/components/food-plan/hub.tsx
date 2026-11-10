@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { FoodMark } from "@/components/food-plan/frame";
+import { HydrationNote } from "@/components/movement-breaks/views";
 import { searchLibrary } from "@/lib/food-plan/plan";
 import { FOOD_SUBTITLE, FOOD_TAGLINE, FOOD_TITLE, PROFESSIONAL_FOOD } from "@/lib/food-plan/sources";
 
@@ -33,6 +34,7 @@ export function FoodHub() {
         <p className="food-tagline">{FOOD_TAGLINE}</p>
         <p>{PROFESSIONAL_FOOD}</p>
       </section>
+      <HydrationNote />
       <section className="card food-card stack">
         <h2>Recipe library assistant</h2>
         <p>

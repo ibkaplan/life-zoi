@@ -7,6 +7,7 @@ import { Art } from "@/components/companion/art";
 import { ActivityCard } from "@/components/companion/activity-card";
 import { GoalsEditor } from "@/components/companion/goals-editor";
 import { SaveNote } from "@/components/companion/shared";
+import { CurrentNewLife } from "@/components/movement-breaks/views";
 import { useProfile } from "@/components/companion/use-profile";
 import { useSession } from "@/components/session-provider";
 import { planContext, planSections, SECTION_IDS, SECTION_INFO, WEEKLY_TARGETS } from "@/lib/companion/day-plan";
@@ -141,6 +142,7 @@ export function PlanView() {
         </p>
         <LifeChangesPanel heading="My current life, my new life: breathing and circulation" />
       </section>
+      <CurrentNewLife />
       <section className="card stack">
         <h2>A few priorities from your assessment</h2>
         <p>These weekly actions come from your latest answers. They are user-reported, not measured, and not hypothetical forecasts.</p>

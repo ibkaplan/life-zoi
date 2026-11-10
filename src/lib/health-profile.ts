@@ -49,6 +49,9 @@ export const MOBILITY_LIMITS = [
   "prefer-not",
 ] as const;
 
+/** What a typical day looks like. Optional; used only to suggest breaks from sitting. */
+export const DAILY_SETTINGS = ["office", "computer", "long-sitting", "television", "driving", "on-my-feet", "prefer-not"] as const;
+
 export const WELLNESS_GOALS = [
   "lose-weight",
   "gain-weight",
@@ -78,6 +81,7 @@ export type ReactionType = (typeof REACTION_TYPES)[number];
 export type FoodReaction = { food: string; type: ReactionType };
 export type MobilityLimit = (typeof MOBILITY_LIMITS)[number];
 export type WellnessGoal = (typeof WELLNESS_GOALS)[number];
+export type DailySetting = (typeof DAILY_SETTINGS)[number];
 
 export type HealthProfileFields = {
   desiredWeightKg: string;
@@ -98,6 +102,8 @@ export type HealthProfileFields = {
   exerciseRestrictions: string;
   wellnessGoals: WellnessGoal[];
   primaryGoal: WellnessGoal | "";
+  /** Work and daily activity: office, computer, long sitting, television, driving. */
+  dailySetting: DailySetting[];
 };
 
 export const EMPTY_HEALTH_PROFILE: HealthProfileFields = {
@@ -117,6 +123,7 @@ export const EMPTY_HEALTH_PROFILE: HealthProfileFields = {
   exerciseRestrictions: "",
   wellnessGoals: [],
   primaryGoal: "",
+  dailySetting: [],
 };
 
 export function emptyHealthProfile(): HealthProfileFields {
@@ -128,6 +135,7 @@ export function emptyHealthProfile(): HealthProfileFields {
     dietPatterns: [],
     mobilityLimits: [],
     wellnessGoals: [],
+    dailySetting: [],
   };
 }
 
@@ -227,6 +235,16 @@ export const mobilityLabels: Record<MobilityLimit, string> = {
   "prefer-not": "Prefer not to answer",
 };
 
+export const dailySettingLabels: Record<DailySetting, string> = {
+  office: "I work in an office",
+  computer: "I work at a computer",
+  "long-sitting": "I sit for many hours at a time",
+  television: "I watch television for long periods",
+  driving: "I drive or travel seated for long periods",
+  "on-my-feet": "I am on my feet for most of the day",
+  "prefer-not": "Prefer not to answer",
+};
+
 export const wellnessGoalLabels: Record<WellnessGoal, string> = {
   "lose-weight": "Lose weight",
   "gain-weight": "Gain weight",
@@ -321,6 +339,7 @@ export function coerceHealthProfile(input: unknown): HealthProfileFields {
     exerciseRestrictions: cleanText(record.exerciseRestrictions, 280),
     wellnessGoals,
     primaryGoal,
+    dailySetting: exclusive(listOf(record.dailySetting, DAILY_SETTINGS), "prefer-not"),
   };
 }
 

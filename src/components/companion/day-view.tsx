@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ActivityCard } from "@/components/companion/activity-card";
 import { Art } from "@/components/companion/art";
 import { SaveNote } from "@/components/companion/shared";
+import { MovementBreakDayCard } from "@/components/movement-breaks/views";
 import { useProfile } from "@/components/companion/use-profile";
 import { DAY_SLOTS, daySchedule, nextOption, planContext, SLOT_INFO, type DaySlot } from "@/lib/companion/day-plan";
 import { commitCompanion } from "@/lib/companion/store";
@@ -180,6 +181,7 @@ export function CompanionDayView() {
           Show the rest of the day ({items.length - visible.length} more)
         </button>
       ) : null}
+      <MovementBreakDayCard />
       <DailyLog day={day} today={today} />
       <Customize today={today} />
       <p className="hint">
