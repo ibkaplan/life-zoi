@@ -229,7 +229,7 @@ export function ProgressView() {
               >
                 {TRACKABLE_HABIT_IDS.map((id) => (
                   <option key={id} value={id}>
-                    {habitLabels[id]}
+                    {t(habitLabels[id])}
                   </option>
                 ))}
               </select>

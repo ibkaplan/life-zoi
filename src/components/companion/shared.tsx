@@ -40,6 +40,8 @@ const FAVORITE_TEXT: Record<string, string> = {
   "this video": msg("Add this video to favorites"),
   "this session": msg("Add this session to favorites"),
   "this class": msg("Add this class to favorites"),
+  "this track": msg("Add this track to favorites"),
+  "this book": msg("Add this book to favorites"),
 };
 
 const LEVEL_WORD: Record<string, string> = { beginner: msg("Beginner"), intermediate: msg("Intermediate"), advanced: msg("Advanced") };

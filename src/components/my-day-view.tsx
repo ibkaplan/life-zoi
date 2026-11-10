@@ -5,6 +5,7 @@ import { useState, useSyncExternalStore } from "react";
 import { usePageFormat } from "@/components/page-format";
 import { useSession } from "@/components/session-provider";
 import { msg } from "@/lib/i18n/translate";
+import { sayJoined } from "@/lib/my-day/say";
 import { LoadingState } from "@/components/sources";
 import { useAccount } from "@/lib/account-store";
 import { isEmptyBrain } from "@/lib/brain-quiz/progress";
@@ -50,6 +51,7 @@ export function MyDayView() {
   const session = useSession();
   const { t, longDate, locale } = usePageFormat();
   const account = useAccount();
+  const say = (text: string) => sayJoined(t, text, locale === "en");
   const snap = useSyncExternalStore(subscribeMyDay, getMyDaySnapshot, getMyDayServerSnapshot);
   const emotional = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
   const signedIn = account.phase === "ready";
@@ -134,24 +136,24 @@ export function MyDayView() {
         {items.map((item) => (
           <li key={item.id} className="card stack" id={`day-${item.id}`}>
             <p className="kicker">{t(item.section)}</p>
-            <h2>{t(item.title)}</h2>
+            <h2>{say(item.title)}</h2>
             <p>
               <span className="hint">{t(item.timeLabel)}. </span>
               <strong>{item.time}</strong>
               {item.status === "done" ? ` · ${t("Done")}` : item.status === "skipped" ? ` · ${t("Skipped")}` : ""}
             </p>
-            <p>{t(item.detail)}</p>
+            <p>{say(item.detail)}</p>
             {item.steps.length > 0 ? (
               <ol>
                 {item.steps.map((step) => (
-                  <li key={step}>{t(step)}</li>
+                  <li key={step}>{say(step)}</li>
                 ))}
               </ol>
             ) : null}
-            {item.why ? <p className="hint">{t(item.why)}</p> : null}
+            {item.why ? <p className="hint">{say(item.why)}</p> : null}
             {item.href ? (
               <Link className="btn btn-secondary" href={item.href}>
-                {t(item.hrefLabel)}
+                {say(item.hrefLabel)}
               </Link>
             ) : null}
             <div className="actions">

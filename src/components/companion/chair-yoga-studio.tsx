@@ -187,7 +187,7 @@ function ChooseToday({ video }: { video: StudioVideo }) {
         })
       }
     >
-      {chosen ? `★ ${t(T.todayChosen)}` : T.chooseToday}
+      {chosen ? `★ ${t(T.todayChosen)}` : t(T.chooseToday)}
     </button>
   );
 }
