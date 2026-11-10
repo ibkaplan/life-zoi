@@ -1,4 +1,7 @@
 import { containsProhibitedClaim } from "@/lib/claims";
+import { makeTranslate, msg, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
 
 export const CHANGE_LAB_KEY = "lifezoi.change-lab.v1";
 
@@ -227,24 +230,28 @@ export function sanitizeChangeLab(input: unknown): ChangeLabState {
   };
 }
 
-export function fieldLabel(fieldId: FieldId, value: string): string {
+export function fieldLabel(fieldId: FieldId, value: string, t: Translate = english): string {
   const field = BASELINE_FIELDS.find((item) => item.id === fieldId);
-  return field?.options.find((option) => option[0] === value)?.[1] ?? "Not answered";
+  return t(field?.options.find((option) => option[0] === value)?.[1] ?? msg("Not answered"));
 }
 
-export function buildPlan(experimentId: ExperimentId, duration: 7 | 30): string[] {
+function planDays(experimentId: ExperimentId, duration: 7 | 30, t: Translate): string[] {
   const experiment = EXPERIMENTS.find((item) => item.id === experimentId);
-  const focus = experiment?.summary ?? "Repeat one small habit you chose.";
-  const days = Array.from({ length: duration }, (_, index) => {
+  const focus = t(experiment?.summary ?? msg("Repeat one small habit you chose."));
+  return Array.from({ length: duration }, (_, index) => {
     const day = index + 1;
     if (index % 7 === 6) {
-      return `Day ${day}: Look back at the week. Note what was workable. Skip any day that does not feel safe.`;
+      return t("Day {day}: Look back at the week. Note what was workable. Skip any day that does not feel safe.", { day });
     }
-    return `Day ${day}: ${focus} This is practice, not a treatment.`;
+    return t("Day {day}: {focus} This is practice, not a treatment.", { day, focus });
   });
-  const problem = containsProhibitedClaim(days.join(" "));
-  if (problem) return ["The plan was withheld because the wording did not stay educational."];
-  return days;
+}
+
+export function buildPlan(experimentId: ExperimentId, duration: 7 | 30, t: Translate = english): string[] {
+  // The wording check reads the English plan; the person sees it in the chosen language.
+  const problem = containsProhibitedClaim(planDays(experimentId, duration, english).join(" "));
+  if (problem) return [t("The plan was withheld because the wording did not stay educational.")];
+  return planDays(experimentId, duration, t);
 }
 
 export type ComparisonRow = {
@@ -254,14 +261,18 @@ export type ComparisonRow = {
   kind: "entered" | "missing";
 };
 
-export function compareChangeLab(state: ChangeLabState): ComparisonRow[] {
+export function compareChangeLab(
+  state: ChangeLabState,
+  t: Translate = english,
+  date: (iso: string) => string = (iso) => iso,
+): ComparisonRow[] {
   const rows: ComparisonRow[] = BASELINE_FIELDS.map((field) => {
     const before = state.baseline[field.id];
     const after = state.followUp?.[field.id];
     return {
-      label: field.label,
-      before: before ? fieldLabel(field.id, before) : "Not entered",
-      after: after ? fieldLabel(field.id, after) : "Not entered yet",
+      label: t(field.label),
+      before: before ? fieldLabel(field.id, before, t) : t("Not entered"),
+      after: after ? fieldLabel(field.id, after, t) : t("Not entered yet"),
       kind: before || after ? "entered" : "missing",
     };
   });
@@ -272,25 +283,40 @@ export function compareChangeLab(state: ChangeLabState): ComparisonRow[] {
   for (const kind of kinds) {
     const before = state.baselineMeasurements.find((item) => item.kind === kind);
     const after = state.followUpMeasurements.find((item) => item.kind === kind);
+    const reading = (item: Measurement) =>
+      t("{value} {unit} on {date}", { value: item.value, unit: t(item.unit), date: date(item.measuredOn) });
     rows.push({
-      label: kind,
-      before: before ? `${before.value} ${before.unit} on ${before.measuredOn}` : "Not entered",
-      after: after ? `${after.value} ${after.unit} on ${after.measuredOn}` : "Not entered yet",
+      label: t(kind),
+      before: before ? reading(before) : t("Not entered"),
+      after: after ? reading(after) : t("Not entered yet"),
       kind: "entered",
     });
   }
   return rows;
 }
 
-export function encouragement(doneCount: number, duration: number): string {
-  if (doneCount <= 0) return "No check-in is marked yet. You can start with today.";
-  if (doneCount >= duration) return `You marked all ${duration} days. That is a record of practice, not a health outcome.`;
-  return `You marked ${doneCount} of ${duration} days. A missed day is part of learning, not a failure.`;
+export function encouragement(doneCount: number, duration: number, t: Translate = english): string {
+  if (doneCount <= 0) return t("No check-in is marked yet. You can start with today.");
+  if (doneCount >= duration) {
+    return t("You marked all {duration} days. That is a record of practice, not a health outcome.", { duration });
+  }
+  return t("You marked {done} of {duration} days. A missed day is part of learning, not a failure.", {
+    done: doneCount,
+    duration,
+  });
 }
 
-export function habitJourneySummary(state: ChangeLabState): string {
+export function habitJourneySummary(state: ChangeLabState, t: Translate = english): string {
   const done = state.checkIns.filter((item) => item.done).length;
-  return `Health Habits Journey: ${done} practice day${done === 1 ? "" : "s"} marked in this experiment. This is not a biological age and it is not a medical score.`;
+  return done === 1
+    ? t(
+        "Health Habits Journey: {count} practice day marked in this experiment. This is not a biological age and it is not a medical score.",
+        { count: done },
+      )
+    : t(
+        "Health Habits Journey: {count} practice days marked in this experiment. This is not a biological age and it is not a medical score.",
+        { count: done },
+      );
 }
 
 const listeners = new Set<() => void>();

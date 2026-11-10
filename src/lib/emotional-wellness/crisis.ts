@@ -1,5 +1,8 @@
 import { CLINICAL_REVIEW_NOTICE } from "@/lib/emotional-wellness/copy";
 import type { CountryChoice, CrisisKind } from "@/lib/emotional-wellness/types";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
 
 /**
  * Deterministic crisis check. It does not call a model.
@@ -103,34 +106,40 @@ export function detectCrisis(text: string): CrisisKind[] {
   return kinds;
 }
 
-export function standingCrisisNotice(country: CountryChoice): string {
+export function standingCrisisNotice(country: CountryChoice, t: Translate = english): string {
   if (showsUsCrisisResources(country)) {
-    return "If you may be in danger of suicide, self-harm, or immediate harm, call or text 988, visit https://988lifeline.org/, or call 911 for immediate danger. This notice stays up even when the companion is off.";
+    return t(
+      "If you may be in danger of suicide, self-harm, or immediate harm, call or text 988, visit https://988lifeline.org/, or call 911 for immediate danger. This notice stays up even when the companion is off.",
+    );
   }
-  return "If you may be in danger, contact your local emergency services. This page does not list a United States crisis number for the country you set, and it will not invent a local number. This notice stays up even when the companion is off.";
+  return t(
+    "If you may be in danger, contact your local emergency services. This page does not list a United States crisis number for the country you set, and it will not invent a local number. This notice stays up even when the companion is off.",
+  );
 }
 
-export function crisisReply(kinds: readonly CrisisKind[], country: CountryChoice): string {
+export function crisisReply(kinds: readonly CrisisKind[], country: CountryChoice, t: Translate = english): string {
   const medical = kinds.includes("medical-emergency");
   const danger = kinds.includes("immediate-danger") || kinds.includes("harm-to-others");
   const emotional = kinds.includes("suicide") || kinds.includes("self-harm");
   const sentences: string[] = [];
-  if (medical) sentences.push("This may be a medical emergency. This page cannot assess symptoms.");
-  if (emotional) sentences.push("If you may be in danger of suicide or self-harm, pause here.");
-  if (danger) sentences.push("If someone may be in immediate danger, get emergency help now.");
+  if (medical) sentences.push(t("This may be a medical emergency. This page cannot assess symptoms."));
+  if (emotional) sentences.push(t("If you may be in danger of suicide or self-harm, pause here."));
+  if (danger) sentences.push(t("If someone may be in immediate danger, get emergency help now."));
   if (showsUsCrisisResources(country)) {
     if (medical || danger || emotional) {
-      sentences.push("In the United States, call 911 for immediate danger.");
+      sentences.push(t("In the United States, call 911 for immediate danger."));
     }
-    sentences.push("You can call or text 988, or visit https://988lifeline.org/.");
+    sentences.push(t("You can call or text 988, or visit https://988lifeline.org/."));
   } else {
     sentences.push(
-      "Contact your local emergency services. This page does not list a United States crisis number for the country you set, and it will not invent a local number.",
+      t(
+        "Contact your local emergency services. This page does not list a United States crisis number for the country you set, and it will not invent a local number.",
+      ),
     );
   }
   sentences.push(
-    "This tool will not describe methods, and it will not continue with ordinary coaching. It is not a crisis counselor.",
+    t("This tool will not describe methods, and it will not continue with ordinary coaching. It is not a crisis counselor."),
   );
-  sentences.push(CLINICAL_REVIEW_NOTICE);
+  sentences.push(t(CLINICAL_REVIEW_NOTICE));
   return sentences.join(" ");
 }

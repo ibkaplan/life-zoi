@@ -1,3 +1,4 @@
+import { makeTranslate, msg, type Translate } from "@/lib/i18n/translate";
 import { WELLNESS_COACH_PATH, type CombPart, type HabitId } from "@/lib/habit-transformation/catalog";
 
 export { WELLNESS_COACH_PATH };
@@ -18,10 +19,12 @@ export type CoachInput = {
   easierAction: string;
 };
 
+const english = makeTranslate(null);
+
 const PART: Record<CombPart, string> = {
-  capability: "Capability",
-  opportunity: "Opportunity",
-  motivation: "Motivation",
+  capability: msg("Capability"),
+  opportunity: msg("Opportunity"),
+  motivation: msg("Motivation"),
 };
 
 export function toWellnessCoachRequest(input: CoachInput): WellnessCoachRequest {
@@ -33,9 +36,12 @@ export function toWellnessCoachRequest(input: CoachInput): WellnessCoachRequest 
   };
 }
 
-export function ruleCoachNote(input: CoachInput): string {
-  const part = input.barrier ? PART[input.barrier] : "No single part";
-  return `${part} may be the tight spot for ${input.habitName}. One small action is: ${input.smallAction}. On a hard day: ${input.easierAction}. This note is educational. It is not a diagnosis, and it is not clinically validated.`;
+export function ruleCoachNote(input: CoachInput, t: Translate = english): string {
+  const part = t(input.barrier ? PART[input.barrier] : msg("No single part"));
+  return t(
+    "{part} may be the tight spot for {habit}. One small action is: {action}. On a hard day: {easier}. This note is educational. It is not a diagnosis, and it is not clinically validated.",
+    { part, habit: input.habitName, action: input.smallAction, easier: input.easierAction },
+  );
 }
 
 export async function readWellnessCoach(

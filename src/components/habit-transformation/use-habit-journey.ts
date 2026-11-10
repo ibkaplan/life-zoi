@@ -4,6 +4,7 @@ import { useSession } from "@/components/session-provider";
 import { LOCAL_NOTE } from "@/lib/habit-transformation/catalog";
 import { emptyHabitJourney, type HabitJourney } from "@/lib/habit-transformation/model";
 import { useAccount } from "@/lib/account-store";
+import { msg } from "@/lib/i18n/translate";
 
 export function useHabitJourney() {
   const account = useAccount();
@@ -21,11 +22,11 @@ export function useHabitJourney() {
       api.saveHabit(next);
     },
     storageNote: !api.ready
-      ? "Checking where to save your habit journey…"
+      ? msg("Checking where to save your habit journey…")
       : api.sample
-        ? "Sample data is read-only."
+        ? msg("Sample data is read-only.")
         : signedIn
-          ? "Saved with this account."
+          ? msg("Saved with this account.")
           : LOCAL_NOTE,
   };
 }

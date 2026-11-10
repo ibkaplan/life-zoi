@@ -1,4 +1,5 @@
 import type { ContextId } from "@/lib/emotional-wellness/types";
+import { msg } from "@/lib/i18n/translate";
 
 export const EMOTIONAL_ROUTE = "/emotional-wellness";
 
@@ -38,15 +39,15 @@ export const CONTEXT_NOTE =
   "Context chips are optional and changeable. Choosing one does not diagnose a condition, and this page will not infer a diagnosis from what you write.";
 
 export const CONTEXT_OPTIONS: { id: ContextId; label: string; phrase: string }[] = [
-  { id: "cancer", label: "Cancer", phrase: "cancer" },
-  { id: "treatment", label: "Treatment", phrase: "treatment" },
-  { id: "diabetes", label: "Diabetes", phrase: "diabetes" },
-  { id: "chronic", label: "Chronic condition", phrase: "a chronic condition" },
-  { id: "pain", label: "Pain", phrase: "pain" },
-  { id: "recovery", label: "Recovery", phrase: "recovery" },
-  { id: "caregiver", label: "Caregiver", phrase: "caregiving" },
-  { id: "loneliness", label: "Loneliness", phrase: "loneliness" },
-  { id: "general", label: "General", phrase: "general" },
+  { id: "cancer", label: "Cancer", phrase: msg("cancer") },
+  { id: "treatment", label: "Treatment", phrase: msg("treatment") },
+  { id: "diabetes", label: "Diabetes", phrase: msg("diabetes") },
+  { id: "chronic", label: "Chronic condition", phrase: msg("a chronic condition") },
+  { id: "pain", label: "Pain", phrase: msg("pain") },
+  { id: "recovery", label: "Recovery", phrase: msg("recovery") },
+  { id: "caregiver", label: "Caregiver", phrase: msg("caregiving") },
+  { id: "loneliness", label: "Loneliness", phrase: msg("loneliness") },
+  { id: "general", label: "General", phrase: msg("general") },
 ];
 
 export function contextPhrase(context: ContextId): string {
