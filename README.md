@@ -23,6 +23,8 @@ Email and password sign-in uses Supabase Auth when `NEXT_PUBLIC_SUPABASE_URL` an
 
 `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only when the account adapter is active and the public Supabase URL and anon key are set. Otherwise it reports `persistence: "development"` and `authentication: "not-configured"`.
 
+`GET /api/news` feeds the two news sections on `/dashboard` (Today's World News, 3–5 stories; Health & Longevity News, 2–3 stories). The server reads free public RSS feeds from BBC News, NPR, ScienceDaily, the National Institutes of Health, and Harvard Health Publishing (`src/lib/news/sources.ts`), with no API key or paid plan. Results are cached with `"use cache"` for six hours and shared by every visitor; a run where every feed fails is cached for five minutes only. Stories must carry a date, world stories must be under 48 hours old, health stories under 14 days, and nothing is padded or invented: when feeds fail, the page says news is unavailable. No visitor information is sent to the feeds. Headlines stay in the source's language; the surrounding UI is translated. The health section carries a "news reporting, not medical advice" note. Feed URLs were written from the publishers' documented addresses and tested only against fixtures in `src/lib/news/fixtures/`, because the development sandbox could not reach them.
+
 ## Local setup
 
 Requirements: Node.js 22 and npm.

@@ -49,6 +49,9 @@ export const en = {
     greetingMorning: "Good Morning! Welcome to LifeZoi.",
     greetingAfternoon: "Good Afternoon! Welcome to LifeZoi.",
     greetingEvening: "Good Evening! Welcome to LifeZoi.",
+    greetingMorningName: "Good morning, {name}! Welcome to LifeZoi.",
+    greetingAfternoonName: "Good afternoon, {name}! Welcome to LifeZoi.",
+    greetingEveningName: "Good evening, {name}! Welcome to LifeZoi.",
     welcomeLede: "Take a slow breath. If you like, gentle classical music can play softly while you explore your wellness activities.",
     welcomeOff: "Background music is off. You can turn it back on with the music button at the top of the page.",
     tracks: {
@@ -320,6 +323,27 @@ export const en = {
     languageTitle: "Language",
     languageText:
       "Choose the language for lifeZoi. Your choice is saved in this browser and does not change your answers.",
+  },
+  news: {
+    worldTitle: "Today's World News",
+    worldIntro: "A few current stories from public news feeds: world, US, politics, economy, science and technology, and culture.",
+    healthTitle: "Health & Longevity News",
+    healthIntro: "Recent reporting on healthy aging, the brain and memory, nutrition, movement, and new research.",
+    healthNote: "This is news reporting, not medical advice. A single study rarely changes what you should do. Talk with your clinician before changing medicines, diet, or exercise because of a news story.",
+    loading: "Loading today's headlines…",
+    unavailable: "News is not available right now. Please check again later. LifeZoi does not show stories it could not read from the news sources.",
+    fewer: "Only {count} recent stories were available from the news sources today.",
+    published: "Published {date}",
+    source: "Source: {source}",
+    readFull: "Read the full article",
+    readFullAt: "Read the full article at {source} (opens in a new tab)",
+    noSummary: "The source did not include a summary. Open the article to read it.",
+    languageNote: "Headlines and summaries are shown in the language the source published them in.",
+    updated: "Headlines updated {time}. They refresh a few times a day.",
+    categories: {
+      world: "World", us: "US", politics: "Politics", business: "Economy", science: "Science & technology", culture: "Culture",
+      aging: "Healthy aging", brain: "Brain & memory", nutrition: "Nutrition", exercise: "Exercise", research: "Research",
+    },
   },
   dashboard: {
     kicker: "Dashboard",

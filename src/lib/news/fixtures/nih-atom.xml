@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>NIH News Releases</title>
+  <entry>
+    <title type="html">Fixture: Walking linked to better memory in older adults</title>
+    <link rel="alternate" href="https://www.nih.gov/news-events/news-releases/fixture-4"/>
+    <published>2026-11-06T14:00:00Z</published>
+    <summary type="html">&lt;p&gt;Researchers followed older adults for several years. The study was observational.&lt;/p&gt;</summary>
+  </entry>
+  <entry>
+    <title>Fixture: Old research release</title>
+    <link href="https://www.nih.gov/news-events/news-releases/fixture-old"/>
+    <updated>2026-09-01T10:00:00Z</updated>
+    <summary>Too old for the health section.</summary>
+  </entry>
+</feed>

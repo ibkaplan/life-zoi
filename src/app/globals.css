@@ -3048,3 +3048,65 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 @media (prefers-reduced-motion: reduce) {
   .music-bars i { animation: none; transform: scaleY(0.7); }
 }
+
+/* Dashboard news: Today's World News and Health & Longevity News */
+.news-sections { display: grid; gap: 1.25rem; }
+.news-sections .stack-sm { display: grid; gap: 0.45rem; }
+@media (min-width: 960px) { .news-sections { grid-template-columns: 3fr 2fr; align-items: start; } }
+.news-card { border-top: 4px solid var(--lavender-brand); }
+.news-health { border-top-color: var(--royal); background: linear-gradient(180deg, var(--sky) 0%, var(--surface) 9rem); }
+.news-head { display: flex; gap: 0.85rem; align-items: flex-start; }
+.news-head h2 { margin: 0; color: var(--royal); }
+.news-head .hint { margin: 0; }
+.news-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--lavender);
+  color: var(--royal);
+}
+.news-advice {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-left: 4px solid var(--royal);
+  border-radius: 10px;
+  background: var(--lavender);
+  color: var(--ink);
+  font-weight: 550;
+}
+.news-unavailable { margin: 0; padding: 0.9rem; border-radius: 12px; border: 1px dashed var(--lavender-brand); background: var(--sky); color: var(--muted); }
+.news-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+.news-story { padding: 0.95rem 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.news-story h3 { margin: 0; font-size: 1.12rem; line-height: 1.35; color: var(--ink); overflow-wrap: anywhere; }
+.news-story p { margin: 0; overflow-wrap: anywhere; }
+.news-chip {
+  display: inline-block;
+  justify-self: start;
+  width: fit-content;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--lavender);
+  color: var(--deep);
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+}
+.news-byline { color: var(--muted); font-size: 0.92rem; }
+.news-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  width: fit-content;
+  font-weight: 650;
+  color: var(--royal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.news-link:hover { color: var(--deep); }
+.news-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.news-meta-note { margin: 0; }
