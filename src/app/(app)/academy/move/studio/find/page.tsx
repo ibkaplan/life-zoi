@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { FindMyMovement } from "@/components/wellness/movement-studio-views";
+import { FindMyMovement } from "@/components/wellness/find-my-movement";
 
 export const metadata: Metadata = {
   title: "Find My Movement",
-  description: "Filter movement lessons by minutes, position, goal, and level.",
+  description: "Exercise videos you can filter by minutes, position, goal, and level, and play on LifeZoi.",
 };
 
 export default function FindMyMovementPage() {
