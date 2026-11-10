@@ -1,4 +1,7 @@
 import { containsProhibitedClaim } from "@/lib/claims";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
 
 export const PURPOSE_KEY = "lifezoi.purpose.v1";
 
@@ -318,10 +321,13 @@ export function weeklyActions(supports: HealthSupport[]): string[] {
   return supports.map((support) => support.actions[0]).filter((action): action is string => Boolean(action)).slice(0, 4);
 }
 
-export function purposeReflection(hope: string): string {
+export function purposeReflection(hope: string, t: Translate = english): string {
   const text = hope.trim();
   if (!text) return "";
-  return `You shared this hope: “${text}”. Let's build a realistic lifestyle plan that supports your goals. ${HEALTH_BRIDGE}`;
+  return t("You shared this hope: “{hope}”. Let's build a realistic lifestyle plan that supports your goals. {bridge}", {
+    hope: text,
+    bridge: t(HEALTH_BRIDGE),
+  });
 }
 
 export function publicPurposeCopy(): string[] {

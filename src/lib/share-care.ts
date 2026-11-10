@@ -1,3 +1,7 @@
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
+
 /** Published LifeZoi site. Invitation links use this origin in production. */
 export const PRODUCTION_SITE_ORIGIN = "https://life-zoi.vercel.app";
 
@@ -113,18 +117,18 @@ export function invitationUrl(origin: string, token: string): string | null {
   return url.toString();
 }
 
-export function defaultLongMessage(link: string): string {
+export function defaultLongMessage(link: string, t: Translate = english): string {
   return [
-    "Sometimes the best gift is helping someone take better care of themselves.",
+    t("Sometimes the best gift is helping someone take better care of themselves."),
     "",
-    "I would love for you to discover LifeZoi. It is free, and you can explore it at your own pace. Your journey is personal, and every small step counts.",
+    t("I would love for you to discover LifeZoi. It is free, and you can explore it at your own pace. Your journey is personal, and every small step counts."),
     "",
     link,
   ].join("\n");
 }
 
-export function defaultShortMessage(link: string): string {
-  return `I thought you might enjoy LifeZoi. It is free, and you can explore it in your own time.\n${link}`;
+export function defaultShortMessage(link: string, t: Translate = english): string {
+  return `${t("I thought you might enjoy LifeZoi. It is free, and you can explore it in your own time.")}\n${link}`;
 }
 
 export function ensureLink(message: string, link: string): string {
@@ -145,16 +149,24 @@ export function replaceInvitationLink(message: string, previousLink: string, nex
  * Optional writing aid. Any short phrase is accepted, including phrases outside the suggestions.
  * The line stays in the message the person chooses to send. It is not stored with the invitation.
  */
-export function mentionRelationship(message: string, relationship: string, link: string): string {
+export function mentionRelationship(message: string, relationship: string, link: string, t: Translate = english): string {
   const clean = relationship.trim().replace(/\s+/g, " ");
   if (!clean || clean.length > 80) return ensureLink(message, link);
-  const line = `I thought of ${clean}.`;
-  const body = message.replace(/^I thought of [^.\n]{1,80}\.\n+/, "");
+  const template = t("I thought of {who}.");
+  const line = template.replace("{who}", clean);
+  const body = message.replace(mentionLinePattern(template), "").replace(mentionLinePattern("I thought of {who}."), "");
   return ensureLink(`${line}\n\n${body.trim()}`, link);
 }
 
-export function mailtoHref(message: string): string {
-  return `mailto:?subject=${encodeURIComponent("A little care")}&body=${encodeURIComponent(message)}`;
+/** Matches an earlier mention line at the start of a message, in the wording of `template`. */
+function mentionLinePattern(template: string): RegExp {
+  const [before, after = ""] = template.split("{who}");
+  const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^${escape(before)}[^.\\n]{1,80}${escape(after)}\\n+`);
+}
+
+export function mailtoHref(message: string, t: Translate = english): string {
+  return `mailto:?subject=${encodeURIComponent(t("A little care"))}&body=${encodeURIComponent(message)}`;
 }
 
 export function smsHref(message: string): string {
@@ -163,8 +175,8 @@ export function smsHref(message: string): string {
 
 export type CareSharePayload = { title: string; text: string };
 
-export function sharePayload(message: string): CareSharePayload {
-  return { title: SHARE_HEADING, text: message };
+export function sharePayload(message: string, t: Translate = english): CareSharePayload {
+  return { title: t(SHARE_HEADING), text: message };
 }
 
 export function canNavigatorShare(share: unknown): share is (data: CareSharePayload) => Promise<void> {

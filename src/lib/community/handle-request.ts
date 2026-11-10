@@ -1,3 +1,4 @@
+import { msg } from "@/lib/i18n/translate";
 import { isAdminEmail } from "@/lib/admin-allowlist";
 import { getDefaultRepository } from "@/lib/community/runtime";
 import { communityAction, communityBoard, type CommunityDeps } from "@/lib/community/service";
@@ -33,17 +34,17 @@ export async function handleCommunityRequest(
   const account = await readAccount(input.authorization);
   const actor = account && UUID.test(account.id) ? { id: account.id, isAdmin: isAdminEmail(account.email) } : null;
   if (input.method === "GET") return communityBoard(actor, serviceDeps);
-  if (input.method !== "POST") return { status: 405, body: { error: "That action is not available." } };
+  if (input.method !== "POST") return { status: 405, body: { error: msg("That action is not available.") } };
   if (!actor) {
-    return { status: 401, body: { error: "Sign in before using the community. The message was not published." } };
+    return { status: 401, body: { error: msg("Sign in before using the community. The message was not published.") } };
   }
   if (!input.body || typeof input.body !== "object" || Array.isArray(input.body)) {
-    return { status: 400, body: { error: "The request could not be read. The message was not published." } };
+    return { status: 400, body: { error: msg("The request could not be read. The message was not published.") } };
   }
   const result = await communityAction(actor, input.body as Record<string, unknown>, serviceDeps);
   const secret = serviceDeps.apiKey?.trim() ?? "";
   if (secret && JSON.stringify(result.body).includes(secret)) {
-    return { status: 500, body: { error: "The server could not complete that request. The message was not published." } };
+    return { status: 500, body: { error: msg("The server could not complete that request. The message was not published.") } };
   }
   return result;
 }

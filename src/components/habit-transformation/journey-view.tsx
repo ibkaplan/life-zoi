@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { HabitFrame } from "@/components/habit-transformation/frame";
 import { useHabitJourney } from "@/components/habit-transformation/use-habit-journey";
+import { useT } from "@/components/locale-provider";
 import {
   CONFIDENCE,
   DURATION,
@@ -43,6 +44,7 @@ export function JourneyView() {
 
 function JourneyForm() {
   const { journey, ready, sample, save } = useHabitJourney();
+  const t = useT();
   const [picked, setPicked] = useState<HabitId[] | null>(null);
   const [otherText, setOtherText] = useState("");
   const [follow, setFollow] = useState<Partial<Record<HabitId, FollowUp>>>({});
@@ -59,7 +61,7 @@ function JourneyForm() {
     setPicked(journey.picks.map((pick) => pick.habitId));
   }
 
-  if (!ready || picked === null) return <p className="card">Loading your habit journey…</p>;
+  if (!ready || picked === null) return <p className="card">{t("Loading your habit journey…")}</p>;
 
   const chosen = picked;
   const habitId = chosen[habitIndex];
@@ -87,11 +89,11 @@ function JourneyForm() {
   function startFollow() {
     if (sample) return;
     if (chosen.length === 0) {
-      setError("Choose at least one habit.");
+      setError(t("Choose at least one habit."));
       return;
     }
     if (chosen.includes("other") && otherText.trim().length === 0) {
-      setError("Add a few words for the habit you named.");
+      setError(t("Add a few words for the habit you named."));
       return;
     }
     setPhase("follow");
@@ -104,7 +106,7 @@ function JourneyForm() {
     if (!habitId) return;
     const keys = SCREEN_KEYS[screen] ?? [];
     if (keys.some((key) => !answers[key])) {
-      setError("Choose an answer for each question on this screen.");
+      setError(t("Choose an answer for each question on this screen."));
       return;
     }
     setError("");
@@ -143,11 +145,11 @@ function JourneyForm() {
   if (phase === "saved") {
     return (
       <section className="stack">
-        <h1>Your journey is saved</h1>
-        <p>The plan uses the answers you just gave. A quiet day later will not erase it.</p>
+        <h1>{t("Your journey is saved")}</h1>
+        <p>{t("The plan uses the answers you just gave. A quiet day later will not erase it.")}</p>
         <div className="actions">
-          <Link className="btn btn-primary" href="/habit-transformation/plan">My Personal Action Plan</Link>
-          <Link className="btn btn-secondary" href="/habit-transformation/actions">My Tiny Daily Actions</Link>
+          <Link className="btn btn-primary" href="/habit-transformation/plan">{t("My Personal Action Plan")}</Link>
+          <Link className="btn btn-secondary" href="/habit-transformation/actions">{t("My Tiny Daily Actions")}</Link>
         </div>
       </section>
     );
@@ -157,11 +159,16 @@ function JourneyForm() {
     const meta = HABITS.find((item) => item.id === habitId);
     return (
       <section className="stack">
-        <h1>Start My Habit Journey</h1>
+        <h1>{t("Start My Habit Journey")}</h1>
         <p>
-          {meta?.short} · habit {habitIndex + 1} of {picked.length} · step {screen + 1} of 3
+          {t("{habit} · habit {current} of {total} · step {step} of 3", {
+            habit: meta ? t(meta.short) : "",
+            current: habitIndex + 1,
+            total: picked.length,
+            step: screen + 1,
+          })}
         </p>
-        <p className="hint">Short questions. They change with the habit you chose.</p>
+        <p className="hint">{t("Short questions. They change with the habit you chose.")}</p>
         {screen === 0 ? (
           <>
             <ChoiceGroup legend={prompts.when} name={`${habitId}-when`} choices={whenChoices(habitId)} value={answers.whenId} onChange={(value) => setField("whenId", value)} />
@@ -185,9 +192,9 @@ function JourneyForm() {
         ) : null}
         {error ? <p role="alert">{error}</p> : null}
         <div className="actions">
-          <button className="btn btn-secondary" type="button" onClick={back}>Back</button>
+          <button className="btn btn-secondary" type="button" onClick={back}>{t("Back")}</button>
           <button className="btn btn-primary" type="button" onClick={nextScreen} disabled={sample}>
-            {screen === 2 && habitIndex === picked.length - 1 ? "Save my journey" : "Next"}
+            {screen === 2 && habitIndex === picked.length - 1 ? t("Save my journey") : t("Next")}
           </button>
         </div>
       </section>
@@ -196,10 +203,10 @@ function JourneyForm() {
 
   return (
     <section className="stack">
-      <h1>Start My Habit Journey</h1>
-      <p>Pick one or more habits. The next questions stay short, and the wording follows what you pick.</p>
+      <h1>{t("Start My Habit Journey")}</h1>
+      <p>{t("Pick one or more habits. The next questions stay short, and the wording follows what you pick.")}</p>
       <fieldset className="stack">
-        <legend>Which habits do you want to look at?</legend>
+        <legend>{t("Which habits do you want to look at?")}</legend>
         <div className="choices">
           {HABITS.map((habit) => (
             <label className="choice" key={habit.id}>
@@ -209,14 +216,14 @@ function JourneyForm() {
                 checked={picked.includes(habit.id)}
                 onChange={() => toggle(habit.id)}
               />
-              <span>{habit.label}</span>
+              <span>{t(habit.label)}</span>
             </label>
           ))}
         </div>
       </fieldset>
       {picked.includes("other") ? (
         <label className="stack">
-          <span>Name the habit in a few words</span>
+          <span>{t("Name the habit in a few words")}</span>
           <input
             type="text"
             value={otherText}
@@ -229,9 +236,9 @@ function JourneyForm() {
         </label>
       ) : null}
       {error ? <p role="alert">{error}</p> : null}
-      {sample ? <p className="hint">Sample data is read-only. Turn off the sample to save your own journey.</p> : null}
+      {sample ? <p className="hint">{t("Sample data is read-only. Turn off the sample to save your own journey.")}</p> : null}
       <button className="btn btn-primary" type="button" onClick={startFollow} disabled={sample}>
-        Continue
+        {t("Continue")}
       </button>
     </section>
   );
@@ -250,14 +257,15 @@ function ChoiceGroup({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const t = useT();
   return (
     <fieldset className="stack">
-      <legend>{legend}</legend>
+      <legend>{t(legend)}</legend>
       <div className="choices">
         {choices.map((choice) => (
           <label className="choice" key={choice.id}>
             <input type="radio" name={name} checked={value === choice.id} onChange={() => onChange(choice.id)} />
-            <span>{choice.label}</span>
+            <span>{t(choice.label)}</span>
           </label>
         ))}
       </div>

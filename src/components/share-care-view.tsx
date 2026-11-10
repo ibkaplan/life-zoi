@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { CareShareArt } from "@/components/care-illustrations";
+import { useT } from "@/components/locale-provider";
 import { useAccount } from "@/lib/account-store";
 import {
   canNavigatorShare,
@@ -29,6 +30,7 @@ import {
   type CareReason,
   type InvitationStats,
 } from "@/lib/share-care";
+import { msg } from "@/lib/i18n/translate";
 import { supabaseGateway } from "@/lib/share-care-store";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 
@@ -41,13 +43,13 @@ function subscribeNoop() {
 function reasonText(reason: CareReason): string {
   switch (reason) {
     case "sign-in":
-      return "Sign in to create an invitation link.";
+      return msg("Sign in to create an invitation link.");
     case "active":
-      return "You already have an invitation link. Revoke it before creating another.";
+      return msg("You already have an invitation link. Revoke it before creating another.");
     case "unavailable":
-      return "The invitation link could not be saved in this browser.";
+      return msg("The invitation link could not be saved in this browser.");
     case "rejected":
-      return "The invitation link could not be saved. Revoke the current link and try again.";
+      return msg("The invitation link could not be saved. Revoke the current link and try again.");
   }
 }
 
@@ -72,13 +74,14 @@ function MessageCard({
   onCopy: (value: string) => void;
   onShare: (value: string) => void;
 }) {
+  const t = useT();
   const text = ensureLink(value, link);
   return (
     <section className="card stack">
       <h2>{title}</h2>
       <p className="hint">{hint}</p>
       <label className="field" htmlFor={id}>
-        <span>Message</span>
+        <span>{t("Message")}</span>
         <textarea
           id={id}
           value={value}
@@ -89,17 +92,17 @@ function MessageCard({
       </label>
       <div className="actions">
         <button className="btn btn-primary" type="button" onClick={() => onCopy(text)}>
-          Copy message
+          {t("Copy message")}
         </button>
-        <a className="btn btn-secondary" href={mailtoHref(text)}>
-          Email with your app
+        <a className="btn btn-secondary" href={mailtoHref(text, t)}>
+          {t("Email with your app")}
         </a>
         <a className="btn btn-secondary" href={smsHref(text)}>
-          Text with your app
+          {t("Text with your app")}
         </a>
         {canShare ? (
           <button className="btn btn-secondary" type="button" onClick={() => onShare(text)}>
-            Share
+            {t("Share")}
           </button>
         ) : null}
       </div>
@@ -108,6 +111,7 @@ function MessageCard({
 }
 
 export function ShareCareView({ productionSite }: { productionSite: boolean }) {
+  const t = useT();
   const account = useAccount();
   const phase = account.phase;
   const browserOrigin = useSyncExternalStore(subscribeNoop, () => window.location.origin, () => "");
@@ -144,8 +148,10 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
     if (previous === nextLink) return;
     if (!previous) {
       const who = thinkingRef.current;
-      setLongText(who ? mentionRelationship(defaultLongMessage(nextLink), who, nextLink) : defaultLongMessage(nextLink));
-      setShortText(who ? mentionRelationship(defaultShortMessage(nextLink), who, nextLink) : defaultShortMessage(nextLink));
+      const long = defaultLongMessage(nextLink, t);
+      const short = defaultShortMessage(nextLink, t);
+      setLongText(who ? mentionRelationship(long, who, nextLink, t) : long);
+      setShortText(who ? mentionRelationship(short, who, nextLink, t) : short);
     } else {
       setLongText((current) => replaceInvitationLink(current, previous, nextLink));
       setShortText((current) => replaceInvitationLink(current, previous, nextLink));
@@ -201,17 +207,17 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
     setThinkingOf(name);
     thinkingRef.current = name;
     if (!link) return;
-    setLongText((current) => mentionRelationship(current || defaultLongMessage(link), name, link));
-    setShortText((current) => mentionRelationship(current || defaultShortMessage(link), name, link));
+    setLongText((current) => mentionRelationship(current || defaultLongMessage(link, t), name, link, t));
+    setShortText((current) => mentionRelationship(current || defaultShortMessage(link, t), name, link, t));
   }
 
   async function copyText(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      setNotice("Copied. You choose who receives it.");
+      setNotice(msg("Copied. You choose who receives it."));
       setTone("ok");
     } catch {
-      setNotice("The words could not be copied. Select them and copy them yourself.");
+      setNotice(msg("The words could not be copied. Select them and copy them yourself."));
       setTone("error");
     }
   }
@@ -220,10 +226,10 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
     const share = window.navigator.share;
     if (!canNavigatorShare(share)) return;
     try {
-      await share(sharePayload(text));
+      await share(sharePayload(text, t));
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      setNotice("Sharing was not available. You can copy the message instead.");
+      setNotice(msg("Sharing was not available. You can copy the message instead."));
       setTone("error");
     }
   }
@@ -231,7 +237,7 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
   async function onCreate() {
     const supabase = getBrowserSupabase();
     if (!supabase) {
-      setNotice("Sign-in is not available in this browser, so an invitation link was not created.");
+      setNotice(msg("Sign-in is not available in this browser, so an invitation link was not created."));
       setTone("error");
       return;
     }
@@ -244,7 +250,7 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
       return;
     }
     setConfirm(null);
-    setNotice("Invitation link created. You choose who receives it.");
+    setNotice(msg("Invitation link created. You choose who receives it."));
     setTone("ok");
     setRefreshKey((value) => value + 1);
   }
@@ -262,7 +268,7 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
       setRefreshKey((value) => value + 1);
       return;
     }
-    setNotice("A new link is ready, and the previous link was revoked.");
+    setNotice(msg("A new link is ready, and the previous link was revoked."));
     setTone("ok");
     setRefreshKey((value) => value + 1);
   }
@@ -279,7 +285,7 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
       setTone("error");
       return;
     }
-    setNotice("The invitation link was revoked.");
+    setNotice(msg("The invitation link was revoked."));
     setTone("ok");
     setRefreshKey((value) => value + 1);
   }
@@ -288,75 +294,75 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
     <article className="stack-lg">
       <div className="care-hero">
         <div>
-          <h1>{SHARE_HEADING}</h1>
-          <p className="care-tagline">{SHARE_TAGLINE}</p>
-          <p className="lede">{SHARE_INTRO}</p>
+          <h1>{t(SHARE_HEADING)}</h1>
+          <p className="care-tagline">{t(SHARE_TAGLINE)}</p>
+          <p className="lede">{t(SHARE_INTRO)}</p>
         </div>
         <figure className="page-photo care-art">
           <CareShareArt />
-          <figcaption>Original lifeZoi illustration.</figcaption>
+          <figcaption>{t("Original lifeZoi illustration.")}</figcaption>
         </figure>
       </div>
 
       <section className="card stack">
-        <h2>Who might enjoy LifeZoi?</h2>
+        <h2>{t("Who might enjoy LifeZoi?")}</h2>
         <p>
-          Suggestions: mother or father, husband or wife, children, brother or sister, friends, someone I care about. You can also write someone else. A suggestion only adds a line you can edit or delete.
+          {t("Suggestions: mother or father, husband or wife, children, brother or sister, friends, someone I care about. You can also write someone else. A suggestion only adds a line you can edit or delete.")}
         </p>
         <p className="hint">
-          You choose the person. LifeZoi does not open your contacts, send the message for you, or invite a group. LifeZoi is free. Each person creates a separate account.
+          {t("You choose the person. LifeZoi does not open your contacts, send the message for you, or invite a group. LifeZoi is free. Each person creates a separate account.")}
         </p>
-        <div className="actions" role="group" aria-label="Suggestions">
+        <div className="actions" role="group" aria-label={t("Suggestions")}>
           {RELATIONSHIP_SUGGESTIONS.map((item) => (
             <button
               key={item}
-              className={thinkingOf === item ? "btn btn-secondary" : "btn btn-ghost"}
+              className={thinkingOf === t(item) ? "btn btn-secondary" : "btn btn-ghost"}
               type="button"
-              aria-pressed={thinkingOf === item}
-              onClick={() => choose(item)}
+              aria-pressed={thinkingOf === t(item)}
+              onClick={() => choose(t(item))}
             >
-              {item}
+              {t(item)}
             </button>
           ))}
         </div>
         <div className="actions">
           <label className="field care-who" htmlFor="care-who">
-            <span>Someone else</span>
+            <span>{t("Someone else")}</span>
             <input
               id="care-who"
               type="text"
               maxLength={80}
               autoComplete="off"
               value={customWho}
-              placeholder="Anyone you care about"
+              placeholder={t("Anyone you care about")}
               onChange={(event) => setCustomWho(event.target.value)}
             />
           </label>
           <button className="btn btn-secondary" type="button" onClick={() => choose(customWho)}>
-            Use these words
+            {t("Use these words")}
           </button>
         </div>
       </section>
 
       <section className="card stack">
-        <h2>Your invitation link</h2>
+        <h2>{t("Your invitation link")}</h2>
         {phase === "off" ? (
-          <p>Account sign-in is not configured in this browser, so this page cannot create an invitation link or keep counts.</p>
+          <p>{t("Account sign-in is not configured in this browser, so this page cannot create an invitation link or keep counts.")}</p>
         ) : null}
         {phase === "signed-out" || phase === "needs-mfa" || phase === "error" ? (
           <p>
-            <Link href="/settings">Sign in from Settings</Link> to create an invitation link.
+            <Link href="/settings">{t("Sign in from Settings")}</Link> {t("to create an invitation link.")}
           </p>
         ) : null}
-        {tracking === "loading" ? <p role="status">Checking your invitation link…</p> : null}
+        {tracking === "loading" ? <p role="status">{t("Checking your invitation link…")}</p> : null}
         {tracking === "omitted" ? (
           <p>
-            Counts of links created, opens, and registrations appear for a signed-in account. This page does not keep a contact list, and it does not store a name, an email address, or health information.
+            {t("Counts of links created, opens, and registrations appear for a signed-in account. This page does not keep a contact list, and it does not store a name, an email address, or health information.")}
           </p>
         ) : null}
         {tracking === "unavailable" ? (
           <p role="status">
-            Invitation counts could not be loaded, so a new link is not created. This page still does not store a name, an email address, or health information.
+            {t("Invitation counts could not be loaded, so a new link is not created. This page still does not store a name, an email address, or health information.")}
           </p>
         ) : null}
         {tracking === "ready" && stats ? (
@@ -364,68 +370,68 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
             <div className="care-stats">
               <p>
                 <b>{stats.linksCreated}</b>
-                <span>Links created</span>
+                <span>{t("Links created")}</span>
               </p>
               <p>
                 <b>{stats.opens}</b>
-                <span>Opens</span>
+                <span>{t("Opens")}</span>
               </p>
               <p>
                 <b>{stats.registrations}</b>
-                <span>Registrations</span>
+                <span>{t("Registrations")}</span>
               </p>
             </div>
             <p className="hint">
-              These numbers are only for you. Opens count visits to your welcome link. Registrations count when someone who was signed out then signs in to their own account during that browser visit.
+              {t("These numbers are only for you. Opens count visits to your welcome link. Registrations count when someone who was signed out then signs in to their own account during that browser visit.")}
             </p>
           </>
         ) : null}
         {phase === "ready" && tracking === "ready" && !link ? (
           <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void onCreate()}>
-            Create invitation link
+            {t("Create invitation link")}
           </button>
         ) : null}
         {link ? (
           <>
             <label className="field" htmlFor="care-link">
-              <span>Invitation link</span>
+              <span>{t("Invitation link")}</span>
               <input id="care-link" readOnly value={link} onFocus={(event) => event.currentTarget.select()} />
             </label>
             {productionSite ? null : (
               <p className="hint">
-                This preview link uses this browser’s address. On the published site the link begins with {PRODUCTION_SITE_ORIGIN}.
+                {t("This preview link uses this browser’s address. On the published site the link begins with {origin}.", { origin: PRODUCTION_SITE_ORIGIN })}
               </p>
             )}
             <div className="actions">
               <button className="btn btn-primary" type="button" onClick={() => void copyText(link)}>
-                Copy link
+                {t("Copy link")}
               </button>
               {confirm === "regenerate" ? (
                 <>
                   <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => void onRegenerate()}>
-                    Regenerate and revoke the previous link
+                    {t("Regenerate and revoke the previous link")}
                   </button>
                   <button className="btn btn-ghost" type="button" onClick={() => setConfirm(null)}>
-                    Keep this link
+                    {t("Keep this link")}
                   </button>
                 </>
               ) : (
                 <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => setConfirm("regenerate")}>
-                  Regenerate link
+                  {t("Regenerate link")}
                 </button>
               )}
               {confirm === "revoke" ? (
                 <>
                   <button className="btn btn-danger" type="button" disabled={busy} onClick={() => void onRevoke()}>
-                    Revoke link
+                    {t("Revoke link")}
                   </button>
                   <button className="btn btn-ghost" type="button" onClick={() => setConfirm(null)}>
-                    Keep this link
+                    {t("Keep this link")}
                   </button>
                 </>
               ) : (
                 <button className="btn btn-danger" type="button" disabled={busy} onClick={() => setConfirm("revoke")}>
-                  Revoke link
+                  {t("Revoke link")}
                 </button>
               )}
             </div>
@@ -433,7 +439,7 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
         ) : null}
         {notice ? (
           <p className={tone === "ok" ? "alert alert-ok" : "alert alert-error"} role={tone === "ok" ? "status" : "alert"}>
-            {notice}
+            {t(notice)}
           </p>
         ) : null}
       </section>
@@ -441,8 +447,8 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
       {link && longText ? (
         <MessageCard
           id="care-long-message"
-          title="Long message"
-          hint="Edit the words. The invitation link stays in the message. Email, text, and Share open your own apps so you can choose the recipient."
+          title={t("Long message")}
+          hint={t("Edit the words. The invitation link stays in the message. Email, text, and Share open your own apps so you can choose the recipient.")}
           value={longText}
           link={link}
           canShare={canShare}
@@ -454,8 +460,8 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
       {link && shortText ? (
         <MessageCard
           id="care-short-message"
-          title="Short message"
-          hint="A shorter note, with the same invitation link."
+          title={t("Short message")}
+          hint={t("A shorter note, with the same invitation link.")}
           value={shortText}
           link={link}
           canShare={canShare}

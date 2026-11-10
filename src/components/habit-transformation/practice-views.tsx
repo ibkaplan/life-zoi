@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { HabitFrame } from "@/components/habit-transformation/frame";
 import { useHabitJourney } from "@/components/habit-transformation/use-habit-journey";
+import { useT } from "@/components/locale-provider";
 import { HELPED, IN_THE_WAY, MICHIE_URL, RESTART_LINE, type HabitId } from "@/lib/habit-transformation/catalog";
 import { ruleCoachNote } from "@/lib/habit-transformation/coach";
 import {
@@ -26,26 +27,36 @@ import {
 } from "@/lib/habit-transformation/model";
 import { localISODate } from "@/lib/dates";
 
+function Loading() {
+  const t = useT();
+  return (
+    <HabitFrame>
+      <p className="card">{t("Loading your habit journey…")}</p>
+    </HabitFrame>
+  );
+}
+
 export function HabitsView() {
   const { journey, ready } = useHabitJourney();
-  if (!ready) return <HabitFrame><p className="card">Loading your habit journey…</p></HabitFrame>;
+  const t = useT();
+  if (!ready) return <Loading />;
   return (
     <HabitFrame>
       <section className="stack">
-        <h1>My Current Habits</h1>
-        <p>These are the habits you chose to look at. Nothing here is a diagnosis.</p>
+        <h1>{t("My Current Habits")}</h1>
+        <p>{t("These are the habits you chose to look at. Nothing here is a diagnosis.")}</p>
       </section>
       {journey.picks.length === 0 ? (
         <section className="card stack">
-          <p>No habits are saved yet.</p>
-          <Link className="btn btn-primary" href="/habit-transformation/journey">Start My Habit Journey</Link>
+          <p>{t("No habits are saved yet.")}</p>
+          <Link className="btn btn-primary" href="/habit-transformation/journey">{t("Start My Habit Journey")}</Link>
         </section>
       ) : (
         journey.picks.map((pick) => (
           <section className="card stack" key={pick.habitId}>
-            <h2>{habitName(pick)}</h2>
+            <h2>{habitName(pick, t)}</h2>
             <dl className="review-list stack">
-              {answerLines(pick).map((line) => (
+              {answerLines(pick, t).map((line) => (
                 <div key={line.label}>
                   <dt>{line.label}</dt>
                   <dd>{line.value}</dd>
@@ -56,7 +67,7 @@ export function HabitsView() {
         ))
       )}
       {journey.picks.length > 0 ? (
-        <p><Link href="/habit-transformation/journey">Change my answers</Link></p>
+        <p><Link href="/habit-transformation/journey">{t("Change my answers")}</Link></p>
       ) : null}
     </HabitFrame>
   );
@@ -64,58 +75,62 @@ export function HabitsView() {
 
 export function PlanView() {
   const { journey, ready } = useHabitJourney();
-  if (!ready) return <HabitFrame><p className="card">Loading your habit journey…</p></HabitFrame>;
-  const plans = plansFor(journey);
+  const t = useT();
+  if (!ready) return <Loading />;
+  const plans = plansFor(journey, t);
   return (
     <HabitFrame>
       <section className="stack">
-        <h1>My Personal Action Plan</h1>
-        <p>Each plan stays small. A five-minute walk, one evening snack swap, or a 10-minute wind-down is the size of a practice, not a test.</p>
-        <p className="hint">Not a diagnosis. Not clinically validated. No specific health outcome is guaranteed.</p>
+        <h1>{t("My Personal Action Plan")}</h1>
+        <p>{t("Each plan stays small. A five-minute walk, one evening snack swap, or a 10-minute wind-down is the size of a practice, not a test.")}</p>
+        <p className="hint">{t("Not a diagnosis. Not clinically validated. No specific health outcome is guaranteed.")}</p>
       </section>
       {plans.length === 0 ? (
         <section className="card stack">
-          <p>A plan appears after you answer the short journey questions.</p>
-          <Link className="btn btn-primary" href="/habit-transformation/journey">Start My Habit Journey</Link>
+          <p>{t("A plan appears after you answer the short journey questions.")}</p>
+          <Link className="btn btn-primary" href="/habit-transformation/journey">{t("Start My Habit Journey")}</Link>
         </section>
       ) : (
         plans.map((plan) => (
           <article className="card stack" key={plan.habitId}>
             <h2>{plan.name}</h2>
-            <h3>Why it continues</h3>
+            <h3>{t("Why it continues")}</h3>
             <p>{plan.why}</p>
-            <h3>Capability, Opportunity, Motivation, Behavior</h3>
+            <h3>{t("Capability, Opportunity, Motivation, Behavior")}</h3>
             <p>
-              Michie, van Stralen, and West (2011) described COM-B.{" "}
-              <a href={MICHIE_URL}>Read the paper</a>.
+              {t("Michie, van Stralen, and West (2011) described COM-B.")}{" "}
+              <a href={MICHIE_URL}>{t("Read the paper")}</a>.
             </p>
             <p><strong>{plan.difficultLine}</strong></p>
             <p><strong>{plan.reading.partLabel}.</strong> {plan.reading.barrier}</p>
             <p>{plan.reading.strategy}</p>
             {plan.reading.extra ? <p>{plan.reading.extra}</p> : null}
-            <p>Behavior is the habit you chose. This reading is one possible way to look at it.</p>
-            <h3>One small action</h3>
+            <p>{t("Behavior is the habit you chose. This reading is one possible way to look at it.")}</p>
+            <h3>{t("One small action")}</h3>
             <p>{plan.smallAction}</p>
-            <h3>A daily routine</h3>
+            <h3>{t("A daily routine")}</h3>
             <p className="habit-quote">{plan.routine}</p>
-            <h3>A prompt</h3>
+            <h3>{t("A prompt")}</h3>
             <p>{plan.prompt}</p>
-            <h3>An easier hard-day alternative</h3>
+            <h3>{t("An easier hard-day alternative")}</h3>
             <p>{plan.easierAction}</p>
-            <h3>How to notice progress</h3>
+            <h3>{t("How to notice progress")}</h3>
             <p>{plan.notice}</p>
-            <h3>A weekly review</h3>
+            <h3>{t("A weekly review")}</h3>
             <p>{plan.weekly}</p>
             {plan.safety ? <p>{plan.safety}</p> : null}
             <p className="hint">
-              {ruleCoachNote({
-                habitId: plan.habitId,
-                habitName: plan.name,
-                barrier: plan.reading.part,
-                barrierLabel: plan.reading.partLabel,
-                smallAction: plan.smallAction,
-                easierAction: plan.easierAction,
-              })}
+              {ruleCoachNote(
+                {
+                  habitId: plan.habitId,
+                  habitName: plan.name,
+                  barrier: plan.reading.part,
+                  barrierLabel: plan.reading.partLabel,
+                  smallAction: plan.smallAction,
+                  easierAction: plan.easierAction,
+                },
+                t,
+              )}
             </p>
           </article>
         ))
@@ -126,31 +141,32 @@ export function PlanView() {
 
 export function ActionsView() {
   const { journey, ready, sample, save } = useHabitJourney();
+  const t = useT();
   const today = localISODate();
-  if (!ready) return <HabitFrame><p className="card">Loading your habit journey…</p></HabitFrame>;
+  if (!ready) return <Loading />;
   const restart = showRestart(journey, today);
   return (
     <HabitFrame>
       <section className="stack">
-        <h1>My Tiny Daily Actions</h1>
-        <p>After I [existing routine], I will [small new action].</p>
+        <h1>{t("My Tiny Daily Actions")}</h1>
+        <p>{t("After I [existing routine], I will [small new action].")}</p>
       </section>
       {restart ? (
         <p className="banner" role="status">
-          {RESTART_LINE} A missed day is not a failure. Achievements stay.
+          {t(RESTART_LINE)} {t("A missed day is not a failure. Achievements stay.")}
         </p>
       ) : null}
       {journey.picks.length === 0 ? (
         <section className="card stack">
-          <p>Tiny actions appear after you save a journey.</p>
-          <Link className="btn btn-primary" href="/habit-transformation/journey">Start My Habit Journey</Link>
+          <p>{t("Tiny actions appear after you save a journey.")}</p>
+          <Link className="btn btn-primary" href="/habit-transformation/journey">{t("Start My Habit Journey")}</Link>
         </section>
       ) : (
         journey.picks.map((pick) => (
           <ActionCard
             key={pick.habitId}
             habitId={pick.habitId}
-            card={actionCard(journey, pick, today)}
+            card={actionCard(journey, pick, today, t)}
             disabled={sample}
             onLog={(status, patch) => save(logAction(journey, pick.habitId, today, status, patch))}
             onNote={(acknowledgment) => save(saveAcknowledgment(journey, pick.habitId, acknowledgment))}
@@ -174,6 +190,7 @@ function ActionCard({
   onLog: (status: ActionStatus, patch?: { cue?: string; action?: string; acknowledgment?: string; usingEasier?: boolean }) => void;
   onNote: (acknowledgment: string) => void;
 }) {
+  const t = useT();
   const [editing, setEditing] = useState(false);
   const [cue, setCue] = useState(card.cue);
   const [action, setAction] = useState(card.smallAction);
@@ -184,24 +201,24 @@ function ActionCard({
       <h2>{card.name}</h2>
       <p className="habit-quote">{card.routine}</p>
       <dl className="review-list stack">
-        <div><dt>What</dt><dd>{card.smallAction}</dd></div>
-        <div><dt>When</dt><dd>{card.whenLabel}</dd></div>
-        <div><dt>Trigger</dt><dd>{card.triggerLabel}</dd></div>
-        <div><dt>Why</dt><dd>{card.personalWhy}</dd></div>
+        <div><dt>{t("What")}</dt><dd>{card.smallAction}</dd></div>
+        <div><dt>{t("When")}</dt><dd>{card.whenLabel}</dd></div>
+        <div><dt>{t("Trigger")}</dt><dd>{card.triggerLabel}</dd></div>
+        <div><dt>{t("Why")}</dt><dd>{card.personalWhy}</dd></div>
       </dl>
       <label className="stack">
-        <span>Acknowledgment, if you want one</span>
+        <span>{t("Acknowledgment, if you want one")}</span>
         <input type="text" value={note} maxLength={160} onChange={(event) => setNote(event.target.value)} />
       </label>
-      <p>{statusCopy(card.todayStatus)}</p>
+      <p>{statusCopy(card.todayStatus, t)}</p>
       {editing ? (
         <div className="stack">
           <label className="stack">
-            <span>Existing routine</span>
+            <span>{t("Existing routine")}</span>
             <input type="text" value={cue} maxLength={160} onChange={(event) => setCue(event.target.value)} />
           </label>
           <label className="stack">
-            <span>Small new action</span>
+            <span>{t("Small new action")}</span>
             <input type="text" value={action} maxLength={160} onChange={(event) => setAction(event.target.value)} />
           </label>
           <button
@@ -213,25 +230,38 @@ function ActionCard({
               setEditing(false);
             }}
           >
-            Save this wording
+            {t("Save this wording")}
           </button>
         </div>
       ) : null}
       <div className="actions">
-        <button className="btn btn-primary" type="button" disabled={disabled} onClick={() => onLog("accepted", { acknowledgment: note })}>Accept</button>
-        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => setEditing(true)}>Change</button>
-        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => onLog("easier", { acknowledgment: note })}>Make easier</button>
-        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => onLog("skipped", { acknowledgment: note })}>Skip</button>
-        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => onLog("complete", { acknowledgment: note })}>Mark complete</button>
-        <button className="btn btn-ghost" type="button" disabled={disabled} onClick={() => onNote(note)}>Save acknowledgment</button>
+        <button className="btn btn-primary" type="button" disabled={disabled} onClick={() => onLog("accepted", { acknowledgment: note })}>{t("Accept")}</button>
+        <button
+          className="btn btn-secondary"
+          type="button"
+          disabled={disabled}
+          onClick={() => {
+            // The wording fields start with the text as it is shown now, in the chosen language.
+            setCue(card.cue);
+            setAction(card.smallAction);
+            setEditing(true);
+          }}
+        >
+          {t("Change")}
+        </button>
+        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => onLog("easier", { acknowledgment: note })}>{t("Make easier")}</button>
+        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => onLog("skipped", { acknowledgment: note })}>{t("Skip")}</button>
+        <button className="btn btn-secondary" type="button" disabled={disabled} onClick={() => onLog("complete", { acknowledgment: note })}>{t("Mark complete")}</button>
+        <button className="btn btn-ghost" type="button" disabled={disabled} onClick={() => onNote(note)}>{t("Save acknowledgment")}</button>
       </div>
-      <p className="hint" id={`${habitId}-skip`}>Skipping today is allowed. It does not wipe what you have already done.</p>
+      <p className="hint" id={`${habitId}-skip`}>{t("Skipping today is allowed. It does not wipe what you have already done.")}</p>
     </article>
   );
 }
 
 export function CheckInView() {
   const { journey, ready, sample, save } = useHabitJourney();
+  const t = useT();
   const today = localISODate();
   const [habitId, setHabitId] = useState<HabitId | "">("");
   const [completed, setCompleted] = useState<CompletedAnswer | "">("");
@@ -242,15 +272,15 @@ export function CheckInView() {
   const [wayId, setWayId] = useState("");
   const [wayNote, setWayNote] = useState("");
   const [error, setError] = useState("");
-  const [offer, setOffer] = useState<{ kind: "smaller" | "same"; text: string; habitId: HabitId } | null>(null);
+  const [offer, setOffer] = useState<{ kind: "smaller" | "same"; check: Parameters<typeof smallerNextStep>[0]; habitId: HabitId } | null>(null);
 
-  if (!ready) return <HabitFrame><p className="card">Loading your habit journey…</p></HabitFrame>;
+  if (!ready) return <Loading />;
   const selected = habitId || journey.picks[0]?.habitId || "";
   const pick = journey.picks.find((item) => item.habitId === selected);
 
   function submit() {
     if (!pick || !completed || !difficulty || !feeling || !helpedId || !wayId) {
-      setError("Answer each question. The extra lines can stay blank.");
+      setError(t("Answer each question. The extra lines can stay blank."));
       return;
     }
     const check = {
@@ -268,20 +298,25 @@ export function CheckInView() {
     save(next);
     const card = actionCard(next, pick, today);
     const step = smallerNextStep(check, card.easierAction);
-    setOffer({ ...step, habitId: pick.habitId });
+    setOffer({ kind: step.kind, check, habitId: pick.habitId });
     setError("");
   }
+
+  // The offer is worded at render time, so it follows the chosen language.
+  const offerPick = offer ? journey.picks.find((item) => item.habitId === offer.habitId) : undefined;
+  const offerText =
+    offer && offerPick ? smallerNextStep(offer.check, actionCard(journey, offerPick, today, t).easierAction, t).text : "";
 
   return (
     <HabitFrame>
       <section className="stack">
-        <h1>Daily Check-In</h1>
-        <p>A few questions about today. The answers can suggest a smaller next step. They do not judge the day.</p>
+        <h1>{t("Daily Check-In")}</h1>
+        <p>{t("A few questions about today. The answers can suggest a smaller next step. They do not judge the day.")}</p>
       </section>
       {journey.picks.length === 0 ? (
         <section className="card stack">
-          <p>Choose a habit before the check-in.</p>
-          <Link className="btn btn-primary" href="/habit-transformation/journey">Start My Habit Journey</Link>
+          <p>{t("Choose a habit before the check-in.")}</p>
+          <Link className="btn btn-primary" href="/habit-transformation/journey">{t("Start My Habit Journey")}</Link>
         </section>
       ) : (
         <form
@@ -292,7 +327,7 @@ export function CheckInView() {
           }}
         >
           <fieldset className="stack">
-            <legend>Which habit is this check-in for?</legend>
+            <legend>{t("Which habit is this check-in for?")}</legend>
             <div className="choices">
               {journey.picks.map((item) => (
                 <label className="choice" key={item.habitId}>
@@ -302,44 +337,44 @@ export function CheckInView() {
                     checked={selected === item.habitId}
                     onChange={() => setHabitId(item.habitId)}
                   />
-                  <span>{habitName(item)}</span>
+                  <span>{habitName(item, t)}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-          <Radio legend="Did you complete the tiny action?" name="completed" value={completed} onChange={setCompleted} options={[
-            ["yes", "Yes"],
-            ["partly", "Partly"],
-            ["not-today", "Not today"],
+          <Radio legend={t("Did you complete the tiny action?")} name="completed" value={completed} onChange={setCompleted} options={[
+            ["yes", t("Yes")],
+            ["partly", t("Partly")],
+            ["not-today", t("Not today")],
           ]} />
-          <Radio legend="How difficult did it feel?" name="difficulty" value={difficulty} onChange={setDifficulty} options={[
-            ["light", "Light"],
-            ["mixed", "Mixed"],
-            ["heavy", "Heavy"],
+          <Radio legend={t("How difficult did it feel?")} name="difficulty" value={difficulty} onChange={setDifficulty} options={[
+            ["light", t("Light")],
+            ["mixed", t("Mixed")],
+            ["heavy", t("Heavy")],
           ]} />
-          <Radio legend="How did you feel afterward?" name="feeling" value={feeling} onChange={setFeeling} options={[
-            ["settled", "A bit more settled"],
-            ["same", "About the same"],
-            ["tender", "Tender"],
+          <Radio legend={t("How did you feel afterward?")} name="feeling" value={feeling} onChange={setFeeling} options={[
+            ["settled", t("A bit more settled")],
+            ["same", t("About the same")],
+            ["tender", t("Tender")],
           ]} />
-          <Radio legend="What helped?" name="helped" value={helpedId} onChange={setHelpedId} options={HELPED.map((item) => [item.id, item.label])} />
+          <Radio legend={t("What helped?")} name="helped" value={helpedId} onChange={setHelpedId} options={HELPED.map((item) => [item.id, t(item.label)])} />
           <label className="stack">
-            <span>Anything else that helped</span>
+            <span>{t("Anything else that helped")}</span>
             <input type="text" value={helpedNote} maxLength={160} onChange={(event) => setHelpedNote(event.target.value)} />
           </label>
-          <Radio legend="What got in the way?" name="way" value={wayId} onChange={setWayId} options={IN_THE_WAY.map((item) => [item.id, item.label])} />
+          <Radio legend={t("What got in the way?")} name="way" value={wayId} onChange={setWayId} options={IN_THE_WAY.map((item) => [item.id, t(item.label)])} />
           <label className="stack">
-            <span>Anything else that got in the way</span>
+            <span>{t("Anything else that got in the way")}</span>
             <input type="text" value={wayNote} maxLength={160} onChange={(event) => setWayNote(event.target.value)} />
           </label>
           {error ? <p role="alert">{error}</p> : null}
-          <button className="btn btn-primary" type="submit" disabled={sample}>Save check-in</button>
+          <button className="btn btn-primary" type="submit" disabled={sample}>{t("Save check-in")}</button>
         </form>
       )}
       {offer ? (
         <section className="card stack" role="status">
-          <h2>{offer.kind === "smaller" ? "A smaller next step" : "Keep the same step"}</h2>
-          <p>{offer.text}</p>
+          <h2>{offer.kind === "smaller" ? t("A smaller next step") : t("Keep the same step")}</h2>
+          <p>{offerText}</p>
           {offer.kind === "smaller" ? (
             <button
               className="btn btn-secondary"
@@ -347,7 +382,7 @@ export function CheckInView() {
               disabled={sample}
               onClick={() => save(logAction(journey, offer.habitId, today, "easier"))}
             >
-              Use the smaller step
+              {t("Use the smaller step")}
             </button>
           ) : null}
         </section>

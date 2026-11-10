@@ -34,14 +34,21 @@ import {
 } from "@/lib/emotional-wellness/store";
 import type { CompanionMode, ContextId, CountryChoice, NoteBucket, PrivateNote } from "@/lib/emotional-wellness/types";
 import { useSession } from "@/components/session-provider";
+import { useLocale, useT } from "@/components/locale-provider";
+import { LOCALE_META } from "@/lib/i18n/config";
+import { msg } from "@/lib/i18n/translate";
 
-const READ_ONLY = "Sample data is read-only. Turn off the sample to record your own notes.";
+const READ_ONLY = msg("Sample data is read-only. Turn off the sample to record your own notes.");
+
+type CompanionRequest = Omit<Parameters<typeof respondToCompanion>[0], "t">;
 
 type Turn = {
   id: string;
   role: "visitor" | "companion";
   text: string;
   crisis: boolean;
+  /** What the reply was written from, so it can be shown again in the chosen language. */
+  request?: CompanionRequest;
 };
 
 const OPENING_TURN: Turn = {
@@ -65,15 +72,23 @@ function NoteList({
   empty: string;
   onDelete: (id: string) => void;
 }) {
-  if (notes.length === 0) return <p className="hint">{empty}</p>;
+  const t = useT();
+  const { locale } = useLocale();
+  if (notes.length === 0) return <p className="hint">{t(empty)}</p>;
+  const day = (iso: string) => {
+    const date = new Date(iso);
+    return Number.isNaN(date.getTime())
+      ? iso.slice(0, 10)
+      : date.toLocaleDateString(LOCALE_META[locale].htmlLang, { year: "numeric", month: "long", day: "numeric" });
+  };
   return (
     <ul className="stack">
       {notes.map((note) => (
         <li key={note.id} className="card card-quiet stack">
           <p>{note.text}</p>
-          <p className="hint">{note.createdAt.slice(0, 10)}</p>
+          <p className="hint">{day(note.createdAt)}</p>
           <button className="btn btn-danger" type="button" onClick={() => onDelete(note.id)}>
-            Delete this note
+            {t("Delete this note")}
           </button>
         </li>
       ))}
@@ -83,6 +98,7 @@ function NoteList({
 
 export function EmotionalWellnessView() {
   const { sample } = useSession();
+  const t = useT();
   const stored = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
   const [turns, setTurns] = useState<Turn[]>([OPENING_TURN]);
   const [mode, setMode] = useState<CompanionMode>("open");
@@ -124,20 +140,21 @@ export function EmotionalWellnessView() {
     event.preventDefault();
     const text = message.trim();
     if (!text) return;
-    const result = respondToCompanion({
+    const request: CompanionRequest = {
       message: text,
       context: stored.context,
       country: stored.country,
       mode,
       companionEnabled: repliesOn,
-    });
+    };
+    const result = respondToCompanion(request);
     setMode(result.mode);
     setMessage("");
     setTurns((current) =>
       [
         ...current,
         { id: `${createNoteId()}v`, role: "visitor" as const, text, crisis: false },
-        { id: `${createNoteId()}c`, role: "companion" as const, text: result.text, crisis: result.crisis },
+        { id: `${createNoteId()}c`, role: "companion" as const, text: result.text, crisis: result.crisis, request },
       ].slice(-40),
     );
   }
@@ -147,24 +164,24 @@ export function EmotionalWellnessView() {
   return (
     <div className="stack-lg">
       <header className="stack">
-        <p className="kicker">{FEATURE_NAME}</p>
-        <h1>{HEADLINE}</h1>
-        <p className="lede">{SUPPORTING_LINE}</p>
+        <p className="kicker">{t(FEATURE_NAME)}</p>
+        <h1>{t(HEADLINE)}</h1>
+        <p className="lede">{t(SUPPORTING_LINE)}</p>
       </header>
 
       <section className="card stack" aria-labelledby="ew-limits">
-        <h2 id="ew-limits">What this page is</h2>
-        <p>{COMPANION_OPENING}</p>
-        <p className="alert alert-error">{CLINICAL_REVIEW_NOTICE}</p>
+        <h2 id="ew-limits">{t("What this page is")}</h2>
+        <p>{t(COMPANION_OPENING)}</p>
+        <p className="alert alert-error">{t(CLINICAL_REVIEW_NOTICE)}</p>
         <p className="banner" role="note">
-          {standingCrisisNotice(stored.country)}
+          {standingCrisisNotice(stored.country, t)}
         </p>
       </section>
 
       <section className="card stack" aria-labelledby="ew-context">
-        <h2 id="ew-context">Optional context</h2>
-        <p className="hint">{CONTEXT_NOTE}</p>
-        <div className="ew-chips" role="group" aria-label="Optional context">
+        <h2 id="ew-context">{t("Optional context")}</h2>
+        <p className="hint">{t(CONTEXT_NOTE)}</p>
+        <div className="ew-chips" role="group" aria-label={t("Optional context")}>
           {CONTEXT_OPTIONS.map((option) => (
             <button
               key={option.id}
@@ -173,21 +190,22 @@ export function EmotionalWellnessView() {
               aria-pressed={stored.context === option.id}
               onClick={() => setContext(option.id)}
             >
-              {option.label}
+              {t(option.label)}
             </button>
           ))}
         </div>
         <fieldset className="stack">
-          <legend>Country for crisis numbers</legend>
+          <legend>{t("Country for crisis numbers")}</legend>
           <p className="hint">
-            Call, text, and immediate-danger numbers for the United States are shown when the country is the United
-            States or not set. Another country does not add a guessed local number.
+            {t(
+              "Call, text, and immediate-danger numbers for the United States are shown when the country is the United States or not set. Another country does not add a guessed local number.",
+            )}
           </p>
           {(
             [
-              ["unset", "Not set"],
-              ["us", "United States"],
-              ["other", "Another country"],
+              ["unset", t("Not set")],
+              ["us", t("United States")],
+              ["other", t("Another country")],
             ] as const
           ).map(([value, label]) => (
             <label key={value} className="choice">
@@ -203,7 +221,7 @@ export function EmotionalWellnessView() {
         </fieldset>
         {stored.country === "other" ? (
           <label className="field">
-            <span>Country name</span>
+            <span>{t("Country name")}</span>
             <input
               value={stored.countryNote}
               maxLength={80}
@@ -214,10 +232,11 @@ export function EmotionalWellnessView() {
       </section>
 
       <section className="card stack" id="companion" aria-labelledby="ew-companion">
-        <h2 id="ew-companion">Companion</h2>
+        <h2 id="ew-companion">{t("Companion")}</h2>
         <p className="hint">
-          One question at a time. Written replies can be paused. The crisis check keeps running, and no paid model is
-          called either way.
+          {t(
+            "One question at a time. Written replies can be paused. The crisis check keeps running, and no paid model is called either way.",
+          )}
         </p>
         <div className="actions">
           <button
@@ -226,7 +245,7 @@ export function EmotionalWellnessView() {
             aria-pressed={!repliesOn}
             onClick={() => setRepliesOn((on) => !on)}
           >
-            {repliesOn ? "Pause written replies" : "Resume written replies"}
+            {repliesOn ? t("Pause written replies") : t("Resume written replies")}
           </button>
         </div>
         <div className="ew-log" aria-live="polite">
@@ -236,14 +255,18 @@ export function EmotionalWellnessView() {
               className={turn.crisis ? "ew-bubble ew-bubble-crisis" : turn.role === "companion" ? "ew-bubble ew-bubble-companion" : "ew-bubble"}
               role={turn.crisis ? "alert" : undefined}
             >
-              <strong>{turn.role === "visitor" ? "You" : "Companion"}: </strong>
-              {turn.text}
+              <strong>{turn.role === "visitor" ? t("You") : t("Companion")}: </strong>
+              {turn.role === "visitor"
+                ? turn.text
+                : turn.request
+                  ? respondToCompanion({ ...turn.request, t }).text
+                  : t(turn.text)}
             </p>
           ))}
         </div>
         <form className="stack" onSubmit={onTalk}>
           <label className="field" htmlFor="ew-message">
-            <span>Message</span>
+            <span>{t("Message")}</span>
             <textarea
               id="ew-message"
               value={message}
@@ -254,42 +277,42 @@ export function EmotionalWellnessView() {
           </label>
           <div className="actions">
             <button className="btn btn-primary" type="submit">
-              Send
+              {t("Send")}
             </button>
           </div>
         </form>
       </section>
 
       <section className="stack" id="exercises" aria-labelledby="ew-exercises">
-        <h2 id="ew-exercises">Short exercises</h2>
-        <p className="hint">{EXERCISE_INTRO}</p>
+        <h2 id="ew-exercises">{t("Short exercises")}</h2>
+        <p className="hint">{t(EXERCISE_INTRO)}</p>
         {EXERCISES.map((item) => {
           const session = exercise?.id === item.id ? exercise : null;
           return (
             <article key={item.id} className="card stack">
-              <h3>{item.title}</h3>
-              <p>{item.summary}</p>
+              <h3>{t(item.title)}</h3>
+              <p>{t(item.summary)}</p>
               {session ? (
                 <>
                   <p className="hint">
-                    Step {session.stepIndex + 1} of {item.steps.length}
+                    {t("Step {current} of {total}", { current: session.stepIndex + 1, total: item.steps.length })}
                   </p>
-                  <p className="ew-step">{item.steps[session.stepIndex]}</p>
+                  <p className="ew-step">{t(item.steps[session.stepIndex])}</p>
                   <div className="actions">
                     {session.stepIndex < item.steps.length - 1 ? (
                       <button className="btn btn-primary" type="button" onClick={() => setExercise(nextExerciseStep(session))}>
-                        Next
+                        {t("Next")}
                       </button>
                     ) : null}
                     <button className="btn btn-secondary" type="button" onClick={() => setExercise(stopExercise())}>
-                      Stop
+                      {t("Stop")}
                     </button>
                   </div>
                 </>
               ) : (
                 <div className="actions">
                   <button className="btn btn-secondary" type="button" onClick={() => setExercise(startExercise(item.id))}>
-                    {item.optional ? "Start if you want" : "Start"}
+                    {item.optional ? t("Start if you want") : t("Start")}
                   </button>
                 </div>
               )}
@@ -299,9 +322,9 @@ export function EmotionalWellnessView() {
       </section>
 
       <section className="card stack" id="journal" aria-labelledby="ew-journal">
-        <h2 id="ew-journal">Private journal</h2>
-        <p className="hint">{JOURNAL_PRIVACY}</p>
-        {notice ? <p role="status">{notice}</p> : null}
+        <h2 id="ew-journal">{t("Private journal")}</h2>
+        <p className="hint">{t(JOURNAL_PRIVACY)}</p>
+        {notice ? <p role="status">{t(notice)}</p> : null}
         <form
           className="stack"
           onSubmit={(event) => {
@@ -310,7 +333,7 @@ export function EmotionalWellnessView() {
           }}
         >
           <label className="field" htmlFor="ew-journal-entry">
-            <span>Journal entry</span>
+            <span>{t("Journal entry")}</span>
             <textarea
               id="ew-journal-entry"
               value={journalDraft}
@@ -320,23 +343,23 @@ export function EmotionalWellnessView() {
           </label>
           <div className="actions">
             <button className="btn btn-primary" type="submit">
-              Save journal entry
+              {t("Save journal entry")}
             </button>
             <button className="btn btn-danger" type="button" onClick={() => save((current) => clearNoteBucket(current, "journal"))}>
-              Delete all journal entries
+              {t("Delete all journal entries")}
             </button>
           </div>
         </form>
         <NoteList
           notes={stored.journal}
-          empty="No journal entries yet."
+          empty={msg("No journal entries yet.")}
           onDelete={(id) => save((current) => removePrivateNote(current, "journal", id))}
         />
       </section>
 
       <section className="card stack" id="joys" aria-labelledby="ew-joys">
-        <h2 id="ew-joys">Small joys</h2>
-        <p className="hint">{JOY_NOTE}</p>
+        <h2 id="ew-joys">{t("Small joys")}</h2>
+        <p className="hint">{t(JOY_NOTE)}</p>
         <form
           className="stack"
           onSubmit={(event) => {
@@ -345,28 +368,28 @@ export function EmotionalWellnessView() {
           }}
         >
           <label className="field" htmlFor="ew-joy">
-            <span>A small joy</span>
+            <span>{t("A small joy")}</span>
             <input id="ew-joy" value={joyDraft} maxLength={1000} onChange={(event) => setJoyDraft(event.target.value)} />
           </label>
           <div className="actions">
             <button className="btn btn-primary" type="submit">
-              Save a small joy
+              {t("Save a small joy")}
             </button>
             <button className="btn btn-danger" type="button" onClick={() => save((current) => clearNoteBucket(current, "joys"))}>
-              Delete all small joys
+              {t("Delete all small joys")}
             </button>
           </div>
         </form>
         <NoteList
           notes={stored.joys}
-          empty="No small joys saved. Skipping this is fine."
+          empty={msg("No small joys saved. Skipping this is fine.")}
           onDelete={(id) => save((current) => removePrivateNote(current, "joys", id))}
         />
       </section>
 
       <section className="card stack" id="caregiver" aria-labelledby="ew-care">
-        <h2 id="ew-care">Caregiver notes</h2>
-        <p className="hint">{CAREGIVER_NOTE}</p>
+        <h2 id="ew-care">{t("Caregiver notes")}</h2>
+        <p className="hint">{t(CAREGIVER_NOTE)}</p>
         <form
           className="stack"
           onSubmit={(event) => {
@@ -375,7 +398,7 @@ export function EmotionalWellnessView() {
           }}
         >
           <label className="field" htmlFor="ew-care-note">
-            <span>Note</span>
+            <span>{t("Note")}</span>
             <textarea
               id="ew-care-note"
               value={careDraft}
@@ -385,20 +408,20 @@ export function EmotionalWellnessView() {
           </label>
           <div className="actions">
             <button className="btn btn-primary" type="submit">
-              Save caregiver note
+              {t("Save caregiver note")}
             </button>
             <button
               className="btn btn-danger"
               type="button"
               onClick={() => save((current) => clearNoteBucket(current, "caregiverNotes"))}
             >
-              Delete all caregiver notes
+              {t("Delete all caregiver notes")}
             </button>
           </div>
         </form>
         <NoteList
           notes={stored.caregiverNotes}
-          empty="No caregiver notes yet."
+          empty={msg("No caregiver notes yet.")}
           onDelete={(id) => save((current) => removePrivateNote(current, "caregiverNotes", id))}
         />
         <div className="actions">
@@ -413,26 +436,26 @@ export function EmotionalWellnessView() {
                 }
                 clearEmotionalStore();
                 setConfirmWipe(false);
-                setNotice("Emotional wellness notes in this browser were deleted.");
+                setNotice(msg("Emotional wellness notes in this browser were deleted."));
               }}
             >
-              Confirm delete of all notes in this browser
+              {t("Confirm delete of all notes in this browser")}
             </button>
           ) : (
             <button className="btn btn-danger" type="button" onClick={() => setConfirmWipe(true)}>
-              Delete all emotional wellness data in this browser
+              {t("Delete all emotional wellness data in this browser")}
             </button>
           )}
         </div>
       </section>
 
       <section className="card stack" id="real-person" aria-labelledby="ew-real">
-        <h2 id="ew-real">Talk to a real person</h2>
+        <h2 id="ew-real">{t("Talk to a real person")}</h2>
         <p className="hint">
-          These are published organizations. This page does not invent phone numbers.{" "}
+          {t("These are published organizations. This page does not invent phone numbers.")}{" "}
           {usNumbers
-            ? "United States crisis numbers are included because a country is not set or is the United States."
-            : "United States crisis numbers are hidden because a different country is set."}
+            ? t("United States crisis numbers are included because a country is not set or is the United States.")
+            : t("United States crisis numbers are hidden because a different country is set.")}
         </p>
         <ul className="stack">
           {REAL_ORGS.filter((org) => org.id !== "lifeline" || usNumbers).map((org) => {
@@ -440,22 +463,24 @@ export function EmotionalWellnessView() {
             return (
               <li key={org.id} className="card card-quiet stack">
                 <h3>{org.name}</h3>
-                <p>{org.detail}</p>
+                <p>{t(org.detail)}</p>
                 <p>
                   <a href={org.url} target="_blank" rel="noopener noreferrer">
-                    {org.name} website
+                    {t("{name} website", { name: org.name })}
                   </a>
                 </p>
                 {phone ? (
                   <p>
-                    <a href={phoneHref(phone)}>{phone === "988" ? "Call or text 988" : `Phone listed by the organization: ${phone}`}</a>
+                    <a href={phoneHref(phone)}>
+                      {phone === "988" ? t("Call or text 988") : t("Phone listed by the organization: {phone}", { phone })}
+                    </a>
                   </p>
                 ) : (
-                  <p className="hint">No phone number is shown here for this country.</p>
+                  <p className="hint">{t("No phone number is shown here for this country.")}</p>
                 )}
                 {org.id === "lifeline" && usNumbers ? (
                   <p>
-                    <a href="tel:911">Call 911 for immediate danger</a>
+                    <a href="tel:911">{t("Call 911 for immediate danger")}</a>
                   </p>
                 ) : null}
               </li>
@@ -465,22 +490,23 @@ export function EmotionalWellnessView() {
       </section>
 
       <section className="card stack" aria-labelledby="ew-sources">
-        <h2 id="ew-sources">Sources</h2>
+        <h2 id="ew-sources">{t("Sources")}</h2>
         <p className="hint">
-          The words on this page are original. The sources below are named so the ideas can be checked. They are not a
-          claim that this page was clinically validated.
+          {t(
+            "The words on this page are original. The sources below are named so the ideas can be checked. They are not a claim that this page was clinically validated.",
+          )}
         </p>
         <ul className="source-list">
           {ATTRIBUTIONS.map((source) => (
             <li key={source.id}>
-              <a href={source.url} target="_blank" rel="noopener noreferrer">
+              <a href={source.url} target="_blank" rel="noopener noreferrer" lang="en">
                 {source.name}: {source.title}
               </a>
-              <span> {source.note}</span>
+              <span> {t(source.note)}</span>
             </li>
           ))}
         </ul>
-        <p>{CLINICAL_REVIEW_NOTICE}</p>
+        <p>{t(CLINICAL_REVIEW_NOTICE)}</p>
       </section>
     </div>
   );

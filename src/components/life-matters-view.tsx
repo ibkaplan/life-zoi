@@ -5,6 +5,9 @@ import { useState, useSyncExternalStore } from "react";
 import { PagePhoto } from "@/components/page-photo";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
+import { useLocale, useT } from "@/components/locale-provider";
+import { LOCALE_META, type Locale } from "@/lib/i18n/config";
+import { msg } from "@/lib/i18n/translate";
 import {
   BRAND_LINE,
   BRAND_SUPPORT,
@@ -36,17 +39,23 @@ import {
 } from "@/lib/purpose";
 
 const SECTIONS = [
-  ["#philosophy", "Philosophy"],
-  ["#legacy", "My Positive Legacy"],
-  ["#connect", "Health connection"],
-  ["#impact", "My Future Impact"],
-  ["#journey", "Purpose journey"],
-  ["#ripple", "My Positive Ripple"],
+  ["#philosophy", msg("Philosophy")],
+  ["#legacy", msg("My Positive Legacy")],
+  ["#connect", msg("Health connection")],
+  ["#impact", msg("My Future Impact")],
+  ["#journey", msg("Purpose journey")],
+  ["#ripple", msg("My Positive Ripple")],
 ] as const;
 
 function MatterArt() {
+  const t = useT();
   return (
-    <svg className="matter-art" viewBox="0 0 640 360" role="img" aria-label="Sunrise over the Earth, with trees and three people of different ages">
+    <svg
+      className="matter-art"
+      viewBox="0 0 640 360"
+      role="img"
+      aria-label={t("Sunrise over the Earth, with trees and three people of different ages")}
+    >
       <defs>
         <linearGradient id="matter-sky" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#EFE5FA" />
@@ -77,10 +86,10 @@ function MatterArt() {
   );
 }
 
-function formatWhen(iso: string): string {
+function formatWhen(iso: string, locale: Locale): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : LOCALE_META[locale].htmlLang, {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: "America/New_York",
@@ -89,19 +98,25 @@ function formatWhen(iso: string): string {
 
 export function LifeMattersView() {
   const { ready, session } = useSession();
+  const t = useT();
+  const { locale } = useLocale();
   const state = useSyncExternalStore(subscribePurpose, getPurpose, getPurposeServer);
   const [status, setStatus] = useState("");
   const [milestone, setMilestone] = useState({ title: "", kind: "goal" as MilestoneKind, note: "" });
   const [ripple, setRipple] = useState({ kind: "help" as RippleKind, note: "" });
   const [formError, setFormError] = useState("");
 
-  if (!ready) return <LoadingState label="Loading Your Life Matters…" />;
+  if (!ready) return <LoadingState label={t("Loading Your Life Matters…")} />;
 
   const hope = session.history[0]?.answers.purposeHope || session.draft.purposeHope;
   const corpus = [...purposeLines(state.legacy), hope].join(" ");
   const supports = healthSupports(corpus);
-  const lines = purposeLines(state.legacy);
-  const reflection = purposeReflection(hope);
+  const lines = LEGACY_QUESTIONS.flatMap((question) => {
+    const text = state.legacy[question.id]?.trim();
+    return text ? [`${t(question.prompt)} ${text}`] : [];
+  });
+  const reflection = purposeReflection(hope, t);
+  const when = (iso: string) => t("{when} Eastern", { when: formatWhen(iso, locale) });
 
   function save(next: PurposeState, message: string) {
     writePurpose(next);
@@ -112,7 +127,7 @@ export function LifeMattersView() {
   function addMilestone() {
     const title = milestone.title.trim();
     if (!title) {
-      setFormError("Add a short title for the milestone.");
+      setFormError(msg("Add a short title for the milestone."));
       return;
     }
     save(
@@ -130,7 +145,7 @@ export function LifeMattersView() {
           },
         ],
       },
-      "Milestone saved in this browser tab.",
+      msg("Milestone saved in this browser tab."),
     );
     setMilestone({ title: "", kind: milestone.kind, note: "" });
   }
@@ -149,7 +164,7 @@ export function LifeMattersView() {
           },
         ],
       },
-      "Positive action saved in this browser tab.",
+      msg("Positive action saved in this browser tab."),
     );
     setRipple({ kind: ripple.kind, note: "" });
   }
@@ -158,56 +173,56 @@ export function LifeMattersView() {
     <div className="life-matters stack-lg">
       <PagePhoto id="life-matters" />
       <div className="stack">
-        <p className="kicker">Your Life Matters</p>
-        <h1>{CENTRAL_MESSAGE}</h1>
-        <p className="lede">{SUPPORTING_MESSAGE}</p>
+        <p className="kicker">{t("Your Life Matters")}</p>
+        <h1>{t(CENTRAL_MESSAGE)}</h1>
+        <p className="lede">{t(SUPPORTING_MESSAGE)}</p>
       </div>
       <MatterArt />
-      <nav className="matter-nav" aria-label="On this page">
+      <nav className="matter-nav" aria-label={t("On this page")}>
         {SECTIONS.map(([href, label]) => (
           <a key={href} href={href}>
-            {label}
+            {t(label)}
           </a>
         ))}
       </nav>
       <p className="banner" role="status">
-        Working reflection in this browser tab. It is not a medical assessment, and lifeZoi does not calculate a contribution to humanity.
-        {status ? ` ${status}` : ""}
+        {t("Working reflection in this browser tab. It is not a medical assessment, and lifeZoi does not calculate a contribution to humanity.")}
+        {status ? ` ${t(status)}` : ""}
       </p>
 
       <section className="card stack" id="philosophy" aria-labelledby="philosophy-title">
-        <h2 id="philosophy-title">Science, psychology, and philosophy</h2>
+        <h2 id="philosophy-title">{t("Science, psychology, and philosophy")}</h2>
         <p>
-          LifeZoi brings these three foundations together. This is practical life philosophy beside health education. It is not a religious service and it does not offer a miracle.
+          {t("LifeZoi brings these three foundations together. This is practical life philosophy beside health education. It is not a religious service and it does not offer a miracle.")}
         </p>
         <ul className="matter-lines">
           {DIRECTION_LINES.map((line) => (
-            <li key={line}>{line}</li>
+            <li key={line}>{t(line)}</li>
           ))}
         </ul>
         <div className="matter-foundations">
           {FOUNDATIONS.map((item) => (
             <article key={item.id}>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+              <h3>{t(item.title)}</h3>
+              <p>{t(item.text)}</p>
             </article>
           ))}
         </div>
-        <p className="matter-brand">{BRAND_LINE}</p>
-        <p>{BRAND_SUPPORT}</p>
-        <p>{PROMISE_BOUNDARY}</p>
+        <p className="matter-brand">{t(BRAND_LINE)}</p>
+        <p>{t(BRAND_SUPPORT)}</p>
+        <p>{t(PROMISE_BOUNDARY)}</p>
         <p>
-          Every healthy choice can be an investment in the days ahead. Every act of kindness can create a ripple. You cannot control everything life brings you. You can influence how you live, how you grow, and what you give.
+          {t("Every healthy choice can be an investment in the days ahead. Every act of kindness can create a ripple. You cannot control everything life brings you. You can influence how you live, how you grow, and what you give.")}
         </p>
-        <p>Live consciously. Live compassionately. Live fully. Make your life matter.</p>
+        <p>{t("Live consciously. Live compassionately. Live fully. Make your life matter.")}</p>
       </section>
 
       <section className="card stack" id="legacy" aria-labelledby="legacy-title">
-        <h2 id="legacy-title">My Positive Legacy</h2>
-        <p>{ENCOURAGEMENT}</p>
+        <h2 id="legacy-title">{t("My Positive Legacy")}</h2>
+        <p>{t(ENCOURAGEMENT)}</p>
         {LEGACY_QUESTIONS.map((question) => (
           <label className="field" key={question.id} htmlFor={`legacy-${question.id}`}>
-            <span>{question.prompt}</span>
+            <span>{t(question.prompt)}</span>
             <textarea
               id={`legacy-${question.id}`}
               maxLength={400}
@@ -215,15 +230,15 @@ export function LifeMattersView() {
               onChange={(event) =>
                 save(
                   { ...state, legacy: { ...state.legacy, [question.id]: event.target.value } },
-                  "Answers saved in this browser tab. You can edit them any time.",
+                  msg("Answers saved in this browser tab. You can edit them any time."),
                 )
               }
             />
           </label>
         ))}
-        <h3>Your purpose statement</h3>
+        <h3>{t("Your purpose statement")}</h3>
         {lines.length === 0 ? (
-          <p>Your purpose statement will appear here from your own words. Waiting is welcome.</p>
+          <p>{t("Your purpose statement will appear here from your own words. Waiting is welcome.")}</p>
         ) : (
           <ul className="matter-lines">
             {lines.map((line) => (
@@ -234,64 +249,64 @@ export function LifeMattersView() {
       </section>
 
       <section className="card stack" id="connect" aria-labelledby="connect-title">
-        <h2 id="connect-title">Connect purpose with health</h2>
-        <p className="matter-brand">{HEALTH_BRIDGE}</p>
-        <p>{DIGNITY_NOTE}</p>
+        <h2 id="connect-title">{t("Connect purpose with health")}</h2>
+        <p className="matter-brand">{t(HEALTH_BRIDGE)}</p>
+        <p>{t(DIGNITY_NOTE)}</p>
         {reflection ? (
           <p>
-            {reflection} This hope is separate from medical information and is not a judgment of worth.
+            {reflection} {t("This hope is separate from medical information and is not a judgment of worth.")}
           </p>
         ) : supports.length > 0 ? (
           <p>
-            These ideas come from the words you wrote above. You can also add a hope at the end of the lifestyle assessment. That hope stays separate from the health answers.
+            {t("These ideas come from the words you wrote above. You can also add a hope at the end of the lifestyle assessment. That hope stays separate from the health answers.")}
           </p>
         ) : (
           <p>
-            The lifestyle assessment can hold an optional hope at the end: what you would like your health to help you experience or accomplish.
+            {t("The lifestyle assessment can hold an optional hope at the end: what you would like your health to help you experience or accomplish.")}
           </p>
         )}
         {supports.length === 0 ? (
-          <p>When you write a hope above, lifeZoi will suggest a few ordinary habits that can support it.</p>
+          <p>{t("When you write a hope above, lifeZoi will suggest a few ordinary habits that can support it.")}</p>
         ) : (
           supports.map((support) => (
             <article key={support.id} className="stack">
-              <h3>{support.title}</h3>
-              <p>{support.why}</p>
+              <h3>{t(support.title)}</h3>
+              <p>{t(support.why)}</p>
               <ul>
                 {support.actions.map((action) => (
-                  <li key={action}>{action}</li>
+                  <li key={action}>{t(action)}</li>
                 ))}
               </ul>
             </article>
           ))
         )}
-        <p>A few actions for this week:</p>
+        <p>{t("A few actions for this week:")}</p>
         {weeklyActions(supports).length === 0 ? (
-          <p>No weekly action yet. One sentence above is enough to begin.</p>
+          <p>{t("No weekly action yet. One sentence above is enough to begin.")}</p>
         ) : (
           <ul>
             {weeklyActions(supports).map((action) => (
-              <li key={action}>{action}</li>
+              <li key={action}>{t(action)}</li>
             ))}
           </ul>
         )}
         <div className="actions">
           <Link className="btn btn-primary" href="/change-lab">
-            Plan it in Change Lab
+            {t("Plan it in Change Lab")}
           </Link>
           <Link className="btn btn-secondary" href="/assessment">
-            Add a hope to the assessment
+            {t("Add a hope to the assessment")}
           </Link>
         </div>
       </section>
 
       <section className="card stack" id="impact" aria-labelledby="impact-title">
-        <h2 id="impact-title">My Future Impact</h2>
+        <h2 id="impact-title">{t("My Future Impact")}</h2>
         <p>
-          This is a personal journey of goals, habits, skills, kindness, time with people, and contributions you choose to record. lifeZoi does not measure social impact or calculate what you give to humanity.
+          {t("This is a personal journey of goals, habits, skills, kindness, time with people, and contributions you choose to record. lifeZoi does not measure social impact or calculate what you give to humanity.")}
         </p>
         <div className="field">
-          <label htmlFor="milestone-title">Milestone title</label>
+          <label htmlFor="milestone-title">{t("Milestone title")}</label>
           <input
             id="milestone-title"
             value={milestone.title}
@@ -300,7 +315,7 @@ export function LifeMattersView() {
           />
         </div>
         <label className="field" htmlFor="milestone-kind">
-          <span>What kind of milestone is this?</span>
+          <span>{t("What kind of milestone is this?")}</span>
           <select
             id="milestone-kind"
             value={milestone.kind}
@@ -308,13 +323,13 @@ export function LifeMattersView() {
           >
             {MILESTONE_KINDS.map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
         </label>
         <label className="field" htmlFor="milestone-note">
-          <span>A note, if you want one</span>
+          <span>{t("A note, if you want one")}</span>
           <textarea
             id="milestone-note"
             maxLength={400}
@@ -324,24 +339,24 @@ export function LifeMattersView() {
         </label>
         {formError ? (
           <p className="field-error" role="alert">
-            {formError}
+            {t(formError)}
           </p>
         ) : null}
         <button className="btn btn-primary" type="button" onClick={addMilestone}>
-          Save milestone
+          {t("Save milestone")}
         </button>
         {state.milestones.length === 0 ? (
-          <p>No milestones yet. Add one when you are ready.</p>
+          <p>{t("No milestones yet. Add one when you are ready.")}</p>
         ) : (
           <ul className="matter-list">
             {state.milestones.map((item) => (
               <li key={item.id}>
                 <p>
-                  <strong>{item.title}</strong> · {kindLabel(item.kind, MILESTONE_KINDS)}
-                  {item.done ? " · Marked done" : ""}
+                  <strong>{item.title}</strong> · {t(kindLabel(item.kind, MILESTONE_KINDS))}
+                  {item.done ? ` · ${t("Marked done")}` : ""}
                 </p>
                 {item.note ? <p>{item.note}</p> : null}
-                <p className="hint">{formatWhen(item.createdAt)} Eastern</p>
+                <p className="hint">{when(item.createdAt)}</p>
                 <div className="actions">
                   <button
                     className="btn btn-secondary"
@@ -354,11 +369,11 @@ export function LifeMattersView() {
                             row.id === item.id ? { ...row, done: !row.done } : row,
                           ),
                         },
-                        item.done ? "Milestone marked open again." : "Milestone marked done.",
+                        item.done ? msg("Milestone marked open again.") : msg("Milestone marked done."),
                       )
                     }
                   >
-                    {item.done ? "Mark not done" : "Mark done"}
+                    {item.done ? t("Mark not done") : t("Mark done")}
                   </button>
                   <button
                     className="btn btn-ghost"
@@ -366,11 +381,11 @@ export function LifeMattersView() {
                     onClick={() =>
                       save(
                         { ...state, milestones: state.milestones.filter((row) => row.id !== item.id) },
-                        "Milestone removed from this browser tab.",
+                        msg("Milestone removed from this browser tab."),
                       )
                     }
                   >
-                    Remove
+                    {t("Remove")}
                   </button>
                 </div>
               </li>
@@ -380,29 +395,29 @@ export function LifeMattersView() {
       </section>
 
       <section className="card stack" id="journey" aria-labelledby="journey-title">
-        <h2 id="journey-title">My Life Purpose Journey</h2>
-        <p>Six steps join your values with the habits you practice in Change Lab, Progress, and WHAT IF?.</p>
+        <h2 id="journey-title">{t("My Life Purpose Journey")}</h2>
+        <p>{t("Six steps join your values with the habits you practice in Change Lab, Progress, and WHAT IF?.")}</p>
         <ol className="matter-journey">
           {JOURNEY_STEPS.map((step, index) => (
             <li key={step.id}>
               <h3>
-                Step {index + 1} — {step.title}
+                {t("Step {number} — {title}", { number: index + 1, title: t(step.title) })}
               </h3>
-              <p>{step.text}</p>
-              <Link href={step.href}>{step.linkLabel}</Link>
+              <p>{t(step.text)}</p>
+              <Link href={step.href}>{t(step.linkLabel)}</Link>
             </li>
           ))}
         </ol>
       </section>
 
       <section className="card stack" id="ripple" aria-labelledby="ripple-title">
-        <h2 id="ripple-title">My Positive Ripple</h2>
-        <p>{KARMA_NOTE}</p>
+        <h2 id="ripple-title">{t("My Positive Ripple")}</h2>
+        <p>{t(KARMA_NOTE)}</p>
         <p>
-          Taking care of yourself can help you be more present for people and causes you care about. Record only what you want to remember. This collection is not a score.
+          {t("Taking care of yourself can help you be more present for people and causes you care about. Record only what you want to remember. This collection is not a score.")}
         </p>
         <label className="field" htmlFor="ripple-kind">
-          <span>What kind of action was it?</span>
+          <span>{t("What kind of action was it?")}</span>
           <select
             id="ripple-kind"
             value={ripple.kind}
@@ -410,13 +425,13 @@ export function LifeMattersView() {
           >
             {RIPPLE_KINDS.map(([value, label]) => (
               <option key={value} value={value}>
-                {label}
+                {t(label)}
               </option>
             ))}
           </select>
         </label>
         <label className="field" htmlFor="ripple-note">
-          <span>What happened? Optional.</span>
+          <span>{t("What happened? Optional.")}</span>
           <textarea
             id="ripple-note"
             maxLength={400}
@@ -425,40 +440,40 @@ export function LifeMattersView() {
           />
         </label>
         <button className="btn btn-primary" type="button" onClick={addRipple}>
-          Save positive action
+          {t("Save positive action")}
         </button>
         {state.ripples.length === 0 ? (
-          <p>No actions recorded yet. A small kindness counts, and so does choosing not to write one down.</p>
+          <p>{t("No actions recorded yet. A small kindness counts, and so does choosing not to write one down.")}</p>
         ) : (
           <ul className="matter-list">
             {[...state.ripples].reverse().map((item) => (
               <li key={item.id}>
                 <p>
-                  <strong>{kindLabel(item.kind, RIPPLE_KINDS)}</strong>
+                  <strong>{t(kindLabel(item.kind, RIPPLE_KINDS))}</strong>
                 </p>
                 {item.note ? <p>{item.note}</p> : null}
-                <p className="hint">{formatWhen(item.createdAt)} Eastern</p>
+                <p className="hint">{when(item.createdAt)}</p>
                 <button
                   className="btn btn-ghost"
                   type="button"
                   onClick={() =>
                     save(
                       { ...state, ripples: state.ripples.filter((row) => row.id !== item.id) },
-                      "Action removed from this browser tab.",
+                      msg("Action removed from this browser tab."),
                     )
                   }
                 >
-                  Remove
+                  {t("Remove")}
                 </button>
               </li>
             ))}
           </ul>
         )}
         <p className="hint">
-          The wellness assistant offers prepared educational answers. It does not see these private notes.
+          {t("The wellness assistant offers prepared educational answers. It does not see these private notes.")}
         </p>
         <Link className="btn btn-secondary" href="/ai-assistant">
-          Open the wellness assistant
+          {t("Open the wellness assistant")}
         </Link>
       </section>
     </div>
