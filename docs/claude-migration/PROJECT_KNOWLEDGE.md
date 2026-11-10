@@ -54,6 +54,8 @@ These match `main`, not pull request #1.
 - The repository is public. An earlier attempt to make it private did not succeed. Do not assume a later agent can flip visibility.
 - Package scripts on `main`: `typecheck` runs `next typegen && tsc --noEmit`. Lint target is `eslint .`.
 
+- Breathe for Life (`/breathe`, added 2026-11-10) keeps nitric oxide copy qualitative. The Oregon State Extension figure of a 75% decline in NO production between ages 20 and 70 has no reference on that page and could not be traced to a study, so the app does not use it and says why. The humming figure is stated only as about 15 times higher nasal NO output in a ten-person study (Weitzberg & Lundberg 2002), never as whole-body NO. Wording tests live in `src/lib/breathe/breathe.test.ts`. Breathing data is stored in the companion state under `breathe`.
+
 ## Historical context
 
 - The first commit is `57cddd7` (placeholder). `2ed8ef7` added the development-mode app to `main`. `a6bfdcc` ignored local Vercel env files. `c9f003a` added the first Claude migration docs.

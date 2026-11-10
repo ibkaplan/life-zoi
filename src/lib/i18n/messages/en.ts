@@ -121,6 +121,7 @@ export const en = {
       day: { title: "My Day", text: "A fresh, gentle schedule each day. Change anything you like." },
       library: { title: "Wellness Library", text: "Pilates, yoga, chair exercise, tai chi and more, from 10 to 60 minutes." },
       meals: { title: "Today's meals", text: "Meals that respect your allergies, requirements, and the foods you avoid." },
+      breathe: { title: "Breathe for Life", text: "Gentle breathing, humming, and nitrate-rich foods for healthy aging. Five to ten minutes, four times a week." },
       music: { title: "Relaxing music", text: "Calm sounds for breathing, focus, and sleep, played in the app." },
       books: { title: "Books and listening", text: "Short reads you can read or listen to, with bookmarks." },
       games: { title: "Brain games", text: "Sudoku, memory, words, and logic, just for enjoyment." },

@@ -41,13 +41,14 @@ const cards = [
   },
 ] as const;
 
-type CompanionKey = "plan" | "day" | "library" | "meals" | "music" | "books" | "games" | "checkin";
+type CompanionKey = "plan" | "day" | "library" | "meals" | "breathe" | "music" | "books" | "games" | "checkin";
 
 const companion: { key: CompanionKey; href: string; art: ArtName }[] = [
   { key: "plan", href: "/plan", art: "plan" },
   { key: "day", href: "/my-day", art: "day" },
   { key: "library", href: "/academy/move/library", art: "yoga" },
   { key: "meals", href: "/food-plan/today", art: "meal" },
+  { key: "breathe", href: "/breathe", art: "music" },
   { key: "music", href: "/library/music", art: "music" },
   { key: "books", href: "/library/books", art: "book" },
   { key: "games", href: "/brain-quiz/games", art: "brain" },

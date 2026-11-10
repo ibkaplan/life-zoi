@@ -1,4 +1,5 @@
 import { isRealISODate, mondayOf } from "@/lib/dates";
+import { emptyBreathe, isEmptyBreathe, sanitizeBreathe, type BreatheState } from "@/lib/breathe/state";
 
 /**
  * Companion state: the guidance mode, preferences, daily logs, weekly
@@ -188,6 +189,8 @@ export type CompanionState = {
   plans: WeeklyPlan[];
   media: MediaState;
   games: GameRecord[];
+  /** Breathe for Life sessions, weekly days, and the 30-day challenge. */
+  breathe: BreatheState;
 };
 
 export const LIMITS = {
@@ -236,6 +239,7 @@ export function emptyCompanion(): CompanionState {
     plans: [],
     media: { favorites: [], recent: [], positions: {}, bookmarks: {}, ratings: {} },
     games: [],
+    breathe: emptyBreathe(),
   };
 }
 
@@ -269,7 +273,8 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     state.movement.enjoyed.length === 0 &&
     state.food.exclusions.length === 0 &&
     state.food.liked.length === 0 &&
-    state.food.disliked.length === 0
+    state.food.disliked.length === 0 &&
+    isEmptyBreathe(state.breathe)
   );
 }
 
@@ -538,6 +543,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
       })
       .filter((item): item is GameRecord => item !== null)
       .slice(0, LIMITS.games),
+    breathe: sanitizeBreathe(record.breathe),
   };
 }
 
