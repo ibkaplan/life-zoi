@@ -1,3 +1,5 @@
+import { FIND_TEXT_SOURCES } from "@/lib/wellness/movement-studio/find-videos";
+
 /**
  * Data from the "wellness-academy" area that pages show through `t(value)`, for example a list of lessons.
  * Every text string found in these values must have a translation in catalog/<locale>/wellness-academy.json.
@@ -27,6 +29,7 @@ import { CATEGORY_INFO, COOL_DOWN, MOVES, WARM_UP } from "@/lib/wellness-library
 const DESCRIBED_SOURCES = new Set(["lifezoi", "youtube-studio", "yoga-org"]);
 
 const sources: unknown[] = [
+  FIND_TEXT_SOURCES,
   mealModules,
   activities,
   coachModules,

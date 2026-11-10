@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useLocale, useT } from "@/components/locale-provider";
 import { MorningWelcome } from "@/components/background-music/morning-welcome";
+import { NewsSections } from "@/components/news-sections";
+import { firstNameOf } from "@/lib/news/greeting";
 import { RecommendationsPanel } from "@/components/recommendations-panel";
 import { fmt, LOCALE_META } from "@/lib/i18n/config";
 import { useSession } from "@/components/session-provider";
@@ -28,7 +30,8 @@ export function DashboardView() {
 
   return (
     <div className="stack-lg">
-      <MorningWelcome />
+      <MorningWelcome firstName={sample ? undefined : firstNameOf(name)} />
+      <NewsSections />
       <section className="stack">
         <p className="kicker">{d.kicker}</p>
         <h1>{name ? fmt(d.welcomeName, { name }) : d.welcome}</h1>
