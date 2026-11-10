@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { STUDIO_PATH } from "@/lib/wellness-library/chair-yoga";
 import { useState, useSyncExternalStore } from "react";
 import {
   ASK_FIRST,
@@ -175,6 +176,22 @@ function ToolCard({ slug }: { slug: string }) {
   );
 }
 
+/** Entry to the Chair Yoga Studio video library. */
+export function ChairYogaBanner() {
+  return (
+    <section className="cy-banner" aria-labelledby="cy-banner">
+      <div>
+        <p className="kicker">New · Video library</p>
+        <h2 id="cy-banner">Chair Yoga Studio</h2>
+        <p>Free seated and standing chair yoga classes, plus gentle yoga and mobility. Press PLAY VIDEO and start.</p>
+      </div>
+      <Link className="btn btn-primary" href={STUDIO_PATH}>
+        ▶ Open Chair Yoga Studio
+      </Link>
+    </section>
+  );
+}
+
 export function MovementStudioHome() {
   return (
     <div className="studio stack-lg" id="movement-studio">
@@ -184,6 +201,7 @@ export function MovementStudioHome() {
         Official films play here only when the player and the length were checked. Everything else stays written, with Coming Soon, until a real recording exists.
       </p>
       <SafetyNote />
+      <ChairYogaBanner />
       <section className="stack-lg" aria-labelledby="choose-movement">
         <h2 id="choose-movement">{STUDIO_SECTION}</h2>
         {studioCategories.map((category) => (
@@ -220,6 +238,7 @@ export function StudioCategory({ slug }: { slug: string }) {
       <h1>{category.title}</h1>
       <p className="lede">{category.summary}</p>
       <SafetyNote />
+      {slug === "chair" || slug === "balance" || slug === "mobility" ? <ChairYogaBanner /> : null}
       <div className="studio-grid">
         {lessonsInCategory(slug).map((lesson) => (
           <LessonCard key={lesson.id} lesson={lesson} />

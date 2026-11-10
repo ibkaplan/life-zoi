@@ -5,6 +5,7 @@ import { useState } from "react";
 import { FavoriteButton, RatingControl, SaveNote, VideoPlayer } from "@/components/companion/shared";
 import { MovementFinder, MovementPreferences } from "@/components/companion/movement-finder";
 import { useProfile } from "@/components/companion/use-profile";
+import { ChairYogaBanner } from "@/components/wellness/movement-studio-views";
 import { useAccount } from "@/lib/account-store";
 import { formatTimestamp } from "@/lib/dates";
 import { COST_TEXT, reviewQueue, SOURCES, VIDEOS, visibleVideos, type VideoItem } from "@/lib/wellness-library/catalog";
@@ -31,6 +32,7 @@ export function WellnessLibraryView() {
         <p className="hint">Suggestions follow your level, experience, mobility, and any limits you reported. Age alone never makes a session harder.</p>
       </div>
       <SaveNote />
+      <ChairYogaBanner />
       <div className="lz-tabs" role="group" aria-label="Library category">
         {LIBRARY_CATEGORIES.map((value) => (
           <button key={value} type="button" className="lz-tab" aria-pressed={value === category} onClick={() => setCategory(value)}>
