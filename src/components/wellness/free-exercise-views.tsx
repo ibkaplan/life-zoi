@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { RoutineSketch } from "@/components/wellness/free-exercise-sketches";
@@ -131,6 +132,7 @@ export function CategoryPage({ slug }: { slug: string }) {
       <p className="kicker">Free exercise resources</p>
       <h1>{category.title}</h1>
       <p className="lede">{category.intro}</p>
+      <ListenToSteps title={category.title} intro={category.intro} steps={category.steps} closing={[category.safety]} />
       <ol className="free-steps">
         {category.steps.map((step) => (
           <li key={step}>{step}</li>

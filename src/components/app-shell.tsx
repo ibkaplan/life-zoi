@@ -6,6 +6,7 @@ import { SittingReminder } from "@/components/movement-breaks/tracker";
 import { CareInviteWatcher } from "@/components/care-invite-watcher";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
+import { PageListen } from "@/components/voice/page-listen";
 import { useAccount } from "@/lib/account-store";
 import { useCompanion } from "@/lib/companion/store";
 import { departmentFor } from "@/lib/departments";
@@ -50,6 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
         <CareInviteWatcher />
         <SittingReminder />
+        <PageListen pathname={pathname} />
         {children}
         <footer className="footer-note">
           <p>{m.shell.professionalNotice}</p>

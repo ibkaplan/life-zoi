@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import Link from "next/link";
 import { useState } from "react";
 import { Art } from "@/components/companion/art";
@@ -229,6 +230,19 @@ export function MealCard({ suggestion, showKcal }: { suggestion: MealSuggestion;
           {warning}
         </p>
       ))}
+      <ListenToSteps
+        title={recipe.name}
+        list={{
+          heading: "Ingredients",
+          items: recipe.ingredients.map((item) => {
+            const swapped = item.swap && swaps.some((text) => text.startsWith(`Made without ${item.name.toLowerCase()}`));
+            return swapped && item.swap ? item.swap.name : item.name;
+          }),
+        }}
+        steps={recipe.steps}
+        label="Read the recipe aloud"
+        compact
+      />
       <details>
         <summary>Ingredients and cooking steps</summary>
         <h4>Ingredients</h4>

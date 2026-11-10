@@ -9,28 +9,27 @@ import { buildSession, focusFor, MIN_SAVED_SECONDS, PACES, PHASE_WORD, phaseAt, 
 import { rateSession } from "@/lib/breathe/state";
 import { localISODate } from "@/lib/dates";
 import { useAudioFocus } from "@/components/background-music/use-audio-focus";
+import { useLocale } from "@/components/locale-provider";
+import { VoiceChoices, useVoicePrefs } from "@/components/voice/read-aloud";
+import type { Locale } from "@/lib/i18n/config";
+import { player } from "@/lib/voice/engine";
+import { segmentsFromText } from "@/lib/voice/voices";
 
 type Status = "ready" | "running" | "paused" | "finished" | "stopped";
 
-function speak(text: string) {
+const VOICE_OWNER = "breathing-guide";
+
+/** Spoken instructions go through the shared read-aloud player, so they use the best voice and never overlap. */
+function speak(text: string, locale: Locale) {
   try {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    utterance.rate = 0.85;
-    window.speechSynthesis.speak(utterance);
+    player.play(VOICE_OWNER, segmentsFromText(text, locale), { rateFactor: 0.9, stepWait: 0 });
   } catch {
     // Spoken instructions are optional. The written ones are always shown.
   }
 }
 
 function hush() {
-  try {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-  } catch {
-    // ignore
-  }
+  player.stop(VOICE_OWNER);
 }
 
 /** Scale for the breathing circle: grows on the in-breath, shrinks on the out-breath or hum. */
@@ -44,6 +43,8 @@ function circleScale(phase: string, progress: number): number {
 
 export function BreathingPlayer() {
   const { ready, sample, breathe, breathless } = useBreathe();
+  const { locale } = useLocale();
+  const voicePrefs = useVoicePrefs();
   const today = localISODate();
   const suggestedFocus = focusFor(breathe.challenge, today);
   const [focusOverride, setFocusOverride] = useState<SessionFocus | null>(null);
@@ -96,12 +97,12 @@ export function BreathingPlayer() {
         window.clearInterval(timer);
         setElapsed(total);
         setStatus("finished");
-        if (breathe.voice) speak("Your session is complete. Take a moment before you get up.");
+        if (breathe.voice) speak("Your session is complete. Take a moment before you get up.", locale);
         save(total, true);
       }
     }, 200);
     return () => window.clearInterval(timer);
-  }, [status, total, breathe.voice, save]);
+  }, [status, total, breathe.voice, save, locale]);
 
   // Spoken instructions on each new step, and optional short cues on each breath.
   useEffect(() => {
@@ -109,14 +110,14 @@ export function BreathingPlayer() {
     if (state.stepIndex !== lastStep.current) {
       lastStep.current = state.stepIndex;
       lastKey.current = state.phaseKey;
-      if (breathe.voice) speak(`${state.step.title}. ${state.step.intro}`);
+      if (breathe.voice) speak(`${state.step.title}. ${state.step.intro}`, locale);
       return;
     }
     if (state.phaseKey !== lastKey.current) {
       lastKey.current = state.phaseKey;
-      if (breathe.voice && breathCues && state.phase !== "natural") speak(PHASE_WORD[state.phase]);
+      if (breathe.voice && breathCues && state.phase !== "natural") speak(PHASE_WORD[state.phase], locale);
     }
-  }, [status, state.stepIndex, state.phaseKey, state.phase, state.step, breathe.voice, breathCues]);
+  }, [status, state.stepIndex, state.phaseKey, state.phase, state.step, breathe.voice, breathCues, locale]);
 
   useEffect(() => () => hush(), []);
 
@@ -206,6 +207,12 @@ export function BreathingPlayer() {
             <input type="checkbox" checked={breathCues} disabled={!breathe.voice} onChange={(event) => setBreathCues(event.target.checked)} />
             <span>Also say &ldquo;breathe in&rdquo; and &ldquo;breathe out&rdquo; on each breath</span>
           </label>
+          {breathe.voice ? (
+            <details className="voice-options">
+              <summary>Voice and speed</summary>
+              <VoiceChoices lang={locale} steps={false} rate={voicePrefs.rate} stepWait={voicePrefs.stepWait} />
+            </details>
+          ) : null}
           <button className="btn btn-primary bf-big" type="button" onClick={start}>
             {status === "ready" ? "Start Breathing Session" : "Start a new session"}
           </button>
@@ -250,6 +257,11 @@ export function BreathingPlayer() {
             <button className="btn btn-primary bf-big" type="button" onClick={() => stop(false)}>
               Stop
             </button>
+            {breathe.voice ? (
+              <button className="btn btn-secondary bf-big" type="button" onClick={() => speak(`${state.step!.title}. ${state.step!.intro}`, locale)}>
+                Repeat the instruction
+              </button>
+            ) : null}
             <button className="btn btn-ghost bf-big" type="button" onClick={() => stop(true)}>
               I feel unwell. Stop now
             </button>

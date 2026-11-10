@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import Link from "next/link";
 import { STUDIO_PATH } from "@/lib/wellness-library/chair-yoga";
@@ -113,6 +114,7 @@ export function LessonCard({ lesson }: { lesson: StudioLesson }) {
         <>
           <p className="studio-soon">Coming Soon</p>
           <p>{SCRIPT_LABEL}</p>
+          <ListenToSteps title={lesson.title} steps={lesson.script.cues.map((cue) => `${cue.heading}. ${cue.words}`)} compact />
           <ol className="studio-steps">
             {lesson.script.cues.map((cue) => (
               <li key={cue.heading}>

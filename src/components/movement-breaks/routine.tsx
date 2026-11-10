@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocale } from "@/components/locale-provider";
+import { player } from "@/lib/voice/engine";
+import { segmentsFromText } from "@/lib/voice/voices";
 import { formatClock } from "@/components/companion/shared";
 import { useProfile } from "@/components/companion/use-profile";
 import { StepArt } from "@/components/movement-breaks/illustrations";
@@ -32,12 +35,33 @@ export function MovementBreakRoutine() {
   const seated = seatedChoice ?? Boolean(flags?.seatedFirst);
   const [run, setRun] = useState<Run>(START);
   const [saved, setSaved] = useState(false);
+  // Read each step aloud as the timer reaches it, so the person can watch their body, not the screen.
+  const [spoken, setSpoken] = useState(true);
+  const { locale } = useLocale();
+  const lastSpoken = useRef(-1);
 
   useEffect(() => {
     if (!run.running) return;
     const id = window.setInterval(() => setRun(tick), 1000);
     return () => window.clearInterval(id);
   }, [run.running]);
+
+  useEffect(() => {
+    if (!run.running || !spoken) {
+      if (!run.running) lastSpoken.current = -1;
+      return;
+    }
+    if (lastSpoken.current === run.index) return;
+    lastSpoken.current = run.index;
+    const current = ROUTINE[run.index];
+    if (current) player.play("movement-break", segmentsFromText(`${current.title}. ${seated ? current.seated : current.standing}`, locale), { rateFactor: 0.95, stepWait: 0 });
+  }, [run.running, run.index, spoken, seated, locale]);
+
+  useEffect(() => {
+    if (run.finished && spoken) player.play("movement-break", segmentsFromText("Break complete. Well done.", locale), { stepWait: 0 });
+  }, [run.finished, spoken, locale]);
+
+  useEffect(() => () => player.stop("movement-break"), []);
 
   const step = ROUTINE[run.index] ?? ROUTINE[0];
   if (!step) return null;
@@ -74,6 +98,17 @@ export function MovementBreakRoutine() {
         {flags?.seatedFirst ? <p className="hint">The seated version is chosen first because you said standing for long is hard.</p> : null}
         {flags?.fallRisk && !seated ? <p className="hint">You mentioned balance or a walking aid. Keep one hand on something sturdy, or choose the seated version.</p> : null}
       </fieldset>
+      <label className="check-row">
+        <input
+          type="checkbox"
+          checked={spoken}
+          onChange={(event) => {
+            setSpoken(event.target.checked);
+            if (!event.target.checked) player.stop("movement-break");
+          }}
+        />
+        <span>Read each step aloud when it starts</span>
+      </label>
 
       {run.finished ? (
         <div className="stack mb-done" role="status">
@@ -113,7 +148,14 @@ export function MovementBreakRoutine() {
               <span style={{ width: `${Math.min(100, Math.round((elapsed / ROUTINE_SECONDS) * 100))}%` }} />
             </div>
             <div className="lz-buttons">
-              <button className="btn btn-primary mb-big" type="button" onClick={() => setRun((current) => ({ ...current, running: !current.running }))}>
+              <button
+                className="btn btn-primary mb-big"
+                type="button"
+                onClick={() => {
+                  if (run.running) player.stop("movement-break");
+                  setRun((current) => ({ ...current, running: !current.running }));
+                }}
+              >
                 {run.running ? "Pause" : run.index === 0 && run.left === step.seconds ? "Start the break" : "Continue"}
               </button>
               <button className="btn btn-secondary mb-big" type="button" disabled={run.index === 0} onClick={() => go(run.index - 1)}>

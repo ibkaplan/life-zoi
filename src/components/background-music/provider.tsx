@@ -43,6 +43,13 @@ type MusicContextValue = {
 const MusicContext = createContext<MusicContextValue | null>(null);
 
 const PLAYLIST = backgroundPlaylist();
+
+/** Share of the music volume kept while the read-aloud voice speaks, so the voice stays clear. */
+export const DUCKED_SHARE = 0.2;
+
+function musicVolume(prefs: MusicPrefs): number {
+  return effectiveVolume(prefs) * (audioFocus.ducked() ? DUCKED_SHARE : 1);
+}
 const CHANNEL = "lifezoi-music";
 
 function readPrefs(): MusicPrefs {
@@ -87,6 +94,8 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
   const synthRef = useRef<Synth | null>(null);
   const synthPosition = useRef(0);
   const videoHold = useRef(false);
+  // False on devices that ignore page volume changes (iPhone, iPad).
+  const volumeWorks = useRef(true);
   const attempt = useRef(0);
   const tabId = useRef("");
   const channelRef = useRef<BroadcastChannel | null>(null);
@@ -129,7 +138,7 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
       const piece = PLAYLIST[at];
       if (!piece) return "unsupported";
       const ticket = ++attempt.current;
-      const volume = effectiveVolume(prefsRef.current);
+      const volume = musicVolume(prefsRef.current);
       if (piece.kind === "file") {
         const element = audioElement();
         if (!element.src.endsWith(piece.recording.file)) element.src = piece.recording.file;
@@ -163,7 +172,7 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
 
   const begin = useCallback(
     async (at: number, fromStart: boolean) => {
-      if (audioFocus.busy() || videoHold.current) {
+      if (audioFocus.busy() || videoHold.current || (audioFocus.ducked() && !volumeWorks.current)) {
         setHoldReason(videoHold.current || audioFocus.claims().some((claim) => claim.kind === "video") ? "video" : "sound");
         updateStatus("held");
         return;
@@ -240,7 +249,64 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
 
   // Step aside for other sound: LifeZoi players that claim focus, any other <audio>/<video>, and spoken instructions.
   useEffect(() => {
+    let duckTimer: ReturnType<typeof setTimeout> | null = null;
+    let fadeTimer: ReturnType<typeof setInterval> | null = null;
+    let wasDucked = false;
+    /** Glides the music to its volume for the current state, so ducking never sounds like a jump. */
+    const glide = (): boolean => {
+      const target = musicVolume(prefsRef.current);
+      synthRef.current?.setVolume(target);
+      const element = audioRef.current;
+      if (!element) return true;
+      if (fadeTimer) clearInterval(fadeTimer);
+      fadeTimer = null;
+      const from = element.volume;
+      if (Math.abs(from - target) < 0.001) return true;
+      const steps = 8;
+      element.volume = from + (target - from) / steps;
+      // iPhone and iPad ignore volume changes from a page. Report that, so music can wait instead.
+      if (Math.abs(element.volume - from) < 0.0001) {
+        volumeWorks.current = false;
+        return false;
+      }
+      let step = 1;
+      fadeTimer = setInterval(() => {
+        step += 1;
+        element.volume = Math.max(0, Math.min(1, from + ((target - from) * step) / steps));
+        if (step >= steps && fadeTimer) {
+          clearInterval(fadeTimer);
+          fadeTimer = null;
+        }
+      }, 40);
+      return true;
+    };
+    const duck = () => {
+      const ducked = audioFocus.ducked();
+      if (duckTimer) clearTimeout(duckTimer);
+      duckTimer = null;
+      if (ducked === wasDucked) return;
+      if (ducked) {
+        wasDucked = true;
+        if (statusRef.current !== "playing") return;
+        const piece = PLAYLIST[indexRef.current];
+        if (!glide() && piece?.kind === "file") {
+          // This device cannot lower the music, so it waits until the voice is done.
+          silence();
+          setHoldReason("sound");
+          updateStatus("held");
+        }
+        return;
+      }
+      // Wait a moment before raising the music again: the voice pauses briefly between sentences.
+      duckTimer = setTimeout(() => {
+        if (audioFocus.ducked()) return;
+        wasDucked = false;
+        glide();
+        if (statusRef.current === "held" && !audioFocus.busy() && !videoHold.current && prefsRef.current.choice === "playing") void begin(indexRef.current, false);
+      }, 1200);
+    };
     const react = () => {
+      duck();
       const busy = audioFocus.busy() || videoHold.current;
       if (busy && (statusRef.current === "playing" || statusRef.current === "starting")) {
         silence();
@@ -248,7 +314,7 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
         updateStatus("held");
       } else if (!busy && statusRef.current === "held" && prefsRef.current.choice === "playing") {
         setTimeout(() => {
-          if (statusRef.current === "held" && !audioFocus.busy() && !videoHold.current) void begin(indexRef.current, false);
+          if (statusRef.current === "held" && !audioFocus.busy() && !videoHold.current && !(audioFocus.ducked() && !volumeWorks.current)) void begin(indexRef.current, false);
         }, 800);
       }
     };
@@ -291,7 +357,8 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
 
     const speech = setInterval(() => {
       const speaking = typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
-      if (speaking) audioFocus.claim("spoken-instructions");
+      // Speech that did not come through the shared read-aloud player still lowers the music.
+      if (speaking) audioFocus.claim("spoken-instructions", "voice");
       else audioFocus.release("spoken-instructions");
     }, 1000);
 
@@ -303,6 +370,8 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
       document.removeEventListener("emptied", onStop, true);
       window.removeEventListener("blur", onBlur);
       clearInterval(speech);
+      if (duckTimer) clearTimeout(duckTimer);
+      if (fadeTimer) clearInterval(fadeTimer);
     };
   }, [begin, silence, updateStatus]);
 
@@ -350,7 +419,7 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
   }, [goTo, silence, updatePrefs]);
 
   const applyVolume = useCallback(() => {
-    const volume = effectiveVolume(prefsRef.current);
+    const volume = musicVolume(prefsRef.current);
     if (audioRef.current) audioRef.current.volume = volume;
     synthRef.current?.setVolume(volume);
   }, []);

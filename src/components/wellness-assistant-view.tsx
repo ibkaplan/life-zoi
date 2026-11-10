@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { WellnessLivePanel } from "@/components/wellness-live-panel";
+import { ReadAloud } from "@/components/voice/read-aloud";
 import {
   FEELING_HEADING,
   LIMITED_SET_MESSAGE,
-  NO_ENGLISH_VOICE_MESSAGE,
   PREPARED_ANSWERS_REMAIN,
   RECOGNITION_UNSUPPORTED_MESSAGE,
-  SPEECH_UNSUPPORTED_MESSAGE,
   VOICE_PRIVACY_NOTE,
   WELLNESS_ASSISTANT_EMERGENCY,
   WELLNESS_ASSISTANT_KIND,
@@ -40,28 +39,16 @@ import {
   subscribeRecent,
 } from "@/lib/wellness-assistant/recent";
 import {
-  SLOWER_SPEECH_RATE,
-  USUAL_SPEECH_RATE,
-  englishVoiceServerSnapshot,
-  englishVoiceSnapshot,
-  pauseAndResumeSupported,
-  pauseSupportServerSnapshot,
-  pauseSupportSnapshot,
   recognitionConstructor,
   recognitionFailureMessage,
   recognitionSupportServerSnapshot,
   recognitionSupportSnapshot,
-  speechPlaybackSupported,
-  speechSupportServerSnapshot,
-  speechSupportSnapshot,
   subscribeEnglishVoices,
   transcriptFromResults,
   type RecognitionHandle,
 } from "@/lib/wellness-assistant/speech";
 
 const ALLOWED_IDS = WELLNESS_QUESTIONS.map((item) => item.id);
-
-type SpeechPhase = "idle" | "playing" | "paused";
 
 function openQuestion(id: string, select: (id: string) => void) {
   rememberRecentId(id, ALLOWED_IDS);
@@ -406,114 +393,10 @@ function AnswerPanel({
 }
 
 function ListenControls({ text }: { text: string }) {
-  const voiceId = useId();
-  const [phase, setPhase] = useState<SpeechPhase>("idle");
-  const [slower, setSlower] = useState(false);
-  const [voiceName, setVoiceName] = useState("");
-  const [note, setNote] = useState("");
-  const voices = useSyncExternalStore(subscribeEnglishVoices, englishVoiceSnapshot, englishVoiceServerSnapshot);
-  const canSpeak = useSyncExternalStore(subscribeEnglishVoices, speechSupportSnapshot, speechSupportServerSnapshot);
-  const canPause = useSyncExternalStore(subscribeEnglishVoices, pauseSupportSnapshot, pauseSupportServerSnapshot);
-  const selectedVoice = voices.some((voice) => voice.name === voiceName) ? voiceName : voices[0]?.name ?? "";
-
-  useEffect(() => {
-    return () => {
-      if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
-    };
-  }, []);
-
-  function listen(rate = slower ? SLOWER_SPEECH_RATE : USUAL_SPEECH_RATE) {
-    if (!speechPlaybackSupported()) {
-      setNote(SPEECH_UNSUPPORTED_MESSAGE);
-      return;
-    }
-    const synth = window.speechSynthesis;
-    const available = synth.getVoices().filter((voice) => /^en([-_]|$)/i.test(voice.lang.trim()));
-    if (available.length === 0) {
-      setNote(NO_ENGLISH_VOICE_MESSAGE);
-      setPhase("idle");
-      return;
-    }
-    const chosen = available.find((voice) => voice.name === selectedVoice) ?? available[0];
-    synth.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = chosen;
-    utterance.lang = chosen.lang || "en-US";
-    utterance.rate = rate;
-    utterance.onend = () => setPhase("idle");
-    utterance.onerror = () => setPhase("idle");
-    setNote("");
-    setPhase("playing");
-    synth.speak(utterance);
-  }
-
-  function pause() {
-    if (!pauseAndResumeSupported(window.speechSynthesis)) return;
-    window.speechSynthesis.pause();
-    setPhase("paused");
-  }
-
-  function resume() {
-    if (!pauseAndResumeSupported(window.speechSynthesis)) return;
-    window.speechSynthesis.resume();
-    setPhase("playing");
-  }
-
-  function stop() {
-    window.speechSynthesis.cancel();
-    setPhase("idle");
-  }
-
+  // The shared read-aloud player: best device voice, pause, replay, speed, and voice choice.
   return (
     <div className="wellness-listen">
-      <div className="wellness-speech">
-        <button className="btn assistant-send" type="button" onClick={() => listen()}>
-          LISTEN TO ANSWER
-        </button>
-        {canPause && phase === "playing" ? (
-          <button className="btn btn-secondary" type="button" onClick={pause}>
-            Pause
-          </button>
-        ) : null}
-        {canPause && phase === "paused" ? (
-          <button className="btn btn-secondary" type="button" onClick={resume}>
-            Resume
-          </button>
-        ) : null}
-        {phase !== "idle" ? (
-          <button className="btn btn-secondary" type="button" onClick={stop}>
-            Stop
-          </button>
-        ) : null}
-        <button
-          className="btn btn-secondary"
-          type="button"
-          aria-pressed={slower}
-          onClick={() => {
-            const next = !slower;
-            setSlower(next);
-            if (phase !== "idle") listen(next ? SLOWER_SPEECH_RATE : USUAL_SPEECH_RATE);
-          }}
-        >
-          Slower speech
-        </button>
-      </div>
-      {voices.length > 0 ? (
-        <label className="wellness-voice-picker" htmlFor={voiceId}>
-          English voice
-          <select id={voiceId} value={selectedVoice} onChange={(event) => setVoiceName(event.target.value)}>
-            {voices.map((voice) => (
-              <option key={`${voice.name}-${voice.lang}`} value={voice.name}>
-                {voice.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      ) : null}
-      {canSpeak === false ? <p role="status">{SPEECH_UNSUPPORTED_MESSAGE}</p> : null}
-      {note ? <p role="status">{note}</p> : null}
-      {phase === "playing" ? <p role="status">Playing the answer.</p> : null}
-      {phase === "paused" ? <p role="status">Speech is paused.</p> : null}
+      <ReadAloud text={text} label="LISTEN TO ANSWER" className="wellness-speech-bar" />
     </div>
   );
 }

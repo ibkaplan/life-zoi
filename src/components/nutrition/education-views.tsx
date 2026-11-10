@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useState } from "react";
@@ -543,6 +544,12 @@ export function BreadRecipePage({ slug }: { slug: string }) {
           </tbody>
         </table>
       </details>
+      <ListenToSteps
+        title={recipe.name}
+        list={{ heading: "Ingredients", items: recipe.ingredients.map((item) => `${item.us} ${item.item}`) }}
+        steps={recipe.steps}
+        closing={recipe.serving}
+      />
       <details className={"nz-fold"} open>
         <summary>{labels.steps}</summary>
         <ol>

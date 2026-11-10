@@ -4,6 +4,7 @@ import { BackgroundMusicProvider } from "@/components/background-music/provider"
 import { LocaleProvider } from "@/components/locale-provider";
 import { SkipLink, TitleSync } from "@/components/localized-text";
 import { SessionProvider } from "@/components/session-provider";
+import { VoiceRouteGuard } from "@/components/voice/voice-route-guard";
 import { LOCALE_BOOT_SCRIPT } from "@/lib/i18n/boot-script";
 import "./globals.css";
 
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <LocaleProvider>
           <SkipLink />
           <TitleSync />
+          <VoiceRouteGuard />
           <BackgroundMusicProvider>
             <SessionProvider>{children}</SessionProvider>
           </BackgroundMusicProvider>
