@@ -537,7 +537,8 @@ export function sanitizeCompanion(input: unknown): CompanionState {
     if (id && typeof raw === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(raw)) times[id] = raw;
   }
   const picks: Record<string, string> = {};
-  for (const [key, raw] of Object.entries(asRecord(customize.picks)).slice(0, 30)) {
+  // Keep the newest picks: keys are added in date order, so older days drop first.
+  for (const [key, raw] of Object.entries(asRecord(customize.picks)).slice(-30)) {
     const id = cleanId(key);
     const value = cleanId(raw);
     if (id && value) picks[id] = value;

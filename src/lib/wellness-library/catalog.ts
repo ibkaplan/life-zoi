@@ -1,6 +1,14 @@
 import { studioLessons } from "@/lib/wellness/movement-studio/catalog";
 import { LINK_CHECKED, SAFETY_LINE, ASK_FIRST, FALL_SUPPORT } from "@/lib/wellness/movement-studio/catalog";
 import { CATEGORY_INFO, type Intensity, type LibraryCategory } from "@/lib/wellness-library/moves";
+import {
+  STUDIO_VERIFIED_ON,
+  STUDIO_VIDEO_SEEDS,
+  type StudioAudience,
+  type StudioPosition,
+  type StudioSection,
+  type StudioVideoSeed,
+} from "@/lib/wellness-library/chair-yoga-videos";
 
 /**
  * Wellness Library content catalog.
@@ -63,6 +71,17 @@ export const SOURCES: ContentSource[] = [
     lastChecked: "",
   },
   {
+    id: "youtube-studio",
+    name: "Free YouTube yoga classes (Chair Yoga Studio)",
+    homepage: "https://www.youtube.com/",
+    platform: "YouTube",
+    approval: "approved",
+    cost: "free-unverified",
+    notes:
+      "Public classes from independent teachers. Each card names the channel. Public and embeddable confirmed through YouTube oEmbed; player length, level, and membership status were not checked. Embedded, never re-hosted.",
+    lastChecked: STUDIO_VERIFIED_ON,
+  },
+  {
     id: "yoga-org",
     name: "Yoga.org schedule",
     homepage: "https://schedule.yoga.org/",
@@ -123,6 +142,21 @@ export type VideoItem = {
   cost: CostStatus;
   lastChecked: string;
   approval: Approval;
+  /** Chair Yoga Studio details. Present only for studio videos. */
+  studio?: StudioMeta;
+};
+
+export type StudioMeta = {
+  youtubeId: string;
+  section: StudioSection;
+  position: StudioPosition;
+  /** Minutes written in the video title, or null. Not the player length. */
+  minutes: number | null;
+  audience: StudioAudience;
+  balance: boolean;
+  topics: string[];
+  channelUrl: string;
+  thumbnailUrl: string;
 };
 
 function youtubeId(url: string): string | null {
@@ -206,7 +240,51 @@ const ownerNamed: VideoItem[] = [
   },
 ];
 
-export const VIDEOS: VideoItem[] = [...niaVideos, ...ownerNamed];
+function studioCategory(seed: StudioVideoSeed): LibraryCategory {
+  if (seed.section === "gentle") return seed.topics.includes("desk") ? "stretching" : "yoga";
+  return seed.balance ? "balance" : "chair";
+}
+
+/** Chair Yoga Studio videos. Title and channel come from YouTube oEmbed; see chair-yoga-videos.ts. */
+export const studioVideos: VideoItem[] = STUDIO_VIDEO_SEEDS.map((seed) => ({
+  id: `yt-${seed.youtubeId}`,
+  kind: "video",
+  title: seed.title,
+  description: seed.note,
+  sourceId: "youtube-studio",
+  platform: "YouTube",
+  originalUrl: `https://www.youtube.com/watch?v=${seed.youtubeId}`,
+  embedUrl: `https://www.youtube-nocookie.com/embed/${seed.youtubeId}`,
+  instructor: seed.channel,
+  durationSeconds: null,
+  category: studioCategory(seed),
+  level: seed.level,
+  ageGuidance: seed.audience === "all" ? "all-adults" : "older-adults",
+  intensity: seed.level === "intermediate" ? "moderate" : "light",
+  equipment: seed.position === "mat" ? ["mat"] : seed.topics.includes("desk") && seed.position === "standing" ? ["none"] : ["chair"],
+  mobility: seed.position === "seated" ? "seated-ok" : seed.position === "mat" ? "floor" : "standing",
+  highImpact: false,
+  kneeLoad: seed.position === "mat",
+  // Balance videos get the fall-support line from videoSafety().
+  safety: `${SAFETY_LINE}${!seed.balance && (seed.position === "standing" || seed.position === "mixed") ? ` ${FALL_SUPPORT}` : ""}`,
+  language: "en",
+  cost: "free-unverified",
+  lastChecked: STUDIO_VERIFIED_ON,
+  approval: "approved",
+  studio: {
+    youtubeId: seed.youtubeId,
+    section: seed.section,
+    position: seed.position,
+    minutes: seed.minutes,
+    audience: seed.audience,
+    balance: seed.balance,
+    topics: seed.topics,
+    channelUrl: seed.channelUrl,
+    thumbnailUrl: `https://i.ytimg.com/vi/${seed.youtubeId}/hqdefault.jpg`,
+  },
+}));
+
+export const VIDEOS: VideoItem[] = [...niaVideos, ...ownerNamed, ...studioVideos];
 
 export function sourceById(id: string): ContentSource | null {
   return SOURCES.find((source) => source.id === id) ?? null;

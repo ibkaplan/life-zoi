@@ -1,5 +1,6 @@
 "use client";
 
+import { ChairYogaTodayCard } from "@/components/companion/chair-yoga-studio";
 import Link from "next/link";
 import { useState } from "react";
 import { ActivityCard } from "@/components/companion/activity-card";
@@ -182,6 +183,7 @@ export function CompanionDayView() {
         </button>
       ) : null}
       <MovementBreakDayCard />
+      <ChairYogaTodayCard />
       <DailyLog day={day} today={today} />
       <Customize today={today} />
       <p className="hint">
