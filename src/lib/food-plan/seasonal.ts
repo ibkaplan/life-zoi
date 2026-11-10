@@ -1,3 +1,4 @@
+import { msg } from "@/lib/i18n/translate";
 import type { Season } from "@/lib/food-plan/types";
 
 export type SeasonalFood = {
@@ -564,10 +565,10 @@ export const KITCHEN_RECIPES: KitchenRecipe[] = [
 ];
 
 export const SEASON_LABEL: Record<Season, string> = {
-  spring: "Spring",
-  summer: "Summer",
-  autumn: "Autumn",
-  winter: "Winter",
+  spring: msg("Spring"),
+  summer: msg("Summer"),
+  autumn: msg("Autumn"),
+  winter: msg("Winter"),
 };
 
 export function seasonalById(id: string): SeasonalFood | null {
@@ -615,6 +616,6 @@ export function guessSeason(timeZone: string, monthIndex: number): { season: Sea
     : north;
   return {
     season,
-    label: "Guessed from this browser’s time zone. It can be wrong. Choose the season yourself.",
+    label: msg("Guessed from this browser’s time zone. It can be wrong. Choose the season yourself."),
   };
 }

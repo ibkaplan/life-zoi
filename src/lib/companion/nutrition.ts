@@ -1,4 +1,5 @@
 import { extraAllergens } from "@/lib/food-plan/plan";
+import { msg, type Translate } from "@/lib/i18n/translate";
 import type { Allergen, MealSlot } from "@/lib/food-plan/types";
 import type { HealthProfileFields, WellnessGoal } from "@/lib/health-profile";
 import { allergenLabels, safetyFlags, safetyNotes } from "@/lib/health-profile";
@@ -10,12 +11,12 @@ export const NUTRITION_GOALS = ["lose", "gain", "maintain", "general", "blood-su
 export type NutritionGoal = (typeof NUTRITION_GOALS)[number];
 
 export const nutritionGoalLabels: Record<NutritionGoal, string> = {
-  lose: "Weight loss",
-  gain: "Weight gain",
-  maintain: "Weight maintenance",
-  general: "General healthy eating",
-  "blood-sugar": "Blood sugar management",
-  cholesterol: "Cholesterol management",
+  lose: msg("Weight loss"),
+  gain: msg("Weight gain"),
+  maintain: msg("Weight maintenance"),
+  general: msg("General healthy eating"),
+  "blood-sugar": msg("Blood sugar management"),
+  cholesterol: msg("Cholesterol management"),
 };
 
 export function nutritionGoalFor(primary: WellnessGoal | "", goals: WellnessGoal[]): NutritionGoal {
@@ -110,7 +111,7 @@ export function foodRules(answers: FoodAnswers | null, prefs: FoodPrefs, existin
   if (prefs.eatsDairy === "no" || has(patterns, "dairy-free")) noKinds.add("dairy");
   if (has(patterns, "low-lactose")) {
     noKinds.add("dairy");
-    notes.push("Low-lactose: dairy is left out of suggestions. Lactose-free products may suit you; check the label.");
+    notes.push(msg("Low-lactose: dairy is left out of suggestions. Lactose-free products may suit you; check the label."));
   }
   if (has(requirements, "no-pork") || has(requirements, "halal") || has(requirements, "kosher")) PORK.forEach((word) => excluded.add(word));
   if (has(requirements, "no-beef")) BEEF.forEach((word) => excluded.add(word));
@@ -118,7 +119,7 @@ export function foodRules(answers: FoodAnswers | null, prefs: FoodPrefs, existin
   if (has(requirements, "kosher")) allergens.add("shellfish");
   if (has(requirements, "halal") || has(requirements, "kosher")) {
     notes.push(
-      "Halal and kosher also depend on how food is sourced and prepared. LifeZoi leaves out pork and other excluded foods but cannot certify a meal. Choose certified products.",
+      msg("Halal and kosher also depend on how food is sourced and prepared. LifeZoi leaves out pork and other excluded foods but cannot certify a meal. Choose certified products."),
     );
   }
   return {
@@ -162,15 +163,15 @@ export function ingredientAllowed(item: { name: string; kind: IngredientKind; al
 }
 
 const CROSS_CONTACT: Partial<Record<Allergen, string>> = {
-  wheat: "Oats and grains can be processed with wheat. Choose products labeled gluten-free if needed.",
-  peanut: "Seeds, granola, and dried fruit can carry a may-contain warning for peanuts. Read the label.",
-  "tree-nut": "Seeds, granola, and dried fruit can carry a may-contain warning for tree nuts. Read the label.",
-  sesame: "Breads and hummus often contain or may contain sesame. Read the label.",
-  milk: "Breads, spreads, and plant drinks can contain milk. Read the label.",
-  soy: "Sauces, breads, and stock can contain soy. Read the label.",
-  egg: "Breads and pasta can contain egg. Read the label.",
-  fish: "Some sauces and stocks contain fish. Read the label.",
-  shellfish: "Some stocks and sauces contain shellfish. Read the label.",
+  wheat: msg("Oats and grains can be processed with wheat. Choose products labeled gluten-free if needed."),
+  peanut: msg("Seeds, granola, and dried fruit can carry a may-contain warning for peanuts. Read the label."),
+  "tree-nut": msg("Seeds, granola, and dried fruit can carry a may-contain warning for tree nuts. Read the label."),
+  sesame: msg("Breads and hummus often contain or may contain sesame. Read the label."),
+  milk: msg("Breads, spreads, and plant drinks can contain milk. Read the label."),
+  soy: msg("Sauces, breads, and stock can contain soy. Read the label."),
+  egg: msg("Breads and pasta can contain egg. Read the label."),
+  fish: msg("Some sauces and stocks contain fish. Read the label."),
+  shellfish: msg("Some stocks and sauces contain shellfish. Read the label."),
 };
 
 /** Can this recipe be recommended? Allergies are never handled by a swap. */
@@ -191,7 +192,7 @@ export function checkRecipe(recipe: Recipe, rules: FoodRules): Check {
     .filter((text): text is string => Boolean(text));
   if (rules.allergyWords.length > 0) warnings.push(`Check labels and shared kitchen tools for ${rules.allergyWords.join(", ")}.`);
   if (rules.allergens.length > 0 || rules.allergyWords.length > 0) {
-    warnings.push("This idea leaves out the foods you listed, but LifeZoi cannot confirm any recipe is free of an allergen or cross-contact.");
+    warnings.push(msg("This idea leaves out the foods you listed, but LifeZoi cannot confirm any recipe is free of an allergen or cross-contact."));
   }
   return { ok: true, swaps, warnings: [...new Set(warnings)] };
 }
@@ -306,9 +307,62 @@ export function mealsForDay(
     safety: [
       ...rules.notes,
       ...(flags ? safetyNotes(flags).filter((note) => /blood sugar|allergen|diet/i.test(note)) : []),
-      "These are general ideas, not a medical diet. A registered dietitian can tailor a plan to a health condition.",
+      msg("These are general ideas, not a medical diet. A registered dietitian can tailor a plan to a health condition."),
     ],
   };
+}
+
+const KIND_WORD: Record<IngredientKind, string> = {
+  meat: msg("meat"),
+  fish: msg("fish"),
+  dairy: msg("dairy"),
+  egg: msg("egg"),
+  plant: msg("plant"),
+  honey: msg("honey"),
+};
+
+/** An English food word from a reason, in the chosen language when LifeZoi knows it. A word the person typed stays as typed. */
+function foodWord(word: string, t: Translate): string {
+  const allergen = (Object.keys(allergenLabels) as Allergen[]).find((id) => allergenLabels[id].toLowerCase() === word);
+  if (allergen) return t(allergenLabels[allergen]).toLocaleLowerCase();
+  const kind = (Object.keys(KIND_WORD) as IngredientKind[]).find((id) => id === word);
+  return kind ? t(KIND_WORD[kind]) : word;
+}
+
+/**
+ * Swaps, warnings, and reasons are built in English, because other checks compare them.
+ * These helpers write them in the chosen language for display.
+ */
+export function swapText(recipe: Recipe, text: string, t: Translate): string {
+  for (const item of recipe.ingredients) {
+    if (item.swap && text === `Made without ${item.name.toLowerCase()}: use ${item.swap.name.toLowerCase()} instead.`) {
+      return t("Made without {food}: use {swap} instead.", { food: t(item.name).toLocaleLowerCase(), swap: t(item.swap.name).toLocaleLowerCase() });
+    }
+  }
+  return t(text);
+}
+
+export function warningText(text: string, t: Translate): string {
+  const match = /^Check labels and shared kitchen tools for (.+)\.$/.exec(text);
+  if (match) return t("Check labels and shared kitchen tools for {foods}.", { foods: match[1] });
+  return t(text);
+}
+
+export function reasonText(recipe: Recipe, reason: string, t: Translate): string {
+  const item = [...recipe.ingredients].sort((a, b) => b.name.length - a.name.length).find((part) => reason.startsWith(`${part.name} `));
+  if (!item) return t(reason);
+  const food = t(item.name);
+  const rest = reason.slice(item.name.length + 1);
+  if (rest === "contains gluten") return t("{food} contains gluten", { food });
+  let match = /^contains (.+) and the swap is not suitable$/.exec(rest);
+  if (match) return t("{food} contains {word} and the swap is not suitable", { food, word: foodWord(match[1], t) });
+  match = /^contains (.+) \(allergy\)$/.exec(rest);
+  if (match) return t("{food} contains {word} (allergy)", { food, word: foodWord(match[1], t) });
+  match = /^contains (.+) \(excluded\)$/.exec(rest);
+  if (match) return t("{food} contains {word} (excluded)", { food, word: foodWord(match[1], t) });
+  match = /^contains (.+)$/.exec(rest);
+  if (match) return t("{food} contains {word}", { food, word: foodWord(match[1], t) });
+  return t(reason);
 }
 
 export type ShoppingLine = { name: string; recipes: string[] };

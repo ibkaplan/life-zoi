@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { FoodMark, FoodNumbers } from "@/components/food-plan/frame";
+import { FoodMark, FoodNumbers, useFoodFormat } from "@/components/food-plan/frame";
+import { LOCALE_META } from "@/lib/i18n/config";
+import { msg } from "@/lib/i18n/translate";
+import { SLOT_WORD } from "@/lib/food-plan/plan";
 import { useFoodPlan } from "@/components/food-plan/use-food-plan";
 import { buildTargets } from "@/lib/food-plan/calc";
 import { extraAllergens, mealAllowed, type MealFilter } from "@/lib/food-plan/plan";
@@ -22,6 +25,7 @@ import {
 
 export function SimpleMeals() {
   const { state } = useFoodPlan();
+  const { t } = useFoodFormat();
   const [pattern, setPattern] = useState<DietPattern | "">(state.profile.pattern);
   const [dairyFree, setDairyFree] = useState(state.profile.pattern === "vegan");
   const [budget, setBudget] = useState(false);
@@ -40,29 +44,29 @@ export function SimpleMeals() {
   const meals = SIMPLE_MEALS.filter((meal) => mealAllowed(meal, filter, { time: true, budget: false, minimal: false }));
   return (
     <div className="stack-lg food-simple">
-      <p className="kicker">SIMPLE PROTEIN, SIMPLE MEALS</p>
-      <h1>Simple protein, simple meals</h1>
-      <p className="lede">{SIMPLE_MESSAGE}</p>
+      <p className="kicker">{t("SIMPLE PROTEIN, SIMPLE MEALS")}</p>
+      <h1>{t("Simple protein, simple meals")}</h1>
+      <p className="lede">{t(SIMPLE_MESSAGE)}</p>
       <section className="card food-card stack">
-        <h2>You can eat healthy without spending hours in the kitchen</h2>
-        <p>These meals use foods you can assemble quickly. Numbers are estimates scaled from USDA FoodData Central. Nothing on this page is mandatory.</p>
+        <h2>{t("You can eat healthy without spending hours in the kitchen")}</h2>
+        <p>{t("These meals use foods you can assemble quickly. Numbers are estimates scaled from USDA FoodData Central. Nothing on this page is mandatory.")}</p>
       </section>
       <CheeseNote />
       <div className="food-filters">
-        <label className="field"><span>Pattern</span>
+        <label className="field"><span>{t("Pattern")}</span>
           <select value={pattern} onChange={(event) => setPattern(event.target.value as DietPattern | "")}>
-            <option value="">Any</option>
-            <option value="omnivore">Omnivore</option>
-            <option value="vegetarian">Vegetarian</option>
-            <option value="vegan">Vegan</option>
+            <option value="">{t("Any")}</option>
+            <option value="omnivore">{t("Omnivore")}</option>
+            <option value="vegetarian">{t("Vegetarian")}</option>
+            <option value="vegan">{t("Vegan")}</option>
           </select>
         </label>
-        <label><input type="checkbox" checked={dairyFree} onChange={() => setDairyFree(!dairyFree)} /> Dairy-free</label>
-        <label><input type="checkbox" checked={budget} onChange={() => setBudget(!budget)} /> Budget</label>
-        <label><input type="checkbox" checked={minimal} onChange={() => setMinimal(!minimal)} /> Minimal cooking</label>
-        <label><input type="checkbox" checked={quick} onChange={() => setQuick(!quick)} /> Quick</label>
+        <label><input type="checkbox" checked={dairyFree} onChange={() => setDairyFree(!dairyFree)} /> {t("Dairy-free")}</label>
+        <label><input type="checkbox" checked={budget} onChange={() => setBudget(!budget)} /> {t("Budget")}</label>
+        <label><input type="checkbox" checked={minimal} onChange={() => setMinimal(!minimal)} /> {t("Minimal cooking")}</label>
+        <label><input type="checkbox" checked={quick} onChange={() => setQuick(!quick)} /> {t("Quick")}</label>
       </div>
-      <p className="hint">Allergies from your food profile are applied. A saved avoid list is respected.</p>
+      <p className="hint">{t("Allergies from your food profile are applied. A saved avoid list is respected.")}</p>
       <div className="grid-2">
         {SIMPLE_LIBRARY_IDS.map((id) => {
           const food = usdaById(id);
@@ -73,43 +77,44 @@ export function SimpleMeals() {
           const scaled = scaleFood(food, 1);
           return (
             <article key={id} className="card food-card stack">
-              <FoodMark label={food.name} />
-              <h2>{food.name}</h2>
-              <p>{food.servingLabel}</p>
+              <FoodMark label={t(food.name)} />
+              <h2>{t(food.name)}</h2>
+              <p>{t(food.servingLabel)}</p>
               <FoodNumbers kcal={scaled.kcal} protein={scaled.protein} fiber={scaled.fiber} sat={scaled.sat} />
-              <ul>{food.ways.map((way) => <li key={way}>{way}</li>)}</ul>
+              <ul>{food.ways.map((way) => <li key={way}>{t(way)}</li>)}</ul>
               <p className="hint"><a href={usdaUrl(food.fdcId)}>USDA {food.fdcId}</a></p>
             </article>
           );
         })}
       </div>
-      <h2>Simple meals</h2>
+      <h2>{t("Simple meals")}</h2>
       <div className="stack">
         {meals.map((meal) => {
           const totals = mealTotals(meal);
           return (
             <article key={meal.id} className="card stack">
-              <h3>{meal.slot}: {meal.name}</h3>
-              <p>{meal.summary}</p>
-              <ol>{meal.steps.map((step) => <li key={step}>{step}</li>)}</ol>
+              <h3>{t("{slot}: {meal}", { slot: t(SLOT_WORD[meal.slot]), meal: t(meal.name) })}</h3>
+              <p>{t(meal.summary)}</p>
+              <ol>{meal.steps.map((step) => <li key={step}>{t(step)}</li>)}</ol>
               <FoodNumbers kcal={totals.kcal} protein={totals.protein} fiber={totals.fiber} sat={totals.sat} />
-              <p className="hint">Estimated. {totals.lines.map((line) => `${line.name} (FDC ${line.fdcId})`).join("; ")}.</p>
+              <p className="hint">{t("Estimated.")} {totals.lines.map((line) => `${t(line.name)} (FDC ${line.fdcId})`).join("; ")}.</p>
             </article>
           );
         })}
       </div>
-      <p><Link className="btn btn-primary" href="/food-plan/simple/plate">Build my simple plate</Link></p>
-      <p><Link href="/food-plan/simple/keep">Lose fat. Support your muscles. Keep your meals simple.</Link></p>
+      <p><Link className="btn btn-primary" href="/food-plan/simple/plate">{t("Build my simple plate")}</Link></p>
+      <p><Link href="/food-plan/simple/keep">{t("Lose fat. Support your muscles. Keep your meals simple.")}</Link></p>
     </div>
   );
 }
 
 function CheeseNote() {
+  const { t } = useFoodFormat();
   return (
     <section className="card stack">
-      <h2>Cheese is one option</h2>
-      <p>Hard cheese can be a useful source of protein and calcium. The serving on this page is about one ounce (the 30 g reference amount), or a 17 g slice in the same FoodData Central record. It is not 200 g a day. Many hard cheeses are calorie-dense and high in saturated fat and sodium. Use a moderate portion and vary your protein foods.</p>
-      <p>Other options: eggs, Greek yogurt, cottage cheese, beans, lentils, fish, chicken, and tofu. None of them is mandatory.</p>
+      <h2>{t("Cheese is one option")}</h2>
+      <p>{t("Hard cheese can be a useful source of protein and calcium. The serving on this page is about one ounce (the 30 g reference amount), or a 17 g slice in the same FoodData Central record. It is not 200 g a day. Many hard cheeses are calorie-dense and high in saturated fat and sodium. Use a moderate portion and vary your protein foods.")}</p>
+      <p>{t("Other options: eggs, Greek yogurt, cottage cheese, beans, lentils, fish, chicken, and tofu. None of them is mandatory.")}</p>
       <ul>
         <li><a href={FOOD_LINKS.harvardCheese.url}>{FOOD_LINKS.harvardCheese.name}</a></li>
         <li><a href={FOOD_LINKS.heartProtein.url}>{FOOD_LINKS.heartProtein.name}</a></li>
@@ -121,6 +126,7 @@ function CheeseNote() {
 
 export function SimplePlate() {
   const { state, save } = useFoodPlan();
+  const { t, n } = useFoodFormat();
   const plate = state.plate;
   const flags = {
     pregnancy: state.profile.pregnancy,
@@ -129,7 +135,7 @@ export function SimplePlate() {
     eatingDisorder: state.profile.eatingDisorder,
     complexMedical: state.profile.complexMedical,
   };
-  const targets = buildTargets(state.protein, flags);
+  const targets = buildTargets(state.protein, flags, t);
   const parts = useMemo(() => {
     const rows = [
       plate.proteinId ? { foodId: plate.proteinId, servings: plate.proteinServings } : null,
@@ -144,19 +150,26 @@ export function SimplePlate() {
   }
   return (
     <div className="stack-lg food-simple">
-      <h1>Build my simple plate</h1>
-      <p>Pick one protein, vegetables, a fiber-rich carbohydrate, and a healthy fat. Replace any of them and change the portion. Meals do not need the same amount of protein.</p>
-      {plate.proteinId === "cheddar" ? <p>Hard cheese is one option in a moderate portion. It is not the center of this plate, and 200 g is not the serving.</p> : null}
-      <PlateSelect label="Protein" value={plate.proteinId} ids={PLATE_PROTEIN_IDS} onChange={(value) => choose("proteinId", value)} servings={plate.proteinServings} onServings={(value) => save({ ...state, plate: { ...plate, proteinServings: value } })} />
-      <PlateSelect label="Vegetables" value={plate.vegetableId} ids={PLATE_VEGETABLE_IDS} onChange={(value) => choose("vegetableId", value)} servings={plate.vegetableServings} onServings={(value) => save({ ...state, plate: { ...plate, vegetableServings: value } })} />
-      <PlateSelect label="Fiber-rich carbohydrate" value={plate.carbId} ids={PLATE_CARB_IDS} onChange={(value) => choose("carbId", value)} servings={plate.carbServings} onServings={(value) => save({ ...state, plate: { ...plate, carbServings: value } })} />
-      <PlateSelect label="Healthy fat" value={plate.fatId} ids={PLATE_FAT_IDS} onChange={(value) => choose("fatId", value)} servings={plate.fatServings} onServings={(value) => save({ ...state, plate: { ...plate, fatServings: value } })} />
+      <h1>{t("Build my simple plate")}</h1>
+      <p>{t("Pick one protein, vegetables, a fiber-rich carbohydrate, and a healthy fat. Replace any of them and change the portion. Meals do not need the same amount of protein.")}</p>
+      {plate.proteinId === "cheddar" ? <p>{t("Hard cheese is one option in a moderate portion. It is not the center of this plate, and 200 g is not the serving.")}</p> : null}
+      <PlateSelect label={msg("Protein")} value={plate.proteinId} ids={PLATE_PROTEIN_IDS} onChange={(value) => choose("proteinId", value)} servings={plate.proteinServings} onServings={(value) => save({ ...state, plate: { ...plate, proteinServings: value } })} />
+      <PlateSelect label={msg("Vegetables")} value={plate.vegetableId} ids={PLATE_VEGETABLE_IDS} onChange={(value) => choose("vegetableId", value)} servings={plate.vegetableServings} onServings={(value) => save({ ...state, plate: { ...plate, vegetableServings: value } })} />
+      <PlateSelect label={msg("Fiber-rich carbohydrate")} value={plate.carbId} ids={PLATE_CARB_IDS} onChange={(value) => choose("carbId", value)} servings={plate.carbServings} onServings={(value) => save({ ...state, plate: { ...plate, carbServings: value } })} />
+      <PlateSelect label={msg("Healthy fat")} value={plate.fatId} ids={PLATE_FAT_IDS} onChange={(value) => choose("fatId", value)} servings={plate.fatServings} onServings={(value) => save({ ...state, plate: { ...plate, fatServings: value } })} />
       <FoodNumbers kcal={parts.kcal} protein={parts.protein} fiber={parts.fiber} sat={parts.sat} />
-      <p className="hint">Estimated from the selected USDA records only. {parts.fiberGap.length ? `Fiber was not reported for ${parts.fiberGap.join(", ")}.` : ""}</p>
+      <p className="hint">{t("Estimated from the selected USDA records only.")} {parts.fiberGap.length ? t("Fiber was not reported for {foods}.", { foods: parts.fiberGap.map((name) => t(name)).join(", ") }) : ""}</p>
       {targets.ok ? (
-        <p>Chosen daily protein target: {targets.proteinGrams.toFixed(1)} g. Calorie estimate: {targets.calorieTarget ?? "not set"} kcal. This plate is one combination toward that day, not a rule that every meal match it.</p>
+        <p>
+          {t("Chosen daily protein target: {grams} g. Calorie estimate: {kcal} kcal. This plate is one combination toward that day, not a rule that every meal match it.", {
+            grams: n(targets.proteinGrams),
+            kcal: targets.calorieTarget ?? t("not set"),
+          })}
+        </p>
       ) : (
-        <p>{targets.reason} Food totals above are still estimates for the foods you picked. No personal target is set.</p>
+        <p>
+          {targets.reason} {t("Food totals above are still estimates for the foods you picked. No personal target is set.")}
+        </p>
       )}
     </div>
   );
@@ -177,19 +190,20 @@ function PlateSelect({
   servings: number;
   onServings: (value: number) => void;
 }) {
+  const { t, locale } = useFoodFormat();
   return (
     <div className="food-filters">
       <label className="field">
-        <span>{label}</span>
+        <span>{t(label)}</span>
         <select value={value} onChange={(event) => onChange(event.target.value)}>
-          <option value="">Choose</option>
-          {ids.map((id) => <option key={id} value={id}>{usdaById(id)?.name}</option>)}
+          <option value="">{t("Choose")}</option>
+          {ids.map((id) => <option key={id} value={id}>{t(usdaById(id)?.name ?? "")}</option>)}
         </select>
       </label>
       <label className="field">
-        <span>Portions of the listed serving</span>
+        <span>{t("Portions of the listed serving")}</span>
         <select value={servings} onChange={(event) => onServings(Number(event.target.value))}>
-          {[0.5, 1, 1.5, 2].map((item) => <option key={item} value={item}>{item}</option>)}
+          {[0.5, 1, 1.5, 2].map((item) => <option key={item} value={item}>{item.toLocaleString(LOCALE_META[locale].htmlLang)}</option>)}
         </select>
       </label>
     </div>
@@ -197,19 +211,20 @@ function PlateSelect({
 }
 
 export function SimpleKeep() {
+  const { t } = useFoodFormat();
   return (
     <article className="stack-lg food-simple">
-      <p className="kicker">LOSE FAT. SUPPORT YOUR MUSCLES. KEEP YOUR MEALS SIMPLE.</p>
-      <h1>Lose fat. Support your muscles. Keep your meals simple.</h1>
+      <p className="kicker">{t("LOSE FAT. SUPPORT YOUR MUSCLES. KEEP YOUR MEALS SIMPLE.")}</p>
+      <h1>{t("Lose fat. Support your muscles. Keep your meals simple.")}</h1>
       <ul>
-        <li>A moderate calorie deficit is the only reduction LifeZoi will estimate, and it will not go into a very-low-calorie diet.</li>
-        <li>Protein can support muscle. It does not, by itself, cause weight loss or build muscle.</li>
-        <li>Resistance exercise is what trains muscle.</li>
-        <li>Vegetables and fiber can make meals more filling.</li>
-        <li>Sleep and consistency matter.</li>
+        <li>{t("A moderate calorie deficit is the only reduction LifeZoi will estimate, and it will not go into a very-low-calorie diet.")}</li>
+        <li>{t("Protein can support muscle. It does not, by itself, cause weight loss or build muscle.")}</li>
+        <li>{t("Resistance exercise is what trains muscle.")}</li>
+        <li>{t("Vegetables and fiber can make meals more filling.")}</li>
+        <li>{t("Sleep and consistency matter.")}</li>
       </ul>
-      <p>No result is guaranteed. No supplements are suggested. If you are pregnant or have kidney disease, liver disease, or a complex medical diet, do not use this page to raise protein. Talk with a qualified professional.</p>
-      <p><Link href="/food-plan/simple">Back to simple meals</Link></p>
+      <p>{t("No result is guaranteed. No supplements are suggested. If you are pregnant or have kidney disease, liver disease, or a complex medical diet, do not use this page to raise protein. Talk with a qualified professional.")}</p>
+      <p><Link href="/food-plan/simple">{t("Back to simple meals")}</Link></p>
     </article>
   );
 }

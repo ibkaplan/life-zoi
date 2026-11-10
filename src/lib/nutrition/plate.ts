@@ -1,5 +1,8 @@
 import { isRealISODate } from "@/lib/dates";
 import { disclaimer } from "@/lib/nutrition/education";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
 
 export const plateSafety = disclaimer;
 
@@ -525,19 +528,23 @@ export function lessSodium(left: { id: string; sodiumMg: number }, right: { id: 
   return "tie";
 }
 
-export function sodiumAnswer(left: TeachingLabel, right: TeachingLabel) {
+/** `t` writes the sentence in the chosen language; English is the default. */
+export function sodiumAnswer(left: TeachingLabel, right: TeachingLabel, t: Translate = english) {
   const winnerId = lessSodium(left, right);
   if (winnerId === "tie") {
     return {
       winnerId,
-      sentence: "These illustrative labels list the same sodium per labeled serving.",
+      sentence: t("These illustrative labels list the same sodium per labeled serving."),
     };
   }
   const winner = winnerId === left.id ? left : right;
   const other = winnerId === left.id ? right : left;
   return {
     winnerId,
-    sentence: `${winner.product} lists ${winner.sodiumMg} mg sodium per labeled serving. ${other.product} lists ${other.sodiumMg} mg. These illustrative samples use the same serving size, so the lower line is the smaller amount of sodium on that serving.`,
+    sentence: t(
+      "{winner} lists {winnerMg} mg sodium per labeled serving. {other} lists {otherMg} mg. These illustrative samples use the same serving size, so the lower line is the smaller amount of sodium on that serving.",
+      { winner: t(winner.product), winnerMg: winner.sodiumMg, other: t(other.product), otherMg: other.sodiumMg },
+    ),
   };
 }
 
@@ -597,50 +604,53 @@ export function parseAmount(raw: string) {
   return value;
 }
 
-function sideName(side: GrocerySide, fallback: string) {
-  return side.product.trim() || fallback;
+function sideName(side: GrocerySide, fallback: string, t: Translate) {
+  // A sample's name is translated; a name the person typed is shown as typed.
+  const name = side.product.trim();
+  return name ? (side.illustrative ? t(name) : name) : fallback;
 }
 
-export function groceryNotes(left: GrocerySide, right: GrocerySide) {
+/** `t` writes the notes in the chosen language; English is the default. */
+export function groceryNotes(left: GrocerySide, right: GrocerySide, t: Translate = english) {
   const notes: string[] = [];
-  const leftName = sideName(left, "The first label");
-  const rightName = sideName(right, "The second label");
+  const leftName = sideName(left, t("The first label"), t);
+  const rightName = sideName(right, t("The second label"), t);
   if (left.illustrative || right.illustrative) {
-    notes.push("Illustrative samples use made-up teaching numbers. They are not store products.");
+    notes.push(t("Illustrative samples use made-up teaching numbers. They are not store products."));
   }
   if (!left.illustrative || !right.illustrative) {
-    notes.push("A label you typed is shown as you entered it. lifeZoi did not look it up.");
+    notes.push(t("A label you typed is shown as you entered it. lifeZoi did not look it up."));
   }
   if (left.serving.trim() && right.serving.trim() && left.serving.trim() !== right.serving.trim()) {
-    notes.push("The serving sizes are not the same, so the lines are not the same amount of food.");
+    notes.push(t("The serving sizes are not the same, so the lines are not the same amount of food."));
   }
   if (left.sodiumMg !== null && right.sodiumMg !== null) {
-    if (left.sodiumMg < right.sodiumMg) notes.push(`${leftName} lists less sodium per labeled serving.`);
-    else if (right.sodiumMg < left.sodiumMg) notes.push(`${rightName} lists less sodium per labeled serving.`);
-    else notes.push("These labels list the same sodium per labeled serving.");
+    if (left.sodiumMg < right.sodiumMg) notes.push(t("{name} lists less sodium per labeled serving.", { name: leftName }));
+    else if (right.sodiumMg < left.sodiumMg) notes.push(t("{name} lists less sodium per labeled serving.", { name: rightName }));
+    else notes.push(t("These labels list the same sodium per labeled serving."));
   } else {
-    notes.push("Sodium is missing on a label, so this page will not guess it.");
+    notes.push(t("Sodium is missing on a label, so this page will not guess it."));
   }
   if (left.addedSugarsG !== null && right.addedSugarsG !== null) {
-    if (left.addedSugarsG < right.addedSugarsG) notes.push(`${leftName} lists less added sugar per labeled serving.`);
-    else if (right.addedSugarsG < left.addedSugarsG) notes.push(`${rightName} lists less added sugar per labeled serving.`);
-    else notes.push("These labels list the same added sugar per labeled serving.");
+    if (left.addedSugarsG < right.addedSugarsG) notes.push(t("{name} lists less added sugar per labeled serving.", { name: leftName }));
+    else if (right.addedSugarsG < left.addedSugarsG) notes.push(t("{name} lists less added sugar per labeled serving.", { name: rightName }));
+    else notes.push(t("These labels list the same added sugar per labeled serving."));
   }
   if (left.fiberG !== null && right.fiberG !== null && left.fiberG !== right.fiberG) {
     const higher = left.fiberG > right.fiberG ? leftName : rightName;
-    notes.push(`${higher} lists more fiber per labeled serving.`);
+    notes.push(t("{name} lists more fiber per labeled serving.", { name: higher }));
   }
   if (left.proteinG !== null && right.proteinG !== null && left.proteinG !== right.proteinG) {
     const higher = left.proteinG > right.proteinG ? leftName : rightName;
-    notes.push(`${higher} lists more protein per labeled serving.`);
+    notes.push(t("{name} lists more protein per labeled serving.", { name: higher }));
   }
-  notes.push("Calories are shown so you can read them. This page does not set a calorie target.");
+  notes.push(t("Calories are shown so you can read them. This page does not set a calorie target."));
   return notes;
 }
 
-export function amountText(value: number | null, unit: string) {
-  if (value === null) return "Not entered";
-  return `${value} ${unit}`;
+export function amountText(value: number | null, unit: string, t: Translate = english) {
+  if (value === null) return t("Not entered");
+  return `${value} ${t(unit)}`;
 }
 
 function walk(value: unknown, out: string[]) {
