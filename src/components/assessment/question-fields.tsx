@@ -108,12 +108,14 @@ type Option<T extends string> = { value: T; label: string };
 function OptionCard({
   type,
   name,
+  value,
   checked,
   label,
   onChange,
 }: {
   type: "radio" | "checkbox";
   name: string;
+  value: string;
   checked: boolean;
   label: string;
   onChange: (checked: boolean) => void;
@@ -125,6 +127,7 @@ function OptionCard({
         className="qz-option-input"
         type={type}
         name={name}
+        value={value}
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />
@@ -198,6 +201,7 @@ export function ChoiceQuestion<T extends string>({
           key={option.value}
           type="radio"
           name={name}
+          value={option.value}
           label={option.label}
           checked={value === option.value}
           onChange={() => onChange(option.value)}
@@ -233,6 +237,7 @@ export function CheckQuestion<T extends string>({
           key={option.value}
           type="checkbox"
           name={id}
+          value={option.value}
           label={option.label}
           checked={values.includes(option.value)}
           onChange={(on) =>

@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import uk from "./catalog/uk.json";
-import ru from "./catalog/ru.json";
-import el from "./catalog/el.json";
+import uk from "./catalog/uk";
+import ru from "./catalog/ru";
+import el from "./catalog/el";
 import { CATALOG_TEXT } from "./catalog-sources";
 
 const CATALOGS: Record<string, Record<string, string>> = { uk, ru, el };
@@ -17,13 +17,27 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
-/** Every English text passed to `t("…")` or marked with `msg("…")` in the app's source. */
+/**
+ * Every English text in the app's source that is passed to `t("…")`, marked with
+ * `msg("…")`, or placed with `<T text="…" />`.
+ */
 function sourceText(): Map<string, string> {
   const found = new Map<string, string>();
-  const pattern = /(?<![\w.])(?:t|msg)\(\s*("(?:[^"\\\n]|\\.)*")/g;
+  const patterns = [/(?<![\w.])(?:t|msg)\(\s*("(?:[^"\\\n]|\\.)*")/g, /<T\s+text=("(?:[^"\\\n]|\\.)*")/g];
   for (const file of sourceFiles(SRC)) {
     const code = readFileSync(file, "utf8");
-    for (const match of code.matchAll(pattern)) found.set(JSON.parse(match[1]) as string, file.slice(SRC.length + 1));
+    for (const pattern of patterns)
+      for (const match of code.matchAll(pattern)) found.set(JSON.parse(match[1]) as string, file.slice(SRC.length + 1));
+  }
+  // Tab titles from page metadata. TitleSync translates them in the browser.
+  for (const file of sourceFiles(join(SRC, "app"))) {
+    const code = readFileSync(file, "utf8");
+    if (!code.includes("metadata")) continue;
+    for (const match of code.matchAll(/\btitle:\s*("(?:[^"\\\n]|\\.)*")/g)) {
+      const title = JSON.parse(match[1]) as string;
+      if (title.includes("%s")) continue;
+      for (const part of title.split(" · ")) if (part !== "lifeZoi") found.set(part, file.slice(SRC.length + 1));
+    }
   }
   return found;
 }

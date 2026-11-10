@@ -1,3 +1,4 @@
+import { msg } from "@/lib/i18n/translate";
 import { SESSION_ADAPTER, type SessionAdapterKind } from "@/lib/session-adapter";
 import { isPublicSupabaseConfig } from "@/lib/supabase-config";
 
@@ -25,8 +26,8 @@ export function getAppStatus(
       authentication: "not-configured",
       supabaseVariablesPresent,
       detail: supabaseVariablesPresent
-        ? "Supabase variables are present, but this environment is not using the account adapter. Answers stay in this browser tab. Requests are not saved on the server."
-        : "Supabase URL and anon key are not set. There is no account sign-in and no database storage. Answers stay in this browser tab. Requests are not saved on the server.",
+        ? msg("Supabase variables are present, but this environment is not using the account adapter. Answers stay in this browser tab. Requests are not saved on the server.")
+        : msg("Supabase URL and anon key are not set. There is no account sign-in and no database storage. Answers stay in this browser tab. Requests are not saved on the server."),
     };
   }
   return {
@@ -34,7 +35,8 @@ export function getAppStatus(
     persistence: "account",
     authentication: "supabase",
     supabaseVariablesPresent: true,
-    detail:
+    detail: msg(
       "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). Without an account, answers stay in this browser tab. Sample data is not saved to an account.",
+    ),
   };
 }

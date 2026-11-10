@@ -7,7 +7,7 @@ import { Art, type ArtName } from "@/components/companion/art";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
 import { StorageNote } from "@/components/storage-note";
-import { useMessages } from "@/components/locale-provider";
+import { useMessages, useT } from "@/components/locale-provider";
 import { sources } from "@/lib/sources";
 
 const cards = [
@@ -73,6 +73,7 @@ const footerLinks = [
 /** The homepage. A client component so the text follows the language picked in the header. */
 export function HomeView() {
   const m = useMessages();
+  const t = useT();
   const h = m.home;
   const footerLabel = (href: (typeof footerLinks)[number]) =>
     href === "/plan" ? h.improvementPlan : href === "/food-plan" ? h.foodWellness : (m.nav as Record<string, string>)[href];
@@ -193,33 +194,33 @@ export function HomeView() {
               <li>{h.creditMeadow}</li>
               <li>
                 {h.creditWalking}{" "}
-                <a href="https://commons.wikimedia.org/wiki/File:Woman_power_walking.jpg">Woman power walking</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Woman_power_walking.jpg">{t("Woman power walking")}</a>
               </li>
               <li>
                 {h.creditHomeCc0}{" "}
-                <a href="https://commons.wikimedia.org/wiki/File:Old_man_reading_newspaper_with_tea_(Unsplash).jpg">cafe window</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Old_man_reading_newspaper_with_tea_(Unsplash).jpg">{t("cafe window")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Sunrise_hiking_views_(Unsplash).jpg">sunrise ridge</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Sunrise_hiking_views_(Unsplash).jpg">{t("sunrise ridge")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Fruits_and_Vegetables_(Unsplash).jpg">fruit and herbs</a>.
+                <a href="https://commons.wikimedia.org/wiki/File:Fruits_and_Vegetables_(Unsplash).jpg">{t("fruit and herbs")}</a>.
               </li>
               <li>
                 {h.creditSectionCc0}{" "}
-                <a href="https://commons.wikimedia.org/wiki/File:Colorful_Wildflowers_(Unsplash).jpg">wildflowers</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Colorful_Wildflowers_(Unsplash).jpg">{t("wildflowers")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Mountains_by_the_lake_(Unsplash).jpg">lake and mountains</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Mountains_by_the_lake_(Unsplash).jpg">{t("lake and mountains")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Walking_up_an_outdoor_path_(Unsplash).jpg">split lane</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Walking_up_an_outdoor_path_(Unsplash).jpg">{t("split lane")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Vegetable_Salad_(Unsplash).jpg">vegetable bowl</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Vegetable_Salad_(Unsplash).jpg">{t("vegetable bowl")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Woman_walking_down_path_(Unsplash).jpg">park path</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Woman_walking_down_path_(Unsplash).jpg">{t("park path")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Elevating_view_of_forest_trees_(Unsplash).jpg">forest trees</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Elevating_view_of_forest_trees_(Unsplash).jpg">{t("forest trees")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Stepping_stone_staircase_(Unsplash).jpg">stone steps</a>
+                <a href="https://commons.wikimedia.org/wiki/File:Stepping_stone_staircase_(Unsplash).jpg">{t("stone steps")}</a>
                 {", "}
-                <a href="https://commons.wikimedia.org/wiki/File:Open_book_(Unsplash).jpg">open book</a>.
+                <a href="https://commons.wikimedia.org/wiki/File:Open_book_(Unsplash).jpg">{t("open book")}</a>.
               </li>
             </ul>
           </details>
