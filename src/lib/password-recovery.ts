@@ -3,16 +3,18 @@
  * The Supabase calls live in `account-store.ts`. These functions do not touch the network.
  */
 
+import { msg } from "@/lib/i18n/translate";
+
 export const RESET_PATH = "/reset-password";
 
 /** Shown whether or not the address has an account, so the form cannot be used to look people up. */
 export const RESET_REQUEST_SENT =
-  "If an account uses that email, a reset link is on its way. Open it in this same browser. The link works once and expires.";
+  msg("If an account uses that email, a reset link is on its way. Open it in this same browser. The link works once and expires.");
 
 export const CONFIRMATION_RESENT =
-  "If that email is waiting for confirmation, a new confirmation message is on its way.";
+  msg("If that email is waiting for confirmation, a new confirmation message is on its way.");
 
-export const PASSWORD_UPDATED = "Your password was changed. Use the new password the next time you sign in.";
+export const PASSWORD_UPDATED = msg("Your password was changed. Use the new password the next time you sign in.");
 
 export function isEmailAddress(email: string): boolean {
   const normalized = email.trim();
@@ -31,9 +33,9 @@ export function resetRedirectUrl(origin: string): string | null {
 }
 
 export function validateNewPassword(password: string, confirm: string): string | null {
-  if (password.length < 8) return "Use at least 8 characters for the password.";
-  if (password.length > 72) return "Use 72 characters or fewer for the password.";
-  if (password !== confirm) return "The two passwords do not match.";
+  if (password.length < 8) return msg("Use at least 8 characters for the password.");
+  if (password.length > 72) return msg("Use 72 characters or fewer for the password.");
+  if (password !== confirm) return msg("The two passwords do not match.");
   return null;
 }
 
@@ -44,24 +46,24 @@ export function passwordChangeMessage(error: AuthErrorLike): string {
   const code = error?.code ?? "";
   const message = error?.message ?? "";
   if (code === "same_password" || /different from the old/i.test(message)) {
-    return "Choose a password that is different from the current one.";
+    return msg("Choose a password that is different from the current one.");
   }
   if (code === "weak_password" || /weak|pwned|leaked/i.test(message)) {
-    return "That password is too easy to guess or has appeared in a data leak. Choose a longer or less common one.";
+    return msg("That password is too easy to guess or has appeared in a data leak. Choose a longer or less common one.");
   }
   if (code === "reauthentication_needed" || /reauthenticat/i.test(message)) {
-    return "For safety, sign out, sign in again, and change the password right after. Or use Forgot password.";
+    return msg("For safety, sign out, sign in again, and change the password right after. Or use Forgot password.");
   }
   if (code === "insufficient_aal" || /aal2/i.test(message)) {
-    return "Enter the code from your authenticator app first, then set the new password.";
+    return msg("Enter the code from your authenticator app first, then set the new password.");
   }
   if (code === "session_not_found" || code === "session_expired" || error?.status === 401) {
-    return "This reset session has ended. Request a new reset link.";
+    return msg("This reset session has ended. Request a new reset link.");
   }
   if (code === "over_request_rate_limit" || error?.status === 429) {
-    return "Too many attempts. Wait a few minutes and try again.";
+    return msg("Too many attempts. Wait a few minutes and try again.");
   }
-  return "The password could not be changed. Try again.";
+  return msg("The password could not be changed. Try again.");
 }
 
 /** Plain wording for errors from `resetPasswordForEmail` and `resend`. Never reveals whether an account exists. */
@@ -69,10 +71,10 @@ export function emailRequestMessage(error: AuthErrorLike): string | null {
   if (!error) return null;
   const code = error.code ?? "";
   if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit" || error.status === 429) {
-    return "Too many emails were requested. Wait a while and try again.";
+    return msg("Too many emails were requested. Wait a while and try again.");
   }
   if (code === "email_address_invalid" || code === "validation_failed") {
-    return "Enter a valid email address.";
+    return msg("Enter a valid email address.");
   }
   // Other failures, including "user not found", get the same neutral answer as success.
   return null;
@@ -88,8 +90,8 @@ export function recoveryLinkProblem(search: string, hash: string): string | null
   const code = params.get("error_code") ?? fragment.get("error_code") ?? "";
   const error = params.get("error") ?? fragment.get("error") ?? "";
   if (!code && !error) return null;
-  if (code === "otp_expired") return "This reset link has expired or was already used. Request a new one below.";
-  return "This reset link could not be used. Request a new one below.";
+  if (code === "otp_expired") return msg("This reset link has expired or was already used. Request a new one below.");
+  return msg("This reset link could not be used. Request a new one below.");
 }
 
 /** True when the URL carries a PKCE code or an implicit-flow recovery token. */

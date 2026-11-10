@@ -3,15 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAccount } from "@/lib/account-store";
-import { PRIVACY_NOTICE, REJECTION_NOTICE, sourceLabel } from "@/lib/community/notices";
+import { localizeCommunityText, PRIVACY_NOTICE, REJECTION_NOTICE, sourceLabel } from "@/lib/community/notices";
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import type { CommunityBoard, OwnMessage, PublicMessage, QueueMessage, ReportReason } from "@/lib/community/types";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 
 const REASONS: { value: ReportReason; label: string }[] = [
-  { value: "harassment", label: "Harassment" },
-  { value: "hate", label: "Hate" },
-  { value: "spam", label: "Spam" },
-  { value: "other", label: "Other" },
+  { value: "harassment", label: msg("Harassment") },
+  { value: "hate", label: msg("Hate") },
+  { value: "spam", label: msg("Spam") },
+  { value: "other", label: msg("Other") },
 ];
 
 function formatTime(iso: string) {
@@ -32,6 +34,8 @@ async function authHeader(): Promise<Record<string, string>> {
 
 export function CommunityView() {
   const account = useAccount();
+  const t = useT();
+  const say = (text: string) => localizeCommunityText(text, t, formatTime);
   const [board, setBoard] = useState<CommunityBoard | null>(null);
   const [name, setName] = useState("");
   const [body, setBody] = useState("");
@@ -44,7 +48,7 @@ export function CommunityView() {
     const headers = await authHeader();
     const response = await fetch("/api/community", { headers, cache: "no-store" });
     if (!response.ok) {
-      setError("The community could not be loaded.");
+      setError(msg("The community could not be loaded."));
       return;
     }
     setBoard((await response.json()) as CommunityBoard);
@@ -60,7 +64,7 @@ export function CommunityView() {
       })
       .catch((loadError: unknown) => {
         if (loadError instanceof DOMException && loadError.name === "AbortError") return;
-        setError("The community could not be loaded.");
+        setError(msg("The community could not be loaded."));
       });
     return () => controller.abort();
   }, [account.phase]);
@@ -68,7 +72,7 @@ export function CommunityView() {
   async function post(payload: Record<string, unknown>) {
     const headers = await authHeader();
     if (!headers.Authorization) {
-      setError("Sign in from Settings before posting. Your message was not sent.");
+      setError(msg("Sign in from Settings before posting. Your message was not sent."));
       setNotice("");
       return;
     }
@@ -83,14 +87,14 @@ export function CommunityView() {
       });
       const result = (await response.json()) as { error?: string; notice?: string; status?: string };
       if (!response.ok) {
-        setError(result.error ?? "The message was not published.");
+        setError(result.error ?? msg("The message was not published."));
         return;
       }
       if (result.notice) setNotice(result.notice);
       if (payload.action === "submit" && result.status !== "rejected") setBody("");
       await load();
     } catch {
-      setError("The message was not published. Try again when you are ready.");
+      setError(msg("The message was not published. Try again when you are ready."));
     } finally {
       setSending(false);
     }
@@ -102,42 +106,48 @@ export function CommunityView() {
   return (
     <div className="stack-lg narrow">
       <div>
-        <p className="kicker">Community</p>
-        <h1>A quiet place to talk</h1>
-        <p className="lede">Share a habit thought under a chosen name. Every post and comment is checked before it is public.</p>
+        <p className="kicker">{t("Community")}</p>
+        <h1>{t("A quiet place to talk")}</h1>
+        <p className="lede">{t("Share a habit thought under a chosen name. Every post and comment is checked before it is public.")}</p>
       </div>
 
       <section className="card stack" aria-labelledby="community-privacy">
-        <h2 id="community-privacy">Privacy</h2>
-        <p>{PRIVACY_NOTICE}</p>
-        <p>{board?.retentionSummary ?? "Rejected messages, messages you remove, and closed reports are kept for 30 days, then deleted."}</p>
+        <h2 id="community-privacy">{t("Privacy")}</h2>
+        <p>{t(PRIVACY_NOTICE)}</p>
+        <p>
+          {say(
+            board?.retentionSummary ??
+              msg("Rejected messages, messages you remove, and closed reports are kept for 30 days, then deleted."),
+          )}
+        </p>
         {board?.moderation === "not-configured" ? (
-          <p>Automatic checking is not configured on this server. A message stays in review until a person approves it. Nothing is published without that check.</p>
+          <p>{t("Automatic checking is not configured on this server. A message stays in review until a person approves it. Nothing is published without that check.")}</p>
         ) : (
-          <p>Messages are checked before they are public. A finished check can publish a respectful note. If a check cannot finish, the message waits for a person.</p>
+          <p>{t("Messages are checked before they are public. A finished check can publish a respectful note. If a check cannot finish, the message waits for a person.")}</p>
         )}
         {board?.storage === "memory" ? (
-          <p>Shared community storage is not configured, so this server holds messages in memory. They can disappear when the server restarts. They are still checked before anyone else can see them.</p>
+          <p>{t("Shared community storage is not configured, so this server holds messages in memory. They can disappear when the server restarts. They are still checked before anyone else can see them.")}</p>
         ) : null}
       </section>
 
       <section className="card stack">
-        <h2>Community guidelines</h2>
+        <h2>{t("Community guidelines")}</h2>
         <ul>
-          <li>Be respectful. Insults, threats, hate, and spam are not published.</li>
-          <li>Do not post identifying information.</li>
-          <li>Do not post health records or questionnaire answers.</li>
-          <li>Other members see your chosen name only.</li>
+          <li>{t("Be respectful. Insults, threats, hate, and spam are not published.")}</li>
+          <li>{t("Do not post identifying information.")}</li>
+          <li>{t("Do not post health records or questionnaire answers.")}</li>
+          <li>{t("Other members see your chosen name only.")}</li>
         </ul>
-        <p>If a message is not published, you will see: {REJECTION_NOTICE}</p>
-        <p>If a check is still running, times out, or cannot be reached, you will see that the message is awaiting moderation. It is not public yet.</p>
+        <p>{t("If a message is not published, you will see: {notice}", { notice: t(REJECTION_NOTICE) })}</p>
+        <p>{t("If a check is still running, times out, or cannot be reached, you will see that the message is awaiting moderation. It is not public yet.")}</p>
       </section>
 
       <section className="card stack">
-        <h2>Share a note</h2>
+        <h2>{t("Share a note")}</h2>
         {account.phase === "ready" ? null : (
           <p>
-            Sign in from <Link href="/settings">Settings</Link> before posting. Without a sign-in, the message is not sent.
+            {t("Sign in from")} <Link href="/settings">{t("Settings")}</Link>{" "}
+            {t("before posting. Without a sign-in, the message is not sent.")}
           </p>
         )}
         <form
@@ -149,25 +159,25 @@ export function CommunityView() {
           }}
         >
           <label className="field">
-            <span>Chosen community name</span>
+            <span>{t("Chosen community name")}</span>
             <input value={name} onChange={(event) => setName(event.target.value)} maxLength={24} autoComplete="off" />
           </label>
           <label className="field">
-            <span>Message</span>
+            <span>{t("Message")}</span>
             <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={1000} />
           </label>
           <button className="btn btn-primary" type="submit" disabled={sending}>
-            {sending ? "Checking…" : "Share"}
+            {sending ? t("Checking…") : t("Share")}
           </button>
         </form>
         {notice ? (
           <p className="alert alert-ok" role="status">
-            {notice}
+            {say(notice)}
           </p>
         ) : null}
         {error ? (
           <p className="alert alert-error" role="alert">
-            {error}
+            {say(error)}
           </p>
         ) : null}
       </section>
@@ -180,8 +190,8 @@ export function CommunityView() {
       />
 
       <section className="stack">
-        <h2>Messages</h2>
-        {posts.length === 0 ? <p className="card empty">No public messages yet.</p> : null}
+        <h2>{t("Messages")}</h2>
+        {posts.length === 0 ? <p className="card empty">{t("No public messages yet.")}</p> : null}
         {posts.map((postMessage) => (
           <article key={postMessage.id} className="card stack community-message">
             <MessageBody message={postMessage} />
@@ -222,11 +232,11 @@ export function CommunityView() {
               }}
             >
               <label className="field">
-                <span>Comment under your chosen name</span>
+                <span>{t("Comment under your chosen name")}</span>
                 <textarea name="comment" maxLength={1000} />
               </label>
               <button className="btn btn-secondary" type="submit" disabled={sending}>
-                Comment
+                {t("Comment")}
               </button>
             </form>
           </article>
@@ -235,23 +245,27 @@ export function CommunityView() {
 
       {board?.isAdmin && board.queue ? (
         <section className="stack" aria-labelledby="community-queue">
-          <h2 id="community-queue">Review queue</h2>
-          <QueueGroup title="Awaiting review" items={board.queue.pending} sending={sending} onApprove={(id) => void post({ action: "admin-approve", messageId: id })} onReject={(id) => void post({ action: "admin-reject", messageId: id })} />
-          <QueueGroup title="Not published" items={board.queue.rejected} sending={sending} onApprove={(id) => void post({ action: "admin-approve", messageId: id })} onReject={(id) => void post({ action: "admin-reject", messageId: id })} />
+          <h2 id="community-queue">{t("Review queue")}</h2>
+          <QueueGroup title={t("Awaiting review")} items={board.queue.pending} sending={sending} onApprove={(id) => void post({ action: "admin-approve", messageId: id })} onReject={(id) => void post({ action: "admin-reject", messageId: id })} />
+          <QueueGroup title={t("Not published")} items={board.queue.rejected} sending={sending} onApprove={(id) => void post({ action: "admin-approve", messageId: id })} onReject={(id) => void post({ action: "admin-reject", messageId: id })} />
           <div className="stack">
-            <h3>Reports</h3>
-            {board.queue.reports.length === 0 ? <p className="card empty">No open reports.</p> : null}
+            <h3>{t("Reports")}</h3>
+            {board.queue.reports.length === 0 ? <p className="card empty">{t("No open reports.")}</p> : null}
             {board.queue.reports.map((report) => (
               <article key={report.id} className="card stack">
                 <p>
-                  <strong>{report.authorName}</strong> · {report.reason} · <time dateTime={report.createdAt}>{formatTime(report.createdAt)}</time>
+                  <strong>{report.authorName}</strong> ·{" "}
+                  {t(REASONS.find((item) => item.value === report.reason)?.label ?? report.reason)} · <time dateTime={report.createdAt}>{formatTime(report.createdAt)}</time>
                 </p>
                 <p>{report.body}</p>
                 <p className="hint">
-                  Reports on this message: {report.reportCount}. Confirmed repeats for this member: {report.authorViolationCount}.
+                  {t("Reports on this message: {reports}. Confirmed repeats for this member: {repeats}.", {
+                    reports: report.reportCount,
+                    repeats: report.authorViolationCount,
+                  })}
                 </p>
                 <button className="btn btn-secondary" type="button" disabled={sending} onClick={() => void post({ action: "admin-dismiss", reportId: report.id })}>
-                  Dismiss
+                  {t("Dismiss")}
                 </button>
               </article>
             ))}
@@ -290,26 +304,27 @@ function MessageActions({
   onBlock: () => void;
   onMute: () => void;
 }) {
+  const t = useT();
   return (
     <div className="community-actions">
       <label className="field">
-        <span className="sr-only">Report reason for {message.authorName}</span>
+        <span className="sr-only">{t("Report reason for {name}", { name: message.authorName })}</span>
         <select value={reason} onChange={(event) => onReason(event.target.value as ReportReason)}>
           {REASONS.map((item) => (
             <option key={item.value} value={item.value}>
-              {item.label}
+              {t(item.label)}
             </option>
           ))}
         </select>
       </label>
       <button className="btn btn-secondary" type="button" disabled={sending} onClick={onReport}>
-        Report
+        {t("Report")}
       </button>
       <button className="btn btn-secondary" type="button" disabled={sending} onClick={onBlock}>
-        Block
+        {t("Block")}
       </button>
       <button className="btn btn-secondary" type="button" disabled={sending} onClick={onMute}>
-        Mute
+        {t("Mute")}
       </button>
     </div>
   );
@@ -326,24 +341,25 @@ function OwnList({
   onAppeal: (messageId: string) => void;
   onRemove: (messageId: string) => void;
 }) {
+  const t = useT();
   if (mine.length === 0) return null;
   return (
     <section className="stack">
-      <h2>Your messages</h2>
+      <h2>{t("Your messages")}</h2>
       {mine.map((message) => (
         <article key={message.id} className="card stack">
           <MessageBody message={message} />
           <p className={message.status === "rejected" ? "alert alert-error" : "alert"} role={message.status === "rejected" ? "alert" : "status"}>
-            {message.notice}
+            {localizeCommunityText(message.notice, t, formatTime)}
           </p>
           <div className="community-actions">
             {message.status === "rejected" && !message.appealed ? (
               <button className="btn btn-secondary" type="button" disabled={sending} onClick={() => onAppeal(message.id)}>
-                Appeal
+                {t("Appeal")}
               </button>
             ) : null}
             <button className="btn btn-danger" type="button" disabled={sending} onClick={() => onRemove(message.id)}>
-              Remove
+              {t("Remove")}
             </button>
           </div>
         </article>
@@ -365,27 +381,31 @@ function QueueGroup({
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
 }) {
+  const t = useT();
   return (
     <div className="stack">
       <h3>{title}</h3>
-      {items.length === 0 ? <p className="card empty">Nothing in this list.</p> : null}
+      {items.length === 0 ? <p className="card empty">{t("Nothing in this list.")}</p> : null}
       {items.map((item) => (
         <article key={item.id} className="card stack">
           <p>
-            <strong>{item.authorName}</strong> · {item.category} · {sourceLabel(item.source)} · <time dateTime={item.createdAt}>{formatTime(item.createdAt)}</time>
+            <strong>{item.authorName}</strong> · {item.category} · {sourceLabel(item.source, t)} · <time dateTime={item.createdAt}>{formatTime(item.createdAt)}</time>
           </p>
           <p>{item.body}</p>
           <p className="hint">
-            Confirmed repeats: {item.authorViolationCount}. Reports: {item.reportCount}.
-            {item.appealed ? " Appealed." : ""}
-            {item.restrictedUntil ? ` Temporary limit until ${formatTime(item.restrictedUntil)}.` : ""}
+            {t("Confirmed repeats: {repeats}. Reports: {reports}.", {
+              repeats: item.authorViolationCount,
+              reports: item.reportCount,
+            })}
+            {item.appealed ? ` ${t("Appealed.")}` : ""}
+            {item.restrictedUntil ? ` ${t("Temporary limit until {time}.", { time: formatTime(item.restrictedUntil) })}` : ""}
           </p>
           <div className="community-actions">
             <button className="btn btn-primary" type="button" disabled={sending} onClick={() => onApprove(item.id)}>
-              Approve
+              {t("Approve")}
             </button>
             <button className="btn btn-danger" type="button" disabled={sending} onClick={() => onReject(item.id)}>
-              Reject
+              {t("Reject")}
             </button>
           </div>
         </article>

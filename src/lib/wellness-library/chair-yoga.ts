@@ -4,6 +4,10 @@ import { isVisible, studioVideos, type VideoItem } from "@/lib/wellness-library/
 import { effectiveLevel, type MoverProfile } from "@/lib/wellness-library/discover";
 import type { StudioAudience, StudioSection } from "@/lib/wellness-library/chair-yoga-videos";
 import type { LibraryCategory } from "@/lib/wellness-library/moves";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+/** English with placeholders filled. Pages pass their own `t` to get the chosen language. */
+const ENGLISH: Translate = makeTranslate(null);
 
 /**
  * Chair Yoga Studio: sections, filters, search, today's recommendation, and
@@ -129,20 +133,24 @@ export function inBand(minutes: number | null, band: DurationBand | null): boole
   return Boolean(found && minutes >= found.min && minutes <= found.max);
 }
 
+/** Lower case with accents removed, so "ώμοι" matches "ωμοι" and "café" matches "cafe". */
 function normalize(text: string): string {
-  return text.toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}+ ]/gu, " ");
+  return text.toLowerCase().normalize("NFKD").replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}+ ]/gu, " ");
 }
 
-export function matchesQuery(video: StudioVideo, query: string): boolean {
+/** With `t`, the search also matches the description, topics, section, and position in the chosen language. */
+export function matchesQuery(video: StudioVideo, query: string, t?: Translate): boolean {
   const words = normalize(query).split(/\s+/).filter((word) => word.length > 1);
   if (words.length === 0) return true;
-  const haystack = normalize(
-    [video.title, video.instructor, video.description, video.studio.topics.join(" "), SECTION_INFO[video.studio.section].title, POSITION_TEXT[video.studio.position]].join(" "),
-  );
+  const english = [video.title, video.instructor, video.description, video.studio.topics.join(" "), SECTION_INFO[video.studio.section].title, POSITION_TEXT[video.studio.position]];
+  const translated = t
+    ? [t(video.description), video.studio.topics.map((topic) => t(topic)).join(" "), t(SECTION_INFO[video.studio.section].title), t(POSITION_TEXT[video.studio.position])]
+    : [];
+  const haystack = normalize([...english, ...translated].join(" "));
   return words.every((word) => haystack.includes(word) || haystack.includes(word.replace(/s$/, "")));
 }
 
-export function filterVideos(filter: StudioFilter, videos: StudioVideo[] = libraryVideos()): StudioVideo[] {
+export function filterVideos(filter: StudioFilter, videos: StudioVideo[] = libraryVideos(), t?: Translate): StudioVideo[] {
   return videos.filter(
     (video) =>
       (filter.section === "all" || video.studio.section === filter.section) &&
@@ -150,15 +158,15 @@ export function filterVideos(filter: StudioFilter, videos: StudioVideo[] = libra
       (!filter.level || video.level === filter.level) &&
       (!filter.audience || video.studio.audience === filter.audience) &&
       inBand(video.studio.minutes, filter.duration) &&
-      matchesQuery(video, filter.query),
+      matchesQuery(video, filter.query, t),
   );
 }
 
 /** Classes this person should not be steered to by default. Shown, but never recommended. */
-export function unsafeForProfile(video: StudioVideo, profile: MoverProfile): string | null {
-  if (profile.seatedFirst && video.studio.position !== "seated") return "Not seated.";
-  if (profile.fallRisk && video.studio.position === "mat") return "Uses the floor.";
-  if ((profile.kneeLimit || profile.jointLimit) && video.kneeLoad) return "May include kneeling.";
+export function unsafeForProfile(video: StudioVideo, profile: MoverProfile, t: Translate = ENGLISH): string | null {
+  if (profile.seatedFirst && video.studio.position !== "seated") return t("Not seated.");
+  if (profile.fallRisk && video.studio.position === "mat") return t("Uses the floor.");
+  if ((profile.kneeLimit || profile.jointLimit) && video.kneeLoad) return t("May include kneeling.");
   return null;
 }
 
@@ -254,8 +262,8 @@ function best(list: StudioVideo[], profile: MoverProfile, minutes: number, level
  * seated class first. Others are moved between seated and standing so the
  * week is not spent only sitting down.
  */
-export function recommendToday(profile: MoverProfile, state: CompanionState, today: string, videos: StudioVideo[] = libraryVideos()): TodayPlan {
-  const { level } = effectiveLevel(profile);
+export function recommendToday(profile: MoverProfile, state: CompanionState, today: string, videos: StudioVideo[] = libraryVideos(), t: Translate = ENGLISH): TodayPlan {
+  const { level } = effectiveLevel(profile, false, t);
   const minutes = state.movement.minutes;
   const favorites = state.media.favorites;
   const safe = videos.filter((video) => unsafeForProfile(video, profile) === null);
@@ -264,7 +272,7 @@ export function recommendToday(profile: MoverProfile, state: CompanionState, tod
   const standing = safe.filter((video) => video.studio.section === "standing");
   const week = weekPractice(state, today, videos);
   const reasons: string[] = [];
-  const cautions: string[] = [CHAIR_YOGA_TEXT.sturdyChair, CHAIR_YOGA_TEXT.stopIf];
+  const cautions: string[] = [t(CHAIR_YOGA_TEXT.sturdyChair), t(CHAIR_YOGA_TEXT.stopIf)];
   const seed = `chair-yoga:${today}`;
 
   const seatedPick = best(seated, profile, minutes, level, favorites, seed);
@@ -273,22 +281,22 @@ export function recommendToday(profile: MoverProfile, state: CompanionState, tod
   let main: StudioVideo | null;
   if (profile.seatedFirst) {
     main = seatedPick;
-    reasons.push(CHAIR_YOGA_TEXT.seatedOnlyCare);
+    reasons.push(t(CHAIR_YOGA_TEXT.seatedOnlyCare));
   } else if (profile.fallRisk) {
     main = seatedPick;
-    reasons.push("You mentioned balance concerns or a walking aid, so today starts seated. A standing class with chair support is offered as the alternative.");
-    cautions.push(CHAIR_YOGA_TEXT.balanceCare);
+    reasons.push(t("You mentioned balance concerns or a walking aid, so today starts seated. A standing class with chair support is offered as the alternative."));
+    cautions.push(t(CHAIR_YOGA_TEXT.balanceCare));
   } else {
     const needsStanding = week.seated > week.standing || (week.sessions === 0 && hash(seed) % 2 === 0);
     main = needsStanding ? (standingPick ?? seatedPick) : (seatedPick ?? standingPick);
-    if (needsStanding && week.seated > week.standing) reasons.push("Most of your classes this week were seated, so today is a standing class with a chair for support.");
-    else if (main?.studio.position === "seated" && week.standing > 0) reasons.push("You practised standing this week, so today is seated.");
-    else reasons.push("Today alternates between seated and standing practice so the week includes time on your feet.");
+    if (needsStanding && week.seated > week.standing) reasons.push(t("Most of your classes this week were seated, so today is a standing class with a chair for support."));
+    else if (main?.studio.position === "seated" && week.standing > 0) reasons.push(t("You practised standing this week, so today is seated."));
+    else reasons.push(t("Today alternates between seated and standing practice so the week includes time on your feet."));
   }
-  if (main && main.studio.minutes !== null && Math.abs(main.studio.minutes - minutes) <= 5) reasons.push(`It is close to the ${minutes} minutes in your preferences.`);
-  if (profile.age !== null && profile.age >= 60) reasons.push("It is chosen from classes made for older adults where possible.");
-  if (level < 1) reasons.push("Beginner level, because no higher level is saved in your preferences.");
-  if (main?.studio.balance) cautions.push(CHAIR_YOGA_TEXT.balanceVideo);
+  if (main && main.studio.minutes !== null && Math.abs(main.studio.minutes - minutes) <= 5) reasons.push(t("It is close to the {minutes} minutes in your preferences.", { minutes }));
+  if (profile.age !== null && profile.age >= 60) reasons.push(t("It is chosen from classes made for older adults where possible."));
+  if (level < 1) reasons.push(t("Beginner level, because no higher level is saved in your preferences."));
+  if (main?.studio.balance) cautions.push(t(CHAIR_YOGA_TEXT.balanceVideo));
 
   return {
     main,
@@ -308,8 +316,8 @@ export function alternativeFor(video: StudioVideo, want: "seated" | "standing", 
   return [...pool].sort((a, b) => shared(b) * 10 - gap(b) - (shared(a) * 10 - gap(a)))[0] ?? null;
 }
 
-export function lengthLabel(video: StudioVideo): string {
-  return video.studio.minutes === null ? CHAIR_YOGA_TEXT.lengthUnknown : `${video.studio.minutes} min (${CHAIR_YOGA_TEXT.lengthFromTitle})`;
+export function lengthLabel(video: StudioVideo, t: Translate = ENGLISH): string {
+  return video.studio.minutes === null ? t(CHAIR_YOGA_TEXT.lengthUnknown) : t("{minutes} min (from the title)", { minutes: video.studio.minutes });
 }
 
 export function sectionCounts(videos: StudioVideo[] = libraryVideos()): Record<StudioSection, number> {

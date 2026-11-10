@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMessages } from "@/components/locale-provider";
+import { useMessages, useT } from "@/components/locale-provider";
 import {
   requestPasswordReset,
   resendConfirmationEmail,
@@ -10,14 +10,15 @@ import {
 } from "@/lib/account-store";
 
 function Notice({ notice }: { notice: AccountNotice | null }) {
+  const t = useT();
   if (!notice) return null;
   return notice.ok ? (
     <p className="alert alert-ok" role="status">
-      {notice.message}
+      {t(notice.message)}
     </p>
   ) : (
     <p className="alert alert-error" role="alert">
-      {notice.message}
+      {t(notice.message)}
     </p>
   );
 }

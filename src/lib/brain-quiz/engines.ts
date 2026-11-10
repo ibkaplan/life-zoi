@@ -1,4 +1,5 @@
 import type { Difficulty } from "@/lib/brain-quiz/progress";
+import { msg } from "@/lib/i18n/translate";
 
 export function hashSeed(id: string): number {
   let hash = 2166136261;
@@ -57,10 +58,15 @@ export function buildDigits(id: string, difficulty: Difficulty): string {
   return Array.from({ length }, () => String(Math.floor(rand() * 10))).join("");
 }
 
-export function buildWordRecall(id: string, difficulty: Difficulty): { shown: string[]; options: string[] } {
+/** `words` lets a language use its own word list; English uses the built-in list. */
+export function buildWordRecall(
+  id: string,
+  difficulty: Difficulty,
+  words: readonly string[] = MEMORY_WORDS,
+): { shown: string[]; options: string[] } {
   const count = span(difficulty, 3, 4, 6);
   const rand = mulberry32(hashSeed(`${id}:words`));
-  const bag = shuffle(MEMORY_WORDS, rand);
+  const bag = shuffle(words, rand);
   const shown = bag.slice(0, count);
   return { shown, options: shuffle([...shown, ...bag.slice(count, count + count)], rand) };
 }
@@ -180,14 +186,14 @@ export function buildPattern(id: string, difficulty: Difficulty): {
   };
 }
 
-export function buildMistake(id: string, difficulty: Difficulty): { values: string[]; wrongIndex: number; rule: string } {
+export function buildMistake(id: string, difficulty: Difficulty): { values: string[]; wrongIndex: number; rule: string; step: number } {
   const rand = mulberry32(hashSeed(`${id}:mis`));
   const start = 2 + Math.floor(rand() * 4);
   const step = span(difficulty, 2, 3, 5);
   const values = Array.from({ length: 6 }, (_, index) => String(start + index * step));
   const wrongIndex = 2 + Math.floor(rand() * 3);
   values[wrongIndex] = String(Number(values[wrongIndex]) + (difficulty === "hard" ? 2 : 1));
-  return { values, wrongIndex, rule: `The count goes up by ${step} each time.` };
+  return { values, wrongIndex, rule: `The count goes up by ${step} each time.`, step };
 }
 
 export function buildMissing(id: string, difficulty: Difficulty): {
@@ -224,7 +230,7 @@ export function buildHidden(id: string, difficulty: Difficulty): { items: Hidden
     y: index < 5 ? 32 : 68,
     target: index === targetIndex,
   }));
-  return { items, clue: "Find the star." };
+  return { items, clue: msg("Find the star.") };
 }
 
 export function wordInGrid(rows: readonly string[], word: string): boolean {
@@ -281,11 +287,23 @@ export function lineBetween(rows: readonly string[], start: readonly [number, nu
   return word.toUpperCase();
 }
 
+/**
+ * Upper case for comparing typed letters. Greek accents and diaeresis are dropped, so
+ * "νερό" matches ΝΕΡΟ; Cyrillic letters such as Й and Ї are kept as they are.
+ */
+export function foldLetters(text: string): string {
+  return text
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/([\u0370-\u03FF])[\u0300-\u036F]+/g, "$1")
+    .normalize("NFC");
+}
+
 export function crosswordMatches(grid: readonly string[], entries: readonly string[]): boolean {
   if (entries.length !== grid.length) return false;
   return grid.every((row, index) => {
-    const guess = (entries[index] ?? "").toUpperCase();
+    const guess = foldLetters(entries[index] ?? "");
     if (guess.length !== row.length) return false;
-    return row.toUpperCase().split("").every((letter, cell) => letter === "#" || guess[cell] === letter);
+    return foldLetters(row).split("").every((letter, cell) => letter === "#" || guess[cell] === letter);
   });
 }

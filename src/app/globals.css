@@ -3049,6 +3049,15 @@ a.home-companion-card:hover { transform: translateY(-2px); }
   .music-bars i { animation: none; transform: scaleY(0.7); }
 }
 
+/* Long words (Ukrainian, Russian and Greek) and long file names or links must not push a column past a phone screen. */
+main {
+  overflow-wrap: anywhere;
+}
+
+html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
+  hyphens: auto;
+}
+
 /* Dashboard news: Today's World News and Health & Longevity News */
 .news-sections { display: grid; gap: 1.25rem; }
 .news-sections .stack-sm { display: grid; gap: 0.45rem; }

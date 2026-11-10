@@ -2,6 +2,7 @@ import type { HealthProfileFields } from "@/lib/health-profile";
 import { safetyFlags } from "@/lib/health-profile";
 import type { ActivityKind, MovementPrefs } from "@/lib/companion/state";
 import { ASK_FIRST, FALL_SUPPORT, SAFETY_LINE } from "@/lib/wellness/movement-studio/catalog";
+import { makeTranslate, msg, type Translate } from "@/lib/i18n/translate";
 import {
   COST_TEXT,
   sourceById,
@@ -93,6 +94,13 @@ export type Recommendation = {
 };
 
 const LEVEL_NAMES = ["beginner", "intermediate", "advanced"] as const;
+/** English with placeholders filled. Pages pass their own `t` to get the chosen language. */
+const ENGLISH: Translate = makeTranslate(null);
+const LEVEL_SENTENCES = [
+  "You chose beginner level.",
+  "You chose intermediate level.",
+  "You chose advanced level.",
+] as const;
 const KNEE = /\bknees?\b/i;
 
 function ageFromRange(range: string): number | null {
@@ -128,30 +136,30 @@ export function moverProfile(
  * Age never raises it. With no stated level, age 65 or older keeps the
  * low-impact default, which is one factor among several, not a cap.
  */
-export function effectiveLevel(profile: MoverProfile, harder = false): { level: 0 | 1 | 2; lowImpact: boolean; why: string[] } {
+export function effectiveLevel(profile: MoverProfile, harder = false, t: Translate = ENGLISH): { level: 0 | 1 | 2; lowImpact: boolean; why: string[] } {
   const why: string[] = [];
   let level: 0 | 1 | 2 = profile.level ?? (profile.experience === "regular" ? 1 : 0);
   why.push(
     profile.level !== null
-      ? `You chose ${LEVEL_NAMES[profile.level]} level.`
+      ? t(LEVEL_SENTENCES[profile.level])
       : profile.experience === "regular"
-        ? "You said you exercise regularly."
-        : "No fitness level is saved, so this starts at beginner.",
+        ? t("You said you exercise regularly.")
+        : t("No fitness level is saved, so this starts at beginner."),
   );
   const limited = profile.kneeLimit || profile.jointLimit || profile.fallRisk || profile.seatedFirst || profile.injury;
   if (harder || profile.wantsChallenge) {
     const next = Math.min(2, level + 1) as 0 | 1 | 2;
     const capped = limited ? (Math.min(next, 1) as 0 | 1) : next;
-    if (capped > level) why.push("You asked for something more challenging, so this is one step harder.");
-    else if (limited) why.push("You asked for more challenge, but your reported limits keep this at the same level.");
+    if (capped > level) why.push(t("You asked for something more challenging, so this is one step harder."));
+    else if (limited) why.push(t("You asked for more challenge, but your reported limits keep this at the same level."));
     level = capped;
   }
   const olderDefault = profile.level === null && profile.age !== null && profile.age >= 65;
-  if (olderDefault) why.push("You have not chosen a level, so this stays low impact. Choose a level in your preferences to change it.");
+  if (olderDefault) why.push(t("You have not chosen a level, so this stays low impact. Choose a level in your preferences to change it."));
   const lowImpact = level < 2 || limited || olderDefault;
-  if (profile.kneeLimit) why.push("You mentioned your knee, so kneeling, deep knee bends, and jumping are left out.");
-  if (profile.seatedFirst) why.push("Everything is seated because you said standing for long is hard or you use a wheelchair.");
-  if (profile.fallRisk) why.push("Hold a sturdy chair or counter for standing moves.");
+  if (profile.kneeLimit) why.push(t("You mentioned your knee, so kneeling, deep knee bends, and jumping are left out."));
+  if (profile.seatedFirst) why.push(t("Everything is seated because you said standing for long is hard or you use a wheelchair."));
+  if (profile.fallRisk) why.push(t("Hold a sturdy chair or counter for standing moves."));
   return { level, lowImpact, why };
 }
 
@@ -173,11 +181,11 @@ function pickMoves(category: LibraryCategory, profile: MoverProfile, level: numb
 }
 
 /** Compose an original LifeZoi session that adds up exactly to the requested minutes. */
-export function buildSession(request: LibraryRequest, profile: MoverProfile): GuidedSession {
+export function buildSession(request: LibraryRequest, profile: MoverProfile, t: Translate = ENGLISH): GuidedSession {
   const { category } = request;
   const minutes = Math.max(5, Math.min(90, Math.round(request.minutes)));
   const total = minutes * 60;
-  const { level, lowImpact } = effectiveLevel(profile, request.harder);
+  const { level, lowImpact } = effectiveLevel(profile, request.harder, t);
   const moves = pickMoves(category, profile, level, lowImpact);
   const calm = category === "breathing" || category === "meditation";
   const warmMoves = (calm ? [] : WARM_UP).filter((move) => moveAllowed(move, profile, 0, true));
@@ -194,7 +202,7 @@ export function buildSession(request: LibraryRequest, profile: MoverProfile): Gu
       previous.seconds += seconds;
       return;
     }
-    steps.push({ moveId: move.id, name: move.name, cue: move.cue, easier: move.easier, seconds, phase });
+    steps.push({ moveId: move.id, name: t(move.name), cue: t(move.cue), easier: t(move.easier), seconds, phase });
   };
   if (warmSeconds > 0 && warmMoves.length > 0) {
     const each = Math.floor(warmSeconds / warmMoves.length);
@@ -214,42 +222,42 @@ export function buildSession(request: LibraryRequest, profile: MoverProfile): Gu
 
   const usedPositions = new Set(moves.map((move) => move.position));
   const equipment = [
-    ...(usedPositions.has("seated") || profile.fallRisk ? ["A sturdy chair without wheels"] : []),
-    ...(usedPositions.has("floor") ? ["A mat or carpet"] : []),
-    ...(category === "strength" ? ["Optional: two water bottles"] : []),
+    ...(usedPositions.has("seated") || profile.fallRisk ? [t("A sturdy chair without wheels")] : []),
+    ...(usedPositions.has("floor") ? [t("A mat or carpet")] : []),
+    ...(category === "strength" ? [t("Optional: two water bottles")] : []),
   ];
-  const modifications = [...new Set(moves.map((move) => `${move.name}: ${move.easier}`))].slice(0, 6);
-  const safetyParts = [SAFETY_LINE];
-  if (category === "balance" || profile.fallRisk) safetyParts.push(FALL_SUPPORT);
-  if (profile.injury || profile.kneeLimit) safetyParts.push("Skip any move that hurts your injury.");
-  safetyParts.push(ASK_FIRST);
+  const modifications = [...new Set(moves.map((move) => `${t(move.name)}: ${t(move.easier)}`))].slice(0, 6);
+  const safetyParts = [t(SAFETY_LINE)];
+  if (category === "balance" || profile.fallRisk) safetyParts.push(t(FALL_SUPPORT));
+  if (profile.injury || profile.kneeLimit) safetyParts.push(t("Skip any move that hurts your injury."));
+  safetyParts.push(t(ASK_FIRST));
   const info = CATEGORY_INFO[category];
   return {
     id: `lz-${category}-${minutes}-${level}${profile.seatedFirst ? "-seated" : ""}${profile.kneeLimit ? "-knee" : ""}`,
     kind: "session",
-    title: `${info.title}${profile.seatedFirst && category !== "chair" ? " (seated)" : ""}`,
+    title: profile.seatedFirst && category !== "chair" ? t("{title} (seated)", { title: t(info.title) }) : t(info.title),
     category,
     minutes,
     level: LEVEL_NAMES[level],
-    intensity: lowImpact ? "Low impact" : "Includes higher-impact options",
-    equipment: equipment.length ? equipment : ["No equipment"],
+    intensity: lowImpact ? t("Low impact") : t("Includes higher-impact options"),
+    equipment: equipment.length ? equipment : [t("No equipment")],
     steps,
     safety: safetyParts.join(" "),
     modifications,
-    sourceName: "LifeZoi guided session",
-    costText: COST_TEXT.original,
+    sourceName: t("LifeZoi guided session"),
+    costText: t(COST_TEXT.original),
   };
 }
 
 const LEVEL_ORDER = { beginner: 0, intermediate: 1, advanced: 2 } as const;
 
 /** Whether an approved catalog video suits this person and request. */
-export function videoFits(video: VideoItem, request: LibraryRequest, profile: MoverProfile, level: number, lowImpact: boolean): string | null {
-  if (video.category !== request.category) return "Different category.";
-  if (LEVEL_ORDER[video.level] > level) return "Harder than your level.";
-  if (video.highImpact && lowImpact) return "High impact.";
-  if ((profile.kneeLimit || profile.jointLimit) && (video.kneeLoad || video.highImpact)) return "Not suitable for a knee or joint limit.";
-  if (profile.seatedFirst && video.mobility !== "seated-ok") return "Not seated.";
+export function videoFits(video: VideoItem, request: LibraryRequest, profile: MoverProfile, level: number, lowImpact: boolean, t: Translate = ENGLISH): string | null {
+  if (video.category !== request.category) return t("Different category.");
+  if (LEVEL_ORDER[video.level] > level) return t("Harder than your level.");
+  if (video.highImpact && lowImpact) return t("High impact.");
+  if ((profile.kneeLimit || profile.jointLimit) && (video.kneeLoad || video.highImpact)) return t("Not suitable for a knee or joint limit.");
+  if (profile.seatedFirst && video.mobility !== "seated-ok") return t("Not seated.");
   return null;
 }
 
@@ -259,32 +267,32 @@ function durationMatches(video: VideoItem, minutes: number): boolean {
   return Math.abs(video.durationSeconds - target) <= Math.max(90, target * 0.15);
 }
 
-export function recommend(request: LibraryRequest, profile: MoverProfile, videos: VideoItem[] = visibleVideos()): Recommendation {
-  const { level, lowImpact, why } = effectiveLevel(profile, request.harder);
-  const session = buildSession(request, profile);
-  const suitable = videos.filter((video) => videoFits(video, request, profile, level, lowImpact) === null);
+export function recommend(request: LibraryRequest, profile: MoverProfile, videos: VideoItem[] = visibleVideos(), t: Translate = ENGLISH): Recommendation {
+  const { level, lowImpact, why } = effectiveLevel(profile, request.harder, t);
+  const session = buildSession(request, profile, t);
+  const suitable = videos.filter((video) => videoFits(video, request, profile, level, lowImpact, t) === null);
   const timed = suitable.filter((video) => durationMatches(video, request.minutes));
-  const title = CATEGORY_INFO[request.category].title;
+  const title = t(CATEGORY_INFO[request.category].title);
   const notes = [...why];
   const alternatives: Recommendation["alternatives"] = [];
   let main: Recommendation["main"];
   const playable = timed.find((video) => video.embedUrl && video.cost === "free-verified");
   if (playable) {
-    main = { kind: "video", video: playable, reasons: [`${sourceById(playable.sourceId)?.name ?? "Approved source"} video that matches your time and level.`] };
-    alternatives.push({ kind: "session", session, note: "LifeZoi guided session with the same length." });
+    main = { kind: "video", video: playable, reasons: [t("{source} video that matches your time and level.", { source: t(sourceById(playable.sourceId)?.name ?? msg("Approved source")) })] };
+    alternatives.push({ kind: "session", session, note: t("LifeZoi guided session with the same length.") });
   } else {
-    main = { kind: "session", session, reasons: ["Built from LifeZoi's own guided moves to fit your exact time and level."] };
+    main = { kind: "session", session, reasons: [t("Built from LifeZoi's own guided moves to fit your exact time and level.")] };
   }
   for (const video of suitable) {
     if (main.kind === "video" && main.video.id === video.id) continue;
-    const length = video.durationSeconds === null ? "length not checked yet" : `${Math.round(video.durationSeconds / 60)} min`;
-    alternatives.push({ kind: "video", video, note: `${length}. ${COST_TEXT[video.cost]}.` });
+    const length = video.durationSeconds === null ? t("length not checked yet") : t("{minutes} min", { minutes: Math.round(video.durationSeconds / 60) });
+    alternatives.push({ kind: "video", video, note: t("{length}. {cost}.", { length, cost: t(COST_TEXT[video.cost]) }) });
   }
   if (profile.disliked.includes(request.category as ActivityKind)) {
-    notes.push(`You said you do not enjoy ${title.toLowerCase()}. You can pick another activity below.`);
+    notes.push(t("You said you do not enjoy {activity}. You can pick another activity below.", { activity: title.toLowerCase() }));
   }
   return {
-    headline: `Your ${request.minutes}-minute ${title} session is ready!`,
+    headline: t("Your {minutes}-minute {title} session is ready!", { minutes: request.minutes, title }),
     main,
     alternatives: alternatives.slice(0, 6),
     notes,

@@ -11,8 +11,9 @@ import {
   TILE_COLORS,
 } from "@/lib/brain-quiz/engines";
 import { Icon } from "@/components/brain-quiz/icons";
-
-const COLOR_LABEL: Record<string, string> = { blue: "B", purple: "P", teal: "T", gold: "G" };
+import { useLocale, useT } from "@/components/locale-provider";
+import { listText, memoryWordsFor, noteText } from "@/lib/brain-quiz/localize";
+import { msg } from "@/lib/i18n/translate";
 
 function same(left: readonly string[], right: readonly string[]) {
   return left.length === right.length && left.every((item, index) => item === right[index]);
@@ -27,6 +28,7 @@ export function MemoryPlay({ activity, onResult }: { activity: MemoryActivity; o
 }
 
 function SequencePlay({ activity, onResult }: { activity: MemoryActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const sequence = useMemo(() => buildSequence(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [phase, setPhase] = useState<"watch" | "play" | "done">("watch");
   const [lit, setLit] = useState(-1);
@@ -49,7 +51,7 @@ function SequencePlay({ activity, onResult }: { activity: MemoryActivity; onResu
     setGuess(next);
     if (sequence[next.length - 1] !== color || next.length === sequence.length) {
       const correct = same(next, sequence);
-      const text = correct ? "You repeated the color sequence." : `The sequence was ${sequence.join(", ")}.`;
+      const text = correct ? msg("You repeated the color sequence.") : `The sequence was ${sequence.join(", ")}.`;
       setNote(text);
       setPhase("done");
       onResult(correct, text);
@@ -58,20 +60,20 @@ function SequencePlay({ activity, onResult }: { activity: MemoryActivity; onResu
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
-      <p className="hint">{phase === "watch" ? "Watch" : phase === "play" ? "Your turn" : note}</p>
+      <p>{t(activity.prompt)}</p>
+      <p className="hint">{phase === "watch" ? t("Watch") : phase === "play" ? t("Your turn") : noteText(note, t)}</p>
       <div className={"quiz-pads"}>
         {TILE_COLORS.map((color) => (
           <button
             key={color}
             type="button"
             className={`quiz-pad quiz-${color}`}
-            aria-label={color}
+            aria-label={t(color)}
             aria-pressed={sequence[lit] === color}
             onClick={() => tap(color)}
             disabled={phase !== "play"}
           >
-            {COLOR_LABEL[color]}
+            {t(color).charAt(0).toUpperCase()}
           </button>
         ))}
       </div>
@@ -80,6 +82,7 @@ function SequencePlay({ activity, onResult }: { activity: MemoryActivity; onResu
 }
 
 function NumberPlay({ activity, onResult }: { activity: MemoryActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const digits = useMemo(() => buildDigits(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [phase, setPhase] = useState<"watch" | "play" | "done">("watch");
   const [shown, setShown] = useState("");
@@ -101,7 +104,7 @@ function NumberPlay({ activity, onResult }: { activity: MemoryActivity; onResult
     setGuess(next);
     if (next.length === digits.length) {
       const correct = next === digits;
-      const text = correct ? "You entered the digits in order." : `The digits were ${digits}.`;
+      const text = correct ? msg("You entered the digits in order.") : `The digits were ${digits}.`;
       setPhase("done");
       onResult(correct, text);
     }
@@ -109,8 +112,8 @@ function NumberPlay({ activity, onResult }: { activity: MemoryActivity; onResult
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
-      <p className="hint" aria-live="polite">{phase === "watch" ? shown || "Watch" : phase === "play" ? guess || "Your turn" : guess}</p>
+      <p>{t(activity.prompt)}</p>
+      <p className="hint" aria-live="polite">{phase === "watch" ? shown || t("Watch") : phase === "play" ? guess || t("Your turn") : guess}</p>
       <div className={"quiz-keys"}>
         {Array.from({ length: 10 }, (_, digit) => (
           <button key={digit} type="button" className={"quiz-key"} onClick={() => add(String(digit))} disabled={phase !== "play"}>
@@ -123,7 +126,11 @@ function NumberPlay({ activity, onResult }: { activity: MemoryActivity; onResult
 }
 
 function WordMemory({ activity, onResult }: { activity: MemoryActivity; onResult: (correct: boolean, note: string) => void }) {
-  const round = useMemo(() => buildWordRecall(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
+  const { locale, t } = useLocale();
+  const round = useMemo(
+    () => buildWordRecall(activity.id, activity.difficulty, memoryWordsFor(locale)),
+    [activity.id, activity.difficulty, locale],
+  );
   const [phase, setPhase] = useState<"study" | "pick" | "done">("study");
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -139,14 +146,14 @@ function WordMemory({ activity, onResult }: { activity: MemoryActivity; onResult
 
   function submit() {
     const correct = same([...round.shown].sort(), [...selected].sort());
-    const text = correct ? "You selected the full word set." : `The words were ${round.shown.join(", ")}.`;
+    const text = correct ? msg("You selected the full word set.") : `The words were ${round.shown.join(", ")}.`;
     setPhase("done");
     onResult(correct, text);
   }
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       {phase === "study" ? (
         <div className={"quiz-iconGrid"}>
           {round.shown.map((word) => <p key={word} className="card">{word}</p>)}
@@ -160,7 +167,7 @@ function WordMemory({ activity, onResult }: { activity: MemoryActivity; onResult
               </button>
             ))}
           </div>
-          {phase === "pick" ? <button className="btn btn-primary" type="button" onClick={submit}>Check the set</button> : <p>{`The words were ${round.shown.join(", ")}.`}</p>}
+          {phase === "pick" ? <button className="btn btn-primary" type="button" onClick={submit}>{t("Check the set")}</button> : <p>{t("The words were {items}.", { items: listText(round.shown, t) })}</p>}
         </>
       )}
     </div>
@@ -168,6 +175,7 @@ function WordMemory({ activity, onResult }: { activity: MemoryActivity; onResult
 }
 
 function PairPlay({ activity, onResult }: { activity: MemoryActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const deck = useMemo(() => buildPairs(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [open, setOpen] = useState<number[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
@@ -189,7 +197,7 @@ function PairPlay({ activity, onResult }: { activity: MemoryActivity; onResult: 
       const pairCount = new Set(deck).size;
       if (found.length === pairCount) {
         setDone(true);
-        onResult(true, "You matched every pair.");
+        onResult(true, msg("You matched every pair."));
       }
       return;
     }
@@ -199,12 +207,12 @@ function PairPlay({ activity, onResult }: { activity: MemoryActivity; onResult: 
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <div className={"quiz-iconGrid"}>
         {deck.map((icon, index) => {
           const show = open.includes(index) || matched.includes(icon);
           return (
-            <button key={`${icon}-${index}`} type="button" className={"quiz-cardBtn"} data-open={show} data-matched={matched.includes(icon)} onClick={() => tap(index)} aria-label={show ? icon : "Hidden card"}>
+            <button key={`${icon}-${index}`} type="button" className={"quiz-cardBtn"} data-open={show} data-matched={matched.includes(icon)} onClick={() => tap(index)} aria-label={show ? t(icon) : t("Hidden card")}>
               {show ? <Icon name={icon} /> : "?"}
             </button>
           );
@@ -215,6 +223,7 @@ function PairPlay({ activity, onResult }: { activity: MemoryActivity; onResult: 
 }
 
 function OrderPlay({ activity, onResult }: { activity: MemoryActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const order = useMemo(() => buildOrder(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [phase, setPhase] = useState<"show" | "play" | "done">("show");
   const [guess, setGuess] = useState<string[]>([]);
@@ -226,7 +235,7 @@ function OrderPlay({ activity, onResult }: { activity: MemoryActivity; onResult:
     setGuess(next);
     if (next.length === order.length) {
       const correct = same(next, order);
-      const text = correct ? "You tapped the pictures in order." : `The order was ${order.join(", ")}.`;
+      const text = correct ? msg("You tapped the pictures in order.") : `The order was ${order.join(", ")}.`;
       setPhase("done");
       onResult(correct, text);
     }
@@ -234,7 +243,7 @@ function OrderPlay({ activity, onResult }: { activity: MemoryActivity; onResult:
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       {phase === "show" ? (
         <>
           <div className={"quiz-row"}>
@@ -245,7 +254,7 @@ function OrderPlay({ activity, onResult }: { activity: MemoryActivity; onResult:
               </div>
             ))}
           </div>
-          <button className="btn btn-primary" type="button" onClick={() => setPhase("play")}>Hide and mix</button>
+          <button className="btn btn-primary" type="button" onClick={() => setPhase("play")}>{t("Hide and mix")}</button>
         </>
       ) : (
         <div className={"quiz-iconGrid"}>
@@ -256,7 +265,7 @@ function OrderPlay({ activity, onResult }: { activity: MemoryActivity; onResult:
           ))}
         </div>
       )}
-      {phase === "done" ? <p>{same(guess, order) ? "The order matched." : `The order was ${order.join(", ")}.`}</p> : null}
+      {phase === "done" ? <p>{same(guess, order) ? t("The order matched.") : t("The order was {items}.", { items: listText(order, t) })}</p> : null}
     </div>
   );
 }

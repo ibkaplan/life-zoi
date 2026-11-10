@@ -1,3 +1,4 @@
+import { msg } from "@/lib/i18n/translate";
 import { createHash, randomUUID } from "node:crypto";
 import { defaultFilterConfig, runLocalFilter, type FilterConfig, type LocalResult } from "@/lib/community/local-filter";
 import {
@@ -156,7 +157,7 @@ function toOwn(message: StoredMessage): OwnMessage {
 }
 
 function storageError(): ActionResult {
-  return { status: 503, body: { error: "Community storage is unavailable. The message was not published." } };
+  return { status: 503, body: { error: msg("Community storage is unavailable. The message was not published.") } };
 }
 
 async function guard(repo: CommunityRepository, task: () => Promise<ActionResult>): Promise<ActionResult> {
@@ -194,25 +195,25 @@ async function applyRetention(repo: CommunityRepository, nowMs: number) {
 }
 
 function cleanName(input: unknown): { ok: true; name: string } | { ok: false; error: string } {
-  if (typeof input !== "string") return { ok: false, error: "Choose a community name before posting. The message was not published." };
+  if (typeof input !== "string") return { ok: false, error: msg("Choose a community name before posting. The message was not published.") };
   const name = input.replace(/[\u200B-\u200D\uFEFF]/g, "").trim().replace(/\s+/g, " ");
   if (name.length < 2 || name.length > 24) {
-    return { ok: false, error: "Choose a community name of 2 to 24 characters. The message was not published." };
+    return { ok: false, error: msg("Choose a community name of 2 to 24 characters. The message was not published.") };
   }
   if (name.includes("@") || /https?:\/\//i.test(name) || name.toLowerCase() === "sample visitor") {
-    return { ok: false, error: "Choose a community name that is not an email address. The message was not published." };
+    return { ok: false, error: msg("Choose a community name that is not an email address. The message was not published.") };
   }
   if (!/^[\p{L}\p{N}](?:[\p{L}\p{N} ._-]{0,22}[\p{L}\p{N}])?$/u.test(name)) {
-    return { ok: false, error: "Use letters or numbers for your community name. The message was not published." };
+    return { ok: false, error: msg("Use letters or numbers for your community name. The message was not published.") };
   }
   return { ok: true, name };
 }
 
 function cleanBody(input: unknown): { ok: true; body: string } | { ok: false; error: string } {
-  if (typeof input !== "string") return { ok: false, error: "Write a message before sharing it. It was not published." };
+  if (typeof input !== "string") return { ok: false, error: msg("Write a message before sharing it. It was not published.") };
   const body = input.replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/\r\n/g, "\n").trim();
-  if (!body) return { ok: false, error: "Write a message before sharing it. It was not published." };
-  if (body.length > MAX_BODY_LENGTH) return { ok: false, error: "That message is too long. It was not published." };
+  if (!body) return { ok: false, error: msg("Write a message before sharing it. It was not published.") };
+  if (body.length > MAX_BODY_LENGTH) return { ok: false, error: msg("That message is too long. It was not published.") };
   return { ok: true, body };
 }
 
@@ -387,14 +388,14 @@ function prepareSubmit(actor: CommunityActor, input: Record<string, unknown>): {
   let parentId: string | null = null;
   if (input.parentId !== undefined && input.parentId !== null && input.parentId !== "") {
     if (typeof input.parentId !== "string" || !UUID.test(input.parentId)) {
-      return { ok: false, result: { status: 400, body: { error: "That conversation is not available. The comment was not published." } } };
+      return { ok: false, result: { status: 400, body: { error: msg("That conversation is not available. The comment was not published.") } } };
     }
     parentId = input.parentId;
   }
   let clientRequestId: string | null = null;
   if (input.clientRequestId !== undefined && input.clientRequestId !== null && input.clientRequestId !== "") {
     if (typeof input.clientRequestId !== "string" || !REQUEST_ID.test(input.clientRequestId)) {
-      return { ok: false, result: { status: 400, body: { error: "That submit could not be accepted. The message was not published." } } };
+      return { ok: false, result: { status: 400, body: { error: msg("That submit could not be accepted. The message was not published.") } } };
     }
     clientRequestId = input.clientRequestId;
   }
@@ -433,7 +434,7 @@ async function submitUnlocked(
       !parent.removedAt &&
       !hidden(actor.id, parent.authorId, blocks, mutes);
     if (!available) {
-      return { status: 400, body: { error: "That conversation is not available. The comment was not published." } };
+      return { status: 400, body: { error: msg("That conversation is not available. The comment was not published.") } };
     }
   }
   const duplicate = findDuplicate(messages, actor.id, prepared.parentId, prepared.hash, prepared.clientRequestId, nowMs);
@@ -445,12 +446,12 @@ async function submitUnlocked(
   ).length;
   const submitCap = deps.maxSubmitsPerHour ?? MEMBER_SUBMITS_PER_HOUR;
   if (recentSubmits >= submitCap) {
-    return { status: 429, body: { error: "Please wait before sending another message. It was not published." } };
+    return { status: 429, body: { error: msg("Please wait before sending another message. It was not published.") } };
   }
   const taken = profiles.some(
     (item) => item.userId !== actor.id && item.displayName.toLowerCase() === prepared.name.toLowerCase(),
   );
-  if (taken) return { status: 400, body: { error: "That community name is already used. Choose another. The message was not published." } };
+  if (taken) return { status: 400, body: { error: msg("That community name is already used. Choose another. The message was not published.") } };
   profile.displayName = prepared.name;
   const config = deps.filterConfig ?? defaultFilterConfig;
   const local = strongerLocal(
@@ -482,7 +483,7 @@ async function submitUnlocked(
   const providerCap = deps.maxProviderCallsPerHour ?? MEMBER_PROVIDER_CALLS_PER_HOUR;
   const willCall = Boolean(deps.apiKey?.trim());
   if (willCall && profile.providerCalls.length >= providerCap) {
-    return { status: 429, body: { error: "Please wait before sending another message. It was not published." } };
+    return { status: 429, body: { error: msg("Please wait before sending another message. It was not published.") } };
   }
   const provider = await moderateText(prepared.body, {
     apiKey: deps.apiKey,
@@ -566,22 +567,22 @@ export async function communityAction(
     const nowIso = now.toISOString();
     await applyRetention(deps.repo, nowMs);
     if (action === "admin-approve" || action === "admin-reject" || action === "admin-dismiss") {
-      if (!actor.isAdmin) return bad(403, "Admin review is not available for this account.");
+      if (!actor.isAdmin) return bad(403, msg("Admin review is not available for this account."));
     }
     if (action === "admin-dismiss") return dismissReport(input, deps, nowIso);
     if (action === "admin-approve" || action === "admin-reject") return reviewMessage(actor, action, input, deps, nowIso, nowMs);
     const messageId = typeof input.messageId === "string" ? input.messageId : "";
-    if (!UUID.test(messageId)) return bad(400, "That message is not available.");
+    if (!UUID.test(messageId)) return bad(400, msg("That message is not available."));
     const message = await deps.repo.getMessage(messageId);
-    if (!message) return bad(404, "That message is not available.");
+    if (!message) return bad(404, msg("That message is not available."));
     const blocks = await deps.repo.listBlocks();
     const mutes = await deps.repo.listMutes();
     if (action === "remove") return removeOwn(actor, message, deps, nowIso);
     if (action === "appeal") return appealOwn(actor, message, deps, nowIso);
-    if (!canSee(actor, message, blocks, mutes)) return bad(404, "That message is not available.");
+    if (!canSee(actor, message, blocks, mutes)) return bad(404, msg("That message is not available."));
     if (action === "report") return reportMessage(actor, message, input, deps, nowIso);
     if (action === "block" || action === "mute") return relate(actor, message, action, deps, nowIso);
-    return bad(400, "That action is not available.");
+    return bad(400, msg("That action is not available."));
   });
 }
 
@@ -592,10 +593,10 @@ async function reportMessage(
   deps: CommunityDeps,
   nowIso: string,
 ): Promise<ActionResult> {
-  if (message.authorId === actor.id) return bad(400, "You can remove your own message instead of reporting it.");
+  if (message.authorId === actor.id) return bad(400, msg("You can remove your own message instead of reporting it."));
   const reason = typeof input.reason === "string" ? input.reason : "";
   if (!REASON_SET.has(reason)) {
-    return bad(400, "Choose a report reason. The report was not saved.");
+    return bad(400, msg("Choose a report reason. The report was not saved."));
   }
   const reports = await deps.repo.listReports();
   const existing = reports.find((report) => report.messageId === message.id && report.reporterId === actor.id);
@@ -619,7 +620,7 @@ async function relate(
   deps: CommunityDeps,
   nowIso: string,
 ): Promise<ActionResult> {
-  if (message.authorId === actor.id) return bad(400, "That action is not available on your own message.");
+  if (message.authorId === actor.id) return bad(400, msg("That action is not available on your own message."));
   const relation = { ownerId: actor.id, otherId: message.authorId, createdAt: nowIso };
   if (action === "block") await deps.repo.addBlock(relation);
   else await deps.repo.addMute(relation);
@@ -627,7 +628,7 @@ async function relate(
 }
 
 async function removeOwn(actor: CommunityActor, message: StoredMessage, deps: CommunityDeps, nowIso: string): Promise<ActionResult> {
-  if (message.authorId !== actor.id) return bad(403, "You can remove only your own message.");
+  if (message.authorId !== actor.id) return bad(403, msg("You can remove only your own message."));
   if (message.redacted) return { status: 200, body: { ok: true } };
   message.body = "";
   message.redacted = true;
@@ -637,9 +638,9 @@ async function removeOwn(actor: CommunityActor, message: StoredMessage, deps: Co
 }
 
 async function appealOwn(actor: CommunityActor, message: StoredMessage, deps: CommunityDeps, nowIso: string): Promise<ActionResult> {
-  if (message.authorId !== actor.id) return bad(403, "You can appeal only your own message.");
-  if (message.status !== "rejected" || message.redacted) return bad(400, "That message cannot be appealed.");
-  if (message.appealUsed) return bad(400, "That message was already appealed. It is awaiting moderation.");
+  if (message.authorId !== actor.id) return bad(403, msg("You can appeal only your own message."));
+  if (message.status !== "rejected" || message.redacted) return bad(400, msg("That message cannot be appealed."));
+  if (message.appealUsed) return bad(400, msg("That message was already appealed. It is awaiting moderation."));
   message.status = "pending";
   message.appealUsed = true;
   message.decidedAt = nowIso;
@@ -655,11 +656,11 @@ async function reviewMessage(
   nowIso: string,
   nowMs: number,
 ): Promise<ActionResult> {
-  if (!actor.isAdmin) return bad(403, "Admin review is not available for this account.");
+  if (!actor.isAdmin) return bad(403, msg("Admin review is not available for this account."));
   const messageId = typeof input.messageId === "string" ? input.messageId : "";
-  if (!UUID.test(messageId)) return bad(400, "That message is not available.");
+  if (!UUID.test(messageId)) return bad(400, msg("That message is not available."));
   const message = await deps.repo.getMessage(messageId);
-  if (!message || message.redacted || !message.body) return bad(404, "That message is not available.");
+  if (!message || message.redacted || !message.body) return bad(404, msg("That message is not available."));
   const profile = (await deps.repo.getProfile(message.authorId)) ?? emptyProfile(message.authorId);
   if (!profile.displayName) profile.displayName = message.authorName;
   normalizeProfile(profile, nowMs);
@@ -684,10 +685,10 @@ async function reviewMessage(
 
 async function dismissReport(input: Record<string, unknown>, deps: CommunityDeps, nowIso: string): Promise<ActionResult> {
   const reportId = typeof input.reportId === "string" ? input.reportId : "";
-  if (!UUID.test(reportId)) return bad(400, "That report is not available.");
+  if (!UUID.test(reportId)) return bad(400, msg("That report is not available."));
   const reports = await deps.repo.listReports();
   const report = reports.find((item) => item.id === reportId);
-  if (!report) return bad(404, "That report is not available.");
+  if (!report) return bad(404, msg("That report is not available."));
   report.status = "dismissed";
   report.resolvedAt = nowIso;
   await deps.repo.updateReport(report);

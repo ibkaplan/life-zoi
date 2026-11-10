@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prepareAccountWrite, rowsToSession, shouldCopyLocalIntoAccount } from "@/lib/account-records";
-import { activitiesFor, allActivities, isCategory } from "@/lib/brain-quiz/catalog";
+import { activitiesFor, activityById, allActivities, isCategory } from "@/lib/brain-quiz/catalog";
 import { dailyPools, dailyRound } from "@/lib/brain-quiz/daily";
 import {
   buildDifferences,
@@ -13,8 +13,11 @@ import {
   buildPattern,
   buildSequence,
   buildWordRecall,
+  crosswordMatches,
+  foldLetters,
   wordInGrid,
 } from "@/lib/brain-quiz/engines";
+import { localizeActivity, NATIVE, nativeIds, noteText } from "@/lib/brain-quiz/localize";
 import {
   completeDaily,
   emptyBrainProgress,
@@ -186,5 +189,65 @@ describe("daily rotation and scoring", () => {
     expect(loaded.brainQuiz.awarded).toContain("L01");
     expect(sanitizeBrain({ points: -4, awarded: ["bad id", "L01"] }).awarded).toEqual(["L01"]);
     expect(isCategory("habits")).toBe(true);
+  });
+});
+
+describe("native puzzles for other languages", () => {
+  it("keep the same ids, kinds, and answer positions, and the word games work", () => {
+    const native = nativeIds();
+    for (const [locale, set] of Object.entries(NATIVE)) {
+      expect(new Set(set.memoryWords).size, locale).toBe(set.memoryWords.length);
+      expect(buildWordRecall("M-words-h", "hard", set.memoryWords).shown).toHaveLength(6);
+      for (const id of Object.keys(set.variants)) {
+        expect(native.has(id), `${locale} ${id}`).toBe(true);
+        const base = activityById(id);
+        expect(base, id).toBeDefined();
+        if (!base) continue;
+        const activity = localizeActivity(base, locale as "uk" | "ru" | "el");
+        expect(activity.id).toBe(base.id);
+        expect(activity.kind).toBe(base.kind);
+        expect(activity.title).not.toBe(base.title);
+        if ((activity.kind === "choice" || activity.kind === "rebus") && (base.kind === "choice" || base.kind === "rebus")) {
+          expect(activity.correctIndex).toBe(base.correctIndex);
+          expect(new Set(activity.choices).size, `${locale} ${id}`).toBe(4);
+          expect(activity.explanations).toHaveLength(4);
+          expect(activity.choices).not.toEqual(base.choices);
+        }
+        if (activity.kind === "rebus" && base.kind === "rebus") expect(activity.rebus).not.toEqual(base.rebus);
+        if (activity.kind === "word-search") {
+          expect(new Set(activity.rows).size).toBe(activity.rows.length);
+          expect(activity.rows.every((row) => row.length === activity.rows[0]?.length), `${locale} ${id}`).toBe(true);
+          for (const word of activity.words) expect(wordInGrid(activity.rows, word), `${locale} ${word}`).toBe(true);
+        }
+        if (activity.kind === "letters") {
+          expect(activity.answer.length).toBe(activity.pattern.length);
+          activity.pattern.split("").forEach((letter, index) => {
+            if (letter === "_") expect(activity.bank, `${locale} ${id}`).toContain(activity.answer[index]);
+            else expect(letter).toBe(activity.answer[index]);
+          });
+        }
+        if (activity.kind === "acrostic") {
+          expect(activity.words.map((word) => word[0]).join("").toUpperCase(), `${locale} ${id}`).toBe(activity.answer);
+        }
+        if (activity.kind === "crossword") {
+          expect(new Set(activity.grid).size).toBe(activity.grid.length);
+          expect(activity.grid.every((row) => row.length === activity.grid[0]?.length), `${locale} ${id}`).toBe(true);
+          expect(crosswordMatches(activity.grid, activity.grid.map((row) => row.toLowerCase()))).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("matches typed Greek letters with or without accents", () => {
+    expect(crosswordMatches(["ΝΕΡΟ"], ["νερό"])).toBe(true);
+    expect(foldLetters("й")).toBe("Й");
+    expect(crosswordMatches(["СОН"], ["сон"])).toBe(true);
+  });
+
+  it("translates saved result notes that carry a value", () => {
+    const upper = (text: string, values?: Record<string, string | number>) =>
+      (values ? Object.entries(values).reduce((out, [key, value]) => out.replace(`{${key}}`, String(value)), text) : text).toUpperCase();
+    expect(noteText("The sequence was blue, gold.", upper)).toBe("THE SEQUENCE WAS BLUE, GOLD.");
+    expect(noteText("You matched every pair.", upper)).toBe("YOU MATCHED EVERY PAIR.");
   });
 });

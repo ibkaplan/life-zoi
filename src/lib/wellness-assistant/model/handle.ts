@@ -1,7 +1,9 @@
-import { assistantReplyIsUnsafe, isUrgentMessage, SAFETY_NOTICE, WITHHELD_MESSAGE } from "@/lib/assistant";
+import { assistantReplyIsUnsafe, foldForSafety, isUrgentMessage, SAFETY_NOTICE, WITHHELD_MESSAGE } from "@/lib/assistant";
+import { isLocale, type Locale } from "@/lib/i18n/config";
+import { CATALOG_LOADERS, msg, type Catalog } from "@/lib/i18n/translate";
 import { LIMITED_SET_MESSAGE, MODEL_NOT_CONFIGURED, MODEL_QUOTA, MODEL_UNAVAILABLE } from "@/lib/wellness-assistant/copy";
 import { questionById, WELLNESS_QUESTIONS } from "@/lib/wellness-assistant/library";
-import { matchPreparedQuestions } from "@/lib/wellness-assistant/match";
+import { matchPreparedQuestions, type LocalQuestionText } from "@/lib/wellness-assistant/match";
 import { createGeminiProvider, FREE_GEMINI_MODEL } from "@/lib/wellness-assistant/model/gemini";
 import { personalFieldsPresent, redactTurns, suggestionFromSession } from "@/lib/wellness-assistant/model/session-text";
 import type {
@@ -21,6 +23,10 @@ const MAX_OUTPUT_TOKENS = 320;
 const PROMISE =
   /\b(?:prevents?|cures?|reverses?)\s+(?:disease|cancer|diabetes|heart disease|illness)\b|\bguaranteed\b/i;
 
+/** The same promises in Ukrainian, Russian, and Greek, matched on folded text. */
+const PROMISE_LOCAL =
+  /гарантован|гарантирован|εγγυημεν|запобігає хвороб|предотвращает болезн|προλαμβανει ασθενει|виліковує|вилікує|излечивает|излечит|вылечит|θεραπευει τον|θεραπευει τη|θεραπευει το/;
+
 type Env = Record<string, string | undefined>;
 
 function pointers(ids: string[]): PreparedPointer[] {
@@ -30,8 +36,26 @@ function pointers(ids: string[]): PreparedPointer[] {
   });
 }
 
-function preparedFor(question: string): { reply: string; preparedQuestionId: string | null; related: PreparedPointer[] } {
-  const match = matchPreparedQuestions(question);
+/**
+ * The prepared questions in the visitor's interface language, so a question typed in
+ * Ukrainian, Russian, or Greek can still find its prepared answer. English needs none.
+ */
+async function localQuestions(language: Locale): Promise<LocalQuestionText | undefined> {
+  if (language === "en") return undefined;
+  let catalog: Catalog;
+  try {
+    catalog = await CATALOG_LOADERS[language]();
+  } catch {
+    return undefined;
+  }
+  return (item) => ({ question: catalog[item.question] || item.question, answer: catalog[item.answer] || item.answer });
+}
+
+function preparedFor(
+  question: string,
+  local?: LocalQuestionText,
+): { reply: string; preparedQuestionId: string | null; related: PreparedPointer[] } {
+  const match = matchPreparedQuestions(question, local);
   if (match.selectedId) {
     const item = questionById(match.selectedId);
     if (item) {
@@ -49,32 +73,38 @@ function preparedFor(question: string): { reply: string; preparedQuestionId: str
   return { reply: LIMITED_SET_MESSAGE, preparedQuestionId: null, related };
 }
 
-function parseTurns(input: unknown): { ok: true; messages: WellnessTurn[]; meterKey: string; personalDataIgnored: boolean } | { ok: false; error: string } {
-  if (!input || typeof input !== "object") return { ok: false, error: "The request could not be read." };
+function parseTurns(
+  input: unknown,
+):
+  | { ok: true; messages: WellnessTurn[]; meterKey: string; personalDataIgnored: boolean; language: Locale }
+  | { ok: false; error: string } {
+  if (!input || typeof input !== "object") return { ok: false, error: msg("The request could not be read.") };
   const record = input as Record<string, unknown>;
   if (!Array.isArray(record.messages) || record.messages.length === 0) {
-    return { ok: false, error: "Enter a message before sending." };
+    return { ok: false, error: msg("Enter a message before sending.") };
   }
   if (record.messages.length > MAX_TURNS) {
-    return { ok: false, error: "This conversation is too long for one request. Clear it and start again." };
+    return { ok: false, error: msg("This conversation is too long for one request. Clear it and start again.") };
   }
   const messages: WellnessTurn[] = [];
   for (const item of record.messages) {
-    if (!item || typeof item !== "object") return { ok: false, error: "The request could not be read." };
+    if (!item || typeof item !== "object") return { ok: false, error: msg("The request could not be read.") };
     const turn = item as Record<string, unknown>;
     const role = turn.role === "assistant" ? "assistant" : turn.role === "user" ? "user" : null;
     const content = typeof turn.content === "string" ? turn.content.trim() : "";
     if (!role || !content || content.length > MAX_CHARS) {
-      return { ok: false, error: "Use a shorter message, up to 800 characters." };
+      return { ok: false, error: msg("Use a shorter message, up to 800 characters.") };
     }
     messages.push({ role, content });
   }
-  if (messages[messages.length - 1]?.role !== "user") return { ok: false, error: "Enter a message before sending." };
+  if (messages[messages.length - 1]?.role !== "user") return { ok: false, error: msg("Enter a message before sending.") };
   const meterKey = typeof record.meterKey === "string" ? record.meterKey.trim() : "";
   if (!METER_KEY.test(meterKey)) {
-    return { ok: false, error: "This browser session could not be counted. Refresh the page and try again." };
+    return { ok: false, error: msg("This browser session could not be counted. Refresh the page and try again.") };
   }
-  return { ok: true, messages, meterKey, personalDataIgnored: personalFieldsPresent(record) };
+  // Only the interface language is read here. It chooses the reply language and nothing else.
+  const language: Locale = isLocale(record.language) ? record.language : "en";
+  return { ok: true, messages, meterKey, personalDataIgnored: personalFieldsPresent(record), language };
 }
 
 function body(partial: WellnessChatBody): { status: number; body: WellnessChatBody } {
@@ -88,7 +118,7 @@ export function describeWellnessModel(env: Env = process.env) {
     provider: configured ? "gemini" : "none",
     model: configured ? FREE_GEMINI_MODEL : null,
     notice: configured
-      ? "A free wellness model can reply to general questions in this session. Prepared answers are used if it cannot reply."
+      ? msg("A free wellness model can reply to general questions in this session. Prepared answers are used if it cannot reply.")
       : MODEL_NOT_CONFIGURED,
   };
 }
@@ -127,7 +157,7 @@ export async function handleWellnessRequest(
 
   const latest = parsed.messages[parsed.messages.length - 1]?.content ?? "";
   const suggestion = suggestionFromSession(redactTurns(parsed.messages));
-  const prepared = preparedFor(latest);
+  const prepared = preparedFor(latest, await localQuestions(parsed.language));
   const base = {
     suggestion,
     personalDataIgnored: parsed.personalDataIgnored,
@@ -184,6 +214,7 @@ export async function handleWellnessRequest(
   const result = await provider.complete({
     messages: redactTurns(parsed.messages),
     maxOutputTokens: MAX_OUTPUT_TOKENS,
+    language: parsed.language,
   });
   if (!result.ok) {
     const source: WellnessSource = result.reason === "quota" ? "quota" : "unavailable";
@@ -201,7 +232,7 @@ export async function handleWellnessRequest(
     });
   }
 
-  if (assistantReplyIsUnsafe(result.text) || PROMISE.test(result.text)) {
+  if (assistantReplyIsUnsafe(result.text) || PROMISE.test(result.text) || PROMISE_LOCAL.test(foldForSafety(result.text))) {
     return body({
       ...base,
       source: "withheld",

@@ -1,10 +1,15 @@
+"use client";
+
+import { useT } from "@/components/locale-provider";
 import type { Source } from "@/lib/types";
 
+/** Organization names and page titles stay as published. */
 export function SourceList({ sources }: { sources: Source[] }) {
+  const t = useT();
   if (sources.length === 0) return null;
   return (
     <>
-      <h3>Sources</h3>
+      <h3>{t("Sources")}</h3>
       <ul className="source-list">
         {sources.map((source) => (
           <li key={source.url}>

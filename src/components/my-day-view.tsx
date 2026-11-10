@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
+import { usePageFormat } from "@/components/page-format";
 import { useSession } from "@/components/session-provider";
+import { msg } from "@/lib/i18n/translate";
+import { sayJoined } from "@/lib/my-day/say";
 import { LoadingState } from "@/components/sources";
 import { useAccount } from "@/lib/account-store";
 import { isEmptyBrain } from "@/lib/brain-quiz/progress";
@@ -34,23 +37,25 @@ import {
 } from "@/lib/my-day/storage";
 
 const OVERVIEW = [
-  ["Workout", "/academy/move"],
-  ["Nutrition", "/academy/meals"],
-  ["Brain challenge", "/brain-quiz"],
-  ["Habit", "/habit-transformation"],
-  ["Sleep and recovery", "/choices/sleep"],
-  ["Emotional Wellness", "/emotional-wellness"],
-  ["Progress", "/progress"],
-  ["Wellness Assistant", "/ai-assistant"],
+  [msg("Workout"), "/academy/move"],
+  [msg("Nutrition"), "/academy/meals"],
+  [msg("Brain challenge"), "/brain-quiz"],
+  [msg("Habit"), "/habit-transformation"],
+  [msg("Sleep and recovery"), "/choices/sleep"],
+  [msg("Emotional Wellness"), "/emotional-wellness"],
+  [msg("Progress"), "/progress"],
+  [msg("Wellness Assistant"), "/ai-assistant"],
 ] as const;
 
 export function MyDayView() {
   const session = useSession();
+  const { t, longDate, locale } = usePageFormat();
   const account = useAccount();
+  const say = (text: string) => sayJoined(t, text, locale === "en");
   const snap = useSyncExternalStore(subscribeMyDay, getMyDaySnapshot, getMyDayServerSnapshot);
   const emotional = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
   const signedIn = account.phase === "ready";
-  if (!session.ready || !snap.ready || !snap.today) return <LoadingState label="Loading your day…" />;
+  if (!session.ready || !snap.ready || !snap.today) return <LoadingState label={t("Loading your day…")} />;
 
   const answers = session.sample ? null : (session.session.history[0]?.answers ?? null);
   const journey = session.sample ? emptyHabitJourney() : session.session.habitJourney;
@@ -58,7 +63,7 @@ export function MyDayView() {
   const source = session.sample ? emptyMyDay() : session.session.myDay;
   const file = ensureToday(source, snap.today);
   const day = file.days[snap.today];
-  if (!day) return <LoadingState label="Loading your day…" />;
+  if (!day) return <LoadingState label={t("Loading your day…")} />;
 
   const items = presentDay(day, file.savedTimes, answers, journey, {
     date: snap.today,
@@ -71,6 +76,8 @@ export function MyDayView() {
   const protein = proteinEstimate(answers);
   const chart = weightChart(weights);
   const today = snap.today;
+  // English shows the saved date as it was stored. Other languages show it written out.
+  const day0 = (isoDate: string) => (locale === "en" ? isoDate : longDate(isoDate));
 
   function update(next: typeof file) {
     if (session.sample) return;
@@ -80,22 +87,23 @@ export function MyDayView() {
   return (
     <div className="stack-lg">
       <section className="stack">
-        <p className="kicker">My Day at LifeZoi</p>
-        <h1>TAKE CARE OF YOUR HEALTH EASILY</h1>
-        <p className="lede">Take Care of Your Health Easily.</p>
+        <p className="kicker">{t("My Day at LifeZoi")}</p>
+        <h1>{t("TAKE CARE OF YOUR HEALTH EASILY")}</h1>
+        <p className="lede">{t("Take Care of Your Health Easily.")}</p>
         <p>
-          One day, in the order you can walk through it. Times you have saved stay yours. Other times are labeled suggested, and you can change them.
-          Nothing here is sent to an outside service.
+          {t("One day, in the order you can walk through it. Times you have saved stay yours. Other times are labeled suggested, and you can change them.")}
+          {" "}
+          {t("Nothing here is sent to an outside service.")}
         </p>
       </section>
 
       <section className="card stack" aria-labelledby="day-progress-title">
-        <p className="kicker">Wellness overview</p>
-        <h2 id="day-progress-title">Today</h2>
+        <p className="kicker">{t("Wellness overview")}</p>
+        <h2 id="day-progress-title">{t("Today")}</h2>
         <div className="progress-label">
           <span>{progress.percent}%</span>
           <span>
-            {progress.completed} done, {progress.remaining} still open
+            {t("{done} done, {open} still open", { done: progress.completed, open: progress.remaining })}
           </span>
         </div>
         <div
@@ -104,67 +112,67 @@ export function MyDayView() {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={progress.percent}
-          aria-label="Activities marked done today"
+          aria-label={t("Activities marked done today")}
         >
           <span style={{ width: `${progress.percent}%` }} />
         </div>
-        <p>{encouragement(progress)}</p>
-        <p className="hint">Skipped items stay off the count. An unfinished day is not a failure.</p>
+        <p>{t(encouragement(progress))}</p>
+        <p className="hint">{t("Skipped items stay off the count. An unfinished day is not a failure.")}</p>
         <div className="actions">
           {OVERVIEW.map(([label, href]) => (
             <Link key={href} className="btn btn-secondary" href={href}>
-              {label}
+              {t(label)}
             </Link>
           ))}
         </div>
         {answers ? (
-          <p className="hint">Suggestions use the completed assessment already saved. This page does not ask those questions again.</p>
+          <p className="hint">{t("Suggestions use the completed assessment already saved. This page does not ask those questions again.")}</p>
         ) : (
-          <p className="hint">No completed assessment is saved, so the day stays general. Sample answers are not used.</p>
+          <p className="hint">{t("No completed assessment is saved, so the day stays general. Sample answers are not used.")}</p>
         )}
       </section>
 
       <ol className="stack-lg">
         {items.map((item) => (
           <li key={item.id} className="card stack" id={`day-${item.id}`}>
-            <p className="kicker">{item.section}</p>
-            <h2>{item.title}</h2>
+            <p className="kicker">{t(item.section)}</p>
+            <h2>{say(item.title)}</h2>
             <p>
-              <span className="hint">{item.timeLabel}. </span>
+              <span className="hint">{t(item.timeLabel)}. </span>
               <strong>{item.time}</strong>
-              {item.status === "done" ? " · Done" : item.status === "skipped" ? " · Skipped" : ""}
+              {item.status === "done" ? ` · ${t("Done")}` : item.status === "skipped" ? ` · ${t("Skipped")}` : ""}
             </p>
-            <p>{item.detail}</p>
+            <p>{say(item.detail)}</p>
             {item.steps.length > 0 ? (
               <ol>
                 {item.steps.map((step) => (
-                  <li key={step}>{step}</li>
+                  <li key={step}>{say(step)}</li>
                 ))}
               </ol>
             ) : null}
-            {item.why ? <p className="hint">{item.why}</p> : null}
+            {item.why ? <p className="hint">{say(item.why)}</p> : null}
             {item.href ? (
               <Link className="btn btn-secondary" href={item.href}>
-                {item.hrefLabel}
+                {say(item.hrefLabel)}
               </Link>
             ) : null}
             <div className="actions">
               <button className="btn btn-primary" type="button" onClick={() => update(setItemStatus(file, today, item.id, item.status === "done" ? "open" : "done"))}>
-                {item.status === "done" ? "Mark open" : "Mark done"}
+                {item.status === "done" ? t("Mark open") : t("Mark done")}
               </button>
               <button className="btn btn-ghost" type="button" onClick={() => update(setItemStatus(file, today, item.id, item.status === "skipped" ? "open" : "skipped"))}>
-                {item.status === "skipped" ? "Put back" : "Skip"}
+                {item.status === "skipped" ? t("Put back") : t("Skip")}
               </button>
               <button className="btn btn-ghost" type="button" onClick={() => update(cycleItem(file, today, item.id))}>
-                Replace
+                {t("Replace")}
               </button>
               <button className="btn btn-ghost" type="button" onClick={() => update(toggleShorter(file, today, item.id))}>
-                {item.shorter ? "Full version" : "Shorter alternative"}
+                {item.shorter ? t("Full version") : t("Shorter alternative")}
               </button>
             </div>
             <TimeField key={`${item.id}-${item.time}`} id={item.id} value={item.time} onCommit={(time) => update(setItemTime(file, today, item.id, time))} />
             <label className="field" htmlFor={`note-${item.id}`}>
-              <span>Note</span>
+              <span>{t("Note")}</span>
               <input
                 id={`note-${item.id}`}
                 type="text"
@@ -178,33 +186,40 @@ export function MyDayView() {
       </ol>
 
       <section className="card stack" aria-labelledby="estimates-title">
-        <h2 id="estimates-title">Estimates from saved answers</h2>
-        <p>{calories.reason}</p>
-        {calories.kind === "resting" ? <p>Resting estimate: about {calories.kcal} kcal.</p> : null}
+        <h2 id="estimates-title">{t("Estimates from saved answers")}</h2>
+        <p>{t(calories.reason)}</p>
+        {calories.kind === "resting" ? <p>{t("Resting estimate: about {kcal} kcal.", { kcal: calories.kcal })}</p> : null}
         {calories.kind === "maintenance" ? (
           <p>
-            Resting estimate: about {calories.resting} kcal. Maintenance estimate: about {calories.kcal} kcal.
+            {t("Resting estimate: about {resting} kcal. Maintenance estimate: about {kcal} kcal.", {
+              resting: calories.resting,
+              kcal: calories.kcal,
+            })}
           </p>
         ) : null}
-        <p>{protein.reason}</p>
-        {protein.kind === "estimate" ? <p>Protein estimate: about {protein.grams} grams.</p> : null}
+        <p>{t(protein.reason)}</p>
+        {protein.kind === "estimate" ? <p>{t("Protein estimate: about {grams} grams.", { grams: protein.grams })}</p> : null}
       </section>
 
       <section className="card stack" aria-labelledby="weight-title">
-        <h2 id="weight-title">Saved weight</h2>
-        {chart.kind === "empty" ? <p>No saved weight entries, so there is no chart.</p> : null}
+        <h2 id="weight-title">{t("Saved weight")}</h2>
+        {chart.kind === "empty" ? <p>{t("No saved weight entries, so there is no chart.")}</p> : null}
         {chart.kind === "single" ? (
           <p>
-            One saved entry on {chart.entry.date}: {chart.entry.value} {chart.entry.unit}. One entry is not drawn as a chart.
+            {t("One saved entry on {date}: {value} {unit}. One entry is not drawn as a chart.", {
+              date: day0(chart.entry.date),
+              value: chart.entry.value,
+              unit: t(chart.entry.unit),
+            })}
           </p>
         ) : null}
         {chart.kind === "list" ? (
           <>
-            <p>These entries use more than one unit, so they are listed as saved and not drawn on one chart.</p>
+            <p>{t("These entries use more than one unit, so they are listed as saved and not drawn on one chart.")}</p>
             <ul>
               {chart.entries.map((entry) => (
                 <li key={entry.id}>
-                  {entry.date}: {entry.value} {entry.unit}
+                  {day0(entry.date)}: {entry.value} {t(entry.unit)}
                 </li>
               ))}
             </ul>
@@ -212,14 +227,14 @@ export function MyDayView() {
         ) : null}
         {chart.kind === "bars" ? (
           <>
-            <p className="hint">Bar length compares these saved entries only.</p>
+            <p className="hint">{t("Bar length compares these saved entries only.")}</p>
             <ul className="stack">
               {chart.entries.map((entry) => (
                 <li key={entry.id}>
                   <div className="progress-label">
-                    <span>{entry.date}</span>
+                    <span>{day0(entry.date)}</span>
                     <span>
-                      {entry.value} {entry.unit}
+                      {entry.value} {t(entry.unit)}
                     </span>
                   </div>
                   <div className="progress-track" aria-hidden="true">
@@ -235,15 +250,15 @@ export function MyDayView() {
       {file.ayurvedaHidden ? (
         <p>
           <button className="btn btn-ghost" type="button" onClick={() => update(setAyurvedaHidden(file, false))}>
-            Show the optional traditional note
+            {t("Show the optional traditional note")}
           </button>
         </p>
       ) : (
         <section className="card stack" aria-labelledby="tradition-title">
-          <h2 id="tradition-title">Optional traditional note</h2>
-          <p>{ayurvedaNote()}</p>
+          <h2 id="tradition-title">{t("Optional traditional note")}</h2>
+          <p>{t(ayurvedaNote())}</p>
           <button className="btn btn-ghost" type="button" onClick={() => update(setAyurvedaHidden(file, true))}>
-            Skip this note
+            {t("Skip this note")}
           </button>
         </section>
       )}
@@ -252,10 +267,11 @@ export function MyDayView() {
 }
 
 function TimeField({ id, value, onCommit }: { id: ItemId; value: string; onCommit: (time: string) => void }) {
+  const { t } = usePageFormat();
   const [draft, setDraft] = useState(value);
   return (
     <label className="field" htmlFor={`time-${id}`}>
-      <span>Time</span>
+      <span>{t("Time")}</span>
       <input
         id={`time-${id}`}
         type="text"

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useSyncExternalStore, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
+import { useLocale, useT } from "@/components/locale-provider";
+import { LOCALE_META } from "@/lib/i18n/config";
+import { msg } from "@/lib/i18n/translate";
 import {
   BASELINE_FIELDS,
   EXPERIMENTS,
@@ -21,13 +24,13 @@ import {
 } from "@/lib/change-lab";
 
 const STEPS = [
-  "Baseline",
-  "Discover",
-  "Choose",
-  "Plan",
-  "Daily progress",
-  "Reassess",
-  "Before and after",
+  msg("Baseline"),
+  msg("Discover"),
+  msg("Choose"),
+  msg("Plan"),
+  msg("Daily progress"),
+  msg("Reassess"),
+  msg("Before and after"),
 ];
 
 function ChoiceGroup({
@@ -43,9 +46,10 @@ function ChoiceGroup({
   options: readonly (readonly [string, string])[];
   onChange: (value: string) => void;
 }) {
+  const t = useT();
   return (
     <fieldset className="field">
-      <legend>{legend}</legend>
+      <legend>{t(legend)}</legend>
       <div className="choices">
         {options.map(([option, label]) => (
           <label className="choice" key={option}>
@@ -56,7 +60,7 @@ function ChoiceGroup({
               checked={value === option}
               onChange={() => onChange(option)}
             />
-            <span>{label}</span>
+            <span>{t(label)}</span>
           </label>
         ))}
       </div>
@@ -66,33 +70,52 @@ function ChoiceGroup({
 
 export function ChangeLabView() {
   const { ready, sample } = useSession();
+  const t = useT();
+  const { locale } = useLocale();
   const state = useSyncExternalStore(subscribeChangeLab, getChangeLab, getChangeLabServer);
-  const [measure, setMeasure] = useState({ kind: "Walking minutes", value: "", unit: "minutes", measuredOn: "" });
-  if (!ready) return <LoadingState label="Loading Change Lab…" />;
+  // The suggested name and unit are shown in the chosen language until the person types their own.
+  const [measure, setMeasure] = useState<{ kind: string | null; value: string; unit: string | null; measuredOn: string }>({
+    kind: null,
+    value: "",
+    unit: null,
+    measuredOn: "",
+  });
+  if (!ready) return <LoadingState label={t("Loading Change Lab…")} />;
+  const measureKind = measure.kind ?? t("Walking minutes");
+  const measureUnit = measure.unit ?? t("minutes");
+  const dateText = (iso: string) => {
+    const [year, month, day] = iso.split("-").map(Number);
+    const value = new Date(Date.UTC(year, month - 1, day));
+    return Number.isNaN(value.getTime())
+      ? iso
+      : value.toLocaleDateString(LOCALE_META[locale].htmlLang, { timeZone: "UTC", year: "numeric", month: "long", day: "numeric" });
+  };
 
   function update(patch: Partial<ChangeLabState>) {
     writeChangeLab({ ...state, ...patch });
   }
 
-  const plan = state.experimentId ? buildPlan(state.experimentId, state.duration) : [];
+  const plan = state.experimentId ? buildPlan(state.experimentId, state.duration, t) : [];
   const done = state.checkIns.filter((item) => item.done).length;
   const answered = BASELINE_FIELDS.filter((field) => state.baseline[field.id]).map((field) => field.label);
 
   return (
     <div className="change-lab stack-lg">
       <div className="stack">
-        <p className="kicker">LifeZoi Change Lab</p>
-        <h1>Your personal health and lifestyle experiment</h1>
+        <p className="kicker">{t("LifeZoi Change Lab")}</p>
+        <h1>{t("Your personal health and lifestyle experiment")}</h1>
         <p className="lede">
-          Choose one small habit experiment, practice it, and compare what you entered before and after. This is education, not a treatment, and it does not promise a health outcome. It can be the Plan and Act steps in{" "}
-          <Link href="/life-matters">Your Life Matters</Link>.
+          {t(
+            "Choose one small habit experiment, practice it, and compare what you entered before and after. This is education, not a treatment, and it does not promise a health outcome. It can be the Plan and Act steps in",
+          )}{" "}
+          <Link href="/life-matters">{t("Your Life Matters")}</Link>.
         </p>
       </div>
       <p className="banner" role="status">
-        Saved in this browser tab only. Nothing here is sent to an AI provider or to MedlinePlus.
-        {sample ? " The sample-visitor banner is about the older assessment, not this experiment." : ""}
+        {t("Saved in this browser tab only. Nothing here is sent to an AI provider or to MedlinePlus.")}
+        {sample ? ` ${t("The sample-visitor banner is about the older assessment, not this experiment.")}` : ""}
       </p>
-      <ol className="step-list" aria-label="Change Lab progress">
+      <ol className="step-list" aria-label={t("Change Lab progress")}>
         {STEPS.map((label, index) => (
           <li key={label}>
             <button
@@ -101,7 +124,7 @@ export function ChangeLabView() {
               aria-current={state.step === index ? "step" : undefined}
               onClick={() => update({ step: index })}
             >
-              {index + 1}. {label}
+              {index + 1}. {t(label)}
             </button>
           </li>
         ))}
@@ -109,8 +132,8 @@ export function ChangeLabView() {
 
       {state.step === 0 ? (
         <section className="card stack">
-          <h2>Step 1. Baseline</h2>
-          <p>Answer only what you want. Every question is optional. A rough answer is enough.</p>
+          <h2>{t("Step 1. Baseline")}</h2>
+          <p>{t("Answer only what you want. Every question is optional. A rough answer is enough.")}</p>
           {BASELINE_FIELDS.map((field) => (
             <ChoiceGroup
               key={field.id}
@@ -121,23 +144,23 @@ export function ChangeLabView() {
               onChange={(value) => update({ baseline: { ...state.baseline, [field.id]: value } })}
             />
           ))}
-          <h3>Optional demonstration measurements</h3>
-          <p>Type a practice number if you want it in the later comparison. Leave this blank to skip it. These numbers stay in this tab.</p>
+          <h3>{t("Optional demonstration measurements")}</h3>
+          <p>{t("Type a practice number if you want it in the later comparison. Leave this blank to skip it. These numbers stay in this tab.")}</p>
           <div className="grid-2">
             <label className="field">
-              <span>Measurement name</span>
-              <input value={measure.kind} onChange={(event) => setMeasure({ ...measure, kind: event.target.value })} />
+              <span>{t("Measurement name")}</span>
+              <input value={measureKind} onChange={(event) => setMeasure({ ...measure, kind: event.target.value })} />
             </label>
             <label className="field">
-              <span>Value</span>
+              <span>{t("Value")}</span>
               <input inputMode="decimal" value={measure.value} onChange={(event) => setMeasure({ ...measure, value: event.target.value })} />
             </label>
             <label className="field">
-              <span>Unit</span>
-              <input value={measure.unit} onChange={(event) => setMeasure({ ...measure, unit: event.target.value })} />
+              <span>{t("Unit")}</span>
+              <input value={measureUnit} onChange={(event) => setMeasure({ ...measure, unit: event.target.value })} />
             </label>
             <label className="field">
-              <span>Date</span>
+              <span>{t("Date")}</span>
               <input type="date" value={measure.measuredOn} onChange={(event) => setMeasure({ ...measure, measuredOn: event.target.value })} />
             </label>
           </div>
@@ -146,67 +169,68 @@ export function ChangeLabView() {
             type="button"
             onClick={() => {
               const value = Number(measure.value);
-              if (!measure.kind.trim() || !Number.isFinite(value) || !measure.measuredOn) return;
+              if (!measureKind.trim() || !Number.isFinite(value) || !measure.measuredOn) return;
               update({
                 baselineMeasurements: [
                   ...state.baselineMeasurements,
                   {
                     id: crypto.randomUUID(),
-                    kind: measure.kind.trim().slice(0, 40),
+                    kind: measureKind.trim().slice(0, 40),
                     value,
-                    unit: measure.unit.trim().slice(0, 24) || "units",
+                    unit: measureUnit.trim().slice(0, 24) || "units",
                     measuredOn: measure.measuredOn,
                   },
                 ],
               });
             }}
           >
-            Add baseline measurement
+            {t("Add baseline measurement")}
           </button>
           <ul>
             {state.baselineMeasurements.map((item) => (
               <li key={item.id}>
-                {item.kind}: {item.value} {item.unit} on {item.measuredOn}
+                {t(item.kind)}:{" "}
+                {t("{value} {unit} on {date}", { value: item.value, unit: t(item.unit), date: dateText(item.measuredOn) })}
               </li>
             ))}
           </ul>
           <button className="btn btn-primary" type="button" onClick={() => update({ step: 1 })}>
-            See the overview
+            {t("See the overview")}
           </button>
         </section>
       ) : null}
 
       {state.step === 1 ? (
         <section className="card stack">
-          <h2>Step 2. Discover</h2>
-          <p>This overview repeats what you entered. It does not score your health.</p>
-          <h3>Answers on file</h3>
-          {answered.length === 0 ? <p>No baseline answers yet. You can still choose an experiment.</p> : null}
+          <h2>{t("Step 2. Discover")}</h2>
+          <p>{t("This overview repeats what you entered. It does not score your health.")}</p>
+          <h3>{t("Answers on file")}</h3>
+          {answered.length === 0 ? <p>{t("No baseline answers yet. You can still choose an experiment.")}</p> : null}
           <ul>
             {BASELINE_FIELDS.filter((field) => state.baseline[field.id]).map((field) => (
               <li key={field.id}>
-                <strong>{field.label}: </strong>
-                {fieldLabel(field.id, state.baseline[field.id] as string)}
+                <strong>{t(field.label)}: </strong>
+                {fieldLabel(field.id, state.baseline[field.id] as string, t)}
               </li>
             ))}
           </ul>
-          <h3>Patterns you may want to practice</h3>
+          <h3>{t("Patterns you may want to practice")}</h3>
           <ul>
-            {state.baseline.sugar === "often" ? <li>Sugary drinks were marked as most days.</li> : null}
-            {state.baseline.sleep === "short" ? <li>Sleep was marked as often short.</li> : null}
-            {state.baseline.activity === "rare" ? <li>Walking was marked as rare.</li> : null}
-            {state.baseline.sedentary === "often" ? <li>Long sitting stretches were marked as often.</li> : null}
-            {answered.length === 0 ? <li>Add a baseline answer if you want a pattern listed here.</li> : null}
+            {state.baseline.sugar === "often" ? <li>{t("Sugary drinks were marked as most days.")}</li> : null}
+            {state.baseline.sleep === "short" ? <li>{t("Sleep was marked as often short.")}</li> : null}
+            {state.baseline.activity === "rare" ? <li>{t("Walking was marked as rare.")}</li> : null}
+            {state.baseline.sedentary === "often" ? <li>{t("Long sitting stretches were marked as often.")}</li> : null}
+            {answered.length === 0 ? <li>{t("Add a baseline answer if you want a pattern listed here.")}</li> : null}
           </ul>
           <button className="btn btn-primary" type="button" onClick={() => update({ step: 2 })}>
-            Choose an experiment
+            {t("Choose an experiment")}
           </button>
         </section>
       ) : null}
 
       {state.step === 2 ? (
         <section className="card stack">
-          <h2>Step 3. Choose an experiment</h2>
+          <h2>{t("Step 3. Choose an experiment")}</h2>
           <div className="choices">
             {EXPERIMENTS.map((experiment) => (
               <label className="choice" key={experiment.id}>
@@ -217,14 +241,14 @@ export function ChangeLabView() {
                   onChange={() => update({ experimentId: experiment.id as ExperimentId })}
                 />
                 <span>
-                  <strong>{experiment.title}</strong>
-                  <span className="hint">{experiment.summary}</span>
+                  <strong>{t(experiment.title)}</strong>
+                  <span className="hint">{t(experiment.summary)}</span>
                 </span>
               </label>
             ))}
           </div>
           <fieldset className="field">
-            <legend>Length</legend>
+            <legend>{t("Length")}</legend>
             <div className="choices">
               {[7, 30].map((days) => (
                 <label className="choice" key={days}>
@@ -234,36 +258,36 @@ export function ChangeLabView() {
                     checked={state.duration === days}
                     onChange={() => update({ duration: days as 7 | 30 })}
                   />
-                  <span>{days} days</span>
+                  <span>{t("{days} days", { days })}</span>
                 </label>
               ))}
             </div>
           </fieldset>
           <button className="btn btn-primary" type="button" disabled={!state.experimentId} onClick={() => update({ step: 3 })}>
-            Build the plan
+            {t("Build the plan")}
           </button>
         </section>
       ) : null}
 
       {state.step === 3 ? (
         <section className="card stack">
-          <h2>Step 4. Personal plan</h2>
-          {plan.length === 0 ? <p>Choose an experiment first.</p> : null}
+          <h2>{t("Step 4. Personal plan")}</h2>
+          {plan.length === 0 ? <p>{t("Choose an experiment first.")}</p> : null}
           <ol>
             {plan.map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ol>
           <button className="btn btn-primary" type="button" onClick={() => update({ step: 4 })}>
-            Go to daily progress
+            {t("Go to daily progress")}
           </button>
         </section>
       ) : null}
 
       {state.step === 4 ? (
         <section className="card stack">
-          <h2>Step 5. Daily progress</h2>
-          <p role="status">{encouragement(done, state.duration)}</p>
+          <h2>{t("Step 5. Daily progress")}</h2>
+          <p role="status">{encouragement(done, state.duration, t)}</p>
           <ul className="record-list">
             {plan.map((line, index) => {
               const date = `day-${index + 1}`;
@@ -290,15 +314,15 @@ export function ChangeLabView() {
             })}
           </ul>
           <button className="btn btn-primary" type="button" onClick={() => update({ step: 5, followUp: state.followUp ?? { ...state.baseline } })}>
-            Reassess
+            {t("Reassess")}
           </button>
         </section>
       ) : null}
 
       {state.step === 5 ? (
         <section className="card stack">
-          <h2>Step 6. Reassessment</h2>
-          <p>Enter a new answer only where something feels different. The first answers stay as the baseline.</p>
+          <h2>{t("Step 6. Reassessment")}</h2>
+          <p>{t("Enter a new answer only where something feels different. The first answers stay as the baseline.")}</p>
           {BASELINE_FIELDS.map((field) => (
             <ChoiceGroup
               key={field.id}
@@ -310,29 +334,29 @@ export function ChangeLabView() {
             />
           ))}
           <button className="btn btn-primary" type="button" onClick={() => update({ step: 6 })}>
-            See before and after
+            {t("See before and after")}
           </button>
         </section>
       ) : null}
 
       {state.step === 6 ? (
         <section className="card stack">
-          <h2>Step 7. Before and after</h2>
+          <h2>{t("Step 7. Before and after")}</h2>
           <p>
-            The table shows words and numbers you typed. A difference is a change in the record, not proof that the experiment caused a health effect.
+            {t("The table shows words and numbers you typed. A difference is a change in the record, not proof that the experiment caused a health effect.")}
           </p>
-          <p role="status">{habitJourneySummary(state)}</p>
+          <p role="status">{habitJourneySummary(state, t)}</p>
           <table>
-            <caption>What you entered at baseline and at reassessment</caption>
+            <caption>{t("What you entered at baseline and at reassessment")}</caption>
             <thead>
               <tr>
-                <th scope="col">Item</th>
-                <th scope="col">Before</th>
-                <th scope="col">After</th>
+                <th scope="col">{t("Item")}</th>
+                <th scope="col">{t("Before")}</th>
+                <th scope="col">{t("After")}</th>
               </tr>
             </thead>
             <tbody>
-              {compareChangeLab(state).map((row) => (
+              {compareChangeLab(state, t, dateText).map((row) => (
                 <tr key={row.label}>
                   <th scope="row">{row.label}</th>
                   <td>{row.before}</td>

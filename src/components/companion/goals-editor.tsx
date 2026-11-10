@@ -6,6 +6,8 @@ import { goalActivity } from "@/lib/companion/day-plan";
 import { commitCompanion } from "@/lib/companion/store";
 import { cleanText, LIMITS, type PersonalGoal } from "@/lib/companion/state";
 import { localISODate } from "@/lib/dates";
+import { useT } from "@/components/locale-provider";
+import { goalStep } from "@/components/companion/i18n";
 
 /** Personal goals in the person's own words. Each becomes a small daily step. */
 export function GoalsEditor() {
@@ -13,6 +15,7 @@ export function GoalsEditor() {
   const [text, setText] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const t = useT();
   const goals = companion.goals.filter((goal) => !goal.archivedOn);
   const today = localISODate();
 
@@ -33,21 +36,21 @@ export function GoalsEditor() {
 
   return (
     <div className="stack">
-      <p>Write a goal in your own words, such as “Walk to the park with my grandchildren” or “Feel calmer in the evenings”. LifeZoi turns each one into a small daily step.</p>
-      {sample ? <p className="hint">Sample data is on. Goals are not saved.</p> : null}
+      <p>{t("Write a goal in your own words, such as “Walk to the park with my grandchildren” or “Feel calmer in the evenings”. LifeZoi turns each one into a small daily step.")}</p>
+      {sample ? <p className="hint">{t("Sample data is on. Goals are not saved.")}</p> : null}
       <div className="inline-form">
-        <input aria-label="A new goal" value={text} maxLength={LIMITS.text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => event.key === "Enter" && add()} />
+        <input aria-label={t("A new goal")} value={text} maxLength={LIMITS.text} onChange={(event) => setText(event.target.value)} onKeyDown={(event) => event.key === "Enter" && add()} />
         <button className="btn btn-primary" type="button" onClick={add} disabled={!text.trim()}>
-          Add goal
+          {t("Add goal")}
         </button>
       </div>
-      {goals.length === 0 ? <p className="hint">No personal goals yet.</p> : null}
+      {goals.length === 0 ? <p className="hint">{t("No personal goals yet.")}</p> : null}
       <ul className="record-list">
         {goals.map((goal) => (
           <li key={goal.id} className="stack">
             {editing === goal.id ? (
               <div className="inline-form">
-                <input aria-label="Edit goal" value={draft} maxLength={LIMITS.text} onChange={(event) => setDraft(event.target.value)} />
+                <input aria-label={t("Edit goal")} value={draft} maxLength={LIMITS.text} onChange={(event) => setDraft(event.target.value)} />
                 <button
                   className="btn btn-primary"
                   type="button"
@@ -57,16 +60,16 @@ export function GoalsEditor() {
                     setEditing(null);
                   }}
                 >
-                  Save
+                  {t("Save")}
                 </button>
                 <button className="btn btn-ghost" type="button" onClick={() => setEditing(null)}>
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
             ) : (
               <>
                 <strong>{goal.text}</strong>
-                <span className="hint">Daily step: {goalActivity(goal).title.replace(/^Toward “.*”: ?/, "") || "one small step"}</span>
+                <span className="hint">{t("Daily step: {step}", { step: goalStep(goalActivity(goal), t) })}</span>
                 <div className="lz-buttons">
                   <button
                     className="btn btn-ghost"
@@ -76,10 +79,10 @@ export function GoalsEditor() {
                       setDraft(goal.text);
                     }}
                   >
-                    Edit
+                    {t("Edit")}
                   </button>
                   <button className="btn btn-ghost" type="button" onClick={() => update(goal.id, { archivedOn: today })}>
-                    Remove
+                    {t("Remove")}
                   </button>
                 </div>
               </>

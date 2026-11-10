@@ -2,25 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from "@/components/locale-provider";
+import { LOCALE_META } from "@/lib/i18n/config";
 import { storageLine, useFoodPlan } from "@/components/food-plan/use-food-plan";
+import { msg } from "@/lib/i18n/translate";
 
 const LINKS = [
-  ["/food-plan", "Overview"],
-  ["/food-plan/today", "Today's meals"],
-  ["/food-plan/preferences", "My food choices"],
-  ["/food-plan/seasonal", "Seasonal"],
-  ["/food-plan/modern", "Modern"],
-  ["/food-plan/ayurveda", "Ayurveda"],
-  ["/food-plan/profile", "Profile"],
-  ["/food-plan/week", "Week"],
-  ["/food-plan/favorites", "Favorites"],
-  ["/food-plan/shopping", "Shopping"],
-  ["/food-plan/progress", "Progress"],
-  ["/food-plan/spices", "Spices"],
-  ["/food-plan/science", "Science"],
-  ["/food-plan/protein", "Protein"],
-  ["/food-plan/simple", "Simple meals"],
+  ["/food-plan", msg("Overview")],
+  ["/food-plan/today", msg("Today's meals")],
+  ["/food-plan/preferences", msg("My food choices")],
+  ["/food-plan/seasonal", msg("Seasonal")],
+  ["/food-plan/modern", msg("Modern")],
+  ["/food-plan/ayurveda", msg("Ayurveda")],
+  ["/food-plan/profile", msg("Profile")],
+  ["/food-plan/week", msg("Week")],
+  ["/food-plan/favorites", msg("Favorites")],
+  ["/food-plan/shopping", msg("Shopping")],
+  ["/food-plan/progress", msg("Progress")],
+  ["/food-plan/spices", msg("Spices")],
+  ["/food-plan/science", msg("Science")],
+  ["/food-plan/protein", msg("Protein")],
+  ["/food-plan/simple", msg("Simple meals")],
 ] as const;
+
+/** Translation plus numbers written the way the chosen language writes them (1.5 in English, 1,5 in Ukrainian). */
+export function useFoodFormat() {
+  const { t, locale } = useLocale();
+  const n = (value: number, digits = 1) =>
+    value.toLocaleString(LOCALE_META[locale].htmlLang, { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: false });
+  const plain = (value: number) => value.toLocaleString(LOCALE_META[locale].htmlLang, { maximumFractionDigits: 3, useGrouping: false });
+  return { t, n, plain, locale };
+}
 
 export function FoodMark({ label }: { label: string }) {
   return (
@@ -36,20 +48,21 @@ export function FoodMark({ label }: { label: string }) {
 export function FoodFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { phase, sample } = useFoodPlan();
+  const { t } = useFoodFormat();
   return (
     <div className="stack-lg">
-      <nav className="food-nav" aria-label="Food and wellness">
+      <nav className="food-nav" aria-label={t("Food and wellness")}>
         {LINKS.map(([href, label]) => {
           const current = href === "/food-plan" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
           return (
             <Link key={href} href={href} aria-current={current ? "page" : undefined}>
-              {label}
+              {t(label)}
             </Link>
           );
         })}
       </nav>
-      <p className="hint">{storageLine(phase)}</p>
-      {sample ? <p className="hint">Sample data is read-only.</p> : null}
+      <p className="hint">{t(storageLine(phase))}</p>
+      {sample ? <p className="hint">{t("Sample data is read-only.")}</p> : null}
       {children}
     </div>
   );
@@ -68,28 +81,30 @@ export function FoodNumbers({
   sat: number | null;
   sodium?: number | null;
 }) {
+  const { t, n } = useFoodFormat();
+  const grams = (value: number) => t("{amount} g", { amount: n(value) });
   return (
     <dl className="food-numbers">
       <div>
-        <dt>Protein</dt>
-        <dd>{protein.toFixed(1)} g</dd>
+        <dt>{t("Protein")}</dt>
+        <dd>{grams(protein)}</dd>
       </div>
       <div>
-        <dt>Calories</dt>
-        <dd>{kcal.toFixed(1)} kcal</dd>
+        <dt>{t("Calories")}</dt>
+        <dd>{t("{amount} kcal", { amount: n(kcal) })}</dd>
       </div>
       <div>
-        <dt>Saturated fat</dt>
-        <dd>{sat === null ? "Not reported" : `${sat.toFixed(1)} g`}</dd>
+        <dt>{t("Saturated fat")}</dt>
+        <dd>{sat === null ? t("Not reported") : grams(sat)}</dd>
       </div>
       <div>
-        <dt>Fiber</dt>
-        <dd>{fiber === null ? "Not reported" : `${fiber.toFixed(1)} g`}</dd>
+        <dt>{t("Fiber")}</dt>
+        <dd>{fiber === null ? t("Not reported") : grams(fiber)}</dd>
       </div>
       {sodium !== undefined ? (
         <div>
-          <dt>Sodium</dt>
-          <dd>{sodium === null ? "Not reported" : `${Math.round(sodium)} mg`}</dd>
+          <dt>{t("Sodium")}</dt>
+          <dd>{sodium === null ? t("Not reported") : t("{amount} mg", { amount: n(sodium, 0) })}</dd>
         </div>
       ) : null}
     </dl>

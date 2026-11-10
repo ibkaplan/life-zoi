@@ -3,8 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLocale, useT } from "@/components/locale-provider";
 import { useWellness } from "@/components/wellness/use-wellness";
+import { msg } from "@/lib/i18n/translate";
 import { formatLongDate } from "@/lib/dates";
+import { LOCALE_META, type Locale } from "@/lib/i18n/config";
 import { commitWellness } from "@/lib/wellness/client-store";
 import { upsertCheck } from "@/lib/wellness/storage";
 import {
@@ -52,10 +55,10 @@ import {
 } from "@/lib/nutrition/plate";
 
 const slots: { id: PlateSlot; label: string }[] = [
-  { id: "produce", label: "Vegetables and fruit" },
-  { id: "protein", label: "Protein" },
-  { id: "grain", label: "Grains and other carbohydrate foods" },
-  { id: "fat", label: "Healthy fats, modest amount" },
+  { id: "produce", label: msg("Vegetables and fruit") },
+  { id: "protein", label: msg("Protein") },
+  { id: "grain", label: msg("Grains and other carbohydrate foods") },
+  { id: "fat", label: msg("Healthy fats, modest amount") },
 ];
 
 type Draft = {
@@ -110,7 +113,7 @@ function useMarks() {
         { id, date: prior?.date ?? wellness.today, done, reflection },
       ),
     );
-    setStatus("Saved in this browser tab with your other check-ins.");
+    setStatus(msg("Saved in this browser tab with your other check-ins."));
   }
 
   function toggle(id: string) {
@@ -137,7 +140,7 @@ function useMarks() {
       );
     }
     commitWellness(next);
-    setStatus("Saved in this browser tab with your other check-ins.");
+    setStatus(msg("Saved in this browser tab with your other check-ins."));
   }
 
   function clearMatching(match: (id: string) => boolean) {
@@ -149,10 +152,17 @@ function useMarks() {
       ...wellness.log,
       checks: wellness.log.checks.filter((item) => !match(item.id)),
     });
-    setStatus("Cleared in this browser tab.");
+    setStatus(msg("Cleared in this browser tab."));
   }
 
   return { wellness, status, marked, textOf, writeMany, toggle, clearMatching };
+}
+
+/** The week's first day, written in the chosen language. English keeps the existing long date. */
+function weekDate(iso: string, locale: Locale): string {
+  if (locale === "en") return formatLongDate(iso);
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(LOCALE_META[locale].htmlLang, { year: "numeric", month: "long", day: "numeric" });
 }
 
 function FoodDraw({ kind, label }: { kind: DrawKind; label: string }) {
@@ -220,45 +230,48 @@ function FoodDraw({ kind, label }: { kind: DrawKind; label: string }) {
 }
 
 function Visual({ item }: { item: FoodVisual }) {
+  const t = useT();
   return (
     <div>
       {item.image ? (
         <div className="nz-photoFrame">
-          <Image src={item.image} alt={item.alt} width={1024} height={768} />
+          <Image src={item.image} alt={t(item.alt)} width={1024} height={768} />
         </div>
       ) : item.draw ? (
-        <FoodDraw kind={item.draw} label={item.alt} />
+        <FoodDraw kind={item.draw} label={t(item.alt)} />
       ) : null}
-      <p className="nz-note">{item.caption}</p>
+      <p className="nz-note">{t(item.caption)}</p>
     </div>
   );
 }
 
 function LabelSheet({ label }: { label: TeachingLabel }) {
+  const t = useT();
   const rows = [
-    ["Serving size", label.serving],
-    ["Calories", `${label.calories} kcal`],
-    ["Added sugars", `${label.addedSugarsG} g`],
-    ["Sodium", `${label.sodiumMg} mg`],
-    ["Fiber", `${label.fiberG} g`],
-    ["Protein", `${label.proteinG} g`],
+    ["Serving size", t(label.serving)],
+    ["Calories", t("{amount} kcal", { amount: label.calories })],
+    ["Added sugars", t("{amount} g", { amount: label.addedSugarsG })],
+    ["Sodium", t("{amount} mg", { amount: label.sodiumMg })],
+    ["Fiber", t("{amount} g", { amount: label.fiberG })],
+    ["Protein", t("{amount} g", { amount: label.proteinG })],
   ];
   return (
-    <figure className="nz-labelSheet" aria-label={label.product}>
-      <figcaption>{illustrativeBanner}</figcaption>
-      <p className="nz-labelProduct">{label.product}</p>
+    <figure className="nz-labelSheet" aria-label={t(label.product)}>
+      <figcaption>{t(illustrativeBanner)}</figcaption>
+      <p className="nz-labelProduct">{t(label.product)}</p>
       {rows.map(([name, value]) => (
         <p key={name} className={name === "Sodium" ? "nz-labelAdded" : "nz-labelRow"}>
-          <span>{name}</span>
+          <span>{t(name)}</span>
           <span>{value}</span>
         </p>
       ))}
-      <p>Ingredients: {label.ingredients}</p>
+      <p>{t("Ingredients: {list}", { list: t(label.ingredients) })}</p>
     </figure>
   );
 }
 
 function Sources() {
+  const t = useT();
   return (
     <ul className="nz-sources">
       {plateSources.map((source) => (
@@ -266,7 +279,7 @@ function Sources() {
           <a href={source.url} target="_blank" rel="noopener noreferrer">
             {source.publisher}: {source.name}
           </a>
-          . Checked {source.checked}.
+          . {t("Checked {date}.", { date: source.checked })}
         </li>
       ))}
     </ul>
@@ -277,6 +290,7 @@ function PlateSection() {
   const breakfast = plateExamples[0].foodIds;
   const [picked, setPicked] = useState<string[]>([...breakfast]);
   const summary = plateSummary(picked);
+  const t = useT();
 
   function toggleFood(id: string) {
     setPicked((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
@@ -284,11 +298,11 @@ function PlateSection() {
 
   return (
     <section className="nz-panel" id="healthy-plate">
-      <p className="nz-kicker">Plate</p>
-      <h2>{plateIntro.title}</h2>
-      <p>{plateIntro.lead}</p>
-      <p>{plateIntro.vary}</p>
-      <div className="nz-actions" aria-label="Example meals">
+      <p className="nz-kicker">{t("Plate")}</p>
+      <h2>{t(plateIntro.title)}</h2>
+      <p>{t(plateIntro.lead)}</p>
+      <p>{t(plateIntro.vary)}</p>
+      <div className="nz-actions" aria-label={t("Example meals")}>
         {plateExamples.map((example) => (
           <button
             key={example.id}
@@ -296,55 +310,55 @@ function PlateSection() {
             type="button"
             onClick={() => setPicked([...example.foodIds])}
           >
-            {example.name}
+            {t(example.name)}
           </button>
         ))}
       </div>
       <div className="nz-split">
-        <figure className="nz-plate" aria-label="Plate divided into vegetables and fruit, protein, and grains">
+        <figure className="nz-plate" aria-label={t("Plate divided into vegetables and fruit, protein, and grains")}>
           <div className="nz-wedge nz-wedgeProduce">
-            <h3>Vegetables and fruit</h3>
+            <h3>{t("Vegetables and fruit")}</h3>
             <ul>
               {summary.produce.map((food) => (
-                <li key={food.id}>{food.name}</li>
+                <li key={food.id}>{t(food.name)}</li>
               ))}
             </ul>
           </div>
           <div className="nz-wedge nz-wedgeProtein">
-            <h3>Protein</h3>
+            <h3>{t("Protein")}</h3>
             <ul>
               {summary.protein.map((food) => (
-                <li key={food.id}>{food.name}</li>
+                <li key={food.id}>{t(food.name)}</li>
               ))}
             </ul>
           </div>
           <div className="nz-wedge nz-wedgeGrain">
-            <h3>Grains</h3>
+            <h3>{t("Grains")}</h3>
             <ul>
               {summary.grain.map((food) => (
-                <li key={food.id}>{food.name}</li>
+                <li key={food.id}>{t(food.name)}</li>
               ))}
             </ul>
           </div>
         </figure>
         <div className="nz-panel">
-          <h3>Modest fat</h3>
+          <h3>{t("Modest fat")}</h3>
           <ul>
-            {summary.fat.length > 0 ? summary.fat.map((food) => <li key={food.id}>{food.name}</li>) : <li>None picked yet.</li>}
+            {summary.fat.length > 0 ? summary.fat.map((food) => <li key={food.id}>{t(food.name)}</li>) : <li>{t("None picked yet.")}</li>}
           </ul>
-          <p role="status">{summary.message}</p>
+          <p role="status">{t(summary.message)}</p>
         </div>
       </div>
       {slots.map((slot) => (
         <div key={slot.id}>
-          <h3>{slot.label}</h3>
+          <h3>{t(slot.label)}</h3>
           <div className="nz-actions">
             {plateFoods.filter((food) => food.slot === slot.id).map((food) => {
               const on = picked.includes(food.id);
               return (
                 <button key={food.id} className="nz-pick" type="button" aria-pressed={on} onClick={() => toggleFood(food.id)}>
-                  <strong>{food.name}</strong>
-                  <span>{food.note}</span>
+                  <strong>{t(food.name)}</strong>
+                  <span>{t(food.note)}</span>
                 </button>
               );
             })}
@@ -354,8 +368,8 @@ function PlateSection() {
       <div className="nz-grid nz-two">
         {plateExamples.map((example) => (
           <article key={example.id} className="nz-panel">
-            <h3>{example.name}</h3>
-            <p>{example.blurb}</p>
+            <h3>{t(example.name)}</h3>
+            <p>{t(example.blurb)}</p>
           </article>
         ))}
       </div>
@@ -364,31 +378,32 @@ function PlateSection() {
 }
 
 function ProteinSection() {
+  const t = useT();
   return (
     <section className="nz-panel" id="protein">
-      <p className="nz-kicker">Protein</p>
-      <h2>{proteinCopy.title}</h2>
-      <p>{proteinCopy.lead}</p>
-      <p>{proteinCopy.aging}</p>
-      <p>{proteinCopy.recovery}</p>
+      <p className="nz-kicker">{t("Protein")}</p>
+      <h2>{t(proteinCopy.title)}</h2>
+      <p>{t(proteinCopy.lead)}</p>
+      <p>{t(proteinCopy.aging)}</p>
+      <p>{t(proteinCopy.recovery)}</p>
       <p>
-        {proteinCopy.movement}{" "}
-        <Link href="/academy/move">Open Movement</Link>
+        {t(proteinCopy.movement)}{" "}
+        <Link href="/academy/move">{t("Open Movement")}</Link>
         {" · "}
-        <Link href="/academy/move/chair-stand">Stand from a chair</Link>
+        <Link href="/academy/move/chair-stand">{t("Stand from a chair")}</Link>
         {" · "}
-        <Link href="/academy/move/heel-to-toe">Heel-to-toe steps</Link>
+        <Link href="/academy/move/heel-to-toe">{t("Heel-to-toe steps")}</Link>
       </p>
       <div className="nz-grid nz-three">
         {proteinCards.map((card) => (
           <article key={card.id} className="nz-panel">
             <Visual item={card} />
-            <h3>{card.name}</h3>
-            {card.vegetarian ? <p className="nz-pill">Vegetarian option</p> : null}
-            <p>{card.note}</p>
+            <h3>{t(card.name)}</h3>
+            {card.vegetarian ? <p className="nz-pill">{t("Vegetarian option")}</p> : null}
+            <p>{t(card.note)}</p>
             <p>
-              <strong>Meal idea. </strong>
-              {card.meal}
+              <strong>{t("Meal idea.")} </strong>
+              {t(card.meal)}
             </p>
           </article>
         ))}
@@ -404,25 +419,26 @@ function SaltSection() {
   const pair = sodiumPairs.find((item) => item.id === pairId) ?? sodiumPairs[0];
   const left = labelById(pair.leftId);
   const right = labelById(pair.rightId);
-  const answer = left && right ? sodiumAnswer(left, right) : null;
+  const t = useT();
+  const answer = left && right ? sodiumAnswer(left, right, t) : null;
 
   return (
     <section className="nz-panel" id="hidden-salt">
-      <p className="nz-kicker">Sodium</p>
-      <h2>{saltCopy.title}</h2>
-      <p>{saltCopy.titleNote}</p>
-      <p>{saltCopy.saltVersusSodium}</p>
-      <p>{saltCopy.pressure}</p>
+      <p className="nz-kicker">{t("Sodium")}</p>
+      <h2>{t(saltCopy.title)}</h2>
+      <p>{t(saltCopy.titleNote)}</p>
+      <p>{t(saltCopy.saltVersusSodium)}</p>
+      <p>{t(saltCopy.pressure)}</p>
       <div className="nz-grid nz-two">
         {saltPlaces.map((place) => (
           <article key={place.id} className="nz-panel">
-            <h3>{place.title}</h3>
-            <p>{place.text}</p>
+            <h3>{t(place.title)}</h3>
+            <p>{t(place.text)}</p>
           </article>
         ))}
       </div>
-      <h3>Label reading</h3>
-      <p>{saltCopy.label}</p>
+      <h3>{t("Label reading")}</h3>
+      <p>{t(saltCopy.label)}</p>
       <div className="nz-actions">
         {sodiumPairs.map((item) => (
           <button
@@ -435,19 +451,19 @@ function SaltSection() {
               setShown(false);
             }}
           >
-            {item.id === "soups" ? "Compare two soups" : "Compare two breads"}
+            {item.id === "soups" ? t("Compare two soups") : t("Compare two breads")}
           </button>
         ))}
       </div>
       {left && right && answer ? (
         <div className="nz-panel" id="sodium-quiz">
-          <h3>{sodiumQuestion}</h3>
+          <h3>{t(sodiumQuestion)}</h3>
           <div className="nz-split">
             <LabelSheet label={left} />
             <LabelSheet label={right} />
           </div>
           <fieldset className="field">
-            <legend>Choose the label with less sodium</legend>
+            <legend>{t("Choose the label with less sodium")}</legend>
             <div className="nz-choices">
               {[left, right].map((label) => (
                 <label key={label.id} className="nz-choice">
@@ -458,32 +474,32 @@ function SaltSection() {
                     checked={choice === label.id}
                     onChange={() => setChoice(label.id)}
                   />
-                  <span>{label.product}</span>
+                  <span>{t(label.product)}</span>
                 </label>
               ))}
             </div>
           </fieldset>
           <div className="nz-actions">
             <button className="btn btn-primary" type="button" onClick={() => setShown(true)}>
-              Check the sodium line
+              {t("Check the sodium line")}
             </button>
           </div>
           {shown ? (
             <p role="status">
               {!choice
-                ? "Choose a label first. "
+                ? t("Choose a label first.")
                 : choice === answer.winnerId
-                  ? "That label lists less sodium. "
-                  : "Look again at the sodium lines. "}
+                  ? t("That label lists less sodium.")
+                  : t("Look again at the sodium lines.")}{" "}
               {answer.sentence}
             </p>
           ) : null}
         </div>
       ) : null}
-      <h3>Kitchen steps</h3>
+      <h3>{t("Kitchen steps")}</h3>
       <ul>
         {saltTips.map((tip) => (
-          <li key={tip}>{tip}</li>
+          <li key={tip}>{t(tip)}</li>
         ))}
       </ul>
     </section>
@@ -493,22 +509,23 @@ function SaltSection() {
 function FatSection() {
   const [fatId, setFatId] = useState(fatChoices[0]?.id ?? "olive-oil");
   const chosen = fatChoices.find((item) => item.id === fatId) ?? fatChoices[0];
+  const t = useT();
 
   return (
     <section className="nz-panel" id="healthy-fats">
-      <p className="nz-kicker">Fats</p>
-      <h2>{fatCopy.title}</h2>
-      <p>{fatCopy.lead}</p>
-      <p>{fatCopy.modest}</p>
+      <p className="nz-kicker">{t("Fats")}</p>
+      <h2>{t(fatCopy.title)}</h2>
+      <p>{t(fatCopy.lead)}</p>
+      <p>{t(fatCopy.modest)}</p>
       <div className="nz-grid nz-three">
         {fatKinds.map((kind) => (
           <article key={kind.id} className="nz-panel">
-            <h3>{kind.title}</h3>
-            <p>{kind.text}</p>
+            <h3>{t(kind.title)}</h3>
+            <p>{t(kind.text)}</p>
           </article>
         ))}
       </div>
-      <h3>Choose your healthy fat</h3>
+      <h3>{t("Choose your healthy fat")}</h3>
       <div className="nz-actions">
         {fatChoices.map((choice) => (
           <button
@@ -518,21 +535,21 @@ function FatSection() {
             aria-pressed={choice.id === fatId}
             onClick={() => setFatId(choice.id)}
           >
-            <strong>{choice.name}</strong>
+            <strong>{t(choice.name)}</strong>
           </button>
         ))}
       </div>
       {chosen ? (
         <article className="nz-panel">
           <Visual item={chosen} />
-          <h3>{chosen.name}</h3>
+          <h3>{t(chosen.name)}</h3>
           <p>
-            <strong>A swap. </strong>
-            {chosen.swap}
+            <strong>{t("A swap.")} </strong>
+            {t(chosen.swap)}
           </p>
           <p>
-            <strong>Meal idea. </strong>
-            {chosen.meal}
+            <strong>{t("Meal idea.")} </strong>
+            {t(chosen.meal)}
           </p>
         </article>
       ) : null}
@@ -551,18 +568,20 @@ function RainbowSection() {
         .map((item) => item.id.slice(prefix.length))
     : [];
   const count = uniquePlantsMarked(markedIds, catalog);
+  const t = useT();
+  const { locale } = useLocale();
 
   return (
     <section className="nz-panel" id="eat-the-rainbow">
-      <p className="nz-kicker">Variety</p>
-      <h2>{rainbowCopy.title}</h2>
-      <p>{rainbowCopy.lead}</p>
-      <p>{rainbowCopy.count}</p>
-      {week ? <p>This week begins {formatLongDate(week)}.</p> : null}
-      {marks.wellness.readOnlyMessage ? <p role="status">{marks.wellness.readOnlyMessage}</p> : null}
+      <p className="nz-kicker">{t("Variety")}</p>
+      <h2>{t(rainbowCopy.title)}</h2>
+      <p>{t(rainbowCopy.lead)}</p>
+      <p>{t(rainbowCopy.count)}</p>
+      {week ? <p>{t("This week begins {date}.", { date: weekDate(week, locale) })}</p> : null}
+      {marks.wellness.readOnlyMessage ? <p role="status">{t(marks.wellness.readOnlyMessage)}</p> : null}
       {plantGroups.map((group) => (
         <div key={group.id}>
-          <h3>{group.title}</h3>
+          <h3>{t(group.title)}</h3>
           <div className="nz-actions">
             {group.foods.map((food) => {
               const id = week ? plantCheckId(week, food.id) : food.id;
@@ -576,8 +595,8 @@ function RainbowSection() {
                   disabled={!week}
                   onClick={() => marks.toggle(id)}
                 >
-                  <strong>{food.name}</strong>
-                  <span>{on ? "Counted this week" : "Count once"}</span>
+                  <strong>{t(food.name)}</strong>
+                  <span>{on ? t("Counted this week") : t("Count once")}</span>
                 </button>
               );
             })}
@@ -585,13 +604,13 @@ function RainbowSection() {
         </div>
       ))}
       <p role="status">
-        {count} different plants marked this week. Thirty is not required.
-        {count >= 30 ? " You have marked 30 or more. That is variety, not a finish line." : ""}
+        {t("{count} different plants marked this week. Thirty is not required.", { count })}
+        {count >= 30 ? ` ${t("You have marked 30 or more. That is variety, not a finish line.")}` : ""}
       </p>
       <button className="btn btn-secondary" type="button" onClick={() => marks.clearMatching((id) => prefix !== "" && id.startsWith(prefix))}>
-        Reset this week
+        {t("Reset this week")}
       </button>
-      {marks.status ? <p role="status">{marks.status}</p> : null}
+      {marks.status ? <p role="status">{t(marks.status)}</p> : null}
     </section>
   );
 }
@@ -624,11 +643,12 @@ function AmountField({
   onChange: (value: string) => void;
 }) {
   const invalid = value.trim() !== "" && parseAmount(value) === null;
+  const t = useT();
   return (
     <label className="field">
-      <span>{label}</span>
+      <span>{t(label)}</span>
       <input value={value} inputMode="decimal" onChange={(event) => onChange(event.target.value)} />
-      {invalid ? <span className="field-error">Use a plain number, zero or greater.</span> : null}
+      {invalid ? <span className="field-error">{t("Use a plain number, zero or greater.")}</span> : null}
     </label>
   );
 }
@@ -636,6 +656,7 @@ function AmountField({
 function SideEditor({ title, draft, onChange }: { title: string; draft: Draft; onChange: (next: Draft) => void }) {
   const sample = labelById(draft.sampleId);
   const category = sample?.category ?? "yogurt";
+  const t = useT();
 
   function setCategory(next: string) {
     const first = grocerySamples.find((item) => item.category === next);
@@ -663,49 +684,49 @@ function SideEditor({ title, draft, onChange }: { title: string; draft: Draft; o
 
   return (
     <div className="nz-panel">
-      <h3>{title}</h3>
+      <h3>{t(title)}</h3>
       <label className="field">
-        <span>Food group</span>
+        <span>{t("Food group")}</span>
         <select value={category} onChange={(event) => setCategory(event.target.value)}>
           {groceryCategories.map((item) => (
             <option key={item.id} value={item.id}>
-              {item.label}
+              {t(item.label)}
             </option>
           ))}
         </select>
       </label>
       <label className="field">
-        <span>Sample or your own label</span>
+        <span>{t("Sample or your own label")}</span>
         <select value={draft.mode === "enter" ? "enter" : draft.sampleId} onChange={(event) => setProduct(event.target.value)}>
           {grocerySamples
             .filter((item) => item.category === category)
             .map((item) => (
               <option key={item.id} value={item.id}>
-                {item.product}
+                {t(item.product)}
               </option>
             ))}
-          <option value="enter">Enter a label I am reading</option>
+          <option value="enter">{t("Enter a label I am reading")}</option>
         </select>
       </label>
       {draft.mode === "sample" && sample ? <LabelSheet label={sample} /> : null}
       {draft.mode === "enter" ? (
         <div className="nz-grid">
-          <p>Type only the numbers on the package in front of you. Leave a line blank if you do not see it. lifeZoi will not fill it in.</p>
+          <p>{t("Type only the numbers on the package in front of you. Leave a line blank if you do not see it. lifeZoi will not fill it in.")}</p>
           <label className="field">
-            <span>Product name, optional</span>
+            <span>{t("Product name, optional")}</span>
             <input value={draft.product} maxLength={80} onChange={(event) => onChange({ ...draft, product: event.target.value })} />
           </label>
           <label className="field">
-            <span>Serving size</span>
+            <span>{t("Serving size")}</span>
             <input value={draft.serving} maxLength={80} onChange={(event) => onChange({ ...draft, serving: event.target.value })} />
           </label>
-          <AmountField label="Calories" value={draft.calories} onChange={(calories) => onChange({ ...draft, calories })} />
-          <AmountField label="Added sugars, in grams" value={draft.addedSugars} onChange={(addedSugars) => onChange({ ...draft, addedSugars })} />
-          <AmountField label="Sodium, in milligrams" value={draft.sodium} onChange={(sodium) => onChange({ ...draft, sodium })} />
-          <AmountField label="Fiber, in grams" value={draft.fiber} onChange={(fiber) => onChange({ ...draft, fiber })} />
-          <AmountField label="Protein, in grams" value={draft.protein} onChange={(protein) => onChange({ ...draft, protein })} />
+          <AmountField label={msg("Calories")} value={draft.calories} onChange={(calories) => onChange({ ...draft, calories })} />
+          <AmountField label={msg("Added sugars, in grams")} value={draft.addedSugars} onChange={(addedSugars) => onChange({ ...draft, addedSugars })} />
+          <AmountField label={msg("Sodium, in milligrams")} value={draft.sodium} onChange={(sodium) => onChange({ ...draft, sodium })} />
+          <AmountField label={msg("Fiber, in grams")} value={draft.fiber} onChange={(fiber) => onChange({ ...draft, fiber })} />
+          <AmountField label={msg("Protein, in grams")} value={draft.protein} onChange={(protein) => onChange({ ...draft, protein })} />
           <label className="field">
-            <span>Ingredients</span>
+            <span>{t("Ingredients")}</span>
             <textarea value={draft.ingredients} maxLength={280} rows={3} onChange={(event) => onChange({ ...draft, ingredients: event.target.value })} />
           </label>
         </div>
@@ -720,41 +741,44 @@ function GrocerySection({ activePrint, onPrint }: { activePrint: boolean; onPrin
   const [right, setRight] = useState<Draft>(emptyDraft("yogurt-vanilla"));
   const leftSide = sideFromDraft(left);
   const rightSide = sideFromDraft(right);
-  const notes = groceryNotes(leftSide, rightSide);
+  const t = useT();
+  const notes = groceryNotes(leftSide, rightSide, t);
+  // Sample text is translated; text the person typed is shown as typed.
+  const shown = (side: GrocerySide, text: string) => (text ? (side.illustrative ? t(text) : text) : t("Not entered"));
   const rows = [
-    ["Serving size", leftSide.serving || "Not entered", rightSide.serving || "Not entered"],
-    ["Calories", amountText(leftSide.calories, "kcal"), amountText(rightSide.calories, "kcal")],
-    ["Added sugars", amountText(leftSide.addedSugarsG, "g"), amountText(rightSide.addedSugarsG, "g")],
-    ["Sodium", amountText(leftSide.sodiumMg, "mg"), amountText(rightSide.sodiumMg, "mg")],
-    ["Fiber", amountText(leftSide.fiberG, "g"), amountText(rightSide.fiberG, "g")],
-    ["Protein", amountText(leftSide.proteinG, "g"), amountText(rightSide.proteinG, "g")],
-    ["Ingredients", leftSide.ingredients || "Not entered", rightSide.ingredients || "Not entered"],
+    ["Serving size", shown(leftSide, leftSide.serving), shown(rightSide, rightSide.serving)],
+    ["Calories", amountText(leftSide.calories, "kcal", t), amountText(rightSide.calories, "kcal", t)],
+    ["Added sugars", amountText(leftSide.addedSugarsG, "g", t), amountText(rightSide.addedSugarsG, "g", t)],
+    ["Sodium", amountText(leftSide.sodiumMg, "mg", t), amountText(rightSide.sodiumMg, "mg", t)],
+    ["Fiber", amountText(leftSide.fiberG, "g", t), amountText(rightSide.fiberG, "g", t)],
+    ["Protein", amountText(leftSide.proteinG, "g", t), amountText(rightSide.proteinG, "g", t)],
+    ["Ingredients", shown(leftSide, leftSide.ingredients), shown(rightSide, rightSide.ingredients)],
   ];
 
   return (
     <section className={activePrint ? "nz-panel nz-printing" : "nz-panel"} id="grocery">
-      <p className="nz-kicker">Shopping</p>
-      <h2>{groceryCopy.title}</h2>
-      <p>{groceryCopy.lead}</p>
+      <p className="nz-kicker">{t("Shopping")}</p>
+      <h2>{t(groceryCopy.title)}</h2>
+      <p>{t(groceryCopy.lead)}</p>
       <div className="nz-split nz-noPrint">
-        <SideEditor title="First package" draft={left} onChange={setLeft} />
-        <SideEditor title="Second package" draft={right} onChange={setRight} />
+        <SideEditor title={msg("First package")} draft={left} onChange={setLeft} />
+        <SideEditor title={msg("Second package")} draft={right} onChange={setRight} />
       </div>
       <div className="nz-panel nz-noPrint">
-        <h3>Side by side</h3>
+        <h3>{t("Side by side")}</h3>
         <table className="nz-table">
-          <caption>Amounts are per labeled serving. Illustrative samples are marked on their sheets.</caption>
+          <caption>{t("Amounts are per labeled serving. Illustrative samples are marked on their sheets.")}</caption>
           <thead>
             <tr>
-              <th scope="col">Line</th>
-              <th scope="col">{leftSide.product || "First label"}</th>
-              <th scope="col">{rightSide.product || "Second label"}</th>
+              <th scope="col">{t("Line")}</th>
+              <th scope="col">{leftSide.product ? (leftSide.illustrative ? t(leftSide.product) : leftSide.product) : t("First label")}</th>
+              <th scope="col">{rightSide.product ? (rightSide.illustrative ? t(rightSide.product) : rightSide.product) : t("Second label")}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row[0]}>
-                <th scope="row">{row[0]}</th>
+                <th scope="row">{t(row[0])}</th>
                 <td>{row[1]}</td>
                 <td>{row[2]}</td>
               </tr>
@@ -768,25 +792,25 @@ function GrocerySection({ activePrint, onPrint }: { activePrint: boolean; onPrin
         </ul>
       </div>
       <div className="nz-panel" id="grocery-checklist">
-        <h3>{groceryCopy.checklistTitle}</h3>
-        <p>{groceryCopy.checklistNote}</p>
-        {marks.wellness.readOnlyMessage ? <p role="status">{marks.wellness.readOnlyMessage}</p> : null}
+        <h3>{t(groceryCopy.checklistTitle)}</h3>
+        <p>{t(groceryCopy.checklistNote)}</p>
+        {marks.wellness.readOnlyMessage ? <p role="status">{t(marks.wellness.readOnlyMessage)}</p> : null}
         <ul className="nz-checkList">
           {groceryChecklist.map((item) => (
             <li key={item.id}>
               <label className="nz-choice">
                 <input type="checkbox" checked={marks.marked(item.id)} onChange={() => marks.toggle(item.id)} />
-                <span>{item.label}</span>
+                <span>{t(item.label)}</span>
               </label>
             </li>
           ))}
         </ul>
         <div className="nz-actions nz-noPrint">
           <button className="btn btn-primary" type="button" onClick={onPrint}>
-            Print checklist
+            {t("Print checklist")}
           </button>
         </div>
-        {marks.status ? <p role="status">{marks.status}</p> : null}
+        {marks.status ? <p role="status">{t(marks.status)}</p> : null}
       </div>
     </section>
   );
@@ -797,6 +821,7 @@ function ChallengeSection({ activePrint, onPrint }: { activePrint: boolean; onPr
   const [drafts, setDrafts] = useState<Record<string, string | null>>({});
   const doneIds = challengeSteps.filter((step) => marks.marked(step.id)).map((step) => step.id);
   const progress = challengeProgress(doneIds);
+  const t = useT();
 
   function savePlan() {
     marks.writeMany(
@@ -809,38 +834,36 @@ function ChallengeSection({ activePrint, onPrint }: { activePrint: boolean; onPr
 
   return (
     <section className={activePrint ? "nz-panel nz-printing" : "nz-panel"} id="nutrition-challenge">
-      <p className="nz-kicker">Challenge</p>
-      <h2>{challengeCopy.title}</h2>
+      <p className="nz-kicker">{t("Challenge")}</p>
+      <h2>{t(challengeCopy.title)}</h2>
       <p>
-        <strong>{challengeCopy.motto}</strong>
+        <strong>{t(challengeCopy.motto)}</strong>
       </p>
-      <p>{challengeCopy.lead}</p>
-      {marks.wellness.readOnlyMessage ? <p role="status">{marks.wellness.readOnlyMessage}</p> : null}
-      <p role="status">
-        {progress.done} of {progress.total} steps marked in this browser tab.
-      </p>
-      {progress.complete ? <p role="status">{challengeCopy.done}</p> : null}
+      <p>{t(challengeCopy.lead)}</p>
+      {marks.wellness.readOnlyMessage ? <p role="status">{t(marks.wellness.readOnlyMessage)}</p> : null}
+      <p role="status">{t("{done} of {total} steps marked in this browser tab.", { done: progress.done, total: progress.total })}</p>
+      {progress.complete ? <p role="status">{t(challengeCopy.done)}</p> : null}
       <ol className="nz-steps">
         {challengeSteps.map((step) => (
           <li key={step.id}>
             <label className="nz-choice">
               <input type="checkbox" checked={marks.marked(step.id)} onChange={() => marks.toggle(step.id)} />
               <span>
-                <strong>{step.title}. </strong>
-                {step.body}
+                <strong>{t(step.title)}. </strong>
+                {t(step.body)}
               </span>
             </label>
           </li>
         ))}
       </ol>
       <div className="nz-panel">
-        <h3>Meal sketch</h3>
-        <p>One breakfast, one lunch, one dinner, and two snacks.</p>
+        <h3>{t("Meal sketch")}</h3>
+        <p>{t("One breakfast, one lunch, one dinner, and two snacks.")}</p>
         {planFields.map((field) => {
           const value = drafts[field.id] ?? marks.textOf(field.id);
           return (
             <label key={field.id} className="field">
-              <span>{field.label}</span>
+              <span>{t(field.label)}</span>
               <input
                 value={value}
                 maxLength={280}
@@ -851,24 +874,25 @@ function ChallengeSection({ activePrint, onPrint }: { activePrint: boolean; onPr
         })}
         <div className="nz-actions nz-noPrint">
           <button className="btn btn-primary" type="button" onClick={savePlan} disabled={marks.wellness.sample}>
-            Save the meal sketch
+            {t("Save the meal sketch")}
           </button>
           <button className="btn btn-secondary" type="button" onClick={onPrint}>
-            Print summary
+            {t("Print summary")}
           </button>
           <button className="btn btn-secondary" type="button" onClick={() => marks.clearMatching((id) => id.startsWith("nstep-"))}>
-            Restart
+            {t("Restart")}
           </button>
         </div>
-        <p className="nz-note">{challengeCopy.restart}</p>
+        <p className="nz-note">{t(challengeCopy.restart)}</p>
       </div>
-      {marks.status ? <p role="status">{marks.status}</p> : null}
+      {marks.status ? <p role="status">{t(marks.status)}</p> : null}
     </section>
   );
 }
 
 export function NutritionStudio() {
   const [printId, setPrintId] = useState<string | null>(null);
+  const t = useT();
 
   useEffect(() => {
     if (!printId) return;
@@ -896,18 +920,18 @@ export function NutritionStudio() {
       <GrocerySection activePrint={printId === "grocery"} onPrint={() => setPrintId("grocery")} />
       <ChallengeSection activePrint={printId === "challenge"} onPrint={() => setPrintId("challenge")} />
       <section className="nz-panel" id="nutrition-links">
-        <h2>Elsewhere in lifeZoi</h2>
-        <p>These pages are already part of lifeZoi. This Nutrition page does not invent a result for them.</p>
+        <h2>{t("Elsewhere in lifeZoi")}</h2>
+        <p>{t("These pages are already part of lifeZoi. This Nutrition page does not invent a result for them.")}</p>
         <div className="nz-actions">
           {relatedLinks.map((link) => (
             <Link key={link.href} className="btn btn-secondary" href={link.href}>
-              {link.label}
+              {t(link.label)}
             </Link>
           ))}
         </div>
-        <h3>Sources you can open</h3>
+        <h3>{t("Sources you can open")}</h3>
         <Sources />
-        <p className="nz-note">lifeZoi did not copy those articles or their images. The words on this plate are written for lifeZoi.</p>
+        <p className="nz-note">{t("lifeZoi did not copy those articles or their images. The words on this plate are written for lifeZoi.")}</p>
       </section>
     </div>
   );

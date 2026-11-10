@@ -1,5 +1,12 @@
 /** Member-facing copy. These strings do not claim a live provider call succeeded. */
 
+import { fmt } from "@/lib/i18n/config";
+import { makeTranslate, msg, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
+
+const RESTRICTION = msg("You cannot post right now. This limit is temporary and ends at {until}. It is not a permanent ban.");
+
 export const REJECTION_NOTICE =
   "Your message could not be published because it may violate our Community Guidelines. Please rewrite it respectfully.";
 
@@ -17,7 +24,17 @@ export const RETENTION_SUMMARY =
   "Rejected messages, messages you remove, and closed reports are kept for 30 days so a review or appeal can finish, then deleted. A published message stays until you remove it. The moderation record keeps the chosen name, the message text while it still exists, a short category, the decision, and the time. It does not keep an email address, a legal name, a health record, or a questionnaire answer. The server keeps the signed-in account's internal id so it can tell your own messages apart, apply a block or mute, and delete them with your account. That id is not shown to other members.";
 
 export function temporaryRestrictionMessage(until: string): string {
-  return `You cannot post right now. This limit is temporary and ends at ${until}. It is not a permanent ban.`;
+  return fmt(RESTRICTION, { until });
+}
+
+/**
+ * Shows a message from the community server in the chosen language. The server answers in English;
+ * a temporary limit carries its end time, which is formatted for the reader.
+ */
+export function localizeCommunityText(text: string, t: Translate, time: (iso: string) => string): string {
+  const limit = /^You cannot post right now\. This limit is temporary and ends at (.+)\. It is not a permanent ban\.$/.exec(text);
+  if (limit) return t(RESTRICTION, { until: time(limit[1]) || limit[1] });
+  return t(text);
 }
 
 export function noticeFor(status: "approved" | "pending" | "rejected", source: string): string {
@@ -27,23 +44,23 @@ export function noticeFor(status: "approved" | "pending" | "rejected", source: s
   return PENDING_NOTICE;
 }
 
-export function sourceLabel(source: string): string {
+export function sourceLabel(source: string, t: Translate = english): string {
   switch (source) {
     case "local-filter":
-      return "Local filter";
+      return t("Local filter");
     case "provider":
-      return "Moderation provider";
+      return t("Moderation provider");
     case "not-configured":
-      return "Provider not configured";
+      return t("Provider not configured");
     case "timeout":
-      return "Provider timed out";
+      return t("Provider timed out");
     case "quota":
-      return "Provider quota";
+      return t("Provider quota");
     case "error":
-      return "Provider error";
+      return t("Provider error");
     case "admin":
-      return "Admin review";
+      return t("Admin review");
     default:
-      return "Review";
+      return t("Review");
   }
 }

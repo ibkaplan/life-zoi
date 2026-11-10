@@ -1,5 +1,6 @@
 import { MAX_MOVEMENT_BREAKS, withDay, type CompanionState, type DayLog } from "@/lib/companion/state";
 import type { Assessment } from "@/lib/types";
+import { msg } from "@/lib/i18n/translate";
 
 /**
  * Personal movement-break suggestions from answers the person already gave:
@@ -51,20 +52,20 @@ export function sittingProfile(answers: Answers | null): SittingProfile {
   if (reasons.includes("office") || reasons.includes("computer")) {
     current.push({
       id: "desk",
-      text: hours !== null && hours > 0 ? `I sit at a desk or computer, and sit for about ${hours} hours a day.` : "I sit at a desk or computer for much of the day.",
+      text: hours !== null && hours > 0 ? `I sit at a desk or computer, and sit for about ${hours} hours a day.` : msg("I sit at a desk or computer for much of the day."),
     });
   } else if (hours !== null && hours >= MANY_SITTING_HOURS) {
     current.push({ id: "hours", text: `I sit or recline for about ${hours} hours a day.` });
   }
-  if (reasons.includes("long-sitting")) current.push({ id: "long", text: "I often sit for many hours at a time and rarely take movement breaks." });
-  if (reasons.includes("television")) current.push({ id: "tv", text: "I spend long periods watching television." });
-  if (reasons.includes("driving")) current.push({ id: "driving", text: "I drive or travel seated for long periods." });
+  if (reasons.includes("long-sitting")) current.push({ id: "long", text: msg("I often sit for many hours at a time and rarely take movement breaks.") });
+  if (reasons.includes("television")) current.push({ id: "tv", text: msg("I spend long periods watching television.") });
+  if (reasons.includes("driving")) current.push({ id: "driving", text: msg("I drive or travel seated for long periods.") });
   if (answers?.hydration && answers.hydration !== "rarely" && (reasons.includes("low-activity") || answers.walking === "rarely")) {
-    current.push({ id: "water-only", text: "I drink water, but I have little physical activity." });
+    current.push({ id: "water-only", text: msg("I drink water, but I have little physical activity.") });
   } else if (reasons.includes("low-activity")) {
-    current.push({ id: "low", text: "I am physically active on one day a week or less." });
+    current.push({ id: "low", text: msg("I am physically active on one day a week or less.") });
   }
-  if (answers?.strength === "rarely" || answers?.walking === "rarely") current.push({ id: "legs", text: "I rarely exercise my legs." });
+  if (answers?.strength === "rarely" || answers?.walking === "rarely") current.push({ id: "legs", text: msg("I rarely exercise my legs.") });
 
   const next: LifeLine[] = [
     {

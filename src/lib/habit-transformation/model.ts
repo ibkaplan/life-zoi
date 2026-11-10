@@ -17,6 +17,9 @@ import {
   type HabitId,
 } from "@/lib/habit-transformation/catalog";
 import { isRealISODate } from "@/lib/dates";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
 
 export const ACTION_STATUSES = ["accepted", "changed", "easier", "skipped", "complete"] as const;
 export type ActionStatus = (typeof ACTION_STATUSES)[number];
@@ -253,9 +256,9 @@ export function sanitizeHabitJourney(input: unknown): HabitJourney {
   return { picks, tunes, checks, notes };
 }
 
-export function habitName(pick: HabitPick): string {
+export function habitName(pick: HabitPick, t: Translate = english): string {
   if (pick.habitId === "other" && pick.otherText.trim()) return pick.otherText.trim();
-  return habitMeta(pick.habitId).label;
+  return t(habitMeta(pick.habitId).label);
 }
 
 export function savePicks(journey: HabitJourney, picks: HabitPick[]): HabitJourney {

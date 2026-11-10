@@ -13,6 +13,17 @@ export const FREE_GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${FREE_GEMINI_MODEL}:generateContent`;
 
+const LANGUAGE_NAME = { en: "English", uk: "Ukrainian", ru: "Russian", el: "Greek" } as const;
+
+/** The instructions, with the reply written in the visitor's interface language. */
+export function systemPrompt(language: keyof typeof LANGUAGE_NAME = "en"): string {
+  if (language === "en") return SYSTEM_PROMPT;
+  return SYSTEM_PROMPT.replace(
+    "Reply in warm, plain English.",
+    `Reply in warm, plain ${LANGUAGE_NAME[language]}, the language the visitor chose for LifeZoi, even if earlier messages are in another language.`,
+  );
+}
+
 const SYSTEM_PROMPT = [
   "You are LifeZoi's wellness assistant. Reply in warm, plain English.",
   "Give general education about everyday habits such as sleep, food, movement, stress, and routines.",
@@ -82,7 +93,7 @@ export function createGeminiProvider(options: {
             "x-goog-api-key": apiKey,
           },
           body: JSON.stringify({
-            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            systemInstruction: { parts: [{ text: systemPrompt(request.language) }] },
             contents,
             generationConfig: {
               temperature: 0.4,

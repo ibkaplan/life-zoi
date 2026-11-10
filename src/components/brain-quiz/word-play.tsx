@@ -2,9 +2,12 @@
 
 import { useMemo, useState } from "react";
 import type { AcrosticActivity, CrosswordActivity, LetterActivity, WordSearchActivity } from "@/lib/brain-quiz/activities";
-import { lineBetween } from "@/lib/brain-quiz/engines";
+import { useT } from "@/components/locale-provider";
+import { foldLetters, lineBetween } from "@/lib/brain-quiz/engines";
+import { msg } from "@/lib/i18n/translate";
 
 export function WordSearchPlay({ activity, onResult }: { activity: WordSearchActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const [start, setStart] = useState<[number, number] | null>(null);
   const [found, setFound] = useState<string[]>([]);
   const [done, setDone] = useState(false);
@@ -25,13 +28,13 @@ export function WordSearchPlay({ activity, onResult }: { activity: WordSearchAct
     setFound(next);
     if (next.length === targets.length) {
       setDone(true);
-      onResult(true, "You found every word.");
+      onResult(true, msg("You found every word."));
     }
   }
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <div className={"quiz-board"}>
         {activity.rows.map((row, y) => (
           <div key={row} className={"quiz-boardRow"}>
@@ -46,12 +49,13 @@ export function WordSearchPlay({ activity, onResult }: { activity: WordSearchAct
           </div>
         ))}
       </div>
-      <p>Found: {found.length ? found.join(", ") : "none yet"}</p>
+      <p>{t("Found: {words}", { words: found.length ? found.join(", ") : t("none yet") })}</p>
     </div>
   );
 }
 
 export function LetterPlay({ activity, onResult }: { activity: LetterActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const blanks = activity.pattern.split("").filter((letter) => letter === "_").length;
   const [fills, setFills] = useState<string[]>([]);
   const [done, setDone] = useState(false);
@@ -75,7 +79,7 @@ export function LetterPlay({ activity, onResult }: { activity: LetterActivity; o
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <p className={"quiz-word"}>{shown}</p>
       <div className={"quiz-keys"}>
         {activity.bank.map((letter, index) => (
@@ -84,12 +88,13 @@ export function LetterPlay({ activity, onResult }: { activity: LetterActivity; o
           </button>
         ))}
       </div>
-      {!done && fills.length > 0 ? <button className="btn btn-secondary" type="button" onClick={() => setFills([])}>Clear</button> : null}
+      {!done && fills.length > 0 ? <button className="btn btn-secondary" type="button" onClick={() => setFills([])}>{t("Clear")}</button> : null}
     </div>
   );
 }
 
 export function AcrosticPlay({ activity, onResult }: { activity: AcrosticActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const [picked, setPicked] = useState<number[]>([]);
   const [done, setDone] = useState(false);
   const letters = picked.map((index) => activity.words[index]?.[0] ?? "").join("");
@@ -108,7 +113,7 @@ export function AcrosticPlay({ activity, onResult }: { activity: AcrosticActivit
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <div className={"quiz-iconGrid"}>
         {activity.words.map((word, index) => (
           <button key={word} type="button" className={"quiz-cardBtn"} aria-pressed={picked.includes(index)} disabled={done} onClick={() => tap(index)}>
@@ -116,34 +121,39 @@ export function AcrosticPlay({ activity, onResult }: { activity: AcrosticActivit
           </button>
         ))}
       </div>
-      <p>Letters: {letters || "—"}</p>
+      <p>{t("Letters: {letters}", { letters: letters || "—" })}</p>
     </div>
   );
 }
 
 export function CrosswordPlay({ activity, onResult }: { activity: CrosswordActivity; onResult: (correct: boolean, note: string) => void }) {
-  const [rows, setRows] = useState(() => activity.grid.map((row) => row.replace(/[A-Z]/g, " ")));
+  const t = useT();
+  const [rows, setRows] = useState(() => activity.grid.map((row) => row.replace(/[^#]/g, " ")));
   const [done, setDone] = useState(false);
 
   function setCell(y: number, x: number, value: string) {
-    const letter = value.toUpperCase().slice(-1);
+    const letter = foldLetters(value).slice(-1);
     setRows((current) => current.map((row, index) => (index === y ? `${row.slice(0, x)}${letter || " "}${row.slice(x + 1)}` : row)));
   }
 
   function check() {
     const correct = activity.grid.every((row, y) =>
-      row.split("").every((letter, x) => letter === "#" || (rows[y]?.[x] ?? "").toUpperCase() === letter),
+      foldLetters(row).split("").every((letter, x) => letter === "#" || foldLetters(rows[y]?.[x] ?? "") === letter),
     );
     setDone(true);
-    onResult(correct, correct ? "The crossword matches." : "Some letters still differ from the puzzle.");
+    onResult(correct, correct ? msg("The crossword matches.") : msg("Some letters still differ from the puzzle."));
   }
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <ul>
         {activity.clues.map((clue) => (
-          <li key={`${clue.number}-${clue.dir}`}>{clue.number} {clue.dir}: {clue.text}</li>
+          <li key={`${clue.number}-${clue.dir}`}>
+            {clue.dir === "across"
+              ? t("{number} across: {clue}", { number: clue.number, clue: t(clue.text) })
+              : t("{number} down: {clue}", { number: clue.number, clue: t(clue.text) })}
+          </li>
         ))}
       </ul>
       <div className={"quiz-board"}>
@@ -157,7 +167,7 @@ export function CrosswordPlay({ activity, onResult }: { activity: CrosswordActiv
                   {number ? <span className={"quiz-num"}>{number}</span> : null}
                   <input
                     className={"quiz-crossInput"}
-                    aria-label={`Row ${y + 1} column ${x + 1}`}
+                    aria-label={t("Row {row} column {column}", { row: y + 1, column: x + 1 })}
                     maxLength={1}
                     value={(rows[y]?.[x] ?? " ").trim()}
                     disabled={done}
@@ -169,7 +179,7 @@ export function CrosswordPlay({ activity, onResult }: { activity: CrosswordActiv
           </div>
         ))}
       </div>
-      {done ? null : <button className="btn btn-primary" type="button" onClick={check}>Check crossword</button>}
+      {done ? null : <button className="btn btn-primary" type="button" onClick={check}>{t("Check crossword")}</button>}
     </div>
   );
 }

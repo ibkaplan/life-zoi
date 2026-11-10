@@ -1,5 +1,6 @@
 import type { RebusLayout, RebusPiece } from "@/lib/brain-quiz/activities";
 import { Icon } from "@/components/brain-quiz/icons";
+import { useT } from "@/components/locale-provider";
 
 function Piece({ piece }: { piece: RebusPiece }) {
   if (piece.type === "rule") return <span className={"quiz-rule"} />;
@@ -9,9 +10,10 @@ function Piece({ piece }: { piece: RebusPiece }) {
 }
 
 export function RebusArt({ layout }: { layout: RebusLayout }) {
+  const t = useT();
   if (layout.arrangement === "between") {
     return (
-      <div className={"quiz-rebus"} aria-label="Picture puzzle with a word between two lines">
+      <div className={"quiz-rebus"} aria-label={t("Picture puzzle with a word between two lines")}>
         <div className={"quiz-between"}>
           <span className={"quiz-rule"} />
           <p className={`quiz-word quiz-lg`}>{layout.text}</p>

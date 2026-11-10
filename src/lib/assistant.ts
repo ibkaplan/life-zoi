@@ -1,34 +1,57 @@
+import { msg } from "@/lib/i18n/translate";
+
 export const ASSISTANT_STORAGE_KEY = "lifezoi.assistant.v1";
 
 export const WELCOME_MESSAGE =
-  "Hello! I'm your LifeZoi AI Health Assistant. I can help you understand your health habits, explore wellness topics, and make informed lifestyle choices. What would you like to discuss today?";
+  msg("Hello! I'm your LifeZoi AI Health Assistant. I can help you understand your health habits, explore wellness topics, and make informed lifestyle choices. What would you like to discuss today?");
 
 export const SUGGESTED_QUESTIONS = [
-  "I want to have enough energy to travel with my grandchildren.",
-  "How can I improve my sleep?",
-  "How can I reduce my sugar cravings?",
-  "What exercises can improve my balance?",
-  "How can I build healthier eating habits?",
-  "How can I improve my energy?",
-  "What small changes can I make this week?",
+  msg("I want to have enough energy to travel with my grandchildren."),
+  msg("How can I improve my sleep?"),
+  msg("How can I reduce my sugar cravings?"),
+  msg("What exercises can improve my balance?"),
+  msg("How can I build healthier eating habits?"),
+  msg("How can I improve my energy?"),
+  msg("What small changes can I make this week?"),
 ] as const;
 
 export const METER_STORAGE_KEY = "lifezoi.meter.v1";
 
 export const DEVELOPMENT_MESSAGE =
-  "Development mock mode. Replies are prepared on this server for testing. No paid AI service is contacted, and lifestyle assessment answers are not sent to an AI provider.";
+  msg("Development mock mode. Replies are prepared on this server for testing. No paid AI service is contacted, and lifestyle assessment answers are not sent to an AI provider.");
 
 export const UNAVAILABLE_MESSAGE =
-  "The AI service is unavailable. No reply was created, and the conversation was not saved in a database.";
+  msg("The AI service is unavailable. No reply was created, and the conversation was not saved in a database.");
 
 export const WITHHELD_MESSAGE =
-  "That reply was withheld because it did not stay within lifeZoi's educational limits. No diagnosis, medication change, or lifespan estimate is available. A qualified clinician can help with personal medical decisions.";
+  msg("That reply was withheld because it did not stay within lifeZoi's educational limits. No diagnosis, medication change, or lifespan estimate is available. A qualified clinician can help with personal medical decisions.");
 
 export const SAFETY_NOTICE =
-  "This may need urgent medical care. If you are in immediate danger, contact local emergency services now. If you are in the United States and in emotional distress, call or text 988.";
+  msg("This may need urgent medical care. If you are in immediate danger, contact local emergency services now. If you are in the United States and in emotional distress, call or text 988.");
 
 const URGENT_PATTERN =
   /\b(suicid|kill myself|want to die|end my life|overdose|chest pain|cannot breathe|can't breathe|trouble breathing|shortness of breath|stroke|face droop|slurred speech|severe bleeding|unconscious|not breathing)\b/i;
+
+/**
+ * Text folded for the Ukrainian, Russian, and Greek checks below: lower case, without
+ * accents, with the Greek final sigma as σ and the Ukrainian apostrophe removed.
+ */
+export function foldForSafety(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/ς/g, "σ")
+    .replace(/[’'ʼ]/g, "");
+}
+
+/** The same urgent topics in Ukrainian, Russian, and Greek. Stems, matched on folded text. */
+const URGENT_LOCAL =
+  /суіцид|суицид|самогубств|самоуби|вбити себе|убить себя|покінчити з собою|покончить с собой|хочу померти|хочу умереть|не хочу жити|не хочу жить|передозуванн|передозировк|біль у грудях|біль в грудях|болить у грудях|боль в груди|болит в груди|не можу дихати|не могу дышать|важко дихати|трудно дышать|тяжело дышать|задишк|одышк|інсульт|инсульт|перекосило обличчя|перекосило лицо|оніміло обличчя|невиразна мова|невнятная речь|заплітається язик|заплетается язык|сильна кровотеча|сильное кровотечение|без свідомості|без сознания|знепритомні|не дихає|не дышит|αυτοκτον|σκοτωσω τον εαυτο μου|να σκοτωθω|θελω να πεθανω|δεν θελω να ζω|υπερβολικη δοση|πονο στο στηθοσ|πονοσ στο στηθοσ|δεν μπορω να αναπνευσω|δυσκολια στην αναπνοη|δυσκολευομαι να αναπνευσω|δυσπνοια|εγκεφαλικο|σοβαρη αιμορραγια|αναισθητ|λιποθυμ|δεν αναπνεει/;
+
+/** Replies in Ukrainian, Russian, or Greek that leave lifeZoi's educational limits. Matched on folded text. */
+const UNSAFE_LOCAL_REPLY =
+  /дата смерті|дата смерти|ημερομηνια θανατου|тривалість життя|продолжительность жизни|προσδοκιμο ζωησ|років життя|лет жизни|χρονια ζωησ|відсот|процент|τοισ εκατο|припиніть приим|перестаньте приим|перестаньте приним|прекратите прием|прекратите принимать|σταματηστε να παιρνετε|σταματηστε το φαρμακο|змініть дозу|збільште дозу|зменште дозу|измените дозу|увеличьте дозу|уменьшите дозу|αλλαξτε τη δοση|αυξηστε τη δοση|μειωστε τη δοση|у вас діабет|у вас рак|у вас гіпертон|у вас депрес|у вас хвороба серця|у вас диабет|у вас гипертон|у вас болезнь сердца|εχετε διαβητη|εχετε καρκινο|εχετε υπερταση|εχετε καταθλιψη/;
 
 const UNSAFE_REPLY =
   /stop taking|change (?:your|the) dose|increase (?:your|the) dose|decrease (?:your|the) dose|\btake \d+\s*(?:mg|mcg|milligrams)\b|you have (?:diabetes|cancer|hypertension|heart disease|depression)/i;
@@ -43,14 +66,16 @@ export type AssistantTurn = {
 export type StoredAssistantTurn = AssistantTurn & { id: string };
 
 export function isUrgentMessage(text: string): boolean {
-  return URGENT_PATTERN.test(text);
+  return URGENT_PATTERN.test(text) || URGENT_LOCAL.test(foldForSafety(text));
 }
 
 export function assistantReplyIsUnsafe(text: string): boolean {
   return (
     /\bdate of death\b|\byou will die\b|\blife expectancy\b|\blifespan\b|\byears of life\b|\byears gained\b|\b\d+\s*%|\bpercent\b/i.test(
       text,
-    ) || UNSAFE_REPLY.test(text)
+    ) ||
+    UNSAFE_REPLY.test(text) ||
+    UNSAFE_LOCAL_REPLY.test(foldForSafety(text))
   );
 }
 
@@ -63,30 +88,30 @@ export function parseAssistantRequest(input: unknown):
     }
   | { ok: false; error: string } {
   if (!input || typeof input !== "object") {
-    return { ok: false, error: "The request could not be read." };
+    return { ok: false, error: msg("The request could not be read.") };
   }
   const record = input as Record<string, unknown>;
   if (!Array.isArray(record.messages) || record.messages.length === 0) {
-    return { ok: false, error: "Enter a message before sending." };
+    return { ok: false, error: msg("Enter a message before sending.") };
   }
   if (record.messages.length > 16) {
-    return { ok: false, error: "This conversation is too long for one request. Clear the chat and start again." };
+    return { ok: false, error: msg("This conversation is too long for one request. Clear the chat and start again.") };
   }
   const messages: AssistantTurn[] = [];
   for (const item of record.messages) {
     if (!item || typeof item !== "object") {
-      return { ok: false, error: "The request could not be read." };
+      return { ok: false, error: msg("The request could not be read.") };
     }
     const turn = item as Record<string, unknown>;
     const role = turn.role === "assistant" ? "assistant" : turn.role === "user" ? "user" : null;
     const content = typeof turn.content === "string" ? turn.content.trim() : "";
     if (!role || !content || content.length > 1500) {
-      return { ok: false, error: "Use a shorter message, up to 1500 characters." };
+      return { ok: false, error: msg("Use a shorter message, up to 1500 characters.") };
     }
     messages.push({ role, content });
   }
   if (messages[messages.length - 1]?.role !== "user") {
-    return { ok: false, error: "Enter a message before sending." };
+    return { ok: false, error: msg("Enter a message before sending.") };
   }
   const meterKey = typeof record.meterKey === "string" ? record.meterKey.trim() : "";
   const personalDataIgnored = "assessment" in record && record.assessment != null;

@@ -104,6 +104,53 @@ export const WORDS = [
   "almond", "breeze", "candle", "forest", "island", "lemon", "puzzle", "river", "summer", "walnut",
 ];
 
+/**
+ * Words for the scramble in each other language, written for that language (not translated
+ * from the English list), so the letters and the first-letter hint work in that alphabet.
+ */
+export const WORDS_BY_LOCALE: Record<"uk" | "ru" | "el", readonly string[]> = {
+  uk: [
+    "вікно", "ранок", "чайник", "сонечко", "камінь", "гавань", "скрипка", "ковдра", "яблуко", "ліхтар",
+    "галявина", "печиво", "компас", "веселка", "пікнік", "бібліотека", "подушка", "кошик", "мигдаль", "вітерець",
+    "свічка", "діброва", "острів", "лимон", "загадка", "річка", "суниця", "горіх", "квітка", "метелик",
+  ],
+  ru: [
+    "окно", "утро", "чайник", "солнце", "камешек", "гавань", "скрипка", "одеяло", "яблоко", "фонарь",
+    "поляна", "печенье", "компас", "радуга", "пикник", "библиотека", "подушка", "корзина", "миндаль", "ветерок",
+    "свеча", "дубрава", "остров", "лимон", "загадка", "речка", "малина", "орех", "цветок", "бабочка",
+  ],
+  el: [
+    "κήπος", "παράθυρο", "πρωί", "τσαγιέρα", "ήλιος", "βότσαλο", "λιμάνι", "βιολί", "κουβέρτα", "περιβόλι",
+    "φανάρι", "λιβάδι", "μπισκότο", "πυξίδα", "βροχή", "πικνίκ", "βιβλιοθήκη", "μαξιλάρι", "καλάθι", "αμύγδαλο",
+    "αεράκι", "κερί", "δάσος", "νησί", "λεμόνι", "γρίφος", "ποτάμι", "καλοκαίρι", "καρύδι", "λουλούδι",
+  ],
+};
+
+/** The scramble words for a language. English and any other language use the English list. */
+export function wordsFor(locale: string): readonly string[] {
+  return locale === "uk" || locale === "ru" || locale === "el" ? WORDS_BY_LOCALE[locale] : WORDS;
+}
+
+/** Compares a typed answer with the word, forgiving Greek accents and final sigma, and Russian ё. */
+export function sameWord(typed: string, word: string): boolean {
+  const plain = (text: string) =>
+    text
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0301\u0308]/g, "")
+      .normalize("NFC")
+      .replace(/ς/g, "σ")
+      .replace(/ё/g, "е");
+  return plain(typed) === plain(word);
+}
+
+/** Letters as shown on screen: capitals, and for Greek without accents, as Greek capitals are written. */
+export function shownLetters(text: string): string {
+  const upper = text.toUpperCase();
+  return /[\u0370-\u03ff\u1f00-\u1fff]/.test(upper) ? upper.normalize("NFD").replace(/[\u0301\u0308]/g, "").normalize("NFC") : upper;
+}
+
 export function scramble(word: string, seed: string): string {
   const random = rng(`word:${seed}:${word}`);
   for (let attempt = 0; attempt < 10; attempt += 1) {
@@ -113,9 +160,9 @@ export function scramble(word: string, seed: string): string {
   return word.split("").reverse().join("");
 }
 
-export function wordRound(seed: string, count = 5): { word: string; mixed: string }[] {
+export function wordRound(seed: string, count = 5, words: readonly string[] = WORDS): { word: string; mixed: string }[] {
   const random = rng(`words:${seed}`);
-  return shuffle(WORDS, random)
+  return shuffle(words, random)
     .slice(0, count)
     .map((word) => ({ word, mixed: scramble(word, seed) }));
 }
@@ -142,7 +189,10 @@ export function oddOneRound(seed: string, round: number, cells = 20): { symbols:
 
 // ---------- What comes next? ----------
 
-export type LogicQuestion = { shown: number[]; answer: number; choices: number[]; rule: string };
+export type LogicRule = "add" | "subtract" | "double" | "growing";
+
+/** `rule` is the English explanation; `ruleKind` and `step` let a page say it in another language. */
+export type LogicQuestion = { shown: number[]; answer: number; choices: number[]; rule: string; ruleKind: LogicRule; step: number };
 
 export function logicQuestion(seed: string, round: number): LogicQuestion {
   const random = rng(`logic:${seed}:${round}`);
@@ -152,23 +202,28 @@ export function logicQuestion(seed: string, round: number): LogicQuestion {
   let shown: number[];
   let answer: number;
   let rule: string;
+  let ruleKind: LogicRule;
   if (kind === 0) {
     shown = [0, 1, 2, 3].map((i) => start + i * step);
     answer = start + 4 * step;
     rule = `Add ${step} each time.`;
+    ruleKind = "add";
   } else if (kind === 1) {
     const top = start + 6 * step;
     shown = [0, 1, 2, 3].map((i) => top - i * step);
     answer = top - 4 * step;
     rule = `Take away ${step} each time.`;
+    ruleKind = "subtract";
   } else if (kind === 2) {
     shown = [0, 1, 2, 3].map((i) => start * 2 ** i);
     answer = start * 16;
     rule = "Double each time.";
+    ruleKind = "double";
   } else {
     shown = [0, 1, 2, 3].map((i) => start + (i * (i + 1)) / 2);
     answer = start + 10;
     rule = "Add 1, then 2, then 3, then 4.";
+    ruleKind = "growing";
   }
   const wrong = new Set<number>();
   for (const delta of shuffle([1, -1, 2, -2, step, -step, 3], random)) {
@@ -176,5 +231,5 @@ export function logicQuestion(seed: string, round: number): LogicQuestion {
     if (value > 0 && value !== answer) wrong.add(value);
     if (wrong.size === 3) break;
   }
-  return { shown, answer, rule, choices: shuffle([answer, ...wrong], random) };
+  return { shown, answer, rule, ruleKind, step, choices: shuffle([answer, ...wrong], random) };
 }

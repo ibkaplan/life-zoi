@@ -4,6 +4,8 @@ import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import Link from "next/link";
 import { STUDIO_PATH } from "@/lib/wellness-library/chair-yoga";
 import { useState, useSyncExternalStore } from "react";
+import { useLocale, useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import {
   ASK_FIRST,
   FALL_SUPPORT,
@@ -63,17 +65,26 @@ function useStudioProgress() {
 }
 
 function SafetyNote() {
+  const t = useT();
   return (
     <aside className="studio-safety" role="note">
-      <h2>Safety</h2>
-      <p>{SAFETY_LINE}</p>
-      <p>{FALL_SUPPORT}</p>
-      <p>{ASK_FIRST}</p>
+      <h2>{t("Safety")}</h2>
+      <p>{t(SAFETY_LINE)}</p>
+      <p>{t(FALL_SUPPORT)}</p>
+      <p>{t(ASK_FIRST)}</p>
     </aside>
   );
 }
 
+/** Time label for a lesson card: a film's player length, or a script's planned minutes. */
+function timeLabel(t: ReturnType<typeof useT>, lesson: StudioLesson): string {
+  if (lesson.kind === "video") return lessonTimeLabel(lesson);
+  return t("About {minutes} minutes of written practice", { minutes: lesson.practiceMinutes });
+}
+
 export function LessonCard({ lesson }: { lesson: StudioLesson }) {
+  const t = useT();
+  const { locale } = useLocale();
   const studio = useStudioProgress();
   const [playing, setPlaying] = useState(false);
   const src = embedSrc(lesson);
@@ -82,31 +93,31 @@ export function LessonCard({ lesson }: { lesson: StudioLesson }) {
 
   return (
     <article className="card studio-card stack" id={lesson.id}>
-      <p className="kicker">{category?.title}</p>
+      <p className="kicker">{category ? t(category.title) : null}</p>
       <h3>
-        <Link href={`/academy/move/studio/lessons/${lesson.id}`}>{lesson.title}</Link>
+        <Link href={`/academy/move/studio/lessons/${lesson.id}`}>{t(lesson.title)}</Link>
       </h3>
       <p>
-        <strong>Time.</strong> {lessonTimeLabel(lesson)}
+        <strong>{t("Time.")}</strong> {timeLabel(t, lesson)}
       </p>
       <p>
-        <strong>Level.</strong> {levelLabel[lesson.level]}
+        <strong>{t("Level.")}</strong> {t(levelLabel[lesson.level])}
       </p>
       <p>
-        <strong>Position.</strong> {positionLabel[lesson.position]}
+        <strong>{t("Position.")}</strong> {t(positionLabel[lesson.position])}
       </p>
       <p>
-        <strong>Goal.</strong> {goalLabel[lesson.goal]}
+        <strong>{t("Goal.")}</strong> {t(goalLabel[lesson.goal])}
       </p>
-      <p>{lesson.summary}</p>
+      <p>{t(lesson.summary)}</p>
       {lesson.kind === "script" ? (
         <>
-          <p className="studio-soon">Coming Soon</p>
-          <p>{SCRIPT_LABEL}</p>
+          <p className="studio-soon">{t("Coming Soon")}</p>
+          <p>{t(SCRIPT_LABEL)}</p>
           <ol className="studio-steps">
             {lesson.script.cues.map((cue) => (
               <li key={cue.heading}>
-                <strong>{cue.heading}.</strong> {cue.words}
+                <strong>{t(cue.heading)}.</strong> {t(cue.words)}
               </li>
             ))}
           </ol>
@@ -114,11 +125,12 @@ export function LessonCard({ lesson }: { lesson: StudioLesson }) {
       ) : (
         <>
           <p>
-            {lesson.license.attribution}. {lesson.license.license} Embed allowed. The file is not copied onto lifeZoi.
+            {lesson.license.attribution}. {t(lesson.license.license)} {t("Embed allowed. The file is not copied onto lifeZoi.")}
+            {locale !== "en" ? ` ${t("Film in English.")}` : null}
           </p>
           <p>
             <a href={lesson.license.sourceUrl} target="_blank" rel="noopener noreferrer">
-              Original film
+              {t("Original film")}
             </a>
           </p>
           {playing && src ? (
@@ -141,28 +153,29 @@ export function LessonCard({ lesson }: { lesson: StudioLesson }) {
                 studio.notePlay(lesson.id);
               }}
             >
-              Play
+              {t("Play")}
             </button>
           )}
         </>
       )}
-      <p className="studio-safety-line">{lesson.safety}</p>
+      <p className="studio-safety-line">{t(lesson.safety)}</p>
       <button type="button" className="btn btn-secondary" disabled={done} onClick={() => studio.completeLesson(lesson.id)}>
-        {done ? "Lesson marked complete" : "Mark lesson complete"}
+        {done ? t("Lesson marked complete") : t("Mark lesson complete")}
       </button>
     </article>
   );
 }
 
 function ToolCard({ slug }: { slug: string }) {
+  const t = useT();
   const category = categoryBySlug(slug);
   if (!category) return null;
   return (
     <article className="card studio-card stack">
-      <h3>{category.title}</h3>
-      <p>{category.summary}</p>
+      <h3>{t(category.title)}</h3>
+      <p>{t(category.summary)}</p>
       <Link className="btn btn-secondary" href={category.href}>
-        Open
+        {t("Open")}
       </Link>
     </article>
   );
@@ -170,38 +183,40 @@ function ToolCard({ slug }: { slug: string }) {
 
 /** Entry to the Chair Yoga Studio video library. */
 export function ChairYogaBanner() {
+  const t = useT();
   return (
     <section className="cy-banner" aria-labelledby="cy-banner">
       <div>
-        <p className="kicker">New · Video library</p>
-        <h2 id="cy-banner">Chair Yoga Studio</h2>
-        <p>Free seated and standing chair yoga classes, plus gentle yoga and mobility. Press PLAY VIDEO and start.</p>
+        <p className="kicker">{t("New · Video library")}</p>
+        <h2 id="cy-banner">{t("Chair Yoga Studio")}</h2>
+        <p>{t("Free seated and standing chair yoga classes, plus gentle yoga and mobility. Press PLAY VIDEO and start.")}</p>
       </div>
       <Link className="btn btn-primary" href={STUDIO_PATH}>
-        ▶ Open Chair Yoga Studio
+        ▶ {t("Open Chair Yoga Studio")}
       </Link>
     </section>
   );
 }
 
 export function MovementStudioHome() {
+  const t = useT();
   return (
     <div className="studio stack-lg" id="movement-studio">
-      <p className="kicker">Movement Studio</p>
-      <h1>{STUDIO_HERO}</h1>
+      <p className="kicker">{t("Movement Studio")}</p>
+      <h1>{t(STUDIO_HERO)}</h1>
       <p className="lede">
-        Official films play here only when the player and the length were checked. Everything else stays written, with Coming Soon, until a real recording exists.
+        {t("Official films play here only when the player and the length were checked. Everything else stays written, with Coming Soon, until a real recording exists.")}
       </p>
       <SafetyNote />
       <ChairYogaBanner />
       <section className="stack-lg" aria-labelledby="choose-movement">
-        <h2 id="choose-movement">{STUDIO_SECTION}</h2>
+        <h2 id="choose-movement">{t(STUDIO_SECTION)}</h2>
         {studioCategories.map((category) => (
           <section key={category.slug} className="stack" aria-labelledby={`studio-${category.slug}`}>
             <h3 id={`studio-${category.slug}`}>
-              <Link href={category.href}>{category.title}</Link>
+              <Link href={category.href}>{t(category.title)}</Link>
             </h3>
-            <p>{category.summary}</p>
+            <p>{t(category.summary)}</p>
             {category.kind === "tool" ? (
               <ToolCard slug={category.slug} />
             ) : (
@@ -215,20 +230,21 @@ export function MovementStudioHome() {
         ))}
       </section>
       <p>
-        <Link href="/academy/move/resources">Free exercise resources and printable guides</Link>
+        <Link href="/academy/move/resources">{t("Free exercise resources and printable guides")}</Link>
       </p>
     </div>
   );
 }
 
 export function StudioCategory({ slug }: { slug: string }) {
+  const t = useT();
   const category = categoryBySlug(slug);
   if (!category) return null;
   return (
     <div className="studio stack-lg">
-      <p className="kicker">Movement Studio</p>
-      <h1>{category.title}</h1>
-      <p className="lede">{category.summary}</p>
+      <p className="kicker">{t("Movement Studio")}</p>
+      <h1>{t(category.title)}</h1>
+      <p className="lede">{t(category.summary)}</p>
       <SafetyNote />
       {slug === "chair" || slug === "balance" || slug === "mobility" ? <ChairYogaBanner /> : null}
       <div className="studio-grid">
@@ -236,38 +252,40 @@ export function StudioCategory({ slug }: { slug: string }) {
           <LessonCard key={lesson.id} lesson={lesson} />
         ))}
       </div>
-      <Link href="/academy/move">All movement</Link>
+      <Link href="/academy/move">{t("All movement")}</Link>
     </div>
   );
 }
 
 export function StudioLessonPage({ slug }: { slug: string }) {
+  const t = useT();
   const lesson = lessonById(slug);
   if (!lesson) return null;
   return (
     <div className="studio stack-lg">
-      <p className="kicker">Movement Studio</p>
+      <p className="kicker">{t("Movement Studio")}</p>
       <LessonCard lesson={lesson} />
-      <Link href={`/academy/move/studio/categories/${lesson.categorySlug}`}>Back to the category</Link>
+      <Link href={`/academy/move/studio/categories/${lesson.categorySlug}`}>{t("Back to the category")}</Link>
     </div>
   );
 }
 
 export function DailyMission() {
+  const t = useT();
   const studio = useStudioProgress();
   const todayDay = studio.today ? missionDayForDate(studio.today) : null;
   const marked = studio.today ? missionsMarked(studio.progress, studio.today) : 0;
 
   return (
     <div className="studio stack-lg">
-      <p className="kicker">Movement Studio</p>
-      <h1>Daily Movement Mission</h1>
+      <p className="kicker">{t("Movement Studio")}</p>
+      <h1>{t("Daily Movement Mission")}</h1>
       <p className="lede">
-        Monday hands, Tuesday balance, Wednesday legs, Thursday back, Friday a 10-minute walk, Saturday gentle yoga, and Sunday breathe.
+        {t("Monday hands, Tuesday balance, Wednesday legs, Thursday back, Friday a 10-minute walk, Saturday gentle yoga, and Sunday breathe.")}
       </p>
-      <p>Marking the mission checks that day. It does not mark the lesson. Pressing play does not check the day.</p>
+      <p>{t("Marking the mission checks that day. It does not mark the lesson. Pressing play does not check the day.")}</p>
       <p>
-        <strong>{PROGRESS_COPY.week}.</strong> {marked} of 7 missions marked.
+        <strong>{t(PROGRESS_COPY.week)}.</strong> {t("Missions marked: {count} of 7.", { count: marked })}
       </p>
       <SafetyNote />
       {missionPlan.map((mission) => {
@@ -276,8 +294,8 @@ export function DailyMission() {
         return (
           <section key={mission.day} className="stack" aria-labelledby={`mission-${mission.day}`}>
             <h2 id={`mission-${mission.day}`}>
-              {mission.label}: {mission.focus}
-              {todayDay === mission.day ? " (today)" : ""}
+              {t(mission.label)}: {t(mission.focus)}
+              {todayDay === mission.day ? ` ${t("(today)")}` : ""}
             </h2>
             <button
               type="button"
@@ -285,22 +303,23 @@ export function DailyMission() {
               disabled={!studio.today || checked}
               onClick={() => studio.completeMission(mission.day)}
             >
-              {checked ? "Mission marked complete" : "Mark mission complete"}
+              {checked ? t("Mission marked complete") : t("Mark mission complete")}
             </button>
             {lesson ? <LessonCard lesson={lesson} /> : null}
           </section>
         );
       })}
       <button type="button" className="btn btn-secondary" disabled={!studio.today} onClick={() => studio.restart()}>
-        Restart this week
+        {t("Restart this week")}
       </button>
-      <p>{PROGRESS_COPY.restart}</p>
-      <Link href="/academy/move">All movement</Link>
+      <p>{t(PROGRESS_COPY.restart)}</p>
+      <Link href="/academy/move">{t("All movement")}</Link>
     </div>
   );
 }
 
 export function MovementProgress() {
+  const t = useT();
   const studio = useStudioProgress();
   const seconds = videoSecondsCompleted(studio.progress);
   const week = studio.today ? weekStartMonday(studio.today) : null;
@@ -308,48 +327,48 @@ export function MovementProgress() {
 
   return (
     <div className="studio stack-lg">
-      <p className="kicker">Movement Studio</p>
-      <h1>My Movement Progress</h1>
-      <p className="lede">{PROGRESS_COPY.storage}</p>
+      <p className="kicker">{t("Movement Studio")}</p>
+      <h1>{t("My Movement Progress")}</h1>
+      <p className="lede">{t(PROGRESS_COPY.storage)}</p>
       <SafetyNote />
       <dl className="studio-stats">
         <div>
-          <dt>{PROGRESS_COPY.lessons}</dt>
+          <dt>{t(PROGRESS_COPY.lessons)}</dt>
           <dd>{completedLessonCount(studio.progress)}</dd>
         </div>
         <div>
-          <dt>{PROGRESS_COPY.minutes}</dt>
+          <dt>{t(PROGRESS_COPY.minutes)}</dt>
           <dd>{formatDuration(seconds)}</dd>
         </div>
         <div>
-          <dt>{PROGRESS_COPY.week}</dt>
-          <dd>{week ? `Week of ${week}` : "This tab is still opening."}</dd>
+          <dt>{t(PROGRESS_COPY.week)}</dt>
+          <dd>{week ? t("Week of {date}", { date: week }) : t("This tab is still opening.")}</dd>
         </div>
         <div>
-          <dt>{PROGRESS_COPY.categories}</dt>
+          <dt>{t(PROGRESS_COPY.categories)}</dt>
           <dd>{completedCategoryCount(studio.progress)}</dd>
         </div>
         <div>
-          <dt>{PROGRESS_COPY.missions}</dt>
-          <dd>{marked} of 7</dd>
+          <dt>{t(PROGRESS_COPY.missions)}</dt>
+          <dd>{t("{count} of 7", { count: marked })}</dd>
         </div>
       </dl>
-      <p>{PROGRESS_COPY.minutesNote}</p>
+      <p>{t(PROGRESS_COPY.minutesNote)}</p>
       {studio.progress.completedLessonIds.length > 0 ? (
         <ul className="studio-steps">
           {studio.progress.completedLessonIds.map((id) => {
             const lesson = lessonById(id);
-            return <li key={id}>{lesson?.title ?? id}</li>;
+            return <li key={id}>{lesson ? t(lesson.title) : id}</li>;
           })}
         </ul>
       ) : (
-        <p>No lesson is marked complete yet.</p>
+        <p>{t("No lesson is marked complete yet.")}</p>
       )}
       <button type="button" className="btn btn-secondary" disabled={!studio.today} onClick={() => studio.restart()}>
-        Restart this week
+        {t("Restart this week")}
       </button>
-      <p>{PROGRESS_COPY.restart}</p>
-      <Link href="/academy/move/studio/mission">Daily Movement Mission</Link>
+      <p>{t(PROGRESS_COPY.restart)}</p>
+      <Link href="/academy/move/studio/mission">{t("Daily Movement Mission")}</Link>
     </div>
   );
 }

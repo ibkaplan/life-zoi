@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { msg } from "@/lib/i18n/translate";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   normalizeStoredIds,
@@ -33,9 +34,9 @@ import { loadStoredSession } from "@/lib/session";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 import { emptySession, type UserSession } from "@/lib/types";
 
-const SAVE_ERROR = "Saved answers could not be stored. Try again.";
-const LOAD_ERROR = "Saved answers could not be loaded.";
-const SAMPLE_ERROR = "Sample data is not saved to an account.";
+const SAVE_ERROR = msg("Saved answers could not be stored. Try again.");
+const LOAD_ERROR = msg("Saved answers could not be loaded.");
+const SAMPLE_ERROR = msg("Sample data is not saved to an account.");
 
 export type AccountPhase = "loading" | "off" | "signed-out" | "needs-mfa" | "ready" | "error";
 
@@ -364,7 +365,7 @@ async function persist(session: UserSession, gen: number): Promise<string | null
   if (!supabase) return SAVE_ERROR;
   const { data, error } = await supabase.auth.getUser();
   if (gen !== generation) return null;
-  if (error || !data.user?.id) return "Sign in again to save answers.";
+  if (error || !data.user?.id) return msg("Sign in again to save answers.");
   const prepared = prepareAccountWrite(session, data.user.id, new Date().toISOString());
   if (!prepared.ok) return prepared.reason === "sample" ? SAMPLE_ERROR : SAVE_ERROR;
   if (gen !== generation) return null;
@@ -436,8 +437,8 @@ export async function clearAccountRecords(): Promise<string | null> {
   for (const table of tables) {
     const { error } = await supabase.from(table).delete().eq("user_id", userId);
     if (error) {
-      publish({ ...snapshot, error: "Saved answers could not be cleared." });
-      return "Saved answers could not be cleared.";
+      publish({ ...snapshot, error: msg("Saved answers could not be cleared.") });
+      return msg("Saved answers could not be cleared.");
     }
   }
   return null;
@@ -450,11 +451,11 @@ export async function signUpWithPassword(
   const invalid = validateAccountCredentials(email, password);
   if (invalid) return { error: invalid, confirmEmail: false };
   // New accounts are closed. Supabase sign-ups are off and the database refuses other emails too.
-  if (!isAdminEmail(email)) return { error: "New accounts are not open yet.", confirmEmail: false };
+  if (!isAdminEmail(email)) return { error: msg("New accounts are not open yet."), confirmEmail: false };
   const supabase = getBrowserSupabase();
-  if (!supabase) return { error: "Account sign-in is not configured in this environment.", confirmEmail: false };
+  if (!supabase) return { error: msg("Account sign-in is not configured in this environment."), confirmEmail: false };
   const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-  if (error) return { error: publicAuthMessage(error.message, "The account could not be created."), confirmEmail: false };
+  if (error) return { error: publicAuthMessage(error.message, msg("The account could not be created.")), confirmEmail: false };
   if (!data.session) return { error: null, confirmEmail: true };
   await refreshFromAuth();
   return { error: null, confirmEmail: false };
@@ -464,40 +465,40 @@ export async function signInWithPassword(email: string, password: string): Promi
   const invalid = validateAccountCredentials(email, password);
   if (invalid) return invalid;
   const supabase = getBrowserSupabase();
-  if (!supabase) return "Account sign-in is not configured in this environment.";
+  if (!supabase) return msg("Account sign-in is not configured in this environment.");
   const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
   if (error) {
     if (/confirm/i.test(error.message)) {
-      return "Confirm the email from the sign-up message, then sign in. Email confirmation stays on.";
+      return msg("Confirm the email from the sign-up message, then sign in. Email confirmation stays on.");
     }
-    return publicAuthMessage(error.message, "Sign-in could not be completed.");
+    return publicAuthMessage(error.message, msg("Sign-in could not be completed."));
   }
   await refreshFromAuth();
   return null;
 }
 
 export async function verifySignInCode(code: string): Promise<string | null> {
-  if (!isTotpCode(code)) return "Enter the 6-digit code from your authenticator app.";
+  if (!isTotpCode(code)) return msg("Enter the 6-digit code from your authenticator app.");
   const supabase = getBrowserSupabase();
-  if (!supabase || snapshot.phase !== "needs-mfa") return "Sign in before entering the authenticator code.";
+  if (!supabase || snapshot.phase !== "needs-mfa") return msg("Sign in before entering the authenticator code.");
   const listed = await supabase.auth.mfa.listFactors();
   const factor = listed.data?.totp[0];
-  if (listed.error || !factor) return "No authenticator is set up for this account.";
+  if (listed.error || !factor) return msg("No authenticator is set up for this account.");
   const verified = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code: code.trim() });
-  if (verified.error) return "That code was not accepted. Try the current code.";
+  if (verified.error) return msg("That code was not accepted. Try the current code.");
   await refreshFromAuth();
   return null;
 }
 
 export async function beginAuthenticatorSetup(): Promise<string | null> {
   const supabase = getBrowserSupabase();
-  if (!supabase || snapshot.phase !== "ready") return "Sign in before setting up an authenticator app.";
+  if (!supabase || snapshot.phase !== "ready") return msg("Sign in before setting up an authenticator app.");
   const listed = await supabase.auth.mfa.listFactors();
-  if (listed.error || !listed.data) return "The authenticator setup could not be started.";
+  if (listed.error || !listed.data) return msg("The authenticator setup could not be started.");
   for (const factor of listed.data.all) {
     if (factor.factor_type === "totp" && factor.status !== "verified") {
       const removed = await supabase.auth.mfa.unenroll({ factorId: factor.id });
-      if (removed.error) return "The authenticator setup could not be started.";
+      if (removed.error) return msg("The authenticator setup could not be started.");
     }
   }
   const enrolled = await supabase.auth.mfa.enroll({
@@ -505,24 +506,24 @@ export async function beginAuthenticatorSetup(): Promise<string | null> {
     friendlyName: "lifeZoi",
     issuer: "lifeZoi",
   });
-  if (enrolled.error || enrolled.data?.type !== "totp") return "The authenticator setup could not be started.";
+  if (enrolled.error || enrolled.data?.type !== "totp") return msg("The authenticator setup could not be started.");
   const qr = authenticatorQrSrc(enrolled.data.totp.qr_code);
   const secret = enrolled.data.totp.secret.trim();
-  if (!qr || !secret) return "The authenticator setup could not be started.";
+  if (!qr || !secret) return msg("The authenticator setup could not be started.");
   publish({ ...snapshot, enrollment: { factorId: enrolled.data.id, qr, secret }, error: "" });
   return null;
 }
 
 export async function confirmAuthenticatorSetup(code: string): Promise<string | null> {
-  if (!isTotpCode(code)) return "Enter the 6-digit code from your authenticator app.";
+  if (!isTotpCode(code)) return msg("Enter the 6-digit code from your authenticator app.");
   const enrollment = snapshot.enrollment;
   const supabase = getBrowserSupabase();
-  if (!supabase || !enrollment || snapshot.phase !== "ready") return "Start authenticator setup first.";
+  if (!supabase || !enrollment || snapshot.phase !== "ready") return msg("Start authenticator setup first.");
   const verified = await supabase.auth.mfa.challengeAndVerify({
     factorId: enrollment.factorId,
     code: code.trim(),
   });
-  if (verified.error) return "That code was not accepted. Try the current code.";
+  if (verified.error) return msg("That code was not accepted. Try the current code.");
   publish({ ...snapshot, enrollment: null, factorVerified: true, error: "" });
   await refreshFromAuth();
   return null;
@@ -545,9 +546,9 @@ export async function signOutAccount(): Promise<void> {
 
 export async function deleteSignedInAccount(): Promise<string | null> {
   const supabase = getBrowserSupabase();
-  if (!supabase || snapshot.phase !== "ready") return "Sign in before deleting the account.";
+  if (!supabase || snapshot.phase !== "ready") return msg("Sign in before deleting the account.");
   const { error } = await supabase.rpc("delete_own_account");
-  if (error) return "The account could not be deleted.";
+  if (error) return msg("The account could not be deleted.");
   generation += 1;
   pending = null;
   writeBrowserStore(emptySession(), false);
@@ -558,15 +559,15 @@ export async function deleteSignedInAccount(): Promise<string | null> {
 
 export type AccountNotice = { ok: true; message: string } | { ok: false; message: string };
 
-const NOT_CONFIGURED = "Account sign-in is not configured in this environment.";
+const NOT_CONFIGURED = msg("Account sign-in is not configured in this environment.");
 
 /** Sends a reset link. The answer is the same whether or not the email has an account. */
 export async function requestPasswordReset(email: string): Promise<AccountNotice> {
-  if (!isEmailAddress(email)) return { ok: false, message: "Enter a valid email address." };
+  if (!isEmailAddress(email)) return { ok: false, message: msg("Enter a valid email address.") };
   const supabase = getBrowserSupabase();
   if (!supabase) return { ok: false, message: NOT_CONFIGURED };
   const redirectTo = resetRedirectUrl(window.location.origin);
-  if (!redirectTo) return { ok: false, message: "The reset link could not be prepared on this page." };
+  if (!redirectTo) return { ok: false, message: msg("The reset link could not be prepared on this page.") };
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
   const problem = emailRequestMessage(error);
   return problem ? { ok: false, message: problem } : { ok: true, message: RESET_REQUEST_SENT };
@@ -574,7 +575,7 @@ export async function requestPasswordReset(email: string): Promise<AccountNotice
 
 /** Sends the sign-up confirmation email again. Neutral answer, like the reset request. */
 export async function resendConfirmationEmail(email: string): Promise<AccountNotice> {
-  if (!isEmailAddress(email)) return { ok: false, message: "Enter a valid email address." };
+  if (!isEmailAddress(email)) return { ok: false, message: msg("Enter a valid email address.") };
   const supabase = getBrowserSupabase();
   if (!supabase) return { ok: false, message: NOT_CONFIGURED };
   const { error } = await supabase.auth.resend({ type: "signup", email: email.trim() });
@@ -589,9 +590,9 @@ export async function updateAccountPassword(password: string, confirm: string): 
   const supabase = getBrowserSupabase();
   if (!supabase) return { ok: false, message: NOT_CONFIGURED };
   if (snapshot.phase === "needs-mfa") {
-    return { ok: false, message: "Enter the code from your authenticator app first, then set the new password." };
+    return { ok: false, message: msg("Enter the code from your authenticator app first, then set the new password.") };
   }
-  if (snapshot.phase !== "ready") return { ok: false, message: "Sign in, or open a new reset link, before changing the password." };
+  if (snapshot.phase !== "ready") return { ok: false, message: msg("Sign in, or open a new reset link, before changing the password.") };
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { ok: false, message: passwordChangeMessage(error) };
   return { ok: true, message: PASSWORD_UPDATED };

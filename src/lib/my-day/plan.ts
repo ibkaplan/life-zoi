@@ -14,6 +14,7 @@ import {
   vegetableLabels,
 } from "@/lib/labels";
 import type { Assessment, GoalId, WeightEntry } from "@/lib/types";
+import { msg } from "@/lib/i18n/translate";
 
 export const ITEM_IDS = [
   "water",
@@ -47,7 +48,7 @@ export const SUGGESTED_TIMES: Record<ItemId, string> = {
 };
 
 export const PERFECT_DAY =
-  "Your day does not have to be perfect. Choose one small action you can do now.";
+  msg("Your day does not have to be perfect. Choose one small action you can do now.");
 
 export const HABIT_HREF = "/habit-transformation/actions";
 
@@ -55,13 +56,13 @@ const CLINICAL = /\b(kidney|renal|dialysis|liver|hepatic|pregnan\w*)\b/i;
 const GENTLE_NOTE = /\b(pain|injur(?:y|ies|ed)?|surgery|surgeries|fall|falls|falling|wheelchair|joint|dizzy|dizziness)\b/i;
 
 const LOCAL_HABIT: Record<GoalId, string> = {
-  walk: "Move for a few minutes in a way you already use.",
-  sleep: "Keep a wind-down you can manage tonight.",
-  eating: "Eat one meal you already know how to make.",
-  smoking: "For one urge, you can wait or step away. There is no shame if you smoke.",
-  stress: "Take a few quiet minutes.",
-  alcohol: "For one occasion, you can choose a smaller amount or skip it.",
-  connection: "Send one short note to someone.",
+  walk: msg("Move for a few minutes in a way you already use."),
+  sleep: msg("Keep a wind-down you can manage tonight."),
+  eating: msg("Eat one meal you already know how to make."),
+  smoking: msg("For one urge, you can wait or step away. There is no shame if you smoke."),
+  stress: msg("Take a few quiet minutes."),
+  alcohol: msg("For one occasion, you can choose a smaller amount or skip it."),
+  connection: msg("Send one short note to someone."),
 };
 
 export type ItemState = {
@@ -166,7 +167,7 @@ function mifflin(sex: "female" | "male", kg: number, cm: number, age: number): n
 
 export function calorieEstimate(answers: Assessment | null): CalorieEstimate {
   if (!answers) {
-    return { kind: "none", reason: "No completed assessment is saved, so no calorie estimate is shown." };
+    return { kind: "none", reason: msg("No completed assessment is saved, so no calorie estimate is shown.") };
   }
   const missing: string[] = [];
   const age = numberIn(answers.exactAge, 18, 100);
@@ -209,21 +210,21 @@ export function proteinEstimate(answers: Assessment | null): ProteinEstimate {
     return {
       kind: "hold",
       reason:
-        "Your saved note mentions kidney, liver, or pregnancy. A qualified professional should guide protein. This page does not raise a protein estimate.",
+        msg("Your saved note mentions kidney, liver, or pregnancy. A qualified professional should guide protein. This page does not raise a protein estimate."),
     };
   }
   const weight = answers ? numberIn(answers.weightKg, 30, 300) : null;
   if (!weight) {
     return {
       kind: "none",
-      reason: "A protein estimate needs a saved weight in kilograms. None is stored, so none is shown.",
+      reason: msg("A protein estimate needs a saved weight in kilograms. None is stored, so none is shown."),
     };
   }
   return {
     kind: "estimate",
     grams: Math.round(weight * 0.8),
     reason:
-      "About 0.8 grams per kilogram of the saved weight. That is a general adult reference, not a target to exceed and not medical advice.",
+      msg("About 0.8 grams per kilogram of the saved weight. That is a general adult reference, not a target to exceed and not medical advice."),
   };
 }
 
@@ -277,11 +278,11 @@ function presentLesson(id: string, shorter: boolean, why: string): MoveView {
   const lesson = lessonById(id);
   if (!lesson) {
     return {
-      title: "A short movement",
-      detail: "Open Movement for the lessons that are already on this site. This page does not add a play button.",
+      title: msg("A short movement"),
+      detail: msg("Open Movement for the lessons that are already on this site. This page does not add a play button."),
       steps: [],
       href: "/academy/move",
-      hrefLabel: "Open Movement",
+      hrefLabel: msg("Open Movement"),
       why,
     };
   }
@@ -291,17 +292,17 @@ function presentLesson(id: string, shorter: boolean, why: string): MoveView {
       detail: `${lesson.summary} The film plays on its Movement Studio page. This page does not add a play button.`,
       steps: [],
       href: lessonHref(lesson.id),
-      hrefLabel: "Open this film in Movement Studio",
+      hrefLabel: msg("Open this film in Movement Studio"),
       why,
     };
   }
   const limit = shorter ? 2 : lesson.script.cues.length;
   return {
     title: lesson.title,
-    detail: "Written steps from the existing practice. This is not a video and there is no play button.",
+    detail: msg("Written steps from the existing practice. This is not a video and there is no play button."),
     steps: lessonSteps(lesson.script.id, limit),
     href: lessonHref(lesson.id),
-    hrefLabel: "Open the written practice",
+    hrefLabel: msg("Open the written practice"),
     why,
   };
 }
@@ -309,13 +310,13 @@ function presentLesson(id: string, shorter: boolean, why: string): MoveView {
 function gentleWhy(answers: Assessment | null): string {
   if (!answers) return "";
   if (answers.ageRange === "60-69" || answers.ageRange === "70+") {
-    return "Your saved age range is 60 or older, so movement stays short or seated. Skip any part that does not fit.";
+    return msg("Your saved age range is 60 or older, so movement stays short or seated. Skip any part that does not fit.");
   }
   if (GENTLE_NOTE.test(answers.conditionsNote)) {
-    return "Your saved note mentions pain, injury, or a fall, so movement stays seated or written.";
+    return msg("Your saved note mentions pain, injury, or a fall, so movement stays seated or written.");
   }
   if (answers.activityDays.trim() && Number(answers.activityDays) <= 1) {
-    return "You saved activity on one day or fewer in a typical week, so the movement stays small.";
+    return msg("You saved activity on one day or fewer in a typical week, so the movement stays small.");
   }
   return "";
 }
@@ -339,7 +340,7 @@ function breakView(variant: number, shorter: boolean): MoveView {
     const lesson = lessonById(id);
     if (lesson?.kind === "script") view.steps = lessonSteps(lesson.script.id, 3);
   }
-  view.title = "Movement break";
+  view.title = msg("Movement break");
   return view;
 }
 
@@ -354,7 +355,7 @@ function mealLink(slug: string): { href: string; label: string } {
   const meal = mealModule(slug);
   return {
     href: meal ? `/academy/meals/${meal.slug}` : "/academy/meals",
-    label: meal ? `Open ${meal.title}` : "Open Nutrition",
+    label: meal ? `Open ${meal.title}` : msg("Open Nutrition"),
   };
 }
 
@@ -375,11 +376,11 @@ function mealView(slot: "breakfast" | "lunch" | "dinner", answers: Assessment | 
     ? `A smaller plate of a meal you already make is enough.${plants}`
     : `Use a meal you already know how to make. Vegetables, a protein food you already eat, and a starch can share the plate.${plants}`;
   return {
-    title: slot === "breakfast" ? "Breakfast" : slot === "lunch" ? "Lunch" : "Dinner",
+    title: slot === "breakfast" ? msg("Breakfast") : slot === "lunch" ? msg("Lunch") : msg("Dinner"),
     detail,
     href: link.href,
     hrefLabel: link.label,
-    why: answers ? "" : "No completed assessment is saved, so this stays a general meal cue.",
+    why: answers ? "" : msg("No completed assessment is saved, so this stays a general meal cue."),
   };
 }
 
@@ -388,17 +389,17 @@ function waterView(answers: Assessment | null, variant: number): { detail: strin
   if (!answers?.hydration) {
     return {
       detail: alt
-        ? "If water is not appealing, a warm unsweetened drink you already like is a fine stand-in. A fluid limit from a clinician comes first."
-        : "Drink when you are thirsty, unless a clinician has limited your fluids. There is no amount you must finish.",
+        ? msg("If water is not appealing, a warm unsweetened drink you already like is a fine stand-in. A fluid limit from a clinician comes first.")
+        : msg("Drink when you are thirsty, unless a clinician has limited your fluids. There is no amount you must finish."),
       why: "",
     };
   }
   const label = hydrationLabels[answers.hydration].toLowerCase();
   return {
     detail: alt
-      ? "A warm unsweetened drink you already like can stand in for water. A fluid limit from a clinician comes first."
+      ? msg("A warm unsweetened drink you already like can stand in for water. A fluid limit from a clinician comes first.")
       : `You reported water ${label}. Drink when you are thirsty. A medical fluid limit comes first.`,
-    why: "This uses the water answer already saved on your assessment.",
+    why: msg("This uses the water answer already saved on your assessment."),
   };
 }
 
@@ -407,22 +408,22 @@ function habitOptions(answers: Assessment | null, plans: HabitPlan[]): { detail:
     return plans.map((plan) => ({
       detail: plan.smallAction,
       shorterDetail: plan.easierAction,
-      why: "This is the tiny action already saved in Habit Transformation. My Day does not write a new one.",
+      why: msg("This is the tiny action already saved in Habit Transformation. My Day does not write a new one."),
     }));
   }
   const goals = answers?.goals ?? [];
   if (goals.length === 0) {
     return [
       {
-        detail: "Choose one small action you can do now.",
-        shorterDetail: "One minute is enough. Then stop.",
-        why: "No habit journey is saved, so this is a general small action. Habit Transformation is not filled in here.",
+        detail: msg("Choose one small action you can do now."),
+        shorterDetail: msg("One minute is enough. Then stop."),
+        why: msg("No habit journey is saved, so this is a general small action. Habit Transformation is not filled in here."),
       },
     ];
   }
   return goals.map((goal) => ({
     detail: LOCAL_HABIT[goal],
-    shorterDetail: "One minute is enough. Then stop.",
+    shorterDetail: msg("One minute is enough. Then stop."),
     why: `This line uses the focus “${goalLabels[goal]}” already saved on your assessment. It is not a Habit Transformation record.`,
   }));
 }
@@ -439,11 +440,11 @@ function sleepWhy(answers: Assessment | null): string {
 function relaxView(answers: Assessment | null, shorter: boolean): MoveView {
   const view = presentLesson("script-breathe", shorter, sleepWhy(answers));
   view.href = "/choices/sleep";
-  view.hrefLabel = "Open the sleep lesson";
+  view.hrefLabel = msg("Open the sleep lesson");
   if (answers?.stress === "high" || answers?.stress === "moderate") {
-    view.why = [view.why, "Your saved stress answer is included only as context. This is not treatment."].filter(Boolean).join(" ");
+    view.why = [view.why, msg("Your saved stress answer is included only as context. This is not treatment.")].filter(Boolean).join(" ");
   }
-  view.title = "Relaxation";
+  view.title = msg("Relaxation");
   return view;
 }
 
@@ -496,88 +497,88 @@ export function presentDay(
     };
     if (id === "water") {
       const water = waterView(answers, state.variant);
-      return { ...base, section: "Morning", title: "Water", detail: water.detail, href: "/wellness-coach/hydration", hrefLabel: "Open the hydration lesson", why: water.why };
+      return { ...base, section: msg("Morning"), title: msg("Water"), detail: water.detail, href: "/wellness-coach/hydration", hrefLabel: msg("Open the hydration lesson"), why: water.why };
     }
     if (id === "stretch") {
       const stretch = stretchView(state.variant, state.shorter);
-      return { ...base, section: "Morning", ...stretch };
+      return { ...base, section: msg("Morning"), ...stretch };
     }
     if (id === "movement") {
       const move = movementView(answers, state.variant, state.shorter);
-      return { ...base, section: "Workout", ...move };
+      return { ...base, section: msg("Workout"), ...move };
     }
     if (id === "breakfast" || id === "lunch" || id === "dinner") {
       const saved = savedMeal(sources?.foodPlan, sources?.date || day.date, id);
       if (saved) {
         return {
           ...base,
-          section: "Nutrition",
+          section: msg("Nutrition"),
           title: saved.name,
           detail: state.shorter ? saved.summary : `${saved.summary} Portions stay the ones already saved.`,
           steps: state.shorter ? [] : saved.steps.slice(0, 3),
           href: "/food-plan/week",
-          hrefLabel: "Open the saved food plan",
-          why: "This is the meal already saved on your food plan for this weekday. My Day does not build a new menu.",
+          hrefLabel: msg("Open the saved food plan"),
+          why: msg("This is the meal already saved on your food plan for this weekday. My Day does not build a new menu."),
         };
       }
       const meal = mealView(id, answers, state.variant, state.shorter);
-      return { ...base, section: "Nutrition", steps: [], ...meal };
+      return { ...base, section: msg("Nutrition"), steps: [], ...meal };
     }
     if (id === "brain") {
       const daily = mod(state.variant, 2) === 0;
       const savedBrain = Boolean(sources?.brain && !isEmptyBrain(sources.brain));
       return {
         ...base,
-        section: "Brain challenge",
-        title: "Brain challenge",
+        section: msg("Brain challenge"),
+        title: msg("Brain challenge"),
         detail: state.shorter
-          ? "One question is enough. A score is not a health measure."
-          : "One link to the quiz that is already on this site. A score is not a health measure.",
+          ? msg("One question is enough. A score is not a health measure.")
+          : msg("One link to the quiz that is already on this site. A score is not a health measure."),
         href: daily ? "/brain-quiz/daily" : "/brain-quiz",
-        hrefLabel: daily ? "Open today's Brain & Habit Quiz" : "Open the Brain & Habit Quiz",
-        why: savedBrain ? "You already have Brain & Habit Quiz marks saved. A score is not a health measure." : "",
+        hrefLabel: daily ? msg("Open today's Brain & Habit Quiz") : msg("Open the Brain & Habit Quiz"),
+        why: savedBrain ? msg("You already have Brain & Habit Quiz marks saved. A score is not a health measure.") : "",
       };
     }
     if (id === "break") {
       const pause = breakView(state.variant, state.shorter);
-      return { ...base, section: "Workout", ...pause };
+      return { ...base, section: msg("Workout"), ...pause };
     }
     if (id === "habit") {
       const option = habits[mod(state.variant, habits.length)] ?? habits[0];
       return {
         ...base,
-        section: "Habit",
-        title: "One tiny habit",
+        section: msg("Habit"),
+        title: msg("One tiny habit"),
         detail: state.shorter ? (option?.shorterDetail ?? "") : (option?.detail ?? ""),
         href: HABIT_HREF,
-        hrefLabel: "Open My Tiny Daily Actions",
+        hrefLabel: msg("Open My Tiny Daily Actions"),
         why: option?.why ?? "",
       };
     }
     if (id === "relax") {
       const relax = relaxView(answers, state.shorter);
       if (sources?.emotionalNotes) {
-        relax.why = [relax.why, "You have Emotional Wellness notes in this browser. They are not a diagnosis, and that page has not been clinically reviewed."]
+        relax.why = [relax.why, msg("You have Emotional Wellness notes in this browser. They are not a diagnosis, and that page has not been clinically reviewed.")]
           .filter(Boolean)
           .join(" ");
       }
-      return { ...base, section: "Sleep and recovery", ...relax };
+      return { ...base, section: msg("Sleep and recovery"), ...relax };
     }
     const progressLink = mod(state.variant, 2) === 0;
     return {
       ...base,
-      section: "Sleep and recovery",
-      title: "Evening check-in",
+      section: msg("Sleep and recovery"),
+      title: msg("Evening check-in"),
       detail: state.shorter
-        ? "One word is enough. An open day is not a failure."
-        : "A short evening note, if you want one. An unfinished day can stay unfinished.",
+        ? msg("One word is enough. An open day is not a failure.")
+        : msg("A short evening note, if you want one. An unfinished day can stay unfinished."),
       href: progressLink ? "/progress" : "/habit-transformation/check-in",
-      hrefLabel: progressLink ? "Open Progress" : "Open the Habit Transformation check-in",
+      hrefLabel: progressLink ? msg("Open Progress") : msg("Open the Habit Transformation check-in"),
       why: "",
     };
   });
 }
 
 export function ayurvedaNote(): string {
-  return "A traditional daily rhythm, sometimes called dinacharya, is a cultural practice of morning care, a midday meal, and a quieter evening. It is not a diagnosis, not a body-type label, and not a medical diet. It does not change the meals on this page.";
+  return msg("A traditional daily rhythm, sometimes called dinacharya, is a cultural practice of morning care, a midday meal, and a quieter evening. It is not a diagnosis, not a body-type label, and not a medical diet. It does not change the meals on this page.");
 }

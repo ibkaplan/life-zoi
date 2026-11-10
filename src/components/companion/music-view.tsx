@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Art } from "@/components/companion/art";
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import { FavoriteButton, formatClock, SaveNote } from "@/components/companion/shared";
 import { useProfile } from "@/components/companion/use-profile";
 import { commitCompanion } from "@/lib/companion/store";
@@ -21,6 +23,7 @@ function saveListening(trackId: string, seconds: number, position: number) {
 }
 
 export function MusicPlayer({ track }: { track: Track }) {
+  const t = useT();
   const { companion, sample } = useProfile();
   const saved = companion.media.positions[`music:${track.id}`] ?? 0;
   const total = track.minutes * 60;
@@ -77,44 +80,44 @@ export function MusicPlayer({ track }: { track: Track }) {
       setPlaying(true);
       if (!sample) commitCompanion((state) => addRecent(state, `music:${track.id}`, new Date().toISOString()));
     } catch {
-      setError("This browser cannot play sound from LifeZoi. Try another browser.");
+      setError(t("This browser cannot play sound from LifeZoi. Try another browser."));
     }
   }
 
   const guide = track.breath && playing ? breathPhase(track.breath, position) : null;
   return (
-    <div className="lz-player stack" role="region" aria-label={`Player: ${track.title}`}>
-      <h3>{track.title}</h3>
-      <p>{track.description}</p>
-      <p className="hint">{track.credit}</p>
+    <div className="lz-player stack" role="region" aria-label={t("Player: {title}", { title: t(track.title) })}>
+      <h3>{t(track.title)}</h3>
+      <p>{t(track.description)}</p>
+      <p className="hint">{t(track.credit)}</p>
       {guide ? (
         <p className="lz-breath" aria-live="polite">
-          {guide.phase === "in" ? "Breathe in" : guide.phase === "hold" ? "Hold" : "Breathe out"} · {guide.left}
+          {guide.phase === "in" ? t("Breathe in") : guide.phase === "hold" ? t("Hold") : t("Breathe out")} · {guide.left}
         </p>
       ) : null}
       <div className="lz-buttons">
         {playing ? (
           <button className="btn btn-primary" type="button" onClick={() => stop()}>
-            Pause
+            {t("Pause")}
           </button>
         ) : (
           <button className="btn btn-primary" type="button" onClick={play}>
-            {position > 0 ? "Resume" : "Play"}
+            {position > 0 ? t("Resume") : t("Play")}
           </button>
         )}
         {position > 0 && !playing ? (
           <button className="btn btn-ghost" type="button" onClick={() => setPosition(0)}>
-            Start again
+            {t("Start again")}
           </button>
         ) : null}
-        <FavoriteButton id={`music:${track.id}`} label="this track" />
+        <FavoriteButton id={`music:${track.id}`} label={msg("this track")} />
       </div>
       <p>
-        <span aria-label="Time played">{formatClock(Math.floor(position))}</span> / <span aria-label="Length">{formatClock(total)}</span>
+        <span aria-label={t("Time played")}>{formatClock(Math.floor(position))}</span> / <span aria-label={t("Length")}>{formatClock(total)}</span>
       </p>
-      <progress max={total} value={Math.min(total, position)} aria-label="Progress" />
+      <progress max={total} value={Math.min(total, position)} aria-label={t("Progress")} />
       <label className="field">
-        <span>Volume</span>
+        <span>{t("Volume")}</span>
         <input
           type="range"
           min={0}
@@ -134,10 +137,11 @@ export function MusicPlayer({ track }: { track: Track }) {
 }
 
 export function MusicView() {
+  const t = useT();
   const { ready, companion } = useProfile();
   const [category, setCategory] = useState<MusicCategory>("relaxation");
   const [trackId, setTrackId] = useState<string>("soft-evening");
-  if (!ready) return <p className="hint">Loading music…</p>;
+  if (!ready) return <p className="hint">{t("Loading music…")}</p>;
   const list = TRACKS.filter((track) => track.category === category);
   const current = trackById(trackId) ?? list[0] ?? null;
   const favorites = companion.media.favorites.filter((id) => id.startsWith("music:")).map((id) => trackById(id.slice(6))).filter((track): track is Track => Boolean(track));
@@ -147,16 +151,18 @@ export function MusicView() {
     <div className="stack-lg">
       <div className="lz-hero-row">
         <div className="lz-hello">
-          <p className="kicker">Health Library · Music</p>
-          <h1>Relaxing music</h1>
-          <p className="script brand-line">Breathe. Listen. Rest.</p>
-          <p>Calm sounds for relaxation, sleep, focus, and breathing. Everything plays inside LifeZoi.</p>
+          <p className="kicker">
+            {t("Health Library")} · {t("Music")}
+          </p>
+          <h1>{t("Relaxing music")}</h1>
+          <p className="script brand-line">{t("Breathe. Listen. Rest.")}</p>
+          <p>{t("Calm sounds for relaxation, sleep, focus, and breathing. Everything plays inside LifeZoi.")}</p>
         </div>
         <Art name="music" />
       </div>
       <SaveNote />
-      {today?.listeningMinutes ? <p className="alert alert-ok">You have listened for {today.listeningMinutes} minutes today.</p> : null}
-      <div className="lz-tabs" role="group" aria-label="Music category">
+      {today?.listeningMinutes ? <p className="alert alert-ok">{t("You have listened for {minutes} minutes today.", { minutes: today.listeningMinutes })}</p> : null}
+      <div className="lz-tabs" role="group" aria-label={t("Music category")}>
         {MUSIC_CATEGORIES.map((value) => (
           <button
             key={value}
@@ -169,27 +175,27 @@ export function MusicView() {
               if (first) setTrackId(first.id);
             }}
           >
-            {MUSIC_CATEGORY_LABEL[value]}
+            {t(MUSIC_CATEGORY_LABEL[value])}
           </button>
         ))}
       </div>
       <section className="card stack">
-        <h2>{MUSIC_CATEGORY_LABEL[category]}</h2>
+        <h2>{t(MUSIC_CATEGORY_LABEL[category])}</h2>
         <ul className="record-list">
           {list.map((track) => (
             <li key={track.id}>
               <button type="button" className="lz-tab" aria-pressed={track.id === current?.id} onClick={() => setTrackId(track.id)}>
-                {track.title} · {track.minutes} min
+                {t(track.title)} · {t("{minutes} min", { minutes: track.minutes })}
               </button>
             </li>
           ))}
         </ul>
         {current ? <MusicPlayer key={current.id} track={current} /> : null}
-        <p className="hint">Keep the volume comfortable. Stop if a sound is unpleasant. Sleep sounds are not a treatment for a sleep problem.</p>
+        <p className="hint">{t("Keep the volume comfortable. Stop if a sound is unpleasant. Sleep sounds are not a treatment for a sleep problem.")}</p>
       </section>
       {favorites.length > 0 ? (
         <section className="card stack">
-          <h2>My favorite tracks</h2>
+          <h2>{t("My favorite tracks")}</h2>
           <div className="lz-buttons">
             {favorites.map((track) => (
               <button
@@ -201,7 +207,7 @@ export function MusicView() {
                   setTrackId(track.id);
                 }}
               >
-                {track.title}
+                {t(track.title)}
               </button>
             ))}
           </div>
@@ -209,10 +215,10 @@ export function MusicView() {
       ) : null}
       {recent.length > 0 ? (
         <section className="card stack">
-          <h2>Recently played</h2>
+          <h2>{t("Recently played")}</h2>
           <ul>
             {recent.map((item) => (
-              <li key={item.id}>{trackById(item.id.slice(6))?.title ?? item.id}</li>
+              <li key={item.id}>{t(trackById(item.id.slice(6))?.title ?? item.id)}</li>
             ))}
           </ul>
         </section>

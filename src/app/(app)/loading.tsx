@@ -1,7 +1,9 @@
+import { T } from "@/components/localized-text";
+
 export default function Loading() {
   return (
     <p className="card" role="status">
-      Loading…
+      <T text="Loading…" />
     </p>
   );
 }

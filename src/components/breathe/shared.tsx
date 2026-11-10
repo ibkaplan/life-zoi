@@ -15,22 +15,25 @@ import {
 } from "@/lib/breathe/content";
 import { HABIT_LABELS } from "@/lib/breathe/program";
 import type { BreatheHabits } from "@/lib/breathe/state";
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 
 const TABS = [
-  { href: "/breathe", label: "Overview" },
-  { href: "/breathe/practice", label: "Breathe" },
-  { href: "/breathe/learn", label: "Learn" },
-  { href: "/breathe/foods", label: "Foods" },
-  { href: "/breathe/challenge", label: "30-day challenge" },
+  { href: "/breathe", label: msg("Overview") },
+  { href: "/breathe/practice", label: msg("Breathe") },
+  { href: "/breathe/learn", label: msg("Learn") },
+  { href: "/breathe/foods", label: msg("Foods") },
+  { href: "/breathe/challenge", label: msg("30-day challenge") },
 ];
 
 export function BreatheNav() {
   const pathname = usePathname();
+  const t = useT();
   return (
-    <nav className="bf-nav" aria-label="Breathe for Life">
+    <nav className="bf-nav" aria-label={t("Breathe for Life")}>
       {TABS.map((tab) => (
         <Link key={tab.href} href={tab.href} className="bf-nav-link" aria-current={pathname === tab.href ? "page" : undefined}>
-          {tab.label}
+          {t(tab.label)}
         </Link>
       ))}
     </nav>
@@ -38,21 +41,23 @@ export function BreatheNav() {
 }
 
 export function EvidenceBadge({ level }: { level: EvidenceLevel }) {
+  const t = useT();
   return (
-    <span className="bf-badge" data-level={level} title={EVIDENCE_LABELS[level].text}>
-      {EVIDENCE_LABELS[level].label}
+    <span className="bf-badge" data-level={level} title={t(EVIDENCE_LABELS[level].text)}>
+      {t(EVIDENCE_LABELS[level].label)}
     </span>
   );
 }
 
 export function EvidenceLegend() {
+  const t = useT();
   return (
     <section className="card stack" aria-labelledby="bf-evidence">
-      <h2 id="bf-evidence">How to read the labels</h2>
+      <h2 id="bf-evidence">{t("How to read the labels")}</h2>
       <ul className="bf-legend">
         {(Object.keys(EVIDENCE_LABELS) as EvidenceLevel[]).map((level) => (
           <li key={level}>
-            <EvidenceBadge level={level} /> <span>{EVIDENCE_LABELS[level].text}</span>
+            <EvidenceBadge level={level} /> <span>{t(EVIDENCE_LABELS[level].text)}</span>
           </li>
         ))}
       </ul>
@@ -61,29 +66,31 @@ export function EvidenceLegend() {
 }
 
 export function SafetyCard({ breathless = false, compact = false }: { breathless?: boolean; compact?: boolean }) {
+  const t = useT();
   return (
     <section className="card stack bf-safety" aria-labelledby="bf-safety">
-      <h2 id="bf-safety">Breathe safely</h2>
-      {breathless ? <p className="alert">{REPORTED_BREATHLESSNESS}</p> : null}
+      <h2 id="bf-safety">{t("Breathe safely")}</h2>
+      {breathless ? <p className="alert">{t(REPORTED_BREATHLESSNESS)}</p> : null}
       <ul>
         {SAFETY_RULES.map((rule) => (
-          <li key={rule}>{rule}</li>
+          <li key={rule}>{t(rule)}</li>
         ))}
       </ul>
       <p>
-        <strong>{STOP_SIGNS}</strong>
+        <strong>{t(STOP_SIGNS)}</strong>
       </p>
-      {!compact ? <p>{MEDICAL_CAUTION}</p> : null}
-      <p className="hint">{PROGRAM_LIMITS}</p>
+      {!compact ? <p>{t(MEDICAL_CAUTION)}</p> : null}
+      <p className="hint">{t(PROGRAM_LIMITS)}</p>
     </section>
   );
 }
 
 export function SourcesList() {
+  const t = useT();
   return (
     <section className="card stack" aria-labelledby="bf-sources">
-      <h2 id="bf-sources">Sources</h2>
-      <p className="hint">Each source is described only as far as it supports what this feature says.</p>
+      <h2 id="bf-sources">{t("Sources")}</h2>
+      <p className="hint">{t("Each source is described only as far as it supports what this feature says.")}</p>
       <ol className="bf-sources">
         {BREATHE_SOURCES.map((source) => (
           <li key={source.id}>
@@ -94,12 +101,12 @@ export function SourcesList() {
               {" "}
               {source.authors} {source.year}. {source.where}.
             </span>
-            <p>{source.supports}</p>
+            <p>{t(source.supports)}</p>
           </li>
         ))}
       </ol>
       <div className="alert">
-        <strong>{AGE_FIGURE_NOTE.title}.</strong> {AGE_FIGURE_NOTE.text}
+        <strong>{t(AGE_FIGURE_NOTE.title)}.</strong> {t(AGE_FIGURE_NOTE.text)}
       </div>
     </section>
   );
@@ -146,13 +153,14 @@ function Choice<K extends keyof typeof HABIT_LABELS>({
   disabled?: boolean;
 }) {
   const options = HABIT_LABELS[field] as Record<string, string>;
+  const t = useT();
   return (
     <fieldset className="field">
       <legend>{legend}</legend>
       <div className="lz-tabs">
         {Object.entries(options).map(([id, label]) => (
           <button key={id} type="button" className="lz-tab" disabled={disabled} aria-pressed={value === id} onClick={() => onChange(value === id ? "" : id)}>
-            {label}
+            {t(label)}
           </button>
         ))}
       </div>
@@ -163,15 +171,16 @@ function Choice<K extends keyof typeof HABIT_LABELS>({
 /** The short habit questions asked at the start and the end of the challenge. */
 export function HabitQuestions({ value, onChange, disabled }: { value: BreatheHabits; onChange: (next: BreatheHabits) => void; disabled?: boolean }) {
   const set = (patch: Partial<BreatheHabits>) => onChange({ ...value, ...patch });
+  const t = useT();
   return (
     <div className="stack">
-      <Choice legend="How often do you practice breathing exercises?" field="practice" value={value.practice} disabled={disabled} onChange={(v) => set({ practice: v as BreatheHabits["practice"] })} />
-      <Choice legend="How often do you notice yourself breathing through your mouth?" field="mouthBreathing" value={value.mouthBreathing} disabled={disabled} onChange={(v) => set({ mouthBreathing: v as BreatheHabits["mouthBreathing"] })} />
-      <Choice legend="How often do you eat leafy greens or beetroot?" field="greens" value={value.greens} disabled={disabled} onChange={(v) => set({ greens: v as BreatheHabits["greens"] })} />
-      <Choice legend="How often do you walk for ten minutes or more?" field="walking" value={value.walking} disabled={disabled} onChange={(v) => set({ walking: v as BreatheHabits["walking"] })} />
-      <ScalePicker legend="Stress lately (1 calm, 5 very stressed)" value={value.stress} disabled={disabled} onChange={(v) => set({ stress: v })} />
-      <ScalePicker legend="How easily you relax (1 hard, 5 easy)" value={value.relaxation} disabled={disabled} onChange={(v) => set({ relaxation: v })} />
-      <p className="hint">These are your own impressions, not measurements. Skip any question you like.</p>
+      <Choice legend={t("How often do you practice breathing exercises?")} field="practice" value={value.practice} disabled={disabled} onChange={(v) => set({ practice: v as BreatheHabits["practice"] })} />
+      <Choice legend={t("How often do you notice yourself breathing through your mouth?")} field="mouthBreathing" value={value.mouthBreathing} disabled={disabled} onChange={(v) => set({ mouthBreathing: v as BreatheHabits["mouthBreathing"] })} />
+      <Choice legend={t("How often do you eat leafy greens or beetroot?")} field="greens" value={value.greens} disabled={disabled} onChange={(v) => set({ greens: v as BreatheHabits["greens"] })} />
+      <Choice legend={t("How often do you walk for ten minutes or more?")} field="walking" value={value.walking} disabled={disabled} onChange={(v) => set({ walking: v as BreatheHabits["walking"] })} />
+      <ScalePicker legend={t("Stress lately (1 calm, 5 very stressed)")} value={value.stress} disabled={disabled} onChange={(v) => set({ stress: v })} />
+      <ScalePicker legend={t("How easily you relax (1 hard, 5 easy)")} value={value.relaxation} disabled={disabled} onChange={(v) => set({ relaxation: v })} />
+      <p className="hint">{t("These are your own impressions, not measurements. Skip any question you like.")}</p>
     </div>
   );
 }
