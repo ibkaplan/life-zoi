@@ -5,6 +5,18 @@
  */
 
 import { useId } from "react";
+import { useLocale, useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
+
+/** Step names for the figure labels, as in the routine. */
+const STEP_TITLE: Record<string, string> = {
+  stand: msg("Stand up"),
+  walk: msg("Walk"),
+  heels: msg("Heel raises"),
+  ankles: msg("Ankle movements"),
+  breathe: msg("Breathing"),
+  return: msg("Return to work"),
+};
 
 const ARTERY = "#C2412D";
 const VEIN = "#2F5FA8";
@@ -20,12 +32,14 @@ function Arrow({ x, y, rotate, color }: { x: number; y: number; rotate: number; 
 /** Cardiovascular and lymphatic systems side by side on one body outline. */
 export function BodySystemsArt() {
   const uid = useId();
+  const t = useT();
   return (
     <svg viewBox="0 0 320 300" className="mb-art" role="img" aria-labelledby={`${uid}-t ${uid}-d`}>
-      <title id={`${uid}-t`}>The cardiovascular and lymphatic systems</title>
+      <title id={`${uid}-t`}>{t("The cardiovascular and lymphatic systems")}</title>
       <desc id={`${uid}-d`}>
-        A body outline with the heart in the chest. Red arteries carry blood from the heart down to the legs, blue veins carry it back up. Green lymph vessels collect fluid from
-        the tissues and join the blood near the heart.
+        {t(
+          "A body outline with the heart in the chest. Red arteries carry blood from the heart down to the legs, blue veins carry it back up. Green lymph vessels collect fluid from the tissues and join the blood near the heart.",
+        )}
       </desc>
       {/* body outline */}
       <g fill={SKIN} stroke={INK} strokeWidth="2">
@@ -55,16 +69,16 @@ export function BodySystemsArt() {
       {/* legend */}
       <g fontSize="12" fill={INK} fontFamily="inherit">
         <rect x="222" y="40" width="14" height="6" fill={ARTERY} />
-        <text x="242" y="47">Arteries: out</text>
+        <text x="242" y="47">{t("Arteries: out")}</text>
         <rect x="222" y="62" width="14" height="6" fill={VEIN} />
-        <text x="242" y="69">Veins: back</text>
+        <text x="242" y="69">{t("Veins: back")}</text>
         <circle cx="229" cy="88" r="5" fill={LYMPH} />
-        <text x="242" y="92">Lymph</text>
-        <text x="8" y="47">Heart pumps</text>
-        <text x="8" y="62">blood out</text>
-        <text x="8" y="250">Leg muscles</text>
-        <text x="8" y="265">help the</text>
-        <text x="8" y="280">return trip</text>
+        <text x="242" y="92">{t("Lymph")}</text>
+        <text x="8" y="47">{t("Heart pumps")}</text>
+        <text x="8" y="62">{t("blood out")}</text>
+        <text x="8" y="250">{t("Leg muscles")}</text>
+        <text x="8" y="265">{t("help the")}</text>
+        <text x="8" y="280">{t("return trip")}</text>
       </g>
     </svg>
   );
@@ -77,12 +91,14 @@ export function BodySystemsArt() {
 export function CalfPumpArt({ squeeze = false, animate = false }: { squeeze?: boolean; animate?: boolean }) {
   const uid = useId();
   const cls = `mb-art mb-calf${animate ? " mb-anim" : ""}${squeeze ? " is-squeeze" : ""}`;
+  const t = useT();
   return (
     <svg viewBox="0 0 320 300" className={cls} role="img" aria-labelledby={`${uid}-t ${uid}-d`}>
-      <title id={`${uid}-t`}>The calf muscle pump</title>
+      <title id={`${uid}-t`}>{t("The calf muscle pump")}</title>
       <desc id={`${uid}-d`}>
-        A lower leg seen from the side. The calf muscle lies at the back. A vein runs up through the leg with two small one-way valves. When the calf tightens it presses the
-        vein and pushes blood upward toward the heart. The valve below closes so blood does not fall back.
+        {t(
+          "A lower leg seen from the side. The calf muscle lies at the back. A vein runs up through the leg with two small one-way valves. When the calf tightens it presses the vein and pushes blood upward toward the heart. The valve below closes so blood does not fall back.",
+        )}
       </desc>
       {/* leg outline */}
       <path d="M120 20 L190 20 L196 120 Q206 180 186 236 L192 262 L250 270 Q262 284 246 290 L132 290 L134 236 Q118 170 120 20 Z" fill={SKIN} stroke={INK} strokeWidth="2" />
@@ -106,13 +122,13 @@ export function CalfPumpArt({ squeeze = false, animate = false }: { squeeze?: bo
       <path d="M232 120 L232 40" stroke={VEIN} strokeWidth="4" />
       <Arrow x={232} y={38} rotate={0} color={VEIN} />
       <g fontSize="12" fill={INK} fontFamily="inherit">
-        <text x="240" y="60">To the</text>
-        <text x="240" y="75">heart</text>
-        <text x="8" y="100">Vein valve</text>
+        <text x="240" y="60">{t("To the")}</text>
+        <text x="240" y="75">{t("heart")}</text>
+        <text x="8" y="100">{t("Vein valve")}</text>
         <path d="M70 96 L150 92" stroke={INK} strokeWidth="1" />
-        <text x="8" y="160">Calf muscle</text>
+        <text x="8" y="160">{t("Calf muscle")}</text>
         <path d="M78 156 L168 152" stroke={INK} strokeWidth="1" />
-        <text x="8" y="210">Vein valve</text>
+        <text x="8" y="210">{t("Vein valve")}</text>
         <path d="M70 206 L150 202" stroke={INK} strokeWidth="1" />
       </g>
     </svg>
@@ -121,8 +137,9 @@ export function CalfPumpArt({ squeeze = false, animate = false }: { squeeze?: bo
 
 /** A person sitting at a desk with a 30-minute clock. */
 export function DeskSitterArt() {
+  const t = useT();
   return (
-    <svg viewBox="0 0 240 160" className="mb-art mb-art-sm" role="img" aria-label="A person sitting at a desk with a clock showing 30 minutes">
+    <svg viewBox="0 0 240 160" className="mb-art mb-art-sm" role="img" aria-label={t("A person sitting at a desk with a clock showing 30 minutes")}>
       <rect x="120" y="70" width="100" height="8" rx="2" fill="#8457C2" />
       <rect x="200" y="78" width="6" height="70" fill="#8457C2" />
       <rect x="150" y="44" width="40" height="26" rx="3" fill={INK} />
@@ -134,7 +151,7 @@ export function DeskSitterArt() {
       <circle cx="40" cy="30" r="22" fill="#fff" stroke="#F2B65D" strokeWidth="4" />
       <path d="M40 30 L40 14 M40 30 L40 46" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
       <text x="40" y="66" textAnchor="middle" fontSize="12" fill={INK} fontWeight="700">
-        30 min
+        {t("{minutes} min", { minutes: 30 })}
       </text>
     </svg>
   );
@@ -143,7 +160,11 @@ export function DeskSitterArt() {
 /** One figure per routine step. `seated` swaps to the chair version. */
 export function StepArt({ step, seated, animate }: { step: "stand" | "walk" | "heels" | "ankles" | "breathe" | "return"; seated: boolean; animate: boolean }) {
   const cls = `mb-art mb-step mb-step-${step}${seated ? " is-seated" : ""}${animate ? " mb-anim" : ""}`;
-  const label = `${seated ? "Seated" : "Standing"} figure: ${step}`;
+  const t = useT();
+  const { locale } = useLocale();
+  // English keeps the step id as before; other languages name the step.
+  const name = locale === "en" ? step : t(STEP_TITLE[step] ?? step);
+  const label = seated ? t("Seated figure: {step}", { step: name }) : t("Standing figure: {step}", { step: name });
   return (
     <svg viewBox="0 0 200 200" className={cls} role="img" aria-label={label}>
       <rect x="0" y="186" width="200" height="4" fill="#DDD4F2" />

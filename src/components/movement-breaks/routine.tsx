@@ -10,6 +10,7 @@ import { localISODate } from "@/lib/dates";
 import { safetyFlags } from "@/lib/health-profile";
 import { MB, ROUTINE, ROUTINE_SECONDS } from "@/lib/movement-breaks/content";
 import { addMovementBreak } from "@/lib/movement-breaks/personal";
+import { useT } from "@/components/locale-provider";
 
 type Run = { index: number; left: number; running: boolean; finished: boolean };
 
@@ -32,6 +33,7 @@ export function MovementBreakRoutine() {
   const seated = seatedChoice ?? Boolean(flags?.seatedFirst);
   const [run, setRun] = useState<Run>(START);
   const [saved, setSaved] = useState(false);
+  const t = useT();
 
   useEffect(() => {
     if (!run.running) return;
@@ -58,31 +60,31 @@ export function MovementBreakRoutine() {
 
   return (
     <section className="card stack mb-routine" id="break" aria-labelledby="mb-routine-title">
-      <p className="kicker">About 2 to 3 minutes · at your desk or in your chair</p>
-      <h2 id="mb-routine-title">The 30-minute movement break</h2>
-      <p>Follow the steps at your own pace. The timer is only a guide: move on whenever you are ready, or stop at any time.</p>
+      <p className="kicker">{t("About 2 to 3 minutes · at your desk or in your chair")}</p>
+      <h2 id="mb-routine-title">{t("The 30-minute movement break")}</h2>
+      <p>{t("Follow the steps at your own pace. The timer is only a guide: move on whenever you are ready, or stop at any time.")}</p>
       <fieldset className="field">
-        <legend>How would you like to do it?</legend>
+        <legend>{t("How would you like to do it?")}</legend>
         <div className="lz-tabs">
           <button type="button" className="lz-tab" aria-pressed={!seated} onClick={() => setSeatedChoice(false)}>
-            Standing, with support nearby
+            {t("Standing, with support nearby")}
           </button>
           <button type="button" className="lz-tab" aria-pressed={seated} onClick={() => setSeatedChoice(true)}>
-            Seated in a sturdy chair
+            {t("Seated in a sturdy chair")}
           </button>
         </div>
-        {flags?.seatedFirst ? <p className="hint">The seated version is chosen first because you said standing for long is hard.</p> : null}
-        {flags?.fallRisk && !seated ? <p className="hint">You mentioned balance or a walking aid. Keep one hand on something sturdy, or choose the seated version.</p> : null}
+        {flags?.seatedFirst ? <p className="hint">{t("The seated version is chosen first because you said standing for long is hard.")}</p> : null}
+        {flags?.fallRisk && !seated ? <p className="hint">{t("You mentioned balance or a walking aid. Keep one hand on something sturdy, or choose the seated version.")}</p> : null}
       </fieldset>
 
       {run.finished ? (
         <div className="stack mb-done" role="status">
-          <h3>Break complete. Well done.</h3>
-          <p>{sample ? "Sample data is on, so this break was not saved." : saved ? "Saved to today's tracker." : "Press the button to save it to today's tracker."}</p>
+          <h3>{t("Break complete. Well done.")}</h3>
+          <p>{sample ? t("Sample data is on, so this break was not saved.") : saved ? t("Saved to today's tracker.") : t("Press the button to save it to today's tracker.")}</p>
           <div className="lz-buttons">
             {!saved && !sample ? (
               <button className="btn btn-primary" type="button" onClick={finish}>
-                Save this break
+                {t("Save this break")}
               </button>
             ) : null}
             <button
@@ -93,7 +95,7 @@ export function MovementBreakRoutine() {
                 setRun(START);
               }}
             >
-              Start again
+              {t("Start again")}
             </button>
           </div>
         </div>
@@ -102,10 +104,10 @@ export function MovementBreakRoutine() {
           <StepArt step={step.id} seated={seated} animate={run.running} />
           <div className="stack">
             <p className="mb-step-count">
-              Step {run.index + 1} of {ROUTINE.length}
+              {t("Step {current} of {total}", { current: run.index + 1, total: ROUTINE.length })}
             </p>
-            <h3 className="mb-step-title">{step.title}</h3>
-            <p className="mb-step-text">{seated ? step.seated : step.standing}</p>
+            <h3 className="mb-step-title">{t(step.title)}</h3>
+            <p className="mb-step-text">{t(seated ? step.seated : step.standing)}</p>
             <p className="mb-clock" aria-live="off">
               {formatClock(run.left)}
             </p>
@@ -114,17 +116,17 @@ export function MovementBreakRoutine() {
             </div>
             <div className="lz-buttons">
               <button className="btn btn-primary mb-big" type="button" onClick={() => setRun((current) => ({ ...current, running: !current.running }))}>
-                {run.running ? "Pause" : run.index === 0 && run.left === step.seconds ? "Start the break" : "Continue"}
+                {run.running ? t("Pause") : run.index === 0 && run.left === step.seconds ? t("Start the break") : t("Continue")}
               </button>
               <button className="btn btn-secondary mb-big" type="button" disabled={run.index === 0} onClick={() => go(run.index - 1)}>
-                Back
+                {t("Back")}
               </button>
               <button
                 className="btn btn-secondary mb-big"
                 type="button"
                 onClick={() => (run.index + 1 < ROUTINE.length ? go(run.index + 1) : setRun((current) => ({ ...current, running: false, finished: true })))}
               >
-                {run.index + 1 < ROUTINE.length ? "Next step" : "Finish"}
+                {run.index + 1 < ROUTINE.length ? t("Next step") : t("Finish")}
               </button>
             </div>
           </div>
@@ -133,12 +135,12 @@ export function MovementBreakRoutine() {
       <ol className="mb-step-list">
         {ROUTINE.map((item, index) => (
           <li key={item.id} aria-current={!run.finished && index === run.index ? "step" : undefined}>
-            <strong>{item.title}.</strong> {seated ? item.seated : item.standing}
+            <strong>{t(item.title)}.</strong> {t(seated ? item.seated : item.standing)}
           </li>
         ))}
       </ol>
-      <p className="hint">{MB.rule.walkBetter}</p>
-      <p className="alert">{MB.safety.dvt}</p>
+      <p className="hint">{t(MB.rule.walkBetter)}</p>
+      <p className="alert">{t(MB.safety.dvt)}</p>
     </section>
   );
 }

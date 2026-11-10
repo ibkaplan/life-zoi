@@ -1,3 +1,7 @@
+"use client";
+
+import { useT } from "@/components/locale-provider";
+
 /**
  * Original illustrations for Breathe for Life, drawn as SVG in the LifeZoi palette.
  * They are pictures to explain ideas, not measurements or results.
@@ -47,16 +51,19 @@ export function BreatheHeroArt() {
 
 /** Two blood vessels side by side: a relaxed, flexible one and a stiffer, narrower one. */
 export function VesselArt() {
+  const t = useT();
   return (
     <svg
       viewBox="0 0 340 200"
       className="lz-art"
       role="img"
-      aria-label="Illustration of two blood vessels. On the left, a younger vessel is wide and flexible with many nitric oxide signals. On the right, an older vessel has a thicker wall, fewer nitric oxide signals, and more oxidative stress."
+      aria-label={t(
+        "Illustration of two blood vessels. On the left, a younger vessel is wide and flexible with many nitric oxide signals. On the right, an older vessel has a thicker wall, fewer nitric oxide signals, and more oxidative stress.",
+      )}
     >
       <rect width="340" height="200" rx="18" fill={P.ivory} />
-      <text x="85" y="26" textAnchor="middle" fontSize="14" fontWeight="700" fill={P.royal}>Younger vessel</text>
-      <text x="255" y="26" textAnchor="middle" fontSize="14" fontWeight="700" fill={P.royal}>Older vessel</text>
+      <text x="85" y="26" textAnchor="middle" fontSize="14" fontWeight="700" fill={P.royal}>{t("Younger vessel")}</text>
+      <text x="255" y="26" textAnchor="middle" fontSize="14" fontWeight="700" fill={P.royal}>{t("Older vessel")}</text>
       {/* younger */}
       <circle cx="85" cy="108" r="62" fill="#F4D3D8" stroke="#C97A86" strokeWidth="6" />
       <circle cx="85" cy="108" r="46" fill="#C2414F" opacity="0.9" />
@@ -81,8 +88,8 @@ export function VesselArt() {
           <text x={255 + x} y={108 + y + 3.5} textAnchor="middle" fontSize="7" fontWeight="700" fill={P.ink}>O₂⁻</text>
         </g>
       ))}
-      <text x="85" y="190" textAnchor="middle" fontSize="11" fill={P.ink}>Wide, flexible, more NO signaling</text>
-      <text x="255" y="190" textAnchor="middle" fontSize="11" fill={P.ink}>Stiffer, more oxidative stress</text>
+      <text x="85" y="190" textAnchor="middle" fontSize="11" fill={P.ink}>{t("Wide, flexible, more NO signaling")}</text>
+      <text x="255" y="190" textAnchor="middle" fontSize="11" fill={P.ink}>{t("Stiffer, more oxidative stress")}</text>
     </svg>
   );
 }

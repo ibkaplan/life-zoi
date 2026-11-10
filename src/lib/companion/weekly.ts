@@ -1,5 +1,6 @@
 import { addIsoDays, daysBetween, mondayOf } from "@/lib/dates";
 import type { CompanionState, DayLog, PlanSuggestion, WeeklyPlan, WeeklyReview } from "@/lib/companion/state";
+import { msg } from "@/lib/i18n/translate";
 
 /**
  * Weekly check-in, comparisons, and next-week suggestions.
@@ -116,7 +117,7 @@ export function progressNotes(current: Totals, previous: Totals): string[] {
     if (row.change !== "more" || row.label.startsWith("Average")) continue;
     notes.push(`More ${row.label.toLowerCase()} than the week before.`);
   }
-  if (current.done + current.partial > 0 && notes.length === 0) notes.push("You kept going this week. Every completed or partly completed activity counts.");
+  if (current.done + current.partial > 0 && notes.length === 0) notes.push(msg("You kept going this week. Every completed or partly completed activity counts."));
   return notes;
 }
 
@@ -129,36 +130,36 @@ export function nextWeekSuggestions(review: WeeklyReview, current: Totals, skipp
   const list: PlanSuggestion[] = [];
   const exerciseDays = review.exerciseDays ?? current.activeDays;
   if (exerciseDays <= 2) {
-    list.push(suggestion("move-small", "Movement & Fitness", "Two 10-minute sessions this week, on days that suit you.", "Small sessions are easier to fit in."));
+    list.push(suggestion("move-small", msg("Movement & Fitness"), msg("Two 10-minute sessions this week, on days that suit you."), msg("Small sessions are easier to fit in.")));
   } else {
-    list.push(suggestion("move-keep", "Movement & Fitness", `Keep about ${Math.min(exerciseDays, 5)} active days, and try one new activity.`, "You were active on several days."));
+    list.push(suggestion("move-keep", msg("Movement & Fitness"), `Keep about ${Math.min(exerciseDays, 5)} active days, and try one new activity.`, msg("You were active on several days.")));
   }
   if (skipped.length > 0) {
-    list.push(suggestion("replace-skipped", "My Day", "Swap the activities you skipped most for something you enjoy more.", "Skipping tells LifeZoi what to change. It is not a failure."));
+    list.push(suggestion("replace-skipped", msg("My Day"), msg("Swap the activities you skipped most for something you enjoy more."), msg("Skipping tells LifeZoi what to change. It is not a failure.")));
   }
   if (review.disliked.length > 0) {
-    list.push(suggestion("drop-disliked", "Movement & Fitness", `Leave out ${review.disliked.join(", ")} next week.`, "You said you did not enjoy them."));
+    list.push(suggestion("drop-disliked", msg("Movement & Fitness"), `Leave out ${review.disliked.join(", ")} next week.`, msg("You said you did not enjoy them.")));
   }
   if ((review.energy ?? 3) <= 2 || (current.sleepHours !== null && current.sleepHours < 7)) {
-    list.push(suggestion("sleep", "Sleep & Recovery", "A wind-down routine on four evenings.", "You reported low energy or short sleep."));
+    list.push(suggestion("sleep", msg("Sleep & Recovery"), msg("A wind-down routine on four evenings."), msg("You reported low energy or short sleep.")));
   }
   if ((review.pagesRead ?? current.readingPages) < 5) {
-    list.push(suggestion("read", "Books & Audiobooks", "Read or listen for 10 minutes on three days.", "A few pages is enough to start."));
+    list.push(suggestion("read", msg("Books & Audiobooks"), msg("Read or listen for 10 minutes on three days."), msg("A few pages is enough to start.")));
   }
   if ((review.brainGames ?? current.brainGames) < 2) {
-    list.push(suggestion("brain", "Brain & Memory", "Play one brain game on two days.", "Just for enjoyment."));
+    list.push(suggestion("brain", msg("Brain & Memory"), msg("Play one brain game on two days."), msg("Just for enjoyment.")));
   }
   if (review.nutrition === "rarely" || review.nutrition === "not-tried") {
-    list.push(suggestion("food", "Healthy Eating", "Try one new meal idea from Today's meals on two days.", "One small change at a time."));
+    list.push(suggestion("food", msg("Healthy Eating"), msg("Try one new meal idea from Today's meals on two days."), msg("One small change at a time.")));
   }
   if ((review.feeling ?? 3) <= 2) {
-    list.push(suggestion("emotional", "Emotional Wellness", "Reach out to one person, and take a calm moment on three days.", "You said this week felt hard."));
+    list.push(suggestion("emotional", msg("Emotional Wellness"), msg("Reach out to one person, and take a calm moment on three days."), msg("You said this week felt hard.")));
   }
   if (review.improveNext.trim()) {
-    list.push(suggestion("own-words", "Personal Goals", review.improveNext.trim(), "In your own words."));
+    list.push(suggestion("own-words", msg("Personal Goals"), review.improveNext.trim(), msg("In your own words.")));
   }
   if (review.difficult.trim()) {
-    list.push(suggestion("make-easier", "Personal Goals", `Make this easier: ${review.difficult.trim()}`, "Shorter or simpler is fine."));
+    list.push(suggestion("make-easier", msg("Personal Goals"), `Make this easier: ${review.difficult.trim()}`, msg("Shorter or simpler is fine.")));
   }
   return list.slice(0, 8);
 }

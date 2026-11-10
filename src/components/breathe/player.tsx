@@ -8,15 +8,20 @@ import { STOP_SIGNS } from "@/lib/breathe/content";
 import { buildSession, focusFor, MIN_SAVED_SECONDS, PACES, PHASE_WORD, phaseAt, sessionSeconds, type SessionFocus } from "@/lib/breathe/program";
 import { rateSession } from "@/lib/breathe/state";
 import { localISODate } from "@/lib/dates";
+import { useLocale, useT } from "@/components/locale-provider";
+import { LOCALE_META } from "@/lib/i18n/config";
 
 type Status = "ready" | "running" | "paused" | "finished" | "stopped";
 
-function speak(text: string) {
+/** Voices for each language. The device chooses the voice; English stays US English as before. */
+const SPEECH_LANG: Record<string, string> = { en: "en-US", uk: "uk-UA", ru: "ru-RU", el: "el-GR" };
+
+function speak(text: string, lang = "en-US") {
   try {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
+    utterance.lang = lang;
     utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
   } catch {
@@ -43,6 +48,9 @@ function circleScale(phase: string, progress: number): number {
 
 export function BreathingPlayer() {
   const { ready, sample, breathe, breathless } = useBreathe();
+  const t = useT();
+  const { locale } = useLocale();
+  const voiceLang = SPEECH_LANG[locale] ?? LOCALE_META[locale].htmlLang;
   const today = localISODate();
   const suggestedFocus = focusFor(breathe.challenge, today);
   const [focusOverride, setFocusOverride] = useState<SessionFocus | null>(null);
@@ -66,21 +74,21 @@ export function BreathingPlayer() {
   const save = useCallback(
     (seconds: number, complete: boolean) => {
       if (seconds < MIN_SAVED_SECONDS) {
-        setNote("Sessions shorter than a minute are not saved. Any practice is still worthwhile.");
+        setNote(t("Sessions shorter than a minute are not saved. Any practice is still worthwhile."));
         return;
       }
       if (sample) {
-        setNote("Sample data is on, so this session was not saved.");
+        setNote(t("Sample data is on, so this session was not saved."));
         return;
       }
       const id = `b-${Date.now().toString(36)}`;
       const ok = saveBreatheSession({ id, date: localISODate(), seconds: Math.round(seconds), complete, feltAfter: null });
       if (ok) {
         setSavedId(id);
-        setNote(complete ? "Session saved. Well done." : `Saved as a partial session of ${formatClock(seconds)}.`);
+        setNote(complete ? t("Session saved. Well done.") : t("Saved as a partial session of {time}.", { time: formatClock(seconds) }));
       }
     },
-    [sample],
+    [sample, t],
   );
 
   // The clock. Elapsed time comes from timestamps, so a slow tab does not stretch the breaths.
@@ -93,12 +101,12 @@ export function BreathingPlayer() {
         window.clearInterval(timer);
         setElapsed(total);
         setStatus("finished");
-        if (breathe.voice) speak("Your session is complete. Take a moment before you get up.");
+        if (breathe.voice) speak(t("Your session is complete. Take a moment before you get up."), voiceLang);
         save(total, true);
       }
     }, 200);
     return () => window.clearInterval(timer);
-  }, [status, total, breathe.voice, save]);
+  }, [status, total, breathe.voice, save, t, voiceLang]);
 
   // Spoken instructions on each new step, and optional short cues on each breath.
   useEffect(() => {
@@ -106,14 +114,14 @@ export function BreathingPlayer() {
     if (state.stepIndex !== lastStep.current) {
       lastStep.current = state.stepIndex;
       lastKey.current = state.phaseKey;
-      if (breathe.voice) speak(`${state.step.title}. ${state.step.intro}`);
+      if (breathe.voice) speak(`${t(state.step.title)}. ${t(state.step.intro)}`, voiceLang);
       return;
     }
     if (state.phaseKey !== lastKey.current) {
       lastKey.current = state.phaseKey;
-      if (breathe.voice && breathCues && state.phase !== "natural") speak(PHASE_WORD[state.phase]);
+      if (breathe.voice && breathCues && state.phase !== "natural") speak(t(PHASE_WORD[state.phase]), voiceLang);
     }
-  }, [status, state.stepIndex, state.phaseKey, state.phase, state.step, breathe.voice, breathCues]);
+  }, [status, state.stepIndex, state.phaseKey, state.phase, state.step, breathe.voice, breathCues, t, voiceLang]);
 
   useEffect(() => () => hush(), []);
 
@@ -148,7 +156,7 @@ export function BreathingPlayer() {
     save(seconds, false);
   }
 
-  if (!ready) return <p className="hint">Loading the breathing guide…</p>;
+  if (!ready) return <p className="hint">{t("Loading the breathing guide…")}</p>;
 
   const active = status === "running" || status === "paused";
   const progress = state.phaseLength > 0 ? Math.min(1, state.phaseElapsed / state.phaseLength) : 0;
@@ -158,53 +166,60 @@ export function BreathingPlayer() {
 
   return (
     <section className="card stack bf-player" aria-labelledby="bf-player-title">
-      <h2 id="bf-player-title">Guided breathing session</h2>
+      <h2 id="bf-player-title">{t("Guided breathing session")}</h2>
 
       {!active ? (
         <div className="stack">
           <p>
-            About {Math.round(total / 60)} minutes: {steps.map((step) => step.title.toLowerCase()).join(", then ")}. You can stop at any time.
+            {t("About {minutes} minutes: {steps}. You can stop at any time.", {
+              minutes: Math.round(total / 60),
+              steps: steps.map((step) => t(step.title).toLowerCase()).join(t(", then ")),
+            })}
           </p>
           {suggestedFocus === "foundations" ? (
             <p className="alert">
-              Week 1 of your challenge: this session teaches nasal and belly breathing. Humming is added next week.{" "}
+              {t("Week 1 of your challenge: this session teaches nasal and belly breathing. Humming is added next week.")}{" "}
               <button className="btn btn-ghost" type="button" onClick={() => setFocusOverride(focus === "foundations" ? "complete" : "foundations")}>
-                {focus === "foundations" ? "Include humming anyway" : "Use the week 1 session"}
+                {focus === "foundations" ? t("Include humming anyway") : t("Use the week 1 session")}
               </button>
             </p>
           ) : null}
-          {breathless ? <p className="alert">Your assessment mentions shortness of breath or a heart or chest concern. Use the gentle pace and the short session, and check with your clinician first.</p> : null}
+          {breathless ? (
+            <p className="alert">
+              {t("Your assessment mentions shortness of breath or a heart or chest concern. Use the gentle pace and the short session, and check with your clinician first.")}
+            </p>
+          ) : null}
           <fieldset className="field">
-            <legend>Session length</legend>
+            <legend>{t("Session length")}</legend>
             <div className="lz-tabs">
               {(["full", "short"] as const).map((length) => (
                 <button key={length} type="button" className="lz-tab" aria-pressed={breathe.length === length} disabled={sample} onClick={() => commitBreathe((s) => ({ ...s, length }))}>
-                  {length === "full" ? "About 9 minutes" : "About 5 minutes"}
+                  {length === "full" ? t("About 9 minutes") : t("About 5 minutes")}
                 </button>
               ))}
             </div>
           </fieldset>
           <fieldset className="field">
-            <legend>Breathing pace</legend>
+            <legend>{t("Breathing pace")}</legend>
             <div className="lz-tabs">
               {(["gentle", "standard"] as const).map((pace) => (
                 <button key={pace} type="button" className="lz-tab" aria-pressed={breathe.pace === pace} disabled={sample} onClick={() => commitBreathe((s) => ({ ...s, pace }))}>
-                  {PACES[pace].label}
+                  {t(PACES[pace].label)}
                 </button>
               ))}
             </div>
-            <span className="hint">Choose whatever feels easy. If a count feels long, use the gentle pace or simply breathe at your own rhythm.</span>
+            <span className="hint">{t("Choose whatever feels easy. If a count feels long, use the gentle pace or simply breathe at your own rhythm.")}</span>
           </fieldset>
           <label className="check-row">
             <input type="checkbox" checked={breathe.voice} disabled={sample} onChange={(event) => commitBreathe((s) => ({ ...s, voice: event.target.checked }))} />
-            <span>Spoken instructions (uses your device&apos;s voice)</span>
+            <span>{t("Spoken instructions (uses your device's voice)")}</span>
           </label>
           <label className="check-row">
             <input type="checkbox" checked={breathCues} disabled={!breathe.voice} onChange={(event) => setBreathCues(event.target.checked)} />
-            <span>Also say &ldquo;breathe in&rdquo; and &ldquo;breathe out&rdquo; on each breath</span>
+            <span>{t("Also say “breathe in” and “breathe out” on each breath")}</span>
           </label>
           <button className="btn btn-primary bf-big" type="button" onClick={start}>
-            {status === "ready" ? "Start Breathing Session" : "Start a new session"}
+            {status === "ready" ? t("Start Breathing Session") : t("Start a new session")}
           </button>
         </div>
       ) : null}
@@ -212,43 +227,43 @@ export function BreathingPlayer() {
       {active && state.step ? (
         <div className="bf-stage">
           <p className="kicker">
-            Step {state.stepIndex + 1} of {steps.length} · {formatClock(state.stepRemaining)} left in this step
+            {t("Step {current} of {total} · {time} left in this step", { current: state.stepIndex + 1, total: steps.length, time: formatClock(state.stepRemaining) })}
           </p>
-          <h3>{state.step.title}</h3>
+          <h3>{t(state.step.title)}</h3>
           <div className="bf-circle-wrap" aria-hidden="true">
             <div className="bf-circle" data-phase={state.phase} style={{ transform: `scale(${scale})` }}>
               {state.phase === "hum" ? <span className="bf-ripple" /> : null}
             </div>
           </div>
           <p className="bf-cue" aria-live="polite">
-            {status === "paused" ? "Paused. Breathe normally." : PHASE_WORD[state.phase]}
+            {status === "paused" ? t("Paused. Breathe normally.") : t(PHASE_WORD[state.phase])}
             {status === "running" && state.phase !== "natural" ? <span className="bf-count"> {secondsLeftInPhase}</span> : null}
           </p>
-          <div className="bf-bar" role="progressbar" aria-label="This breath" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+          <div className="bf-bar" role="progressbar" aria-label={t("This breath")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
             <span style={{ width: `${progress * 100}%` }} data-phase={state.phase} />
           </div>
-          <p>{state.step.intro}</p>
+          <p>{t(state.step.intro)}</p>
           <ul className="hint">
             {state.step.cues.map((cue) => (
-              <li key={cue}>{cue}</li>
+              <li key={cue}>{t(cue)}</li>
             ))}
           </ul>
-          <p className="hint">Session time left: {formatClock(state.totalRemaining)}</p>
+          <p className="hint">{t("Session time left: {time}", { time: formatClock(state.totalRemaining) })}</p>
           <div className="lz-buttons">
             {status === "running" ? (
               <button className="btn btn-secondary bf-big" type="button" onClick={pause}>
-                Pause
+                {t("Pause")}
               </button>
             ) : (
               <button className="btn btn-teal bf-big" type="button" onClick={resume}>
-                Continue
+                {t("Continue")}
               </button>
             )}
             <button className="btn btn-primary bf-big" type="button" onClick={() => stop(false)}>
-              Stop
+              {t("Stop")}
             </button>
             <button className="btn btn-ghost bf-big" type="button" onClick={() => stop(true)}>
-              I feel unwell. Stop now
+              {t("I feel unwell. Stop now")}
             </button>
           </div>
         </div>
@@ -257,16 +272,16 @@ export function BreathingPlayer() {
       {unwell ? (
         <div className="alert alert-error" role="alert">
           <p>
-            <strong>You stopped, and that was the right thing to do.</strong> Breathe normally and rest sitting down.
+            <strong>{t("You stopped, and that was the right thing to do.")}</strong> {t("Breathe normally and rest sitting down.")}
           </p>
-          <p>{STOP_SIGNS}</p>
+          <p>{t(STOP_SIGNS)}</p>
         </div>
       ) : null}
       {note ? <p role="status">{note}</p> : null}
       {status === "finished" || (status === "stopped" && savedSession) ? (
         savedSession ? (
           <ScalePicker
-            legend="How relaxed do you feel now? (1 not at all, 5 very relaxed)"
+            legend={t("How relaxed do you feel now? (1 not at all, 5 very relaxed)")}
             value={savedSession.feltAfter}
             onChange={(value) => commitBreathe((s) => rateSession(s, savedSession.id, value))}
           />

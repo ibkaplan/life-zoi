@@ -6,12 +6,15 @@ import { addRecent, clearEntry, recordEntry, toggleFavorite, type DayLog, type E
 import { commitCompanion, SAVE_MODE_TEXT, useCompanion } from "@/lib/companion/store";
 import { COST_TEXT, sourceById, videoSafety, type VideoItem } from "@/lib/wellness-library/catalog";
 import type { GuidedSession } from "@/lib/wellness-library/discover";
+import { useLocale, useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 
 export function SaveNote() {
   const { saveMode } = useCompanion();
+  const t = useT();
   return (
     <p className="lz-save" data-mode={saveMode} role="status">
-      {SAVE_MODE_TEXT[saveMode]}
+      {t(SAVE_MODE_TEXT[saveMode])}
     </p>
   );
 }
@@ -26,10 +29,30 @@ export function formatClock(seconds: number): string {
 type Counts = Partial<Pick<DayLog, "walkingMinutes" | "exerciseMinutes" | "readingPages" | "listeningMinutes" | "brainGames" | "nutritionHabits">>;
 
 const STATUS_TEXT: Record<EntryStatus, string> = {
-  done: "Completed",
-  partial: "Partly done",
-  skipped: "Skipped. That is fine.",
+  done: msg("Completed"),
+  partial: msg("Partly done"),
+  skipped: msg("Skipped. That is fine."),
 };
+
+/** Who a favorite button is for, as a whole phrase in each language. */
+const FAVORITE_TEXT: Record<string, string> = {
+  "this video": msg("Add this video to favorites"),
+  "this session": msg("Add this session to favorites"),
+  "this class": msg("Add this class to favorites"),
+};
+
+const LEVEL_WORD: Record<string, string> = { beginner: msg("Beginner"), intermediate: msg("Intermediate"), advanced: msg("Advanced") };
+const INTENSITY_WORD: Record<string, string> = { "very-light": msg("Very light"), light: msg("Light"), moderate: msg("Moderate"), vigorous: msg("Vigorous") };
+const EQUIPMENT_WORD: Record<string, string> = {
+  none: msg("None"),
+  chair: msg("Chair"),
+  mat: msg("Mat"),
+  "light-weights": msg("Light weights"),
+  wall: msg("Wall"),
+  counter: msg("Counter"),
+  stairs: msg("Stairs"),
+};
+const PHASE_WORD: Record<string, string> = { "warm-up": msg("Warm-up"), main: msg("Main part"), "cool-down": msg("Cool-down") };
 
 /** Completed, Partially completed, Skip, and (optionally) Replace for one activity today. */
 export function ActivityActions({
@@ -37,7 +60,7 @@ export function ActivityActions({
   minutes,
   counts,
   onReplace,
-  replaceLabel = "Replace",
+  replaceLabel,
 }: {
   activityId: string;
   minutes: number;
@@ -46,6 +69,7 @@ export function ActivityActions({
   replaceLabel?: string;
 }) {
   const { state } = useCompanion();
+  const t = useT();
   const today = localISODate();
   const entry = state.days[today]?.entries[activityId];
   function mark(status: EntryStatus) {
@@ -58,26 +82,26 @@ export function ActivityActions({
     <div className="stack">
       {entry ? (
         <p role="status" className="hint">
-          <strong>{STATUS_TEXT[entry.status]}</strong>
-          {entry.status !== "skipped" && entry.minutes ? ` · ${entry.minutes} min` : ""}{" "}
+          <strong>{t(STATUS_TEXT[entry.status])}</strong>
+          {entry.status !== "skipped" && entry.minutes ? ` · ${t("{minutes} min", { minutes: entry.minutes })}` : ""}{" "}
           <button className="btn btn-ghost" type="button" onClick={() => commitCompanion((current) => clearEntry(current, today, activityId))}>
-            Undo
+            {t("Undo")}
           </button>
         </p>
       ) : null}
       <div className="lz-buttons">
         <button className="btn btn-teal" type="button" onClick={() => mark("done")} aria-pressed={entry?.status === "done"}>
-          Completed
+          {t("Completed")}
         </button>
         <button className="btn btn-secondary" type="button" onClick={() => mark("partial")} aria-pressed={entry?.status === "partial"}>
-          Partially completed
+          {t("Partially completed")}
         </button>
         <button className="btn btn-ghost" type="button" onClick={() => mark("skipped")} aria-pressed={entry?.status === "skipped"}>
-          Skip
+          {t("Skip")}
         </button>
         {onReplace ? (
           <button className="btn btn-ghost" type="button" onClick={onReplace}>
-            {replaceLabel}
+            {replaceLabel ?? t("Replace")}
           </button>
         ) : null}
       </div>
@@ -88,9 +112,11 @@ export function ActivityActions({
 export function FavoriteButton({ id, label }: { id: string; label: string }) {
   const { state } = useCompanion();
   const on = state.media.favorites.includes(id);
+  const t = useT();
+  const add = FAVORITE_TEXT[label] ? t(FAVORITE_TEXT[label]) : `Add ${label} to favorites`;
   return (
     <button className="btn btn-ghost" type="button" aria-pressed={on} onClick={() => commitCompanion((current) => toggleFavorite(current, id))}>
-      {on ? `★ Saved to favorites` : `☆ Add ${label} to favorites`}
+      {on ? `★ ${t("Saved to favorites")}` : `☆ ${add}`}
     </button>
   );
 }
@@ -98,16 +124,17 @@ export function FavoriteButton({ id, label }: { id: string; label: string }) {
 export function RatingControl({ id }: { id: string }) {
   const { state } = useCompanion();
   const value = state.media.ratings[id] ?? 0;
+  const t = useT();
   return (
-    <div className="inline-form" role="group" aria-label="Your rating">
-      <span className="hint">Your rating:</span>
+    <div className="inline-form" role="group" aria-label={t("Your rating")}>
+      <span className="hint">{t("Your rating:")}</span>
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
           type="button"
           className="btn btn-ghost"
           aria-pressed={value === n}
-          aria-label={`${n} out of 5`}
+          aria-label={t("{value} out of 5", { value: n })}
           onClick={() =>
             commitCompanion((current) => ({ ...current, media: { ...current.media, ratings: { ...current.media.ratings, [id]: n } } }))
           }
@@ -120,15 +147,18 @@ export function RatingControl({ id }: { id: string }) {
 }
 
 export function VideoMeta({ video }: { video: VideoItem }) {
-  const minutes = video.durationSeconds === null ? "Length not checked yet" : `${formatClock(video.durationSeconds)} long`;
+  const t = useT();
+  const { locale } = useLocale();
+  const minutes = video.durationSeconds === null ? t("Length not checked yet") : t("{time} long", { time: formatClock(video.durationSeconds) });
   return (
     <ul className="lz-meta">
       <li>{minutes}</li>
-      <li>{video.level[0]?.toUpperCase() + video.level.slice(1)}</li>
-      <li>{video.intensity.replace("-", " ")}</li>
-      <li>Equipment: {video.equipment.join(", ")}</li>
-      <li className={video.cost === "free-verified" ? "lz-meta-ok" : "lz-meta-warn"}>{COST_TEXT[video.cost]}</li>
-      {!video.lastChecked ? <li className="lz-meta-warn">Availability not checked yet</li> : null}
+      <li>{LEVEL_WORD[video.level] ? t(LEVEL_WORD[video.level]) : video.level[0]?.toUpperCase() + video.level.slice(1)}</li>
+      <li>{INTENSITY_WORD[video.intensity] ? t(INTENSITY_WORD[video.intensity]) : video.intensity.replace("-", " ")}</li>
+      <li>{t("Equipment: {list}", { list: video.equipment.map((item) => (EQUIPMENT_WORD[item] ? t(EQUIPMENT_WORD[item]) : item)).join(", ") })}</li>
+      <li className={video.cost === "free-verified" ? "lz-meta-ok" : "lz-meta-warn"}>{t(COST_TEXT[video.cost])}</li>
+      {!video.lastChecked ? <li className="lz-meta-warn">{t("Availability not checked yet")}</li> : null}
+      {locale !== "en" && video.language === "en" ? <li>{t("Video in English")}</li> : null}
     </ul>
   );
 }
@@ -136,14 +166,15 @@ export function VideoMeta({ video }: { video: VideoItem }) {
 /** Official YouTube player, loaded only after the person presses Play. */
 export function VideoPlayer({ video, autoStart = false }: { video: VideoItem; autoStart?: boolean }) {
   const [playing, setPlaying] = useState(autoStart);
+  const t = useT();
   const source = sourceById(video.sourceId);
   return (
     <div className="stack">
       <VideoMeta video={video} />
       <p className="hint">
-        Source: {video.instructor} via {source?.name ?? video.platform}. The video stays on {video.platform}; LifeZoi does not copy it.{" "}
+        {t("Source: {instructor} via {source}. The video stays on {platform}; LifeZoi does not copy it.", { instructor: video.instructor, source: source?.name ?? video.platform, platform: video.platform })}{" "}
         <a href={video.originalUrl} target="_blank" rel="noopener noreferrer">
-          Open the original
+          {t("Open the original")}
         </a>
       </p>
       {playing && video.embedUrl ? (
@@ -165,15 +196,15 @@ export function VideoPlayer({ video, autoStart = false }: { video: VideoItem; au
             commitCompanion((current) => addRecent(current, `video:${video.id}`, new Date().toISOString()));
           }}
         >
-          ▶ Play video
+          ▶ {t("Play video")}
         </button>
       ) : (
-        <p className="hint">This video cannot be embedded. Use the link above.</p>
+        <p className="hint">{t("This video cannot be embedded. Use the link above.")}</p>
       )}
       {playing && !video.lastChecked ? (
-        <p className="hint">If the player shows an error, the video may have moved. An administrator will check it.</p>
+        <p className="hint">{t("If the player shows an error, the video may have moved. An administrator will check it.")}</p>
       ) : null}
-      <p className="studio-safety-line">{videoSafety(video)}</p>
+      <p className="studio-safety-line">{t(videoSafety(video))}</p>
     </div>
   );
 }
@@ -184,6 +215,7 @@ export function SessionPlayer({ session, onFinished }: { session: GuidedSession;
   const [started, setStarted] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const finishedRef = useRef(false);
+  const t = useT();
   const total = session.steps.reduce((sum, step) => sum + step.seconds, 0);
 
   useEffect(() => {
@@ -217,28 +249,29 @@ export function SessionPlayer({ session, onFinished }: { session: GuidedSession;
   return (
     <div className="stack">
       <ul className="lz-meta">
-        <li>{session.minutes} minutes</li>
-        <li>{session.level[0]?.toUpperCase() + session.level.slice(1)}</li>
-        <li>{session.intensity}</li>
-        <li>Equipment: {session.equipment.join(", ")}</li>
-        <li className="lz-meta-ok">{session.costText}</li>
+        <li>{t("{minutes} minutes", { minutes: session.minutes })}</li>
+        <li>{LEVEL_WORD[session.level] ? t(LEVEL_WORD[session.level]) : session.level[0]?.toUpperCase() + session.level.slice(1)}</li>
+        <li>{INTENSITY_WORD[session.intensity] ? t(INTENSITY_WORD[session.intensity]) : session.intensity}</li>
+        <li>{t("Equipment: {list}", { list: session.equipment.map((item) => (EQUIPMENT_WORD[item] ? t(EQUIPMENT_WORD[item]) : item)).join(", ") })}</li>
+        <li className="lz-meta-ok">{t(session.costText)}</li>
       </ul>
       {started ? (
         <div className="lz-player" aria-live="polite">
           <p className="hint">
-            Step {index + 1} of {session.steps.length} · {current?.phase.replace("-", " ")}
+            {t("Step {current} of {total}", { current: index + 1, total: session.steps.length })} ·{" "}
+            {current ? (PHASE_WORD[current.phase] ? t(PHASE_WORD[current.phase]) : current.phase.replace("-", " ")) : ""}
           </p>
-          <p className="lz-player-now">{current?.name}</p>
-          <p>{current?.cue}</p>
-          <p className="hint">Easier: {current?.easier}</p>
-          <p className="lz-player-clock" aria-label={`${formatClock(left)} left in this step`}>
+          <p className="lz-player-now">{current ? t(current.name) : ""}</p>
+          <p>{current ? t(current.cue) : ""}</p>
+          <p className="hint">{t("Easier: {text}", { text: current ? t(current.easier) : "" })}</p>
+          <p className="lz-player-clock" aria-label={t("{time} left in this step", { time: formatClock(left) })}>
             {formatClock(left)}
           </p>
-          <progress className="lz-range" max={total} value={elapsed} aria-label="Session progress" />
-          {next ? <p className="hint">Next: {next.name}</p> : <p className="hint">Last step.</p>}
+          <progress className="lz-range" max={total} value={elapsed} aria-label={t("Session progress")} />
+          {next ? <p className="hint">{t("Next: {name}", { name: t(next.name) })}</p> : <p className="hint">{t("Last step.")}</p>}
           <div className="lz-buttons">
             <button className="btn btn-primary" type="button" onClick={() => setRunning((value) => !value)}>
-              {running ? "Pause" : elapsed >= total ? "Finished" : "Resume"}
+              {running ? t("Pause") : elapsed >= total ? t("Finished") : t("Resume")}
             </button>
             <button
               className="btn btn-secondary"
@@ -246,7 +279,7 @@ export function SessionPlayer({ session, onFinished }: { session: GuidedSession;
               disabled={!next}
               onClick={() => setElapsed(at + (current?.seconds ?? 0))}
             >
-              Next step
+              {t("Next step")}
             </button>
             <button
               className="btn btn-ghost"
@@ -258,7 +291,7 @@ export function SessionPlayer({ session, onFinished }: { session: GuidedSession;
                 finishedRef.current = false;
               }}
             >
-              Stop
+              {t("Stop")}
             </button>
           </div>
         </div>
@@ -272,30 +305,30 @@ export function SessionPlayer({ session, onFinished }: { session: GuidedSession;
             commitCompanion((state) => addRecent(state, `session:${session.id}`, new Date().toISOString()));
           }}
         >
-          ▶ Start session
+          ▶ {t("Start session")}
         </button>
       )}
       <details>
-        <summary>See all {session.steps.length} steps</summary>
+        <summary>{t("See all steps ({count})", { count: session.steps.length })}</summary>
         <ol className="lz-steps">
           {session.steps.map((step, i) => (
             <li key={`${step.moveId}-${i}`}>
-              <strong>{step.name}</strong> ({formatClock(step.seconds)}): {step.cue}
+              <strong>{t(step.name)}</strong> ({formatClock(step.seconds)}): {t(step.cue)}
             </li>
           ))}
         </ol>
       </details>
       {session.modifications.length > 0 ? (
         <details>
-          <summary>Lower-impact and beginner options</summary>
+          <summary>{t("Lower-impact and beginner options")}</summary>
           <ul>
             {session.modifications.map((text) => (
-              <li key={text}>{text}</li>
+              <li key={text}>{t(text)}</li>
             ))}
           </ul>
         </details>
       ) : null}
-      <p className="studio-safety-line">{session.safety}</p>
+      <p className="studio-safety-line">{t(session.safety)}</p>
     </div>
   );
 }

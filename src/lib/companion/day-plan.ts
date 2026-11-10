@@ -46,7 +46,7 @@ export const SECTION_INFO: Record<SectionId, { title: string; art: ArtName; intr
   goals: { title: "Personal Goals", art: "plan", intro: "Your goals, in your own words, turned into small daily steps." },
 };
 
-const A = {
+export const A = {
   morningStretch: {
     id: "morning-stretch",
     title: "Morning stretch and glass of water",
@@ -173,7 +173,7 @@ function movement(category: LibraryCategory, title: string, minutes: number, kin
   };
 }
 
-const MOVES: PlanActivity[] = [
+export const MOVES: PlanActivity[] = [
   movement("chair", "Chair exercises", 10, ["chair-exercises", "chair-yoga"]),
   movement("pilates", "Beginner Pilates", 20, ["pilates"]),
   movement("yoga", "Gentle yoga", 20, ["yoga"]),
