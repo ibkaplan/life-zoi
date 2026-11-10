@@ -18,3 +18,26 @@ export const CUISINES = [
   "Mediterranean", "Middle Eastern", "Indian", "Chinese", "Japanese", "Mexican", "Italian", "French",
   "Eastern European", "Caribbean", "African", "Home-style", "Other",
 ] as const;
+
+type Translate = (english: string) => string;
+
+/**
+ * Food words and cuisines are saved in English, so meal checks keep matching them.
+ * `foodWordLabel` shows a saved word in the chosen language. A word the person typed
+ * that LifeZoi does not know is shown as typed.
+ */
+export function foodWordLabel(word: string, t: Translate): string {
+  return (FOOD_WORDS as readonly string[]).includes(word) ? t(word) : word;
+}
+
+/** A suggestion picked or typed in the chosen language is saved as the English word, so saved values keep working. */
+export function foodWordFromInput(text: string, t: Translate): string {
+  const typed = text.trim().toLocaleLowerCase();
+  const known = FOOD_WORDS.find((word) => word === typed || t(word).toLocaleLowerCase() === typed);
+  return known ?? text;
+}
+
+/** The suggestions offered in the food box, in the chosen language. */
+export function foodWordOptions(t: Translate): string[] {
+  return FOOD_WORDS.map((word) => t(word));
+}

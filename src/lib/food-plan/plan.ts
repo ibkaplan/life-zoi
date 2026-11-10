@@ -1,4 +1,5 @@
 import { isRealISODate } from "@/lib/dates";
+import { makeTranslate, msg, type Translate } from "@/lib/i18n/translate";
 import { mealById, SIMPLE_MEALS, type SimpleMeal } from "@/lib/food-plan/meals";
 import { foodsForSeason, KITCHEN_RECIPES, SEASONAL_FOODS } from "@/lib/food-plan/seasonal";
 import { SPICES } from "@/lib/food-plan/spices";
@@ -41,7 +42,11 @@ import {
 } from "@/lib/food-plan/usda";
 
 const PORTIONS = [0.5, 1, 1.5, 2];
-const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAY_NAMES = [msg("Monday"), msg("Tuesday"), msg("Wednesday"), msg("Thursday"), msg("Friday"), msg("Saturday"), msg("Sunday")];
+const english = makeTranslate(null);
+
+/** Meal slot names as they appear inside a sentence. */
+export const SLOT_WORD: Record<MealSlot, string> = { breakfast: msg("breakfast"), lunch: msg("lunch"), dinner: msg("dinner"), snack: msg("snack") };
 
 export function dayName(index: number): string {
   return DAY_NAMES[index] ?? `Day ${index + 1}`;
@@ -128,9 +133,9 @@ function randomIndex(seed: number, salt: number, length: number): number {
   return length === 0 ? 0 : s % length;
 }
 
-export function planBlockReason(profile: FoodProfile): string {
+export function planBlockReason(profile: FoodProfile, t: Translate = english): string {
   if (profile.pregnancy || profile.eatingDisorder || profile.complexMedical) {
-    return "LifeZoi will not build a personal meal plan for pregnancy, an eating disorder, or a complex medical diet. A clinician or registered dietitian can help. The seasonal library, spice guide, and science pages stay open.";
+    return t("LifeZoi will not build a personal meal plan for pregnancy, an eating disorder, or a complex medical diet. A clinician or registered dietitian can help. The seasonal library, spice guide, and science pages stay open.");
   }
   return "";
 }
@@ -141,8 +146,28 @@ export function slotsFor(profile: FoodProfile): MealSlot[] {
   return main;
 }
 
-export function buildWeek(profile: FoodProfile, seed: number, id: string, createdOn: string): { ok: true; week: WeekPlan } | { ok: false; reason: string } {
-  const blocked = planBlockReason(profile);
+/** The week note is saved in English. These are its sentences, translated when the note is shown. */
+const WEEK_NOTES = [
+  msg("Some meals are longer or less thrifty than requested, because closer matches ran out. Allergies and the eating pattern were kept."),
+  msg("Protein portions are ordinary servings. They are not raised for kidney or liver disease."),
+  msg("Meals do not have to contain the same amount of protein."),
+];
+
+export function translateWeekNote(note: string, t: Translate): string {
+  let out = note;
+  for (const sentence of WEEK_NOTES) out = out.split(sentence).join(t(sentence));
+  return out;
+}
+
+/** The reason is shown right away and never saved, so it is written in the chosen language. */
+export function buildWeek(
+  profile: FoodProfile,
+  seed: number,
+  id: string,
+  createdOn: string,
+  t: Translate = english,
+): { ok: true; week: WeekPlan } | { ok: false; reason: string } {
+  const blocked = planBlockReason(profile, t);
   if (blocked) return { ok: false, reason: blocked };
   const filter = profileFilter(profile);
   const slots = slotsFor(profile);
@@ -158,7 +183,10 @@ export function buildWeek(profile: FoodProfile, seed: number, id: string, create
       const fresh = pool.meals.filter((meal) => !used.has(meal.id));
       const list = fresh.length > 0 ? fresh : pool.meals;
       if (list.length === 0) {
-        return { ok: false, reason: `No ${slot} fits the allergies and eating pattern. LifeZoi will not fill that slot with a food you asked to avoid.` };
+        return {
+          ok: false,
+          reason: t("No {slot} fits the allergies and eating pattern. LifeZoi will not fill that slot with a food you asked to avoid.", { slot: t(SLOT_WORD[slot]) }),
+        };
       }
       const meal = list[randomIndex(seed, index * 10 + MEAL_SLOTS.indexOf(slot) + 1, list.length)];
       used.add(meal.id);
@@ -180,9 +208,9 @@ export function buildWeek(profile: FoodProfile, seed: number, id: string, create
       createdOn,
       days,
       note: [
-        relaxed ? "Some meals are longer or less thrifty than requested, because closer matches ran out. Allergies and the eating pattern were kept." : "",
-        kidney ? "Protein portions are ordinary servings. They are not raised for kidney or liver disease." : "",
-        "Meals do not have to contain the same amount of protein.",
+        relaxed ? WEEK_NOTES[0] : "",
+        kidney ? WEEK_NOTES[1] : "",
+        WEEK_NOTES[2],
       ]
         .filter(Boolean)
         .join(" "),
@@ -224,18 +252,18 @@ export function ayurvedaLine(meal: SimpleMeal, profile: FoodProfile): string {
   const avoid = `${profile.avoid} ${profile.dislikes}`.toLowerCase();
   const spices = ["cumin", "cardamom", "cinnamon", "coriander", "fennel", "ginger", "turmeric", "pepper", "rosemary", "mint"];
   if (spices.some((spice) => meal.ayurveda.toLowerCase().includes(spice) && avoid.includes(spice))) {
-    return "The traditional spice note is hidden because it overlaps a food you avoid. The meal stays the same.";
+    return msg("The traditional spice note is hidden because it overlaps a food you avoid. The meal stays the same.");
   }
   return meal.ayurveda;
 }
 
 function shopGroup(food: UsdaFood): string {
-  if (food.kind === "dairy") return "Dairy";
-  if (food.plate.includes("vegetable") || food.plate.includes("fruit")) return "Produce";
-  if (food.plate.includes("carb")) return "Grains";
-  if (food.id === "olive-oil") return "Pantry";
-  if (food.allergens.includes("tree-nut") || food.id === "pumpkin-seeds" || food.id === "chia") return "Nuts and seeds";
-  return "Protein";
+  if (food.kind === "dairy") return msg("Dairy");
+  if (food.plate.includes("vegetable") || food.plate.includes("fruit")) return msg("Produce");
+  if (food.plate.includes("carb")) return msg("Grains");
+  if (food.id === "olive-oil") return msg("Pantry");
+  if (food.allergens.includes("tree-nut") || food.id === "pumpkin-seeds" || food.id === "chia") return msg("Nuts and seeds");
+  return msg("Protein");
 }
 
 export function shoppingFromWeek(week: WeekPlan, previous: ShoppingItem[] = []): ShoppingItem[] {
@@ -269,29 +297,53 @@ export function shoppingFromWeek(week: WeekPlan, previous: ShoppingItem[] = []):
   return [...generated, ...custom].slice(0, 80);
 }
 
+const MEAL_NAMES_LONGEST_FIRST = SIMPLE_MEALS.map((meal) => meal.name).sort((a, b) => b.length - a.length);
+
+/**
+ * Shopping details are saved in English. A generated detail is shown in the chosen language;
+ * a detail the person typed is shown as typed.
+ */
+export function shoppingDetail(detail: string, t: Translate, n: (value: number, digits?: number) => string = String): string {
+  const match = /^About ([\d.]+) listed servings \((.*)\)$/.exec(detail);
+  if (match) {
+    const count = Number(match[1]);
+    // Meal names can hold commas, so each known name is replaced whole, longest first.
+    let meals = match[2];
+    for (const name of MEAL_NAMES_LONGEST_FIRST) meals = meals.split(name).join(t(name));
+    return t("About {count} listed servings ({meals})", { count: Number.isInteger(count) ? String(count) : n(count), meals });
+  }
+  return detail === "Added by you" ? t(msg("Added by you")) : detail;
+}
+
 export type LibraryHit = { id: string; title: string; href: string; kind: string };
 
-export function searchLibrary(query: string): LibraryHit[] {
+/** Matches the English text and, when `t` is given, the text in the chosen language. Titles and kinds stay in English for `t`. */
+export function searchLibrary(query: string, t?: Translate): LibraryHit[] {
   const q = query.trim().toLowerCase();
   if (q.length < 2) return [];
   const hits: LibraryHit[] = [];
+  const matches = (parts: string[]) => {
+    const text = parts.join(" ");
+    const shown = t ? parts.map((part) => t(part)).join(" ") : "";
+    return text.toLowerCase().includes(q) || shown.toLowerCase().includes(q);
+  };
   for (const food of SEASONAL_FOODS) {
-    if (`${food.name} ${food.summary}`.toLowerCase().includes(q)) {
-      hits.push({ id: food.id, title: food.name, href: `/food-plan/seasonal/${food.id}`, kind: "Seasonal food" });
+    if (matches([food.name, food.summary])) {
+      hits.push({ id: food.id, title: food.name, href: `/food-plan/seasonal/${food.id}`, kind: msg("Seasonal food") });
     }
   }
   for (const recipe of KITCHEN_RECIPES) {
-    if (`${recipe.name} ${recipe.ingredients.map((item) => item.item).join(" ")}`.toLowerCase().includes(q)) {
-      hits.push({ id: recipe.id, title: recipe.name, href: `/food-plan/seasonal/${recipe.foodId}`, kind: "Kitchen recipe" });
+    if (matches([recipe.name, ...recipe.ingredients.map((item) => item.item)])) {
+      hits.push({ id: recipe.id, title: recipe.name, href: `/food-plan/seasonal/${recipe.foodId}`, kind: msg("Kitchen recipe") });
     }
   }
   for (const meal of SIMPLE_MEALS) {
-    if (`${meal.name} ${meal.summary}`.toLowerCase().includes(q)) {
-      hits.push({ id: meal.id, title: meal.name, href: "/food-plan/simple", kind: "Simple meal" });
+    if (matches([meal.name, meal.summary])) {
+      hits.push({ id: meal.id, title: meal.name, href: "/food-plan/simple", kind: msg("Simple meal") });
     }
   }
   for (const spice of SPICES) {
-    if (spice.name.toLowerCase().includes(q)) hits.push({ id: spice.id, title: spice.name, href: `/food-plan/spices/${spice.id}`, kind: "Spice" });
+    if (matches([spice.name])) hits.push({ id: spice.id, title: spice.name, href: `/food-plan/spices/${spice.id}`, kind: msg("Spice") });
   }
   return hits.slice(0, 8);
 }
