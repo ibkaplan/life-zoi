@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ChoiceActivity, MultiActivity, RebusActivity } from "@/lib/brain-quiz/activities";
 import { RebusArt } from "@/components/brain-quiz/rebus-art";
+import { useT } from "@/components/locale-provider";
 
 type Question = ChoiceActivity | MultiActivity | RebusActivity;
 
@@ -28,6 +29,7 @@ export function ChoicePlay({
   picked: number[];
   onSubmit: (picked: number[], correct: boolean) => void;
 }) {
+  const t = useT();
   const [selected, setSelected] = useState<number[]>(picked);
   const multi = activity.kind === "multi";
   const show = revealed;
@@ -49,9 +51,9 @@ export function ChoicePlay({
   return (
     <div className="stack">
       {activity.kind === "rebus" ? <RebusArt layout={activity.rebus} /> : null}
-      <p>{activity.prompt}</p>
-      {multi ? <p className="hint">Select every correct choice. The full set is required.</p> : null}
-      <div className="choices" role="group" aria-label="Choices">
+      <p>{t(activity.prompt)}</p>
+      {multi ? <p className="hint">{t("Select every correct choice. The full set is required.")}</p> : null}
+      <div className="choices" role="group" aria-label={t("Choices")}>
         {activity.choices.map((choice, index) => {
           const on = selected.includes(index);
           const expected = show && correctIndexes(activity).includes(index);
@@ -64,8 +66,8 @@ export function ChoicePlay({
               disabled={show}
               onClick={() => toggle(index)}
             >
-              <span>{choice}</span>
-              {show ? <span className="choice-mark">{expected ? "Correct" : "Not this one"}</span> : null}
+              <span>{t(choice)}</span>
+              {show ? <span className="choice-mark">{expected ? t("Correct") : t("Not this one")}</span> : null}
             </button>
           );
         })}
@@ -74,8 +76,8 @@ export function ChoicePlay({
         <div className="stack">
           {activity.choices.map((choice, index) => (
             <p key={choice}>
-              <strong>{choice}. </strong>
-              {activity.explanations[index]}
+              <strong>{t(choice)}. </strong>
+              {t(activity.explanations[index] ?? "")}
             </p>
           ))}
           {activity.kind !== "rebus" && activity.sources?.length ? (
@@ -90,7 +92,7 @@ export function ChoicePlay({
         </div>
       ) : (
         <button className="btn btn-primary" type="button" onClick={submit} disabled={selected.length === 0}>
-          Check answer
+          {t("Check answer")}
         </button>
       )}
     </div>

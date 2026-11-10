@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { T } from "@/components/localized-text";
 import { notFound } from "next/navigation";
 import { CategoryView } from "@/components/brain-quiz/category-view";
 import { categoryMeta, isCategory } from "@/lib/brain-quiz/catalog";
@@ -14,7 +15,7 @@ export default async function BrainCategoryPage({ params }: PageProps<"/brain-qu
   const { category } = await params;
   if (!isCategory(category)) notFound();
   return (
-    <Suspense fallback={<p className="card">Loading puzzles…</p>}>
+    <Suspense fallback={<p className="card"><T text="Loading puzzles…" /></p>}>
       <CategoryView category={category} />
     </Suspense>
   );

@@ -1,4 +1,5 @@
 import { addIsoDays, isRealISODate } from "@/lib/dates";
+import { msg } from "@/lib/i18n/translate";
 
 export const CATEGORY_IDS = ["logic", "riddles", "memory", "attention", "numbers", "words", "habits"] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
@@ -6,12 +7,13 @@ export type Difficulty = "easy" | "medium" | "hard";
 
 export const POINT_VALUES = { easy: 10, medium: 20, hard: 30, dailyBonus: 25 } as const;
 
-export const QUIZ_TITLE = "LIFEZOI BRAIN & HABIT QUIZ";
-export const QUIZ_TAGLINE = "Challenge Your Mind. Discover Your Habits. Keep Learning.";
-export const QUIZ_NOTICE =
-  "LifeZoi Brain & Habit Quiz is designed for educational entertainment and everyday learning. Game scores do not measure intelligence, diagnose cognitive conditions, or replace professional medical assessment.";
-export const JOURNEY_NOTE = "Game scores are not a measure of cognitive health.";
-export const LOCAL_NOTE = "Marks stay in this browser.";
+export const QUIZ_TITLE = msg("LIFEZOI BRAIN & HABIT QUIZ");
+export const QUIZ_TAGLINE = msg("Challenge Your Mind. Discover Your Habits. Keep Learning.");
+export const QUIZ_NOTICE = msg(
+  "LifeZoi Brain & Habit Quiz is designed for educational entertainment and everyday learning. Game scores do not measure intelligence, diagnose cognitive conditions, or replace professional medical assessment.",
+);
+export const JOURNEY_NOTE = msg("Game scores are not a measure of cognitive health.");
+export const LOCAL_NOTE = msg("Marks stay in this browser.");
 export const BRAIN_STORAGE_KEY = "lifezoi.brain-quiz.v1";
 
 export function pointsFor(difficulty: Difficulty): number {
@@ -343,18 +345,18 @@ export type Badge = { id: string; title: string; detail: string };
 
 export function badgesFor(progress: BrainProgress): Badge[] {
   const badges: Badge[] = [];
-  if (progress.games >= 1) badges.push({ id: "first-game", title: "First game", detail: "You finished a first question or game." });
-  if (progress.points >= 100) badges.push({ id: "points-100", title: "100 points", detail: "Your saved total reached 100 game points." });
-  if (progress.points >= 300) badges.push({ id: "points-300", title: "300 points", detail: "Your saved total reached 300 game points." });
-  if (progress.bestStreak >= 3) badges.push({ id: "streak-3", title: "3-day streak", detail: "You came back on three days in a row." });
-  if (progress.bestStreak >= 7) badges.push({ id: "streak-7", title: "7-day streak", detail: "You came back on seven days in a row." });
-  if (progress.dailyDone.length >= 1) badges.push({ id: "daily", title: "Daily challenge", detail: "You finished a five-part daily challenge." });
-  if (progress.dailyPerfect.length >= 1) badges.push({ id: "perfect-daily", title: "Perfect daily", detail: "Every part of a daily challenge was correct." });
+  if (progress.games >= 1) badges.push({ id: "first-game", title: msg("First game"), detail: msg("You finished a first question or game.") });
+  if (progress.points >= 100) badges.push({ id: "points-100", title: msg("100 points"), detail: msg("Your saved total reached 100 game points.") });
+  if (progress.points >= 300) badges.push({ id: "points-300", title: msg("300 points"), detail: msg("Your saved total reached 300 game points.") });
+  if (progress.bestStreak >= 3) badges.push({ id: "streak-3", title: msg("3-day streak"), detail: msg("You came back on three days in a row.") });
+  if (progress.bestStreak >= 7) badges.push({ id: "streak-7", title: msg("7-day streak"), detail: msg("You came back on seven days in a row.") });
+  if (progress.dailyDone.length >= 1) badges.push({ id: "daily", title: msg("Daily challenge"), detail: msg("You finished a five-part daily challenge.") });
+  if (progress.dailyPerfect.length >= 1) badges.push({ id: "perfect-daily", title: msg("Perfect daily"), detail: msg("Every part of a daily challenge was correct.") });
   if (CATEGORY_IDS.every((id) => progress.byCategory[id].played > 0)) {
-    badges.push({ id: "explorer", title: "Every category", detail: "You tried all seven categories." });
+    badges.push({ id: "explorer", title: msg("Every category"), detail: msg("You tried all seven categories.") });
   }
   if (progress.byCategory.habits.correct >= 10) {
-    badges.push({ id: "habit-10", title: "Habit learner", detail: "Ten habit questions were answered correctly." });
+    badges.push({ id: "habit-10", title: msg("Habit learner"), detail: msg("Ten habit questions were answered correctly.") });
   }
   return badges;
 }
@@ -381,10 +383,10 @@ export function weekActivity(progress: BrainProgress, today: string): DayMark[] 
 
 export function encouragement(correct: number, total: number): string {
   if (total > 0 && correct === total) {
-    return "You finished every part. This score is about the game, not intelligence or health.";
+    return msg("You finished every part. This score is about the game, not intelligence or health.");
   }
-  if (correct * 2 >= total) return "Nice work. The notes are there if you want to look again.";
-  return "Thanks for playing. Use the notes to learn, and remember the score is only a game score.";
+  if (correct * 2 >= total) return msg("Nice work. The notes are there if you want to look again.");
+  return msg("Thanks for playing. Use the notes to learn, and remember the score is only a game score.");
 }
 
 export function readBrainLocal(storage: Pick<Storage, "getItem"> | null, key = BRAIN_STORAGE_KEY): BrainProgress | null {

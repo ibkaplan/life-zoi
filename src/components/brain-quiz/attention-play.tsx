@@ -11,6 +11,9 @@ import {
   buildPattern,
 } from "@/lib/brain-quiz/engines";
 import { Icon, ShapeGlyph } from "@/components/brain-quiz/icons";
+import { useT } from "@/components/locale-provider";
+import { listText } from "@/lib/brain-quiz/localize";
+import { msg } from "@/lib/i18n/translate";
 
 export function AttentionPlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
   if (activity.mode === "differences") return <DifferencePlay activity={activity} onResult={onResult} />;
@@ -27,6 +30,7 @@ function Scene({ shapes, interactive, selected, onToggle }: {
   selected?: string[];
   onToggle?: (id: string) => void;
 }) {
+  const t = useT();
   return (
     <div className={"quiz-scene"}>
       {shapes.map((shape) =>
@@ -37,7 +41,7 @@ function Scene({ shapes, interactive, selected, onToggle }: {
             className={`quiz-spot quiz-shapeBtn`}
             style={{ left: `${shape.x}%`, top: `${shape.y}%` }}
             aria-pressed={selected?.includes(shape.id)}
-            aria-label={`${shape.shape} in the right picture`}
+            aria-label={t("{shape} in the right picture", { shape: t(shape.shape) })}
             onClick={() => onToggle?.(shape.id)}
           >
             <ShapeGlyph shape={shape.shape} color={shape.color} />
@@ -53,6 +57,7 @@ function Scene({ shapes, interactive, selected, onToggle }: {
 }
 
 function DifferencePlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const puzzle = useMemo(() => buildDifferences(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [selected, setSelected] = useState<string[]>([]);
   const [done, setDone] = useState(false);
@@ -65,24 +70,25 @@ function DifferencePlay({ activity, onResult }: { activity: AttentionActivity; o
   function check() {
     const correct = selected.length === puzzle.changedIds.length && puzzle.changedIds.every((id) => selected.includes(id));
     setDone(true);
-    onResult(correct, correct ? "You found every change." : `The changed shapes were ${puzzle.changedIds.join(", ")}.`);
+    onResult(correct, correct ? msg("You found every change.") : `The changed shapes were ${puzzle.changedIds.join(", ")}.`);
   }
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <div className={"quiz-sceneRow"}>
         <Scene shapes={puzzle.left} />
         <Scene shapes={puzzle.right} interactive selected={selected} onToggle={toggle} />
       </div>
-      {done ? <p>{selected.length === puzzle.changedIds.length && puzzle.changedIds.every((id) => selected.includes(id)) ? "Every change was selected." : `The changed shapes were ${puzzle.changedIds.join(", ")}.`}</p> : (
-        <button className="btn btn-primary" type="button" onClick={check} disabled={selected.length === 0}>Check spots</button>
+      {done ? <p>{selected.length === puzzle.changedIds.length && puzzle.changedIds.every((id) => selected.includes(id)) ? t("Every change was selected.") : t("The changed shapes were {items}.", { items: listText(puzzle.changedIds, t) })}</p> : (
+        <button className="btn btn-primary" type="button" onClick={check} disabled={selected.length === 0}>{t("Check spots")}</button>
       )}
     </div>
   );
 }
 
 function MissingPlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const puzzle = useMemo(() => buildMissing(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [phase, setPhase] = useState<"look" | "ask" | "done">("look");
   const [picked, setPicked] = useState("");
@@ -92,16 +98,16 @@ function MissingPlay({ activity, onResult }: { activity: AttentionActivity; onRe
     const correct = icon === puzzle.correct;
     setPicked(icon);
     setPhase("done");
-    onResult(correct, correct ? "You found the missing object." : `The missing object was ${puzzle.correct}.`);
+    onResult(correct, correct ? msg("You found the missing object.") : `The missing object was ${puzzle.correct}.`);
   }
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       {phase === "look" ? (
         <>
           <div className={"quiz-iconGrid"}>{puzzle.first.map((icon) => <Icon key={icon} name={icon} />)}</div>
-          <button className="btn btn-primary" type="button" onClick={() => setPhase("ask")}>Hide one</button>
+          <button className="btn btn-primary" type="button" onClick={() => setPhase("ask")}>{t("Hide one")}</button>
         </>
       ) : (
         <>
@@ -110,7 +116,7 @@ function MissingPlay({ activity, onResult }: { activity: AttentionActivity; onRe
             {puzzle.options.map((icon) => (
               <button key={icon} type="button" className={"quiz-cardBtn"} aria-pressed={picked === icon} disabled={phase === "done"} onClick={() => choose(icon)}>
                 <Icon name={icon} />
-                <span className="sr-only">{icon}</span>
+                <span className="sr-only">{t(icon)}</span>
               </button>
             ))}
           </div>
@@ -121,13 +127,14 @@ function MissingPlay({ activity, onResult }: { activity: AttentionActivity; onRe
 }
 
 function OddPlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const puzzle = useMemo(() => buildOdd(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [done, setDone] = useState(false);
   const oddIndex = puzzle.cells.findIndex((cell) => cell.odd);
 
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <div className={"quiz-iconGrid"}>
         {puzzle.cells.map((cell, index) => (
           <button
@@ -138,11 +145,11 @@ function OddPlay({ activity, onResult }: { activity: AttentionActivity; onResult
             onClick={() => {
               const correct = cell.odd;
               setDone(true);
-              onResult(correct, correct ? "You found the odd shape." : `The odd shape was number ${oddIndex + 1}.`);
+              onResult(correct, correct ? msg("You found the odd shape.") : `The odd shape was number ${oddIndex + 1}.`);
             }}
           >
             <ShapeGlyph shape={cell.shape} color={cell.color} />
-            <span className="sr-only">Shape {index + 1}</span>
+            <span className="sr-only">{t("Shape {number}", { number: index + 1 })}</span>
           </button>
         ))}
       </div>
@@ -151,11 +158,12 @@ function OddPlay({ activity, onResult }: { activity: AttentionActivity; onResult
 }
 
 function PatternPlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const puzzle = useMemo(() => buildPattern(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [done, setDone] = useState(false);
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
+      <p>{t(activity.prompt)}</p>
       <div className={"quiz-row"}>
         {puzzle.shown.map((token, index) => <ShapeGlyph key={index} shape={token.shape} color={token.color} />)}
         <span className={"quiz-letter"}>?</span>
@@ -165,7 +173,7 @@ function PatternPlay({ activity, onResult }: { activity: AttentionActivity; onRe
           <button key={`${token.shape}-${token.color}-${index}`} type="button" className={"quiz-shapeBtn"} disabled={done} onClick={() => {
             const correct = index === puzzle.correctIndex;
             setDone(true);
-            onResult(correct, correct ? "That shape continues the row." : "Another shape continues the row.");
+            onResult(correct, correct ? msg("That shape continues the row.") : msg("Another shape continues the row."));
           }}>
             <ShapeGlyph shape={token.shape} color={token.color} />
           </button>
@@ -176,18 +184,19 @@ function PatternPlay({ activity, onResult }: { activity: AttentionActivity; onRe
 }
 
 function MistakePlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const puzzle = useMemo(() => buildMistake(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [done, setDone] = useState(false);
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
-      <p className="hint">{puzzle.rule}</p>
+      <p>{t(activity.prompt)}</p>
+      <p className="hint">{t("The count goes up by {step} each time.", { step: puzzle.step })}</p>
       <div className={"quiz-keys"}>
         {puzzle.values.map((value, index) => (
           <button key={`${value}-${index}`} type="button" className={"quiz-key"} disabled={done} onClick={() => {
             const correct = index === puzzle.wrongIndex;
             setDone(true);
-            onResult(correct, correct ? "That number breaks the count." : `The mistake was ${puzzle.values[puzzle.wrongIndex]}.`);
+            onResult(correct, correct ? msg("That number breaks the count.") : `The mistake was ${puzzle.values[puzzle.wrongIndex]}.`);
           }}>
             {value}
           </button>
@@ -198,12 +207,13 @@ function MistakePlay({ activity, onResult }: { activity: AttentionActivity; onRe
 }
 
 function HiddenPlay({ activity, onResult }: { activity: AttentionActivity; onResult: (correct: boolean, note: string) => void }) {
+  const t = useT();
   const puzzle = useMemo(() => buildHidden(activity.id, activity.difficulty), [activity.id, activity.difficulty]);
   const [done, setDone] = useState(false);
   return (
     <div className="stack">
-      <p>{activity.prompt}</p>
-      <p className="hint">{puzzle.clue}</p>
+      <p>{t(activity.prompt)}</p>
+      <p className="hint">{t(puzzle.clue)}</p>
       <div className={"quiz-scene"}>
         {puzzle.items.map((item) => (
           <button
@@ -212,10 +222,10 @@ function HiddenPlay({ activity, onResult }: { activity: AttentionActivity; onRes
             className={`quiz-spot quiz-shapeBtn`}
             style={{ left: `${item.x}%`, top: `${item.y}%` }}
             disabled={done}
-            aria-label="Shape in the picture"
+            aria-label={t("Shape in the picture")}
             onClick={() => {
               setDone(true);
-              onResult(item.target, item.target ? "You found the star." : "That was not the star.");
+              onResult(item.target, item.target ? msg("You found the star.") : msg("That was not the star."));
             }}
           >
             <Icon name={item.icon} />
