@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   DEFAULT_LOCALE,
   detectLocale,
@@ -10,6 +10,7 @@ import {
   type Locale,
 } from "@/lib/i18n/config";
 import { messagesFor, type Messages } from "@/lib/i18n/messages";
+import { CATALOG_LOADERS, makeTranslate, type Catalog, type Translate } from "@/lib/i18n/translate";
 
 const CHANGE_EVENT = "lifezoi:locale";
 
@@ -59,11 +60,34 @@ export function saveLocale(locale: Locale) {
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
-type LocaleContextValue = { locale: Locale; messages: Messages; setLocale: (locale: Locale) => void };
+/** Catalogs already fetched in this page. Each language is loaded once, the first time it is needed. */
+const catalogs: Partial<Record<Locale, Catalog>> = {};
+const pending: Partial<Record<Locale, Promise<Catalog>>> = {};
+
+/** Fetch a language's text ahead of time, for example when the language menu opens, so the switch is instant. */
+export function preloadCatalog(locale: Locale): Promise<Catalog | null> {
+  if (locale === "en") return Promise.resolve(null);
+  if (catalogs[locale]) return Promise.resolve(catalogs[locale]);
+  pending[locale] ??= CATALOG_LOADERS[locale]()
+    .then((catalog) => {
+      catalogs[locale] = catalog;
+      return catalog;
+    })
+    .catch((error) => {
+      delete pending[locale];
+      throw error;
+    });
+  return pending[locale];
+}
+
+const englishT = makeTranslate(null);
+
+type LocaleContextValue = { locale: Locale; messages: Messages; t: Translate; setLocale: (locale: Locale) => void };
 
 const LocaleContext = createContext<LocaleContextValue>({
   locale: DEFAULT_LOCALE,
   messages: messagesFor(DEFAULT_LOCALE),
+  t: englishT,
   setLocale: () => {},
 });
 
@@ -78,8 +102,34 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = LOCALE_META[locale].htmlLang;
   }, [locale]);
 
-  const setLocale = useCallback((next: Locale) => saveLocale(next), []);
-  const value = useMemo(() => ({ locale, messages: messagesFor(locale), setLocale }), [locale, setLocale]);
+  // Bumped when a catalog arrives, so text in that language replaces the English shown meanwhile.
+  const [, setLoaded] = useState(0);
+  useEffect(() => {
+    if (locale === "en" || catalogs[locale]) return;
+    let live = true;
+    preloadCatalog(locale)
+      .then(() => {
+        if (live) setLoaded((count) => count + 1);
+      })
+      .catch(() => {
+        // Offline or blocked: English stays readable.
+      });
+    return () => {
+      live = false;
+    };
+  }, [locale]);
+
+  const setLocale = useCallback((next: Locale) => {
+    // Switch once the text is here, so the page changes language in one step.
+    preloadCatalog(next)
+      .catch(() => null)
+      .finally(() => saveLocale(next));
+  }, []);
+  const catalog = locale === "en" ? null : (catalogs[locale] ?? null);
+  const value = useMemo(
+    () => ({ locale, messages: messagesFor(locale), t: catalog ? makeTranslate(catalog) : englishT, setLocale }),
+    [locale, catalog, setLocale],
+  );
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
@@ -90,4 +140,9 @@ export function useLocale() {
 /** The text for the current language. */
 export function useMessages(): Messages {
   return useContext(LocaleContext).messages;
+}
+
+/** Translate English text into the current language: `t("Save answers")`, `t("{count} answers need attention:", { count: 2 })`. */
+export function useT(): Translate {
+  return useContext(LocaleContext).t;
 }

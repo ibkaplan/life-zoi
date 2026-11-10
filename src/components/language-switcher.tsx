@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { useLocale } from "@/components/locale-provider";
+import { preloadCatalog, useLocale } from "@/components/locale-provider";
 import { fmt, LOCALE_META, LOCALES, type Locale } from "@/lib/i18n/config";
 
 /** The 🌐 LANGUAGE button in the header. One click opens the list, one click picks a language. */
@@ -15,6 +15,8 @@ export function LanguageSwitcher() {
 
   useEffect(() => {
     if (!open) return;
+    // Fetch the other languages while the person reads the list, so a pick switches at once.
+    for (const code of LOCALES) preloadCatalog(code).catch(() => null);
     itemRefs.current[LOCALES.indexOf(locale)]?.focus();
     const onPointer = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);

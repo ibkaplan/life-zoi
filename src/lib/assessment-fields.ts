@@ -1,10 +1,14 @@
 import { STEP_IDS, type StepId } from "@/lib/types";
+import { makeTranslate, type Translate } from "@/lib/i18n/translate";
+
+const english = makeTranslate(null);
 
 /**
  * Plain names for every assessment answer that can show a validation message.
  * The wizard uses them to say exactly which question needs attention, and to
  * move the person to it, even when the message comes from another step.
- * Kept here, not in the component, so a later translation layer has one place to read.
+ * Kept here, not in the component, so the translation catalogs have one place to read.
+ * Labels and nouns are English keys; `t` turns them into the chosen language.
  */
 export const ASSESSMENT_FIELDS: Record<string, { label: string; step: StepId; noun?: string }> = {
   displayName: { label: "What should lifeZoi call you?", step: "about", noun: "your name" },
@@ -27,8 +31,8 @@ export const ASSESSMENT_FIELDS: Record<string, { label: string; step: StepId; no
   purposeHope: { label: "What would you like your health to help you experience or accomplish?", step: "goals" },
 };
 
-export function fieldLabel(field: string): string {
-  return ASSESSMENT_FIELDS[field]?.label ?? "This question";
+export function fieldLabel(field: string, t: Translate = english): string {
+  return t(ASSESSMENT_FIELDS[field]?.label ?? "This question");
 }
 
 /** The step a field is shown on, or null for form-level messages such as `form`. */
@@ -40,21 +44,27 @@ export function fieldStep(field: string): StepId | null {
  * Turns a validation message into one that names the question. The validation
  * rules and their messages are unchanged; this only adds the missing context.
  */
-export function friendlyError(field: string, message: string): string {
+export function friendlyError(
+  field: string,
+  message: string,
+  t: Translate = english,
+  /** Translates a message this function leaves as it is, such as a range message. */
+  fallback: (message: string) => string = (text) => text,
+): string {
   const entry = ASSESSMENT_FIELDS[field];
-  if (!entry) return message;
-  const question = entry.label.replace(/\s*\(.*\)$/, "");
-  const end = /[?.!]$/.test(question) ? "" : ".";
+  if (!entry) return fallback(message);
+  const question = t(entry.label).replace(/\s*\(.*\)$/, "");
+  const end = /[?.!;]$/.test(question) ? "" : ".";
   if (/^Choose the option that fits best\.?$/i.test(message)) {
-    return `Please choose an answer for “${question}”${end}`;
+    return t("Please choose an answer for “{question}”{end}", { question, end });
   }
   if (/^Choose at least one/i.test(message)) {
-    return `Please choose at least one option for “${question}”${end}`;
+    return t("Please choose at least one option for “{question}”{end}", { question, end });
   }
   if (/^Add .+\.$/.test(message) && entry.noun) {
-    return `Please enter ${entry.noun}.`;
+    return t("Please enter {noun}.", { noun: t(entry.noun) });
   }
-  return message;
+  return fallback(message);
 }
 
 /** Error fields in the order the questions appear, step by step, so the first one is the one to show. */

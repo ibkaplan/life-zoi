@@ -2,6 +2,7 @@
 
 import type { HTMLAttributes, ReactNode } from "react";
 import "./questionnaire.css";
+import { useT } from "@/components/locale-provider";
 
 /**
  * Shared questionnaire controls. Every answer area is visible before it is
@@ -117,6 +118,7 @@ function OptionCard({
   label: string;
   onChange: (checked: boolean) => void;
 }) {
+  const t = useT();
   return (
     <label className={`qz-option qz-option-${type}${checked ? " is-selected" : ""}`}>
       <input
@@ -130,7 +132,7 @@ function OptionCard({
         {checked ? <Check /> : null}
       </span>
       <span className="qz-option-text">{label}</span>
-      {checked ? <span className="qz-option-state">Selected</span> : null}
+      {checked ? <span className="qz-option-state">{t("Selected")}</span> : null}
     </label>
   );
 }
@@ -188,8 +190,9 @@ export function ChoiceQuestion<T extends string>({
   onChange: (value: T) => void;
   error?: string;
 }) {
+  const t = useT();
   return (
-    <Group id={name} legend={legend} hint={hint ?? "Choose one."} error={error}>
+    <Group id={name} legend={legend} hint={hint ?? t("Choose one.")} error={error}>
       {options.map((option) => (
         <OptionCard
           key={option.value}
@@ -222,8 +225,9 @@ export function CheckQuestion<T extends string>({
   onChange: (values: T[]) => void;
   error?: string;
 }) {
+  const t = useT();
   return (
-    <Group id={id} legend={legend} hint={hint ?? "Choose all that apply."} error={error}>
+    <Group id={id} legend={legend} hint={hint ?? t("Choose all that apply.")} error={error}>
       {options.map((option) => (
         <OptionCard
           key={option.value}
