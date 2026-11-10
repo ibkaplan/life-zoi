@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Art } from "@/components/companion/art";
+import { useLocale, useT } from "@/components/locale-provider";
+import type { Translate } from "@/lib/i18n/translate";
 import { SaveNote } from "@/components/companion/shared";
 import { useProfile } from "@/components/companion/use-profile";
 import { commitCompanion } from "@/lib/companion/store";
@@ -15,9 +17,13 @@ import {
   makeSudoku,
   memoryDeck,
   oddOneRound,
+  sameWord,
+  shownLetters,
   sudokuValid,
   wordRound,
+  wordsFor,
   type GameId,
+  type LogicQuestion,
   type SudokuSize,
 } from "@/lib/companion/games";
 import { localISODate } from "@/lib/dates";
@@ -40,18 +46,28 @@ function useRecorder(game: GameId) {
   };
 }
 
+/** The pattern's rule in the chosen language. */
+function ruleText(question: LogicQuestion, t: Translate): string {
+  if (question.ruleKind === "add") return t("Add {step} each time.", { step: question.step });
+  if (question.ruleKind === "subtract") return t("Take away {step} each time.", { step: question.step });
+  if (question.ruleKind === "double") return t("Double each time.");
+  return t("Add 1, then 2, then 3, then 4.");
+}
+
 function Done({ text, onAgain }: { text: string; onAgain: () => void }) {
+  const t = useT();
   return (
     <div className="alert alert-ok stack" role="status">
       <p>{text}</p>
       <button className="btn btn-primary" type="button" onClick={onAgain}>
-        Play again
+        {t("Play again")}
       </button>
     </div>
   );
 }
 
 function SudokuGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
+  const t = useT();
   const [size, setSize] = useState<SudokuSize>(4);
   const game = makeSudoku(`${seed}:${size}`, size);
   const [grid, setGrid] = useState<(number | null)[]>(game.puzzle);
@@ -62,7 +78,7 @@ function SudokuGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
   }, [solved, record]);
   return (
     <div className="stack">
-      <div className="lz-tabs" role="group" aria-label="Grid size">
+      <div className="lz-tabs" role="group" aria-label={t("Grid size")}>
         {([4, 6, 9] as const).map((value) => (
           <button
             key={value}
@@ -74,7 +90,7 @@ function SudokuGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
               setGrid(makeSudoku(`${seed}:${value}`, value).puzzle);
             }}
           >
-            {value === 4 ? "Easy 4×4" : value === 6 ? "Medium 6×6" : "Classic 9×9"}
+            {value === 4 ? t("Easy 4×4") : value === 6 ? t("Medium 6×6") : t("Classic 9×9")}
           </button>
         ))}
       </div>
@@ -87,7 +103,7 @@ function SudokuGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
           return (
             <input
               key={`${size}-${index}`}
-              aria-label={`Row ${row + 1}, column ${col + 1}`}
+              aria-label={t("Row {row}, column {column}", { row: row + 1, column: col + 1 })}
               inputMode="numeric"
               maxLength={1}
               readOnly={fixed}
@@ -108,13 +124,14 @@ function SudokuGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
           );
         })}
       </div>
-      <p className="hint">Numbers that do not fit turn pink. There is no time limit.</p>
-      {solved ? <Done text="Well done. The grid is complete." onAgain={onAgain} /> : null}
+      <p className="hint">{t("Numbers that do not fit turn pink. There is no time limit.")}</p>
+      {solved ? <Done text={t("Well done. The grid is complete.")} onAgain={onAgain} /> : null}
     </div>
   );
 }
 
 function MemoryGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
+  const t = useT();
   const deck = memoryDeck(seed, 6);
   const [open, setOpen] = useState<number[]>([]);
   const [found, setFound] = useState<number[]>([]);
@@ -147,22 +164,23 @@ function MemoryGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
         {deck.map((symbol, index) => {
           const shown = open.includes(index) || found.includes(index);
           return (
-            <button key={index} type="button" data-open={shown} aria-label={shown ? symbol : `Card ${index + 1}, face down`} onClick={() => flip(index)}>
+            <button key={index} type="button" data-open={shown} aria-label={shown ? symbol : t("Card {number}, face down", { number: index + 1 })} onClick={() => flip(index)}>
               {shown ? symbol : "?"}
             </button>
           );
         })}
       </div>
       <p className="hint">
-        Pairs found: {found.length / 2} of {deck.length / 2} · turns: {turns}
+        {t("Pairs found: {found} of {total} · turns: {turns}", { found: found.length / 2, total: deck.length / 2, turns })}
       </p>
-      {finished ? <Done text={`All pairs found in ${turns} turns.`} onAgain={onAgain} /> : null}
+      {finished ? <Done text={t("All pairs found in {turns} turns.", { turns })} onAgain={onAgain} /> : null}
     </div>
   );
 }
 
 function WordGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
-  const round = wordRound(seed, 5);
+  const { t, locale } = useLocale();
+  const round = wordRound(seed, 5, wordsFor(locale));
   const [index, setIndex] = useState(0);
   const [guess, setGuess] = useState("");
   const [shownAnswer, setShownAnswer] = useState(false);
@@ -172,20 +190,20 @@ function WordGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
     if (!current) record(true);
   }, [current, record]);
   if (!current) {
-    return <Done text="That is all five words." onAgain={onAgain} />;
+    return <Done text={t("That is all five words.")} onAgain={onAgain} />;
   }
-  const right = guess.trim().toLowerCase() === current.word;
+  const right = sameWord(guess, current.word);
   return (
     <div className="stack">
-      <p className="lz-breath" aria-label={`Letters: ${current.mixed.split("").join(" ")}`}>
-        {current.mixed.toUpperCase().split("").join(" ")}
+      <p className="lz-breath" aria-label={t("Letters: {letters}", { letters: current.mixed.split("").join(" ") })}>
+        {shownLetters(current.mixed).split("").join(" ")}
       </p>
       <label className="field">
-        <span>Your word</span>
+        <span>{t("Your word")}</span>
         <input value={guess} onChange={(event) => setGuess(event.target.value)} autoComplete="off" />
       </label>
-      {right ? <p className="alert alert-ok">Yes, {current.word}.</p> : null}
-      {shownAnswer && !right ? <p className="hint">The word was {current.word}.</p> : null}
+      {right ? <p className="alert alert-ok">{t("Yes, {word}.", { word: current.word })}</p> : null}
+      {shownAnswer && !right ? <p className="hint">{t("The word was {word}.", { word: current.word })}</p> : null}
       <div className="lz-buttons">
         <button
           className="btn btn-primary"
@@ -196,22 +214,27 @@ function WordGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
             setShownAnswer(false);
           }}
         >
-          Next word
+          {t("Next word")}
         </button>
         {!right ? (
           <button className="btn btn-ghost" type="button" onClick={() => setShownAnswer(true)}>
-            Show the word
+            {t("Show the word")}
           </button>
         ) : null}
       </div>
       <p className="hint">
-        Word {index + 1} of {round.length}. Hint: it starts with “{current.word[0]?.toUpperCase()}”.
+        {t("Word {number} of {total}. Hint: it starts with “{letter}”.", {
+          number: index + 1,
+          total: round.length,
+          letter: shownLetters(current.word[0] ?? ""),
+        })}
       </p>
     </div>
   );
 }
 
 function AttentionGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
+  const t = useT();
   const [round, setRound] = useState(0);
   const [miss, setMiss] = useState<number | null>(null);
   const record = useRecorder("attention");
@@ -219,19 +242,19 @@ function AttentionGame({ seed, onAgain }: { seed: string; onAgain: () => void })
     if (round >= 5) record(true);
   }, [round, record]);
   if (round >= 5) {
-    return <Done text="Five rounds done." onAgain={onAgain} />;
+    return <Done text={t("Five rounds done.")} onAgain={onAgain} />;
   }
   const { symbols, odd } = oddOneRound(seed, round);
   return (
     <div className="stack">
-      <p>Round {round + 1} of 5. Which one is different?</p>
+      <p>{t("Round {round} of 5. Which one is different?", { round: round + 1 })}</p>
       <div className="lz-cards" style={{ gridTemplateColumns: "repeat(5, minmax(0, 1fr))" }}>
         {symbols.map((symbol, index) => (
           <button
             key={index}
             type="button"
             data-open="true"
-            aria-label={`Symbol ${index + 1}: ${symbol}`}
+            aria-label={t("Symbol {number}: {symbol}", { number: index + 1, symbol })}
             onClick={() => {
               if (index === odd) {
                 setRound(round + 1);
@@ -243,12 +266,13 @@ function AttentionGame({ seed, onAgain }: { seed: string; onAgain: () => void })
           </button>
         ))}
       </div>
-      {miss !== null ? <p className="hint">Not that one. Take your time and look again.</p> : null}
+      {miss !== null ? <p className="hint">{t("Not that one. Take your time and look again.")}</p> : null}
     </div>
   );
 }
 
 function LogicGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
+  const t = useT();
   const [round, setRound] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const record = useRecorder("logic");
@@ -256,7 +280,7 @@ function LogicGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
     if (round >= 5) record(true);
   }, [round, record]);
   if (round >= 5) {
-    return <Done text="Five patterns done." onAgain={onAgain} />;
+    return <Done text={t("Five patterns done.")} onAgain={onAgain} />;
   }
   const question = logicQuestion(seed, round);
   return (
@@ -271,7 +295,9 @@ function LogicGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
       </div>
       {picked !== null ? (
         <div className="stack" role="status">
-          <p>{picked === question.answer ? "Yes." : `The answer is ${question.answer}.`} {question.rule}</p>
+          <p>
+            {picked === question.answer ? t("Yes.") : t("The answer is {answer}.", { answer: question.answer })} {ruleText(question, t)}
+          </p>
           <button
             className="btn btn-primary"
             type="button"
@@ -280,7 +306,7 @@ function LogicGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
               setPicked(null);
             }}
           >
-            Next pattern
+            {t("Next pattern")}
           </button>
         </div>
       ) : null}
@@ -289,38 +315,42 @@ function LogicGame({ seed, onAgain }: { seed: string; onAgain: () => void }) {
 }
 
 export function GamesView() {
+  const t = useT();
   const { ready, companion } = useProfile();
   const [game, setGame] = useState<GameId>("sudoku");
   const [play, setPlay] = useState(0);
-  if (!ready) return <p className="hint">Loading games…</p>;
+  if (!ready) return <p className="hint">{t("Loading games…")}</p>;
   const today = localISODate();
   const seed = `${today}:${play}`;
   const again = () => setPlay(play + 1);
   const history = companion.games.slice(0, 8);
   const props = { seed, onAgain: again };
+  const [moreBefore, moreAfter = ""] = t("Crosswords, word search, and more memory games are in the {link}.").split("{link}");
   return (
     <div className="stack-lg">
       <div className="lz-hero-row">
         <div className="lz-hello">
-          <p className="kicker">Brain &amp; Habit Quiz · Games</p>
-          <h1>Brain games</h1>
-          <p className="script brand-line">Play, puzzle, smile.</p>
-          <p>New puzzles every day. Play at your own pace.</p>
+          <p className="kicker">
+            {t("Brain & Habit Quiz")} · {t("Games")}
+          </p>
+          <h1>{t("Brain games")}</h1>
+          <p className="script brand-line">{t("Play, puzzle, smile.")}</p>
+          <p>{t("New puzzles every day. Play at your own pace.")}</p>
         </div>
         <Art name="brain" />
       </div>
-      <p className="quiz-notice">{GAME_NOTICE}</p>
+      <p className="quiz-notice">{t(GAME_NOTICE)}</p>
       <SaveNote />
-      <div className="lz-tabs" role="group" aria-label="Game">
+      <div className="lz-tabs" role="group" aria-label={t("Game")}>
         {GAME_IDS.map((id) => (
           <button key={id} type="button" className="lz-tab" aria-pressed={id === game} onClick={() => setGame(id)}>
-            {GAME_INFO[id].title}
+            {t(GAME_INFO[id].title)}
           </button>
         ))}
       </div>
       <section className="card stack" key={`${game}-${play}`}>
-        <h2>{GAME_INFO[game].title}</h2>
-        <p>{GAME_INFO[game].blurb}</p>
+        <h2>{t(GAME_INFO[game].title)}</h2>
+        <p>{t(GAME_INFO[game].blurb)}</p>
         {game === "sudoku" ? <SudokuGame {...props} /> : null}
         {game === "memory" ? <MemoryGame {...props} /> : null}
         {game === "words" ? <WordGame {...props} /> : null}
@@ -328,16 +358,19 @@ export function GamesView() {
         {game === "logic" ? <LogicGame {...props} /> : null}
       </section>
       <p>
-        Crosswords, word search, and more memory games are in the <Link href="/brain-quiz">Brain &amp; Habit Quiz</Link>.
+        {moreBefore}
+        <Link href="/brain-quiz">{t("Brain & Habit Quiz")}</Link>
+        {moreAfter}
       </p>
       {history.length > 0 ? (
         <section className="card stack">
-          <h2>Games you played</h2>
+          <h2>{t("Games you played")}</h2>
           <ul className="record-list">
             {history.map((item) => (
               <li key={item.id}>
-                {GAME_INFO[item.game as GameId]?.title ?? item.game} · {item.date} · {Math.max(1, Math.round(item.seconds / 60))} min
-                {item.completed ? " · finished" : ""}
+                {t(GAME_INFO[item.game as GameId]?.title ?? item.game)} · {item.date} ·{" "}
+                {t("{minutes} min", { minutes: Math.max(1, Math.round(item.seconds / 60)) })}
+                {item.completed ? ` · ${t("finished")}` : ""}
               </li>
             ))}
           </ul>

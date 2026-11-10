@@ -1,3 +1,7 @@
+"use client";
+
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import type { ArtName } from "@/lib/library/catalog";
 import type { SketchKind } from "@/lib/library/movement";
 
@@ -88,26 +92,28 @@ function Leaf() {
 }
 
 export function MovementSketch({ kind }: { kind: SketchKind }) {
-  const label =
+  const t = useT();
+  const label = t(
     kind === "walk"
-      ? "Simple drawing of a person walking"
+      ? msg("Simple drawing of a person walking")
       : kind === "chair"
-        ? "Simple drawing of a seated movement"
+        ? msg("Simple drawing of a seated movement")
         : kind === "balance"
-          ? "Simple drawing of a person holding a support"
+          ? msg("Simple drawing of a person holding a support")
           : kind === "band"
-            ? "Simple drawing of an arm movement"
+            ? msg("Simple drawing of an arm movement")
             : kind === "hands"
-              ? "Simple drawing of open hands"
+              ? msg("Simple drawing of open hands")
               : kind === "feet"
-                ? "Simple drawing of feet and ankles"
+                ? msg("Simple drawing of feet and ankles")
                 : kind === "neck"
-                  ? "Simple drawing of a neck and shoulder movement"
+                  ? msg("Simple drawing of a neck and shoulder movement")
                   : kind === "back"
-                    ? "Simple drawing of a supported seated posture"
+                    ? msg("Simple drawing of a supported seated posture")
                     : kind === "breath"
-                      ? "Simple drawing of a seated breath"
-                      : "Simple drawing of a stretch";
+                      ? msg("Simple drawing of a seated breath")
+                      : msg("Simple drawing of a stretch"),
+  );
   return (
     <svg className="library-art" viewBox="0 0 320 180" role="img" aria-label={label}>
       <rect width="320" height="180" rx="24" fill="#EFE5FA" />
