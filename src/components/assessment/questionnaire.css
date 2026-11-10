@@ -9,6 +9,8 @@
   --qz-border: #9466cc;
   --qz-selected-bg: #ebdff9;
   --qz-placeholder: #5b6690;
+  /* Light lavender fill so an empty box reads as a box before it is touched. */
+  --qz-input-bg: #f8f3fe;
 }
 
 .qz-form { padding: clamp(1.1rem, 3.5vw, 2rem); gap: 1.5rem; }
@@ -51,22 +53,31 @@
   font-size: 1.25rem;
   line-height: 1.4;
   color: var(--ink);
-  background: #ffffff;
+  background: var(--qz-input-bg);
   border: 2px solid var(--qz-border);
   border-radius: 12px;
-  box-shadow: inset 0 1px 3px rgba(23, 37, 84, 0.08);
+  box-shadow: inset 0 2px 4px rgba(82, 40, 138, 0.1);
   caret-color: var(--royal);
+  cursor: text;
+  appearance: none;
+  -moz-appearance: textfield;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .qz .qz-input-wrap:has(.qz-unit) .qz-input { padding-right: 6.25rem; }
+.qz .qz-select { appearance: auto; -moz-appearance: auto; cursor: pointer; }
 .qz-input::placeholder { color: var(--qz-placeholder); opacity: 1; }
-.qz .qz-input:hover { border-color: var(--royal); }
+.qz .qz-input:hover { border-color: var(--royal); background: #f3ebfd; }
 .qz .qz-input:focus,
 .qz .qz-input:focus-visible {
-  outline: none;
-  border-color: var(--royal);
-  box-shadow: 0 0 0 4px rgba(106, 61, 168, 0.28);
+  outline: 3px solid #6a3da8;
+  outline-offset: 0;
+  border-color: #6a3da8;
+  background: #ffffff;
+  box-shadow: 0 0 0 7px rgba(106, 61, 168, 0.2);
 }
+/* The tiny number arrows are hard to use; people type the number instead. */
+.qz .qz-input::-webkit-outer-spin-button,
+.qz .qz-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .qz .qz-textarea { min-height: 8rem; resize: vertical; }
 
 .qz-unit {
@@ -165,7 +176,7 @@
   font-size: 1rem;
 }
 .qz .qz-invalid .qz-input { border-color: var(--danger); background: #fffafa; }
-.qz .qz-invalid .qz-input:focus { box-shadow: 0 0 0 4px rgba(138, 47, 40, 0.22); }
+.qz .qz-invalid .qz-input:focus { outline-color: var(--danger); box-shadow: 0 0 0 7px rgba(138, 47, 40, 0.18); }
 .qz-group.qz-invalid {
   padding: 0.9rem;
   border: 2px solid var(--danger);

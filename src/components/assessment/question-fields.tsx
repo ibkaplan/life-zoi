@@ -55,6 +55,8 @@ export function TextQuestion({
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
+  // Numbers use a real number box, so phones open the number keypad.
+  const numeric = inputMode === "numeric" || inputMode === "decimal";
   const shared = {
     id,
     name: id,
@@ -80,8 +82,10 @@ export function TextQuestion({
         <div className="qz-input-wrap">
           <input
             className="qz-input"
-            type="text"
+            type={numeric ? "number" : "text"}
             inputMode={inputMode}
+            min={numeric ? 0 : undefined}
+            step={inputMode === "decimal" ? "any" : numeric ? 1 : undefined}
             autoComplete="off"
             {...shared}
             onChange={(event) => onChange(event.target.value)}

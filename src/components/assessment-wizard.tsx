@@ -428,7 +428,7 @@ export function AssessmentWizard() {
                 id="desiredWeightKg"
                 label={fieldLabel("desiredWeightKg")}
                 hint="Optional. Only used if one of your goals is about weight. It is your own target, not a medical recommendation."
-                placeholder="Enter a weight"
+                placeholder="Enter your goal weight"
                 unit="kg"
                 inputMode="numeric"
                 maxLength={3}
@@ -444,7 +444,7 @@ export function AssessmentWizard() {
                 id="sleepHours"
                 label={fieldLabel("sleepHours")}
                 hint="Required. A rough number from 0 to 24 is enough."
-                placeholder="Enter hours"
+                placeholder="Enter hours of sleep"
                 unit="hours"
                 inputMode="decimal"
                 maxLength={5}
@@ -472,7 +472,7 @@ export function AssessmentWizard() {
                 id="activityDays"
                 label={fieldLabel("activityDays")}
                 hint="Required. Count brisk walking and anything of similar effort. Whole days from 0 to 7."
-                placeholder="Enter 0 to 7"
+                placeholder="Enter number of days"
                 unit="days"
                 inputMode="numeric"
                 maxLength={2}
@@ -484,7 +484,7 @@ export function AssessmentWizard() {
                 id="activityMinutes"
                 label={fieldLabel("activityMinutes")}
                 hint="If you chose 0 days, you can leave this blank. Otherwise enter 0 to 300."
-                placeholder="Enter minutes"
+                placeholder="Enter number of minutes"
                 unit="minutes"
                 inputMode="numeric"
                 maxLength={3}
@@ -496,7 +496,7 @@ export function AssessmentWizard() {
                 id="sedentaryHours"
                 label={fieldLabel("sedentaryHours")}
                 hint="Required. A typical day, from 0 to 24. This is an estimate."
-                placeholder="Enter hours"
+                placeholder="Enter hours of sitting"
                 unit="hours"
                 inputMode="decimal"
                 maxLength={5}
