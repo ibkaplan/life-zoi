@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLocale } from "@/components/locale-provider";
+import { useLocale, useT } from "@/components/locale-provider";
 import { MorningWelcome } from "@/components/background-music/morning-welcome";
 import { RecommendationsPanel } from "@/components/recommendations-panel";
 import { fmt, LOCALE_META } from "@/lib/i18n/config";
@@ -14,6 +14,7 @@ import { DIGNITY_NOTE, purposeReflection } from "@/lib/purpose";
 export function DashboardView() {
   const { ready, session, sample } = useSession();
   const { locale, messages: m } = useLocale();
+  const t = useT();
   const d = m.dashboard;
   const l = m.labels;
   if (!ready) return <LoadingState label={m.common.loadingSession} />;
@@ -82,8 +83,8 @@ export function DashboardView() {
       {latest?.answers.purposeHope ? (
         <section className="card stack" aria-labelledby="purpose-hope-title">
           <h2 id="purpose-hope-title">{d.hopeTitle}</h2>
-          <p>{purposeReflection(latest.answers.purposeHope)}</p>
-          <p>{DIGNITY_NOTE}</p>
+          <p>{purposeReflection(latest.answers.purposeHope, t)}</p>
+          <p>{t(DIGNITY_NOTE)}</p>
           <p className="hint">{d.hopeHint}</p>
         </section>
       ) : null}

@@ -11,7 +11,7 @@ import { BreadRecipePage, NutritionEducation } from "@/components/nutrition/educ
 import { breadRecipe } from "@/lib/nutrition/education";
 import { activities, mealModules } from "@/lib/wellness/academy";
 import { FOOD_GROUPS, foods } from "@/lib/wellness/foods";
-import { coachingFocus } from "@/lib/wellness/personalize";
+import { coachingFocus, focusReason } from "@/lib/wellness/personalize";
 import type { FoodRecord } from "@/lib/wellness/types";
 import { LOCALE_META } from "@/lib/i18n/config";
 import { msg, type Translate } from "@/lib/i18n/translate";
@@ -315,7 +315,7 @@ export function CoachingView() {
       {cards.map((card) => (
         <Link key={card.id} className="card learn-link" href={card.href}>
           <h2>{t(card.title)}</h2>
-          <p>{t(card.reason)}</p>
+          <p>{focusReason(card, t)}</p>
         </Link>
       ))}
     </div>

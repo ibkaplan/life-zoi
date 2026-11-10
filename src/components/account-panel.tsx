@@ -14,12 +14,13 @@ import {
 } from "@/lib/account-store";
 import { authenticatorQrMarkup } from "@/lib/mfa";
 import { EmailHelpForm, NewPasswordForm } from "@/components/password-forms";
-import { useMessages } from "@/components/locale-provider";
+import { useMessages, useT } from "@/components/locale-provider";
 import { fmt } from "@/lib/i18n/config";
 
 export function AccountPanel() {
   const account = useAccount();
   const m = useMessages();
+  const tr = useT();
   const a = m.accountPanel;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -239,12 +240,12 @@ export function AccountPanel() {
 
       {message ? (
         <p className="alert alert-error" role="alert">
-          {message}
+          {tr(message)}
         </p>
       ) : null}
       {account.error ? (
         <p className="alert alert-error" role="alert">
-          {account.error}
+          {tr(account.error)}
         </p>
       ) : null}
     </section>
