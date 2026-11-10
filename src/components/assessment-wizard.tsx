@@ -58,6 +58,8 @@ import {
   eatingPatternLabels,
   MOBILITY_LIMITS,
   mobilityLabels,
+  DAILY_SETTINGS,
+  dailySettingLabels,
   WELLNESS_GOALS,
   wellnessGoalLabels,
 } from "@/lib/health-profile";
@@ -525,6 +527,17 @@ export function AssessmentWizard() {
                 error={errors.sedentaryHours}
                 onChange={(sedentaryHours) => update({ sedentaryHours })}
               />
+              <CheckList
+                legend="Work and daily activity"
+                hint="Optional. Choose any that describe a usual day. LifeZoi uses this only to suggest short breaks from sitting."
+                values={draft.dailySetting}
+                options={DAILY_SETTINGS.map((value) => ({ value, label: dailySettingLabels[value] }))}
+                onChange={(dailySetting) => {
+                  const added = dailySetting.find((item) => !draft.dailySetting.includes(item));
+                  if (added === "prefer-not") update({ dailySetting: [added] });
+                  else update({ dailySetting: dailySetting.filter((item) => item !== "prefer-not") });
+                }}
+              />
               <p className="hint">Walking, strength, balance, and flexibility are optional. They help the plan name a kind of movement. There is no required distance.</p>
               {(["walking", "strength", "balance", "flexibility"] as const).map((name) => (
                 <Choice
@@ -935,6 +948,11 @@ function Review({
     {
       label: "Sitting or reclining",
       value: draft.sedentaryHours ? `${draft.sedentaryHours} hours` : "Not provided",
+      step: "movement",
+    },
+    {
+      label: "Work and daily activity",
+      value: draft.dailySetting.map((item) => dailySettingLabels[item]).join(", ") || "Not provided",
       step: "movement",
     },
     { label: "Walking", value: draft.walking ? vegetableLabels[draft.walking] : "Not provided", step: "movement" },

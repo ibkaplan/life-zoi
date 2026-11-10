@@ -107,6 +107,8 @@ export type DayLog = {
   energy: number | null;
   /** The person declined the outdoor walk today. */
   stayInside: boolean;
+  /** Short breaks from sitting completed today (the 30-minute movement break). */
+  movementBreaks: number;
 };
 
 export type WeeklyReview = {
@@ -190,6 +192,9 @@ export type CompanionState = {
   games: GameRecord[];
 };
 
+/** One break every 30 minutes across a whole day is 48. More than that is not a real count. */
+export const MAX_MOVEMENT_BREAKS = 48;
+
 export const LIMITS = {
   days: 200,
   reviews: 80,
@@ -253,6 +258,7 @@ export function emptyDay(date: string): DayLog {
     mood: null,
     energy: null,
     stayInside: false,
+    movementBreaks: 0,
   };
 }
 
@@ -360,6 +366,7 @@ function sanitizeDay(date: string, value: unknown): DayLog | null {
     mood: maybe(row.mood, 1, 5),
     energy: maybe(row.energy, 1, 5),
     stayInside: row.stayInside === true,
+    movementBreaks: count(row.movementBreaks, MAX_MOVEMENT_BREAKS),
   };
 }
 

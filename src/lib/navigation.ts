@@ -33,6 +33,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/assessment", label: "Lifestyle assessment" },
   { href: "/academy/move/library", label: "Wellness Library" },
+  { href: "/academy/move/breaks", label: "Movement breaks" },
   { href: "/library/music", label: "Relaxing music" },
   { href: "/library/books", label: "Books and listening" },
   { href: "/brain-quiz/games", label: "Brain games" },

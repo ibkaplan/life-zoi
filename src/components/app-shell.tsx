@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SittingReminder } from "@/components/movement-breaks/tracker";
 import { CareInviteWatcher } from "@/components/care-invite-watcher";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
@@ -45,6 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </p>
         ) : null}
         <CareInviteWatcher />
+        <SittingReminder />
         {children}
         <footer className="footer-note">
           <p>{PROFESSIONAL_NOTICE}</p>

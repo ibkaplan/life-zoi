@@ -2509,3 +2509,83 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .lz-hello .brand-line { color: var(--gold); }
 .home .brand-line { font-size: clamp(1.5rem, 4vw, 2rem); }
 @media (max-width: 640px) { .lz-hero-row .lz-art { max-height: 9rem; } }
+
+/* ---------- Movement breaks: water, calf pump, and the 30-minute break ---------- */
+.mb-heading { font-weight: 800; letter-spacing: 0.01em; color: var(--ink); }
+.mb-key { font-weight: 700; color: var(--ink); font-size: 1.2rem; line-height: 1.5; }
+.mb-key-card { border-left: 6px solid var(--dept-accent, var(--royal)); }
+.mb-split { display: grid; gap: 1.25rem; align-items: start; }
+@media (min-width: 760px) { .mb-split { grid-template-columns: 1.1fr 1fr; } }
+.mb-points { display: grid; gap: 0.6rem; padding-left: 1.25rem; font-size: 1.1rem; }
+.mb-big-text { font-size: 1.15rem; }
+.mb-art { width: 100%; height: auto; max-width: 340px; display: block; margin-inline: auto; }
+.mb-art-sm { max-width: 240px; }
+.mb-figure-box { margin: 0; display: grid; gap: 0.5rem; }
+.mb-pair { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.mb-topics { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.mb-topic { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; display: grid; gap: 0.5rem; align-content: start; background: var(--surface); }
+.mb-topic .mb-art { max-width: 200px; }
+.mb-topic-letter { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--royal); color: #fff; font-size: 1rem; }
+.mb-cite { font-size: 0.95rem; }
+.mb-rule { background: #FDF4E4; border: 2px solid var(--gold); }
+.mb-rule-title { font-weight: 800; font-size: clamp(1.4rem, 4vw, 2rem); color: var(--ink); text-transform: none; }
+.mb-big { min-height: 3.25rem; font-size: 1.1rem; padding-inline: 1.25rem; }
+.mb-stage { display: grid; gap: 1rem; align-items: center; }
+@media (min-width: 700px) { .mb-stage { grid-template-columns: 220px 1fr; } }
+.mb-step .mb-art, .mb-stage .mb-art { max-width: 220px; }
+.mb-step-count { font-weight: 700; color: var(--muted); margin: 0; }
+.mb-step-title { font-size: 1.6rem; margin: 0; }
+.mb-step-text { font-size: 1.2rem; }
+.mb-clock { font-size: 3rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 0; color: var(--ink); }
+.mb-step-list { display: grid; gap: 0.4rem; padding-left: 1.4rem; }
+.mb-step-list li[aria-current="step"] { font-weight: 700; color: var(--royal); }
+.mb-checks { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+.mb-check { align-items: flex-start; font-size: 1.1rem; padding: 0.6rem; border: 1px solid var(--line); border-radius: 12px; }
+.mb-check input { width: 1.5rem; height: 1.5rem; flex: none; }
+.mb-check > span { display: grid; gap: 0.15rem; }
+.mb-count { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+.mb-count p { margin: 0; font-size: 1.15rem; }
+.mb-count-num { font-size: 2rem; color: var(--royal); }
+.mb-week { margin: 0; display: grid; gap: 0.5rem; }
+.mb-week-bars { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; height: 120px; align-items: end; }
+.mb-week-bars li { display: grid; grid-template-rows: 1fr auto auto; height: 100%; text-align: center; font-size: 0.85rem; }
+.mb-week-bar { align-self: end; display: block; min-height: 3px; background: var(--teal-brand); border-radius: 6px 6px 0 0; }
+.mb-week-num { font-weight: 700; }
+.mb-week-day { color: var(--muted); }
+.mb-principles { list-style: none; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.mb-principles li { display: grid; gap: 0.35rem; padding: 1rem; border-radius: var(--radius); background: var(--dept-tint, var(--sky)); }
+.mb-principles strong { font-size: 1.3rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--royal); }
+.mb-life { display: grid; gap: 1.25rem; }
+@media (min-width: 760px) { .mb-life { grid-template-columns: 1fr 1.3fr; } }
+.mb-why-list { display: grid; gap: 0.6rem; }
+.mb-why-list li { display: grid; gap: 0.2rem; }
+.mb-reminder { position: sticky; top: calc(var(--header) + 0.5rem); z-index: 20; background: #FDF4E4; border: 3px solid var(--gold); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); display: grid; gap: 0.5rem; }
+.mb-reminder-title { font-weight: 800; font-size: 1.3rem; color: var(--ink); margin: 0; }
+.mb-done h3 { font-size: 1.5rem; }
+
+/* Animations: calf squeeze, blood moving up, walking, heel raises, ankles, breathing. */
+.mb-calf-muscle { transform-box: fill-box; transform-origin: center; transition: transform 0.6s ease; }
+.mb-calf.is-squeeze .mb-calf-muscle { transform: scaleX(1.45) scaleY(0.82); }
+.mb-calf.is-squeeze .mb-drops { transform: translateY(-14px); }
+.mb-anim .mb-calf-muscle { animation: mb-squeeze 2.4s ease-in-out infinite; }
+.mb-anim .mb-drops { animation: mb-rise 2.4s ease-in-out infinite; }
+.mb-flow { stroke-dasharray: 10 8; }
+.mb-anim.mb-step-walk .mb-leg-a, .mb-anim.mb-step-walk .mb-arm-b { transform-box: view-box; transform-origin: 100px 112px; animation: mb-swing 1.2s ease-in-out infinite; }
+.mb-anim.mb-step-walk .mb-leg-b, .mb-anim.mb-step-walk .mb-arm-a { transform-box: view-box; transform-origin: 100px 112px; animation: mb-swing 1.2s ease-in-out infinite reverse; }
+.mb-anim.mb-step-walk.is-seated .mb-shin { transform-box: view-box; transform-origin: 130px 118px; animation: mb-march 1.2s ease-in-out infinite; }
+.mb-anim.mb-step-heels .mb-figure { animation: mb-heel 2.4s ease-in-out infinite; }
+.mb-anim.mb-step-heels.is-seated .mb-figure { animation: none; }
+.mb-anim.mb-step-heels.is-seated .mb-shin, .mb-anim.mb-step-heels.is-seated .mb-foot { animation: mb-heel 2.4s ease-in-out infinite; }
+.mb-anim.mb-step-ankles .mb-foot { transform-box: view-box; transform-origin: 132px 180px; animation: mb-ankle 1.6s ease-in-out infinite; }
+.mb-anim .mb-breath-ring { transform-box: fill-box; transform-origin: center; animation: mb-breathe 8s ease-in-out infinite; }
+.mb-anim.mb-step-stand .mb-figure { animation: mb-heel 3s ease-out 1; }
+@keyframes mb-squeeze { 0%, 100% { transform: none; } 50% { transform: scaleX(1.45) scaleY(0.82); } }
+@keyframes mb-rise { 0% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-18px); } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes mb-swing { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
+@keyframes mb-march { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-12deg) translateY(-6px); } }
+@keyframes mb-heel { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes mb-ankle { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+@keyframes mb-breathe { 0%, 100% { transform: scale(0.8); opacity: 0.6; } 45% { transform: scale(1.25); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .mb-anim *, .mb-calf-muscle { animation: none !important; transition: none !important; }
+}
