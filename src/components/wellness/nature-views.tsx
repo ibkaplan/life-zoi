@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import { PagePhoto } from "@/components/page-photo";
 import { EvidenceLine, ReadOnlyNote, WellnessSources } from "@/components/wellness/bits";
 import { ChallengePanel } from "@/components/wellness/challenge-panel";
@@ -19,77 +21,80 @@ import {
 import type { NatureActivityId, NatureEntry, NatureRoutine, NatureWeather } from "@/lib/wellness/types";
 
 const links = [
-  { href: "/nature/sunlight", title: "Sunlight", text: "Daylight, winter mood education, and sun safety." },
-  { href: "/nature/earth", title: "Feel the earth", text: "Green space, plus a clear line around unproven earthing claims." },
-  { href: "/nature/trees", title: "Trees", text: "Slow time among trees. Not a workout and not an immune promise." },
-  { href: "/nature/outside", title: "Step outside", text: "Walk, roll, sit, stretch, or watch. No required distance." },
-  { href: "/nature/food", title: "Real food", text: "Everyday plants, protein, and water. No food is a treatment." },
-  { href: "/nature/people", title: "People and place", text: "Inspiration without stereotypes." },
-  { href: "/nature/week", title: "7 days closer to nature", text: "A checklist you can change. An optional 30-day journey sits beside it." },
-  { href: "/nature/routine", title: "My personal nature routine", text: "Morning, afternoon, and evening ideas you can edit." },
-  { href: "/nature/journal", title: "Mood and energy journal", text: "Your notes, kept separate from examples and from clinic measurements." },
+  { href: "/nature/sunlight", title: msg("Sunlight"), text: msg("Daylight, winter mood education, and sun safety.") },
+  { href: "/nature/earth", title: msg("Feel the earth"), text: msg("Green space, plus a clear line around unproven earthing claims.") },
+  { href: "/nature/trees", title: msg("Trees"), text: msg("Slow time among trees. Not a workout and not an immune promise.") },
+  { href: "/nature/outside", title: msg("Step outside"), text: msg("Walk, roll, sit, stretch, or watch. No required distance.") },
+  { href: "/nature/food", title: msg("Real food"), text: msg("Everyday plants, protein, and water. No food is a treatment.") },
+  { href: "/nature/people", title: msg("People and place"), text: msg("Inspiration without stereotypes.") },
+  { href: "/nature/week", title: msg("7 days closer to nature"), text: msg("A checklist you can change. An optional 30-day journey sits beside it.") },
+  { href: "/nature/routine", title: msg("My personal nature routine"), text: msg("Morning, afternoon, and evening ideas you can edit.") },
+  { href: "/nature/journal", title: msg("Mood and energy journal"), text: msg("Your notes, kept separate from examples and from clinic measurements.") },
 ];
 
 export function NatureHome() {
+  const t = useT();
   return (
     <div className="learn stack-lg">
       <PagePhoto id="nature" />
       <header className="stack">
-        <p className="kicker">The power of nature</p>
-        <h1>You are part of nature. Make time to reconnect.</h1>
-        <p className="lede">{NATURE_QUOTE}</p>
+        <p className="kicker">{t("The power of nature")}</p>
+        <h1>{t("You are part of nature. Make time to reconnect.")}</h1>
+        <p className="lede">{t(NATURE_QUOTE)}</p>
         <p>
-          Nature is not medicine and not a replacement for food, sleep, movement, or professional care. Disability, weather, and the space you have all change what “outside” can mean. A missed day is not a failure.
+          {t("Nature is not medicine and not a replacement for food, sleep, movement, or professional care. Disability, weather, and the space you have all change what “outside” can mean. A missed day is not a failure.")}
         </p>
       </header>
       <div className="stack">
         {links.map((item) => (
           <Link key={item.href} className="card learn-link" href={item.href}>
-            <h2>{item.title}</h2>
-            <p>{item.text}</p>
+            <h2>{t(item.title)}</h2>
+            <p>{t(item.text)}</p>
           </Link>
         ))}
       </div>
-      <p>{NATURE_CLOSE}</p>
+      <p>{t(NATURE_CLOSE)}</p>
     </div>
   );
 }
 
 export function NatureModuleView({ slug }: { slug: string }) {
+  const t = useT();
   const topic = natureModule(slug);
   if (!topic) return null;
   return (
     <div className="learn stack-lg">
-      <p className="kicker">The power of nature</p>
-      <h1>{topic.title}</h1>
-      <p className="lede">{topic.summary}</p>
+      <p className="kicker">{t("The power of nature")}</p>
+      <h1>{t(topic.title)}</h1>
+      <p className="lede">{t(topic.summary)}</p>
       {topic.blocks.map((block) => (
         <section key={block.heading} className="card stack">
-          <h2>{block.heading}</h2>
-          <p>{block.body}</p>
-          <EvidenceLine kind={block.evidence} note={block.evidenceNote} />
+          <h2>{t(block.heading)}</h2>
+          <p>{t(block.body)}</p>
+          <EvidenceLine kind={block.evidence} note={t(block.evidenceNote)} />
           <WellnessSources ids={block.sourceIds} />
         </section>
       ))}
-      <Link href="/nature">All nature topics</Link>
+      <Link href="/nature">{t("All nature topics")}</Link>
     </div>
   );
 }
 
 export function NatureWeek() {
+  const t = useT();
   const wellness = useWellness();
   const week = challengeById("nature-7");
   const month = challengeById("nature-30");
   return (
     <div className="learn stack-lg">
-      <p className="kicker">7 days closer to nature</p>
-      <h1>Choose the moments that fit</h1>
+      <p className="kicker">{t("7 days closer to nature")}</p>
+      <h1>{t("Choose the moments that fit")}</h1>
       <p className="lede">
-        Select any activities. There is no required distance and no promised medical result. Window time is daylight. It is stored as its own activity, not as outdoor time.
+        {t("Select any activities. There is no required distance and no promised medical result. Window time is daylight. It is stored as its own activity, not as outdoor time.")}
       </p>
       <ReadOnlyNote message={wellness.readOnlyMessage} />
       <fieldset className="card stack">
-        <legend>Today’s checklist</legend>
+        <legend>{t("Today’s checklist")}</legend>
         {NATURE_ACTIVITIES.map((item) => {
           const id = `nature-${item.id}`;
           return (
@@ -100,7 +105,7 @@ export function NatureWeek() {
                 onChange={() => wellness.toggleCheck(id)}
               />
               <span>
-                <strong>{item.label}.</strong> {item.text}
+                <strong>{t(item.label)}.</strong> {t(item.text)}
               </span>
             </label>
           );
@@ -113,12 +118,15 @@ export function NatureWeek() {
 }
 
 const routineHints = {
-  morning: "Example: open a curtain, or step to a doorway if that is easy. Not a required time.",
-  afternoon: "Example: a bench, a balcony, or a look at trees. Skip it when weather or energy says no.",
-  evening: "Example: dim bright overhead light if that feels gentle before sleep. Not an order.",
+  morning: msg("Example: open a curtain, or step to a doorway if that is easy. Not a required time."),
+  afternoon: msg("Example: a bench, a balcony, or a look at trees. Skip it when weather or energy says no."),
+  evening: msg("Example: dim bright overhead light if that feels gentle before sleep. Not an order."),
 };
 
+const ROUTINE_PARTS = { morning: msg("Morning"), afternoon: msg("Afternoon"), evening: msg("Evening") };
+
 export function NatureRoutineView() {
+  const t = useT();
   const wellness = useWellness();
   const saved = wellness.log.natureRoutine;
   const [draft, setDraft] = useState<NatureRoutine | null>(null);
@@ -126,10 +134,10 @@ export function NatureRoutineView() {
   const [message, setMessage] = useState<string | null>(null);
   return (
     <div className="learn stack-lg">
-      <p className="kicker">My personal nature routine</p>
-      <h1>Shape the day you actually have</h1>
+      <p className="kicker">{t("My personal nature routine")}</p>
+      <h1>{t("Shape the day you actually have")}</h1>
       <p className="lede">
-        Climate, ability, space, and schedule change the routine. These boxes are yours. The hints are examples, not a clock.
+        {t("Climate, ability, space, and schedule change the routine. These boxes are yours. The hints are examples, not a clock.")}
       </p>
       <ReadOnlyNote message={wellness.readOnlyMessage} />
       <form
@@ -137,14 +145,14 @@ export function NatureRoutineView() {
         onSubmit={(event) => {
           event.preventDefault();
           const result = wellness.setNatureRoutine(routine);
-          setMessage(result ?? "Saved in this browser tab.");
+          setMessage(result ?? msg("Saved in this browser tab."));
           setDraft(null);
         }}
       >
         {(["morning", "afternoon", "evening"] as const).map((part) => (
           <label key={part} className="field" htmlFor={`routine-${part}`}>
-            <span>{part[0].toUpperCase() + part.slice(1)}</span>
-            <span className="hint">{routineHints[part]}</span>
+            <span>{t(ROUTINE_PARTS[part])}</span>
+            <span className="hint">{t(routineHints[part])}</span>
             <textarea
               id={`routine-${part}`}
               maxLength={280}
@@ -156,22 +164,27 @@ export function NatureRoutineView() {
           </label>
         ))}
         <button className="btn btn-primary" type="submit">
-          Save this routine
+          {t("Save this routine")}
         </button>
-        {message ? <p role="status">{message}</p> : null}
+        {message ? <p role="status">{t(message)}</p> : null}
       </form>
     </div>
   );
 }
 
 const weatherOptions: { id: NatureWeather; label: string }[] = [
-  { id: "sunny", label: "Sunny" },
-  { id: "cloudy", label: "Cloudy" },
-  { id: "rainy", label: "Rainy" },
-  { id: "window", label: "Window only" },
+  { id: "sunny", label: msg("Sunny") },
+  { id: "cloudy", label: msg("Cloudy") },
+  { id: "rainy", label: msg("Rainy") },
+  { id: "window", label: msg("Window only") },
 ];
 
+function weatherLabel(id: string): string {
+  return weatherOptions.find((item) => item.id === id)?.label ?? id;
+}
+
 export function NatureJournal() {
+  const t = useT();
   const wellness = useWellness();
   const [draft, setDraft] = useState({
     outdoorMinutes: "",
@@ -198,10 +211,10 @@ export function NatureJournal() {
 
   return (
     <div className="learn stack-lg">
-      <p className="kicker">My nature, mood, and energy journal</p>
-      <h1>Your notes stay yours</h1>
+      <p className="kicker">{t("My nature, mood, and energy journal")}</p>
+      <h1>{t("Your notes stay yours")}</h1>
       <p className="lede">
-        Outdoor time, daylight, mood, energy, and sleep on this page are user-reported. They are not clinic measurements, not estimates from a table, and not hypothetical forecasts.
+        {t("Outdoor time, daylight, mood, energy, and sleep on this page are user-reported. They are not clinic measurements, not estimates from a table, and not hypothetical forecasts.")}
       </p>
       <ReadOnlyNote message={wellness.readOnlyMessage} />
       <form
@@ -226,8 +239,8 @@ export function NatureJournal() {
         }}
       >
         <label className="field" htmlFor="outdoor-minutes">
-          <span>Outdoor minutes, if you went out</span>
-          <span className="hint">Leave blank for a window-only note. This is your estimate, not a device reading.</span>
+          <span>{t("Outdoor minutes, if you went out")}</span>
+          <span className="hint">{t("Leave blank for a window-only note. This is your estimate, not a device reading.")}</span>
           <input
             id="outdoor-minutes"
             inputMode="numeric"
@@ -236,7 +249,7 @@ export function NatureJournal() {
           />
         </label>
         <fieldset className="field">
-          <legend>Weather or place</legend>
+          <legend>{t("Weather or place")}</legend>
           <div className="choices">
             {weatherOptions.map((item) => (
               <label key={item.id} className="choice">
@@ -246,19 +259,19 @@ export function NatureJournal() {
                   checked={draft.weather === item.id}
                   onChange={() => setDraft({ ...draft, weather: item.id })}
                 />
-                <span>{item.label}</span>
+                <span>{t(item.label)}</span>
               </label>
             ))}
           </div>
         </fieldset>
         <div className="grid-2">
-          <ScaleField id="mood-before" label="Mood before, 1 to 5" value={draft.moodBefore} onChange={(moodBefore) => setDraft({ ...draft, moodBefore })} />
-          <ScaleField id="mood-after" label="Mood after, 1 to 5" value={draft.moodAfter} onChange={(moodAfter) => setDraft({ ...draft, moodAfter })} />
-          <ScaleField id="energy" label="Energy, 1 to 5" value={draft.energy} onChange={(energy) => setDraft({ ...draft, energy })} />
-          <ScaleField id="sleep-note" label="Sleep last night, 1 to 5" value={draft.sleep} onChange={(sleep) => setDraft({ ...draft, sleep })} />
+          <ScaleField id="mood-before" label={msg("Mood before, 1 to 5")} value={draft.moodBefore} onChange={(moodBefore) => setDraft({ ...draft, moodBefore })} />
+          <ScaleField id="mood-after" label={msg("Mood after, 1 to 5")} value={draft.moodAfter} onChange={(moodAfter) => setDraft({ ...draft, moodAfter })} />
+          <ScaleField id="energy" label={msg("Energy, 1 to 5")} value={draft.energy} onChange={(energy) => setDraft({ ...draft, energy })} />
+          <ScaleField id="sleep-note" label={msg("Sleep last night, 1 to 5")} value={draft.sleep} onChange={(sleep) => setDraft({ ...draft, sleep })} />
         </div>
         <fieldset className="field">
-          <legend>Activities</legend>
+          <legend>{t("Activities")}</legend>
           {NATURE_ACTIVITIES.map((item) => (
             <label key={item.id} className="choice">
               <input
@@ -273,41 +286,41 @@ export function NatureJournal() {
                   })
                 }
               />
-              <span>{item.label}</span>
+              <span>{t(item.label)}</span>
             </label>
           ))}
         </fieldset>
         <label className="field" htmlFor="movement-note">
-          <span>Movement</span>
+          <span>{t("Movement")}</span>
           <input id="movement-note" maxLength={280} value={draft.movement} onChange={(event) => setDraft({ ...draft, movement: event.target.value })} />
         </label>
         <label className="field" htmlFor="connection-note">
-          <span>Social connection</span>
+          <span>{t("Social connection")}</span>
           <input id="connection-note" maxLength={280} value={draft.connection} onChange={(event) => setDraft({ ...draft, connection: event.target.value })} />
         </label>
         <label className="field" htmlFor="nature-reflection">
-          <span>Reflection</span>
+          <span>{t("Reflection")}</span>
           <textarea id="nature-reflection" maxLength={280} value={draft.reflection} onChange={(event) => setDraft({ ...draft, reflection: event.target.value })} />
         </label>
-        <button className="btn btn-primary" type="submit">Save today’s note</button>
-        {message ? <p role="status">{message}</p> : null}
+        <button className="btn btn-primary" type="submit">{t("Save today’s note")}</button>
+        {message ? <p role="status">{t(message)}</p> : null}
       </form>
       <section className="card stack">
-        <h2>Pattern from your notes</h2>
-        <p>{outdoorMoodSentence(entries)}</p>
+        <h2>{t("Pattern from your notes")}</h2>
+        <p>{t(outdoorMoodSentence(entries))}</p>
       </section>
       <section className="card stack">
-        <h2>This month</h2>
-        <p>{monthEntries.length === 0 ? "No notes this month yet." : `${monthEntries.length} notes this month. Kind: user-reported.`}</p>
+        <h2>{t("This month")}</h2>
+        <p>{monthEntries.length === 0 ? t("No notes this month yet.") : t("Notes this month: {count}. Kind: user-reported.", { count: monthEntries.length })}</p>
         <EntryList entries={monthEntries} />
       </section>
       <section className="card stack">
-        <h2>Earlier notes</h2>
+        <h2>{t("Earlier notes")}</h2>
         <EntryList entries={entries} />
       </section>
       <aside className="card example-only stack">
-        <h2>Example only</h2>
-        <p>This card is not saved as your record. Example: a cloudy afternoon, ten minutes on a bench, mood marked a little higher afterward.</p>
+        <h2>{t("Example only")}</h2>
+        <p>{t("This card is not saved as your record. Example: a cloudy afternoon, ten minutes on a bench, mood marked a little higher afterward.")}</p>
       </aside>
     </div>
   );
@@ -324,27 +337,36 @@ function ScaleField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const t = useT();
   return (
     <label className="field" htmlFor={id}>
-      <span>{label}</span>
+      <span>{t(label)}</span>
       <input id={id} inputMode="numeric" value={value} onChange={(event) => onChange(event.target.value)} />
     </label>
   );
 }
 
 function EntryList({ entries }: { entries: NatureEntry[] }) {
-  if (entries.length === 0) return <p>Nothing recorded yet.</p>;
+  const t = useT();
+  if (entries.length === 0) return <p>{t("Nothing recorded yet.")}</p>;
   return (
     <ul className="record-list">
       {entries.map((entry) => (
         <li key={entry.id}>
           <strong>{entry.date}</strong>
           <p>
-            {entry.outdoorMinutes === null ? "No outdoor minutes entered." : `${entry.outdoorMinutes} outdoor minutes, estimated by you.`}{" "}
-            {entry.weather ? `Place: ${entry.weather}.` : ""}
+            {entry.outdoorMinutes === null
+              ? t("No outdoor minutes entered.")
+              : t("Outdoor minutes, estimated by you: {minutes}.", { minutes: entry.outdoorMinutes })}{" "}
+            {entry.weather ? t("Place: {place}.", { place: t(weatherLabel(entry.weather)) }) : ""}
           </p>
           <p className="hint">
-            Mood before {entry.moodBefore ?? "blank"}, after {entry.moodAfter ?? "blank"}. Energy {entry.energy ?? "blank"}. Sleep {entry.sleep ?? "blank"}.
+            {t("Mood before {before}, after {after}. Energy {energy}. Sleep {sleep}.", {
+              before: entry.moodBefore ?? t("blank"),
+              after: entry.moodAfter ?? t("blank"),
+              energy: entry.energy ?? t("blank"),
+              sleep: entry.sleep ?? t("blank"),
+            })}
           </p>
           {entry.reflection ? <p>{entry.reflection}</p> : null}
         </li>
