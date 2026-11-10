@@ -14,9 +14,9 @@ export function makeTranslate(catalog: Catalog | null | undefined): Translate {
 
 /** English needs no catalog. The other three load on demand so a page only downloads one language. */
 export const CATALOG_LOADERS: Record<Exclude<Locale, "en">, () => Promise<Catalog>> = {
-  uk: () => import("./catalog/uk.json").then((mod) => mod.default as Catalog),
-  ru: () => import("./catalog/ru.json").then((mod) => mod.default as Catalog),
-  el: () => import("./catalog/el.json").then((mod) => mod.default as Catalog),
+  uk: () => import("./catalog/uk").then((mod) => mod.default as Catalog),
+  ru: () => import("./catalog/ru").then((mod) => mod.default as Catalog),
+  el: () => import("./catalog/el").then((mod) => mod.default as Catalog),
 };
 
 /**
