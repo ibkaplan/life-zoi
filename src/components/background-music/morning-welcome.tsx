@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { useLocale } from "@/components/locale-provider";
 import { useBackgroundMusic } from "@/components/background-music/provider";
 import { MusicNoteIcon, PlayPauseButton, statusText } from "@/components/background-music/shared";
+import { fmt } from "@/lib/i18n/config";
 import { dayPartFor, type DayPart } from "@/lib/background-music/prefs";
 
 function subscribeClock(onChange: () => void) {
@@ -14,13 +15,15 @@ const currentPart = (): DayPart => dayPartFor(new Date().getHours());
 const morning = (): DayPart => "morning";
 
 /** The dashboard greeting with the optional PLAY MORNING MUSIC control. Music never starts on its own here. */
-export function MorningWelcome() {
+export function MorningWelcome({ firstName }: { firstName?: string }) {
   const { messages: m } = useLocale();
   const music = useBackgroundMusic();
   // The server renders the morning greeting; the browser switches to the visitor's own clock.
   const part = useSyncExternalStore(subscribeClock, currentPart, morning);
 
-  const greeting = part === "morning" ? m.music.greetingMorning : part === "afternoon" ? m.music.greetingAfternoon : m.music.greetingEvening;
+  const greeting = firstName
+    ? fmt(part === "morning" ? m.music.greetingMorningName : part === "afternoon" ? m.music.greetingAfternoonName : m.music.greetingEveningName, { name: firstName })
+    : part === "morning" ? m.music.greetingMorning : part === "afternoon" ? m.music.greetingAfternoon : m.music.greetingEvening;
   const off = music.ready && music.prefs.choice === "off";
   const showStatus = music.ready && !off && music.status !== "idle";
 

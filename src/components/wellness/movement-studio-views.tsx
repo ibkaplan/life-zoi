@@ -7,17 +7,12 @@ import { STUDIO_PATH } from "@/lib/wellness-library/chair-yoga";
 import { useState, useSyncExternalStore } from "react";
 import {
   ASK_FIRST,
-  DURATION_CHOICES,
   FALL_SUPPORT,
-  FILTER_GOALS,
-  FILTER_POSITIONS,
-  LEVELS,
   SAFETY_LINE,
   STUDIO_HERO,
   STUDIO_SECTION,
   categoryBySlug,
   embedSrc,
-  filterLessons,
   formatDuration,
   goalLabel,
   lessonById,
@@ -26,11 +21,6 @@ import {
   levelLabel,
   positionLabel,
   studioCategories,
-  studioLessons,
-  type FilterGoal,
-  type FilterPosition,
-  type LessonFilters,
-  type Level,
   type StudioLesson,
 } from "@/lib/wellness/movement-studio/catalog";
 import {
@@ -261,101 +251,6 @@ export function StudioLessonPage({ slug }: { slug: string }) {
       <p className="kicker">Movement Studio</p>
       <LessonCard lesson={lesson} />
       <Link href={`/academy/move/studio/categories/${lesson.categorySlug}`}>Back to the category</Link>
-    </div>
-  );
-}
-
-const emptyFilters: LessonFilters = { minutes: "any", position: "any", goal: "any", level: "any" };
-
-export function FindMyMovement() {
-  const [filters, setFilters] = useState<LessonFilters>(emptyFilters);
-  const results = filterLessons(studioLessons, filters);
-
-  return (
-    <div className="studio stack-lg">
-      <p className="kicker">Movement Studio</p>
-      <h1>Find My Movement</h1>
-      <p className="lede">
-        Choose minutes, position, goal, and level. The matches come from the list on this page. Nothing is generated.
-      </p>
-      <p>
-        A film appears under a minute choice when its player length is within a minute and a half of that choice. A written practice appears only under its planned minutes. Short films stay under Any.
-      </p>
-      <SafetyNote />
-      <div className="studio-filters">
-        <FilterGroup
-          label="Minutes"
-          value={String(filters.minutes)}
-          options={[{ value: "any", label: "Any" }, ...DURATION_CHOICES.map((minutes) => ({ value: String(minutes), label: String(minutes) }))]}
-          onChange={(value) =>
-            setFilters((current) => ({
-              ...current,
-              minutes: value === "any" ? "any" : (Number(value) as (typeof DURATION_CHOICES)[number]),
-            }))
-          }
-        />
-        <FilterGroup
-          label="Position"
-          value={filters.position}
-          options={[
-            { value: "any", label: "Any" },
-            ...FILTER_POSITIONS.map((position) => ({ value: position, label: positionLabel[position] })),
-          ]}
-          onChange={(value) => setFilters((current) => ({ ...current, position: value as FilterPosition | "any" }))}
-        />
-        <FilterGroup
-          label="Goal"
-          value={filters.goal}
-          options={[{ value: "any", label: "Any" }, ...FILTER_GOALS.map((goal) => ({ value: goal, label: goalLabel[goal] }))]}
-          onChange={(value) => setFilters((current) => ({ ...current, goal: value as FilterGoal | "any" }))}
-        />
-        <FilterGroup
-          label="Level"
-          value={filters.level}
-          options={[{ value: "any", label: "Any" }, ...LEVELS.map((level) => ({ value: level, label: levelLabel[level] }))]}
-          onChange={(value) => setFilters((current) => ({ ...current, level: value as Level | "any" }))}
-        />
-      </div>
-      <p>
-        {results.length === 0 ? "Nothing in the studio matches those filters." : `${results.length} matches.`}
-      </p>
-      <div className="studio-grid">
-        {results.map((lesson) => (
-          <LessonCard key={lesson.id} lesson={lesson} />
-        ))}
-      </div>
-      <Link href="/academy/move">All movement</Link>
-    </div>
-  );
-}
-
-function FilterGroup({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="studio-filter" role="group" aria-label={label}>
-      <p>{label}</p>
-      <div className="studio-filter-row">
-        {options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            className="btn btn-secondary"
-            aria-pressed={value === option.value}
-            onClick={() => onChange(option.value)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

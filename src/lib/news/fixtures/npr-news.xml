@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel><title>NPR Topics: News</title>
+<item>
+  <title>Fixture: Congress passes spending bill</title>
+  <description>&lt;p&gt;Lawmakers voted late on Monday. The bill now goes to the president.&lt;/p&gt;&lt;img src="x.jpg"&gt;</description>
+  <link>https://www.npr.org/2026/11/10/fixture-3</link>
+  <pubDate>Tue, 10 Nov 2026 02:15:00 -0500</pubDate>
+</item>
+<item>
+  <title>Fixture: Leaders meet for climate talks!</title>
+  <description>Same story as another feed.</description>
+  <link>https://www.npr.org/2026/11/10/fixture-dup</link>
+  <pubDate>Tue, 10 Nov 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Fixture: Unsafe link</title>
+  <description><![CDATA[<script>alert(1)</script>Should be dropped.]]></description>
+  <link>javascript:alert(1)</link>
+  <pubDate>Tue, 10 Nov 2026 05:00:00 GMT</pubDate>
+</item>
+</channel></rss>
