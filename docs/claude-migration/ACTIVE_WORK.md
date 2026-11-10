@@ -127,6 +127,12 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 5. Outstanding: only two of the listed sources (Pinto et al. 2023 in PMC, and the ADA 2016 position statement in PMC) could be read from the build environment. StatPearls lymphatic physiology, PubMed 21486777, the calf-pump article in Advances in Physiology Education, PMC6985064, and PubMed 39630056 are marked in `src/lib/movement-breaks/content.ts` as still to be read by a person. All copy is English in one object (`MB`) ready for translation keys. The breathing section links to the existing breathing sounds until the Breathe for Life program lands.
 6. Next action: a person reads the five unread sources and the medical copy, then the owner reviews the pull request.
 
+### My Music (branch `claude/project-thread-9rthjc`, PR open for review)
+
+- Done: "Relaxing music" renamed to My Music in all four languages; six categories; one site-wide player (`src/components/background-music/`) with previous/next, progress bar, volume, Music ON/OFF; music plays softly under videos, guided breathing, and speech (`audio-focus.ts` kinds `video`, `voice`, `sound`); catalog in `src/lib/music-library/catalog.ts`.
+- Not done: no Pixabay track is included. pixabay.com was blocked from the cloud environment, so no licence was read. Add tracks with `public/audio/library/CREDITS.md`.
+- New features that speak or play sound (for example a focus timer) should call `useAudioFocus(active, id, "voice")` so music lowers under them.
+
 ## What is not in progress
 
 No GitHub issues were confirmed in this refresh. `main` is one product: accounts when configured, tab storage otherwise, mock assistant, and educational tools. Pull request #1 is closed historical work. Document upload and a paid model are not started.

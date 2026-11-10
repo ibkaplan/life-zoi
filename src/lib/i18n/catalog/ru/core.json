@@ -461,7 +461,6 @@
  "Reduce or stop smoking": "Меньше курить или бросить",
  "Reduce stress": "Снизить стресс",
  "Regular meals most days": "Регулярно ем большинство дней",
- "Relaxing music": "Спокойная музыка",
  "Remove {food}": "Убрать {food}",
  "Remove {item}": "Удалить {item}",
  "Required. A rough number from 0 to 24 is enough.": "Обязательно. Достаточно примерного числа от 0 до 24.",
@@ -710,5 +709,5 @@
  "{value} cm": "{value} см",
  "{value} hours": "{value} ч",
  "{value} kg": "{value} кг",
- "Music library": "Музыкальная библиотека"
+ "My Music": "Моя музыка"
 }

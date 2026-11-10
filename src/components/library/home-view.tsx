@@ -127,7 +127,7 @@ export function LibraryHome() {
         {" · "}
         <Link href="/library/moments">Having a hard moment?</Link>
         {" · "}
-        <Link href="/library/music">Relaxing music</Link>
+        <Link href="/library/music">My Music</Link>
         {" · "}
         <Link href="/library/books">Books and listening</Link>
         {" · "}

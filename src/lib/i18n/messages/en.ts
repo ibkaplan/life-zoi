@@ -56,7 +56,7 @@ export const en = {
     musicOff: "Music OFF",
     onOffLabel: "Music on or off",
     category: "Type of music",
-    openLibrary: "Open the music library",
+    openLibrary: "Open My Music",
     time: "{position} of {length}",
     timeUnknown: "{position}",
     progress: "Position in this piece",
@@ -76,11 +76,11 @@ export const en = {
         blurb: "Gentle piano and familiar classics, including Beethoven's Moonlight Sonata and Für Elise.",
       },
       meditation: {
-        name: "Meditation & Relaxation",
+        name: "Meditation & Peace",
         blurb: "Peaceful, steady sound for deep relaxation, stress relief, and mindfulness.",
       },
       yoga: {
-        name: "Yoga Music",
+        name: "Yoga & Wellness",
         blurb: "Soft background music for Hatha yoga, chair yoga, stretching, and breathing.",
       },
       nature: {
@@ -88,7 +88,7 @@ export const en = {
         blurb: "Ocean waves, rain, birds in the forest, and flowing water.",
       },
       morning: {
-        name: "Happy Morning",
+        name: "Happy & Positive Music",
         blurb: "Bright, uplifting tunes for energy and a good start to the day.",
       },
       sleep: {
@@ -98,7 +98,7 @@ export const en = {
     },
     library: {
       kicker: "Health Library · Music",
-      title: "Music library",
+      title: "My Music",
       brandLine: "Breathe. Listen. Rest.",
       intro: "Choose a type of music and press Play. Music keeps playing while you move around LifeZoi, and it plays softly under yoga, meditation, and breathing sessions.",
       loading: "Loading music…",
@@ -234,7 +234,7 @@ export const en = {
     "/dashboard": "Dashboard",
     "/assessment": "Lifestyle assessment",
     "/academy/move/library": "Wellness Library",
-    "/library/music": "Relaxing music",
+    "/library/music": "My Music",
     "/library/books": "Books and listening",
     "/brain-quiz/games": "Brain games",
     "/progress/weekly": "Weekly check-in",
@@ -284,7 +284,7 @@ export const en = {
       library: { title: "Wellness Library", text: "Pilates, yoga, chair exercise, tai chi and more, from 10 to 60 minutes." },
       meals: { title: "Today's meals", text: "Meals that respect your allergies, requirements, and the foods you avoid." },
       breathe: { title: "Breathe for Life", text: "Gentle breathing, humming, and nitrate-rich foods for healthy aging. Five to ten minutes, four times a week." },
-      music: { title: "Relaxing music", text: "Calm sounds for breathing, focus, and sleep, played in the app." },
+      music: { title: "My Music", text: "Calm sounds for breathing, focus, and sleep, played in the app." },
       books: { title: "Books and listening", text: "Short reads you can read or listen to, with bookmarks." },
       games: { title: "Brain games", text: "Sudoku, memory, words, and logic, just for enjoyment." },
       checkin: { title: "Weekly check-in", text: "Look back at your week and choose what comes next." },

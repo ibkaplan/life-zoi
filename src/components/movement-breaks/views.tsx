@@ -180,7 +180,7 @@ export function BreathingSection() {
       </div>
       <p className="alert">{MB.breathing.safety}</p>
       <p className="hint">
-        For a guided tone to breathe with, open the breathing sounds in <Link href="/library/music">Relaxing music</Link>. {MB.breathing.followUp}
+        For a guided tone to breathe with, open the breathing sounds in <Link href="/library/music">My Music</Link>. {MB.breathing.followUp}
       </p>
     </section>
   );

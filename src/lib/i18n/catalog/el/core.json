@@ -460,7 +460,6 @@
  "Reduce or stop smoking": "Λιγότερο ή καθόλου κάπνισμα",
  "Reduce stress": "Λιγότερο άγχος",
  "Regular meals most days": "Τακτικά γεύματα τις περισσότερες ημέρες",
- "Relaxing music": "Χαλαρωτική μουσική",
  "Remove {food}": "Αφαίρεση: {food}",
  "Remove {item}": "Αφαίρεση {item}",
  "Required. A rough number from 0 to 24 is enough.": "Υποχρεωτικό. Αρκεί ένας κατά προσέγγιση αριθμός από 0 έως 24.",
@@ -709,5 +708,5 @@
  "{value} cm": "{value} εκ.",
  "{value} hours": "{value} ώρες",
  "{value} kg": "{value} κιλά",
- "Music library": "Μουσική βιβλιοθήκη"
+ "My Music": "Η μουσική μου"
 }

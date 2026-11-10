@@ -36,7 +36,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/breathe", label: "Breathe for Life" },
   { href: "/academy/move/breaks", label: "Movement breaks" },
   { href: "/academy/move/studio/chair-yoga", label: "Chair Yoga Studio" },
-  { href: "/library/music", label: "Relaxing music" },
+  { href: "/library/music", label: "My Music" },
   { href: "/library/books", label: "Books and listening" },
   { href: "/brain-quiz/games", label: "Brain games" },
   { href: "/progress/weekly", label: "Weekly check-in" },
