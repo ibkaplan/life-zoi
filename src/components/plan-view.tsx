@@ -9,6 +9,7 @@ import { GoalsEditor } from "@/components/companion/goals-editor";
 import { SaveNote } from "@/components/companion/shared";
 import { CurrentNewLife } from "@/components/movement-breaks/views";
 import { useProfile } from "@/components/companion/use-profile";
+import { usePageFormat, withLink } from "@/components/page-format";
 import { useSession } from "@/components/session-provider";
 import { planContext, planSections, SECTION_IDS, SECTION_INFO, WEEKLY_TARGETS } from "@/lib/companion/day-plan";
 import { commitCompanion } from "@/lib/companion/store";
@@ -16,22 +17,25 @@ import { GUIDANCE_MODES, type GuidanceMode } from "@/lib/companion/state";
 import { safetyFlags } from "@/lib/health-profile";
 import { LoadingState } from "@/components/sources";
 import { localISODate } from "@/lib/dates";
-import { habitDelta, improvementPlan, reassessDue } from "@/lib/improvement";
+import { msg } from "@/lib/i18n/translate";
+import { localizeBuilt } from "@/lib/page-format";
+import { habitDelta, improvementPlan, reassessDue, RETURN_TO_NOTE } from "@/lib/improvement";
 import type { ReassessDays } from "@/lib/types";
 
 const MODE_TEXT: Record<GuidanceMode, { title: string; text: string }> = {
-  daily: { title: "Daily guidance", text: "A fresh plan for each day in My Day, with times you can change." },
-  weekly: { title: "Weekly guidance", text: "A few targets for the week. You choose the days." },
-  anytime: { title: "Anytime guidance", text: "Everything is here to open whenever you like. No schedule." },
+  daily: { title: msg("Daily guidance"), text: msg("A fresh plan for each day in My Day, with times you can change.") },
+  weekly: { title: msg("Weekly guidance"), text: msg("A few targets for the week. You choose the days.") },
+  anytime: { title: msg("Anytime guidance"), text: msg("Everything is here to open whenever you like. No schedule.") },
 };
 
 function ModeChooser() {
   const { companion, sample } = useProfile();
+  const { t } = usePageFormat();
   return (
     <section className="card stack">
-      <h2>How would you like to receive your recommendations?</h2>
-      {!companion.mode ? <p>Choose one. You can change it at any time.</p> : <p className="hint">You can change this at any time.</p>}
-      <div className="lz-modes" role="group" aria-label="Guidance mode">
+      <h2>{t("How would you like to receive your recommendations?")}</h2>
+      {!companion.mode ? <p>{t("Choose one. You can change it at any time.")}</p> : <p className="hint">{t("You can change this at any time.")}</p>}
+      <div className="lz-modes" role="group" aria-label={t("Guidance mode")}>
         {GUIDANCE_MODES.map((mode) => (
           <button
             key={mode}
@@ -41,14 +45,14 @@ function ModeChooser() {
             disabled={sample}
             onClick={() => commitCompanion((state) => ({ ...state, mode, modeChosenOn: localISODate() }))}
           >
-            <strong>{MODE_TEXT[mode].title}</strong>
-            <span>{MODE_TEXT[mode].text}</span>
+            <strong>{t(MODE_TEXT[mode].title)}</strong>
+            <span>{t(MODE_TEXT[mode].text)}</span>
           </button>
         ))}
       </div>
       {companion.mode === "daily" ? (
         <Link className="btn btn-teal" href="/my-day">
-          Open today in My Day
+          {t("Open today in My Day")}
         </Link>
       ) : null}
     </section>
@@ -57,6 +61,7 @@ function ModeChooser() {
 
 function PlanSections() {
   const { companion, answers } = useProfile();
+  const { t } = usePageFormat();
   const flags = answers ? safetyFlags(answers) : null;
   const ctx = planContext(companion, flags, answers?.wellnessGoals ?? []);
   const sections = planSections(ctx);
@@ -64,16 +69,16 @@ function PlanSections() {
   const thisWeek = companion.plans.find((plan) => plan.weekStart <= localISODate() && plan.suggestions.some((item) => item.status === "accepted" || item.status === "modified"));
   return (
     <section className="stack" aria-labelledby="plan-sections">
-      <h2 id="plan-sections">Your nine areas</h2>
+      <h2 id="plan-sections">{t("Your nine areas")}</h2>
       {weekly && thisWeek ? (
         <div className="card stack">
-          <h3>This week you chose</h3>
+          <h3>{t("This week you chose")}</h3>
           <ul>
             {thisWeek.suggestions
               .filter((item) => item.status === "accepted" || item.status === "modified")
               .map((item) => (
                 <li key={item.id}>
-                  <strong>{item.area}:</strong> {item.edited || item.text}
+                  <strong>{t(item.area)}:</strong> {item.edited || t(item.text)}
                 </li>
               ))}
           </ul>
@@ -85,18 +90,21 @@ function PlanSections() {
         return (
           <details key={id} className="lz-section" data-section={id}>
             <summary>
-              <span>{info.title}</span>
+              <span>{t(info.title)}</span>
             </summary>
             <div className="lz-section-body">
               <div className="lz-hero-row">
-                <p>{info.intro}</p>
+                <p>{t(info.intro)}</p>
                 <Art name={info.art} />
               </div>
-              {weekly ? <p className="alert">This week: {WEEKLY_TARGETS[id]}</p> : null}
+              {weekly ? <p className="alert">{t("This week: {target}", { target: t(WEEKLY_TARGETS[id]) })}</p> : null}
               {id === "goals" ? <GoalsEditor /> : null}
               {id === "emotional" ? (
                 <p className="hint">
-                  These are everyday wellbeing ideas, not therapy. If you are struggling, <Link href="/emotional-wellness">Emotional Wellness</Link> lists places to get support.
+                  {withLink(
+                    t("These are everyday wellbeing ideas, not therapy. If you are struggling, {link} lists places to get support."),
+                    <Link href="/emotional-wellness">{t("Emotional Wellness")}</Link>,
+                  )}
                 </p>
               ) : null}
               {list.map((activity) => (
@@ -112,8 +120,9 @@ function PlanSections() {
 
 export function PlanView() {
   const { ready, sample, session, setReassessment } = useSession();
+  const { t } = usePageFormat();
   const [message, setMessage] = useState<string | null>(null);
-  if (!ready) return <LoadingState label="Loading your plan…" />;
+  if (!ready) return <LoadingState label={t("Loading your plan…")} />;
   const latest = session.history[0]?.answers ?? null;
   const previous = session.history[1]?.answers ?? null;
   const actions = improvementPlan(latest);
@@ -123,44 +132,58 @@ export function PlanView() {
 
   return (
     <div className="learn stack-lg">
-      <p className="kicker">My Life Improvement Plan</p>
-      <h1>Your progress matters</h1>
-      <p className="script brand-line">Make Life Better.</p>
-      <p className="lede">Every healthier choice is a step forward. A short-term change is not proof that illness was prevented, and it is not a count of years.</p>
+      <p className="kicker">{t("My Life Improvement Plan")}</p>
+      <h1>{t("Your progress matters")}</h1>
+      <p className="script brand-line">{t("Make Life Better.")}</p>
+      <p className="lede">{t("Every healthier choice is a step forward. A short-term change is not proof that illness was prevented, and it is not a count of years.")}</p>
       <SaveNote />
       {!latest ? (
         <p className="alert">
-          Your plan is general until you <Link href="/assessment">fill out your assessment</Link>. Then it follows your goals, level, food needs, and any limits you report.
+          {withLink(
+            t("Your plan is general until you {link}. Then it follows your goals, level, food needs, and any limits you report."),
+            <Link href="/assessment">{t("fill out your assessment")}</Link>,
+          )}
         </p>
       ) : null}
       <ModeChooser />
       <PlanSections />
       <section className="stack" aria-labelledby="plan-breathe">
-        <h2 id="plan-breathe">Breathe for Life</h2>
+        <h2 id="plan-breathe">{t("Breathe for Life")}</h2>
         <p>
-          Gentle breathing, nitrate-rich vegetables, and regular walks, chosen from your answers. <Link href="/breathe">Open Breathe for Life</Link> to start a session or the 30-day challenge.
+          {withLink(
+            t("Gentle breathing, nitrate-rich vegetables, and regular walks, chosen from your answers. {link} to start a session or the 30-day challenge."),
+            <Link href="/breathe">{t("Open Breathe for Life")}</Link>,
+          )}
         </p>
-        <LifeChangesPanel heading="My current life, my new life: breathing and circulation" />
+        <LifeChangesPanel heading={t("My current life, my new life: breathing and circulation")} />
       </section>
       <CurrentNewLife />
       <section className="card stack">
-        <h2>A few priorities from your assessment</h2>
-        <p>These weekly actions come from your latest answers. They are user-reported, not measured, and not hypothetical forecasts.</p>
+        <h2>{t("A few priorities from your assessment")}</h2>
+        <p>{t("These weekly actions come from your latest answers. They are user-reported, not measured, and not hypothetical forecasts.")}</p>
         <ul className="record-list">
           {actions.map((action) => (
             <li key={action.area}>
-              <strong>{action.area}</strong>
-              <p>{action.weekly}</p>
-              <p className="hint">Kind: {action.kind}</p>
+              <strong>{t(action.area)}</strong>
+              <p>{localizeBuilt(t, action.weekly, [RETURN_TO_NOTE])}</p>
+              <p className="hint">{t("Kind: {kind}", { kind: t("user-reported") })}</p>
             </li>
           ))}
         </ul>
       </section>
       <section className="card stack">
-        <h2>Reassessment</h2>
-        <p>Choose 30, 90, or 180 days. When that time has passed, compare a new assessment with the previous one. Missing the date is not a failure.</p>
-        {session.reassessDays ? <p>Reminder set for {session.reassessDays} days from {session.reassessOn || "today"}.</p> : <p>No reminder yet.</p>}
-        {due ? <p role="status">The reminder date has arrived. You can retake the assessment when you want.</p> : null}
+        <h2>{t("Reassessment")}</h2>
+        <p>{t("Choose 30, 90, or 180 days. When that time has passed, compare a new assessment with the previous one. Missing the date is not a failure.")}</p>
+        {session.reassessDays ? (
+          <p>
+            {session.reassessOn
+              ? t("Reminder set for {days} days from {date}.", { days: session.reassessDays, date: session.reassessOn })
+              : t("Reminder set for {days} days from today.", { days: session.reassessDays })}
+          </p>
+        ) : (
+          <p>{t("No reminder yet.")}</p>
+        )}
+        {due ? <p role="status">{t("The reminder date has arrived. You can retake the assessment when you want.")}</p> : null}
         <div className="actions">
           {([30, 90, 180] as ReassessDays[]).map((days) => (
             <button
@@ -169,32 +192,37 @@ export function PlanView() {
               type="button"
               onClick={() => {
                 const result = setReassessment(days);
-                setMessage(result ?? `Reminder set for ${days} days.`);
+                setMessage(result ?? t("Reminder set for {days} days.", { days }));
               }}
             >
-              Remind me in {days} days
+              {t("Remind me in {days} days", { days })}
             </button>
           ))}
         </div>
-        {message ? <p role="status">{message}</p> : null}
-        {sample ? <p className="hint">Sample data is read-only.</p> : null}
+        {message ? <p role="status">{t(message)}</p> : null}
+        {sample ? <p className="hint">{t("Sample data is read-only.")}</p> : null}
       </section>
       <section className="card stack">
-        <h2>Previous and current habits</h2>
+        <h2>{t("Previous and current habits")}</h2>
         {deltas.length === 0 ? (
-          <p>Save at least two assessments to see what changed. Until then, nothing here is estimated or hypothetical.</p>
+          <p>{t("Save at least two assessments to see what changed. Until then, nothing here is estimated or hypothetical.")}</p>
         ) : (
           <ul>
             {deltas.map((delta) => (
               <li key={delta.label}>
-                {delta.label}: “{delta.before || "blank"}” then “{delta.after || "blank"}”. Kind: {delta.kind}.
+                {t("{label}: “{before}” then “{after}”. Kind: {kind}.", {
+                  label: t(delta.label),
+                  before: delta.before ? t(delta.before) : t("blank"),
+                  after: delta.after ? t(delta.after) : t("blank"),
+                  kind: t("user-reported"),
+                })}
               </li>
             ))}
           </ul>
         )}
-        <p className="hint">Measured clinic values are not stored. Numbers you typed stay user-reported. WHAT IF? comparisons stay hypothetical on their own page.</p>
+        <p className="hint">{t("Measured clinic values are not stored. Numbers you typed stay user-reported. WHAT IF? comparisons stay hypothetical on their own page.")}</p>
       </section>
-      <Link className="btn btn-primary" href="/assessment">Update the assessment</Link>
+      <Link className="btn btn-primary" href="/assessment">{t("Update the assessment")}</Link>
     </div>
   );
 }

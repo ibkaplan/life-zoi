@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useState, useSyncExternalStore, type FormEvent } from "react";
+import { useLocale } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 import { adapterStatusLabel } from "@/lib/wellness-assistant/adapter";
 import {
   MODEL_NOT_CONFIGURED,
@@ -18,15 +20,18 @@ import {
 import type { PreparedPointer, WellnessChatBody, WellnessUsageSnapshot } from "@/lib/wellness-assistant/model/types";
 
 const SOURCE_LABEL: Record<string, string> = {
-  model: "Wellness model",
-  prepared: "Prepared answer",
-  quota: "Prepared answer",
-  unavailable: "Prepared answer",
-  safety: "Safety notice",
-  withheld: "Reply withheld",
+  model: msg("Wellness model"),
+  prepared: msg("Prepared answer"),
+  quota: msg("Prepared answer"),
+  unavailable: msg("Prepared answer"),
+  safety: msg("Safety notice"),
+  withheld: msg("Reply withheld"),
 };
 
+const COUNT_FAILED = msg("This browser session could not be counted. Refresh the page and try again.");
+
 export function WellnessLivePanel({ onOpenQuestion }: { onOpenQuestion: (id: string) => void }) {
+  const { t, locale } = useLocale();
   const fieldId = useId();
   const turns = useSyncExternalStore(subscribeLive, getLiveTurns, getLiveServerTurns);
   const [draft, setDraft] = useState("");
@@ -55,7 +60,7 @@ export function WellnessLivePanel({ onOpenQuestion }: { onOpenQuestion: (id: str
     if (!content || busy) return;
     const meterKey = loadWellnessMeter(window.sessionStorage);
     if (!meterKey) {
-      setNotice("This browser session could not be counted. Refresh the page and try again.");
+      setNotice(COUNT_FAILED);
       return;
     }
     const userTurn: LiveTurn = { id: crypto.randomUUID(), role: "user", content };
@@ -70,6 +75,7 @@ export function WellnessLivePanel({ onOpenQuestion }: { onOpenQuestion: (id: str
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           meterKey,
+          language: locale,
           messages: history.map((turn) => ({ role: turn.role, content: turn.content })),
         }),
       });
@@ -96,61 +102,64 @@ export function WellnessLivePanel({ onOpenQuestion }: { onOpenQuestion: (id: str
 
   return (
     <section className="wellness-live" aria-labelledby="ask-wellness-title">
-      <h2 id="ask-wellness-title">Ask in your own words</h2>
-      <p className="wellness-source">{notice}</p>
+      <h2 id="ask-wellness-title">{t("Ask in your own words")}</h2>
+      <p className="wellness-source">{t(notice)}</p>
       <p className="wellness-emergency" role="note">
-        {WELLNESS_ASSISTANT_EMERGENCY}
+        {t(WELLNESS_ASSISTANT_EMERGENCY)}
       </p>
       {turns.length > 0 ? (
         <div className="wellness-thread" aria-live="polite">
           {turns.map((turn) => (
             <div key={turn.id} className={`wellness-bubble ${turn.role}`}>
               {turn.role === "assistant" && turn.source ? (
-                <span className="wellness-kicker">{SOURCE_LABEL[turn.source] ?? "Reply"}</span>
+                <span className="wellness-kicker">{t(SOURCE_LABEL[turn.source] ?? "Reply")}</span>
               ) : null}
-              {turn.content}
+              {turn.role === "assistant" && turn.source !== "model" ? t(turn.content) : turn.content}
             </div>
           ))}
         </div>
       ) : null}
       {suggestion ? (
         <p className="wellness-suggestion" role="status">
-          <span className="wellness-kicker">A simple step from this conversation</span>
-          {suggestion}
+          <span className="wellness-kicker">{t("A simple step from this conversation")}</span>
+          {t(suggestion)}
         </p>
       ) : null}
       {usage ? (
         <p className="wellness-source">
-          {usage.sessionUsed} of {usage.sessionDailyLimit} model replies in this session today.
+          {t("{used} of {limit} model replies in this session today.", {
+            used: usage.sessionUsed,
+            limit: usage.sessionDailyLimit,
+          })}
         </p>
       ) : null}
       <form className="wellness-search" onSubmit={send}>
-        <label htmlFor={fieldId}>{turns.length > 0 ? "Follow-up" : "Your question"}</label>
+        <label htmlFor={fieldId}>{turns.length > 0 ? t("Follow-up") : t("Your question")}</label>
         <textarea
           id={fieldId}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           maxLength={800}
           rows={3}
-          placeholder={turns.length > 0 ? "Ask a follow-up about what you already said" : "Ask a general wellness question"}
+          placeholder={turns.length > 0 ? t("Ask a follow-up about what you already said") : t("Ask a general wellness question")}
           autoComplete="off"
         />
         <button className="btn assistant-send" type="submit" disabled={busy || !draft.trim()}>
-          {busy ? "Thinking…" : turns.length > 0 ? "Send follow-up" : "Ask"}
+          {busy ? t("Thinking…") : turns.length > 0 ? t("Send follow-up") : t("Ask")}
         </button>
       </form>
       {preparedId ? (
         <button className="btn btn-secondary" type="button" onClick={() => onOpenQuestion(preparedId)}>
-          Open the matching prepared answer
+          {t("Open the matching prepared answer")}
         </button>
       ) : null}
       {related.length > 0 ? (
         <div className="stack">
-          <h3>Prepared questions you can still open</h3>
+          <h3>{t("Prepared questions you can still open")}</h3>
           <div className="wellness-questions">
             {related.map((item) => (
               <button key={item.id} type="button" onClick={() => onOpenQuestion(item.id)}>
-                {item.question}
+                {t(item.question)}
               </button>
             ))}
           </div>

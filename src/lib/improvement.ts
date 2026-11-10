@@ -1,4 +1,9 @@
+import { fmt } from "@/lib/i18n/config";
+import { msg } from "@/lib/i18n/translate";
 import type { Assessment, ReassessDays } from "@/lib/types";
+
+/** The personal-goals action that repeats the person's own note. */
+export const RETURN_TO_NOTE = msg("Return to your note: {note}");
 import { personalProfile } from "@/lib/outlook";
 import { validateComplete } from "@/lib/validation";
 
@@ -10,43 +15,43 @@ export type PlanAction = {
 
 const ACTIONS: Record<string, PlanAction> = {
   "Vegetables or fruit": {
-    area: "Nutrition",
-    weekly: "Add one vegetable or fruit you already like, on three days.",
+    area: msg("Nutrition"),
+    weekly: msg("Add one vegetable or fruit you already like, on three days."),
     kind: "user-reported",
   },
   Fiber: {
-    area: "Nutrition",
-    weekly: "Add one small fiber food and the fluids you are allowed.",
+    area: msg("Nutrition"),
+    weekly: msg("Add one small fiber food and the fluids you are allowed."),
     kind: "user-reported",
   },
   Movement: {
-    area: "Movement",
-    weekly: "Take two short walks or chair breaks. No fixed distance.",
+    area: msg("Movement"),
+    weekly: msg("Take two short walks or chair breaks. No fixed distance."),
     kind: "user-reported",
   },
   Sleep: {
-    area: "Sleep",
-    weekly: "Keep one wind-down cue on four evenings.",
+    area: msg("Sleep"),
+    weekly: msg("Keep one wind-down cue on four evenings."),
     kind: "user-reported",
   },
   Stress: {
-    area: "Stress",
-    weekly: "Try one calm practice for a few minutes on three days.",
+    area: msg("Stress"),
+    weekly: msg("Try one calm practice for a few minutes on three days."),
     kind: "user-reported",
   },
   "Social connection": {
-    area: "Social connection",
-    weekly: "Send one message or share one meal.",
+    area: msg("Social connection"),
+    weekly: msg("Send one message or share one meal."),
     kind: "user-reported",
   },
   Tobacco: {
-    area: "Healthy aging",
-    weekly: "Open a free public quit page once, or write the cue that shows up.",
+    area: msg("Healthy aging"),
+    weekly: msg("Open a free public quit page once, or write the cue that shows up."),
     kind: "user-reported",
   },
   Alcohol: {
-    area: "Healthy aging",
-    weekly: "Choose one occasion to drink less or skip it.",
+    area: msg("Healthy aging"),
+    weekly: msg("Choose one occasion to drink less or skip it."),
     kind: "user-reported",
   },
 };
@@ -59,15 +64,15 @@ export function improvementPlan(assessment: Assessment | null): PlanAction[] {
     .filter((item): item is PlanAction => Boolean(item))
     .slice(0, 4);
   const outdoors: PlanAction = {
-    area: "Outdoors",
-    weekly: "Spend a few minutes at a window, bench, balcony, or outside. Rest counts.",
+    area: msg("Outdoors"),
+    weekly: msg("Spend a few minutes at a window, bench, balcony, or outside. Rest counts."),
     kind: "user-reported",
   };
   const goals: PlanAction = {
-    area: "Personal goals",
+    area: msg("Personal goals"),
     weekly: assessment?.habitNote
-      ? `Return to your note: ${assessment.habitNote}`
-      : "Write one thing you want this season to make easier.",
+      ? fmt(RETURN_TO_NOTE, { note: assessment.habitNote })
+      : msg("Write one thing you want this season to make easier."),
     kind: "user-reported",
   };
   return [...chosen, outdoors, goals].slice(0, 6);
@@ -76,13 +81,13 @@ export function improvementPlan(assessment: Assessment | null): PlanAction[] {
 export function habitDelta(current: Assessment, previous: Assessment | null) {
   if (!previous) return [];
   const fields: { label: string; before: string; after: string; kind: "user-reported" }[] = [
-    { label: "Sleep hours", before: previous.sleepHours, after: current.sleepHours, kind: "user-reported" },
-    { label: "Activity days", before: previous.activityDays, after: current.activityDays, kind: "user-reported" },
-    { label: "Vegetables or fruit", before: previous.vegetables, after: current.vegetables, kind: "user-reported" },
-    { label: "Stress", before: previous.stress, after: current.stress, kind: "user-reported" },
-    { label: "Tobacco", before: previous.smoking, after: current.smoking, kind: "user-reported" },
+    { label: msg("Sleep hours"), before: previous.sleepHours, after: current.sleepHours, kind: "user-reported" },
+    { label: msg("Activity days"), before: previous.activityDays, after: current.activityDays, kind: "user-reported" },
+    { label: msg("Vegetables or fruit"), before: previous.vegetables, after: current.vegetables, kind: "user-reported" },
+    { label: msg("Stress"), before: previous.stress, after: current.stress, kind: "user-reported" },
+    { label: msg("Tobacco"), before: previous.smoking, after: current.smoking, kind: "user-reported" },
     {
-      label: "Blood pressure text",
+      label: msg("Blood pressure text"),
       before: previous.bloodPressure,
       after: current.bloodPressure,
       kind: "user-reported",

@@ -3,9 +3,14 @@
  * Drawn for this page. They are not stock images.
  */
 
+"use client";
+
+import { useT } from "@/components/locale-provider";
+
 export function CareShareArt() {
+  const t = useT();
   return (
-    <svg viewBox="0 0 640 420" role="img" aria-label="Two people sit together beside a small sprouting plant.">
+    <svg viewBox="0 0 640 420" role="img" aria-label={t("Two people sit together beside a small sprouting plant.")}>
       <defs>
         <linearGradient id="care-sky" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#EFE5FA" />
@@ -40,8 +45,9 @@ export function CareShareArt() {
 }
 
 export function CareWelcomeArt() {
+  const t = useT();
   return (
-    <svg viewBox="0 0 640 360" role="img" aria-label="A quiet path leads toward a soft sunrise.">
+    <svg viewBox="0 0 640 360" role="img" aria-label={t("A quiet path leads toward a soft sunrise.")}>
       <defs>
         <linearGradient id="welcome-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#F3ECFB" />

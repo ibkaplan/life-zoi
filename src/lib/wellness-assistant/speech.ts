@@ -54,6 +54,36 @@ export function englishVoiceServerSnapshot(): VoiceChoice[] {
   return noEnglishVoices;
 }
 
+/** Speech tags used to read answers aloud and to listen, by interface language. */
+export const SPEECH_LANG: Record<string, string> = { en: "en-US", uk: "uk-UA", ru: "ru-RU", el: "el-GR" };
+
+/** Voices whose language matches `lang`, such as "uk" for Ukrainian voices. */
+export function voicesForLanguage(voices: VoiceChoice[], lang: string): VoiceChoice[] {
+  const base = lang.trim().toLowerCase().split(/[-_]/)[0];
+  if (base === "en") return englishVoices(voices);
+  return voices.filter((voice) => voice.lang.trim().toLowerCase().split(/[-_]/)[0] === base);
+}
+
+const voiceCaches = new Map<string, { key: string; voices: VoiceChoice[] }>();
+
+/** A stable snapshot of the browser's voices for one language, for `useSyncExternalStore`. */
+export function languageVoiceSnapshot(lang: string): () => VoiceChoice[] {
+  if (lang === "en") return englishVoiceSnapshot;
+  return () => {
+    if (!speechPlaybackSupported()) return noEnglishVoices;
+    const next = voicesForLanguage(
+      window.speechSynthesis.getVoices().map((voice) => ({ name: voice.name, lang: voice.lang })),
+      lang,
+    );
+    const key = next.map((voice) => `${voice.lang}:${voice.name}`).join("|");
+    const cached = voiceCaches.get(lang);
+    if (cached && cached.key === key) return cached.voices;
+    const voices = next.length === 0 ? noEnglishVoices : next;
+    voiceCaches.set(lang, { key, voices });
+    return voices;
+  };
+}
+
 export function speechSupportSnapshot(): boolean | null {
   return speechPlaybackSupported();
 }

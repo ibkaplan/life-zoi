@@ -8,6 +8,8 @@ export type WellnessTurn = {
 export type WellnessModelRequest = {
   messages: WellnessTurn[];
   maxOutputTokens: number;
+  /** The visitor's interface language. The reply is written in it. English when left out. */
+  language?: "en" | "uk" | "ru" | "el";
 };
 
 export type WellnessModelSuccess = {

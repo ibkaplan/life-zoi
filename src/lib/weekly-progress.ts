@@ -1,4 +1,6 @@
 import { addIsoDays, daysBetween, formatLongDate, isRealISODate, mondayOf } from "@/lib/dates";
+import { msg } from "@/lib/i18n/translate";
+import { englishT, type Translate } from "@/lib/page-format";
 import {
   WEEKLY_ACCOMPLISHMENT_IDS,
   type EnergyLevel,
@@ -15,18 +17,18 @@ export const ENERGY_CHOICES: { level: EnergyLevel; face: string }[] = [
 ];
 
 export const WEEKLY_ACCOMPLISHMENTS: { id: WeeklyAccomplishmentId; label: string }[] = [
-  { id: "movement", label: "I completed my movement lessons." },
-  { id: "food", label: "I made healthier food choices." },
-  { id: "water", label: "I drank enough water." },
-  { id: "sleep", label: "I worked on my sleep." },
-  { id: "relax", label: "I made time to relax." },
+  { id: "movement", label: msg("I completed my movement lessons.") },
+  { id: "food", label: msg("I made healthier food choices.") },
+  { id: "water", label: msg("I drank enough water.") },
+  { id: "sleep", label: msg("I worked on my sleep.") },
+  { id: "relax", label: msg("I made time to relax.") },
 ];
 
 export const JOURNEY_STEPS = [
-  { id: "start", label: "Starting Point", minDays: 0 },
-  { id: "week", label: "First Week", minDays: 7 },
-  { id: "month", label: "30-Day Progress", minDays: 30 },
-  { id: "reflect", label: "90-Day Reflection", minDays: 90 },
+  { id: "start", label: msg("Starting Point"), minDays: 0 },
+  { id: "week", label: msg("First Week"), minDays: 7 },
+  { id: "month", label: msg("30-Day Progress"), minDays: 30 },
+  { id: "reflect", label: msg("90-Day Reflection"), minDays: 90 },
 ] as const;
 
 const MOVEMENT_KIND = /walk|movement|exercise|activity|strength|stretch|balance|cardio|lesson|yoga|chair|mobility/i;
@@ -49,8 +51,8 @@ export function weekRange(isoDate: string): { start: string; end: string } | nul
   return { start, end };
 }
 
-export function formatWeekRange(start: string, end: string): string {
-  return `${formatLongDate(start)} – ${formatLongDate(end)}`;
+export function formatWeekRange(start: string, end: string, date: (iso: string) => string = formatLongDate): string {
+  return `${date(start)} – ${date(end)}`;
 }
 
 export function energyFace(level: EnergyLevel | null): string | null {
@@ -160,26 +162,34 @@ export function formatWeightValue(value: number): string {
 
 export function describeWeightTrend(
   entries: readonly { date: string; value: number; unit: WeightUnit }[],
+  t: Translate = englishT,
+  date: (iso: string) => string = formatLongDate,
 ): string | null {
   const real = entries.filter((entry) => isRealISODate(entry.date) && Number.isFinite(entry.value));
   if (real.length === 0) return null;
   const sorted = [...real].sort((a, b) => a.date.localeCompare(b.date));
   if (sorted.length === 1) {
-    return "One measurement is saved. Two or more are needed before a change over time can be shown.";
+    return t("One measurement is saved. Two or more are needed before a change over time can be shown.");
   }
   const unit = sorted[sorted.length - 1]?.unit;
   const same = sorted.filter((entry) => entry.unit === unit);
   if (!unit || same.length < 2) {
-    return "Measurements use more than one unit. A change over time is shown only when at least two use the same unit.";
+    return t("Measurements use more than one unit. A change over time is shown only when at least two use the same unit.");
   }
   const first = same[0];
   const last = same[same.length - 1];
   if (!first || !last) return null;
   if (first.date === last.date) {
-    return `Two ${unit} measurements are saved on ${formatLongDate(first.date)}.`;
+    return t("Two {unit} measurements are saved on {date}.", { unit: t(unit), date: date(first.date) });
   }
   if (first.value === last.value) {
-    return `The earliest and latest ${unit} numbers you entered are the same.`;
+    return t("The earliest and latest {unit} numbers you entered are the same.", { unit: t(unit) });
   }
-  return `From ${formatLongDate(first.date)} to ${formatLongDate(last.date)}, the ${unit} numbers you entered are ${formatWeightValue(first.value)} and ${formatWeightValue(last.value)}.`;
+  return t("From {start} to {end}, the {unit} numbers you entered are {first} and {last}.", {
+    start: date(first.date),
+    end: date(last.date),
+    unit: t(unit),
+    first: formatWeightValue(first.value),
+    last: formatWeightValue(last.value),
+  });
 }
