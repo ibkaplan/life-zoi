@@ -7,6 +7,8 @@ import { commitCompanion } from "@/lib/companion/store";
 import { FITNESS_LEVELS, EXPERIENCE, type ActivityKind, type FitnessLevel, type Experience } from "@/lib/companion/state";
 import { DURATION_OPTIONS, HOME_CHOICES, INDOOR_CHOICES, recommend } from "@/lib/wellness-library/discover";
 import { CATEGORY_INFO, type LibraryCategory } from "@/lib/wellness-library/moves";
+import { useT } from "@/components/locale-provider";
+import { msg } from "@/lib/i18n/translate";
 
 const KIND_FOR: Partial<Record<LibraryCategory, ActivityKind>> = {
   pilates: "pilates",
@@ -54,14 +56,15 @@ export function MovementFinder({
   const [minutes, setMinutes] = useState<number>(companion.movement.minutes);
   const [harder, setHarder] = useState(false);
   const [open, setOpen] = useState(false);
-  if (!ready) return <p className="hint">Loading…</p>;
+  const t = useT();
+  if (!ready) return <p className="hint">{t("Loading…")}</p>;
   const rec = recommend({ category, minutes, harder }, mover);
   const main = rec.main;
   return (
     <div className="stack">
-      {heading ? <h3>{heading}</h3> : null}
-      {intro ? <p>{intro}</p> : null}
-      <div className="lz-tabs" role="group" aria-label="Activity">
+      {heading ? <h3>{t(heading)}</h3> : null}
+      {intro ? <p>{t(intro)}</p> : null}
+      <div className="lz-tabs" role="group" aria-label={t("Activity")}>
         {choices.map((value) => (
           <button
             key={value}
@@ -73,32 +76,32 @@ export function MovementFinder({
               setOpen(false);
             }}
           >
-            {CATEGORY_INFO[value].title}
+            {t(CATEGORY_INFO[value].title)}
           </button>
         ))}
       </div>
-      <div className="lz-tabs" role="group" aria-label="How many minutes">
+      <div className="lz-tabs" role="group" aria-label={t("How many minutes")}>
         {DURATION_OPTIONS.map((value) => (
           <button key={value} type="button" className="lz-tab" aria-pressed={value === minutes} onClick={() => setMinutes(value)}>
-            {value} min
+            {t("{minutes} min", { minutes: value })}
           </button>
         ))}
       </div>
       <label className="check-row">
         <input type="checkbox" checked={harder} onChange={(event) => setHarder(event.target.checked)} />
-        <span>Make it a bit more challenging today</span>
+        <span>{t("Make it a bit more challenging today")}</span>
       </label>
       {!open ? (
         <button className="btn btn-primary" type="button" onClick={() => setOpen(true)}>
-          Show my {minutes}-minute {CATEGORY_INFO[category].title.toLowerCase()} session
+          {t("Show my {minutes}-minute {activity} session", { minutes, activity: t(CATEGORY_INFO[category].title).toLowerCase() })}
         </button>
       ) : (
         <div className="lz-card">
-          <h3>{rec.headline}</h3>
+          <h3>{t(rec.headline)}</h3>
           {rec.notes.length > 0 ? (
             <ul className="hint">
               {rec.notes.map((note) => (
-                <li key={note}>{note}</li>
+                <li key={note}>{t(note)}</li>
               ))}
             </ul>
           ) : null}
@@ -107,7 +110,7 @@ export function MovementFinder({
               <p>
                 <strong>{main.video.title}</strong>
               </p>
-              <p>{main.video.description}</p>
+              <p>{t(main.video.description)}</p>
               <VideoPlayer video={main.video} />
               <RatingControl id={`video:${main.video.id}`} />
               <FavoriteButton id={`video:${main.video.id}`} label="this video" />
@@ -115,7 +118,7 @@ export function MovementFinder({
           ) : (
             <>
               <p>
-                <strong>{main.session.title}</strong> · {main.session.sourceName}
+                <strong>{t(main.session.title)}</strong> · {t(main.session.sourceName)}
               </p>
               <SessionPlayer session={main.session} />
               <FavoriteButton id={`session:${category}:${minutes}`} label="this session" />
@@ -128,23 +131,23 @@ export function MovementFinder({
               counts={(status) => ({ exerciseMinutes: status === "done" ? minutes : status === "partial" ? Math.round(minutes / 2) : 0 })}
             />
           ) : (
-            <p className="hint">Sample data is on, so nothing is recorded.</p>
+            <p className="hint">{t("Sample data is on, so nothing is recorded.")}</p>
           )}
           {rec.alternatives.length > 0 ? (
             <details>
-              <summary>Alternative sessions ({rec.alternatives.length})</summary>
+              <summary>{t("Alternative sessions ({count})", { count: rec.alternatives.length })}</summary>
               <div className="stack">
                 {rec.alternatives.map((alt) =>
                   alt.kind === "video" ? (
                     <div key={alt.video.id} className="lz-card">
                       <strong>{alt.video.title}</strong>
-                      <p className="hint">{alt.note}</p>
+                      <p className="hint">{t(alt.note)}</p>
                       <VideoPlayer video={alt.video} />
                     </div>
                   ) : (
                     <div key={alt.session.id} className="lz-card">
-                      <strong>{alt.session.title}</strong>
-                      <p className="hint">{alt.note}</p>
+                      <strong>{t(alt.session.title)}</strong>
+                      <p className="hint">{t(alt.note)}</p>
                       <SessionPlayer session={alt.session} />
                     </div>
                   ),
@@ -177,24 +180,26 @@ const ENJOY_CHOICES: ActivityKind[] = [
   "gardening",
 ];
 
+const LEVEL_LABEL: Record<FitnessLevel, string> = { beginner: msg("Beginner"), intermediate: msg("Intermediate"), advanced: msg("Advanced") };
+
 const KIND_LABEL: Record<ActivityKind, string> = {
-  walking: "Walking",
-  pilates: "Pilates",
-  yoga: "Yoga",
-  "chair-yoga": "Chair yoga",
-  "chair-exercises": "Chair exercises",
-  "tai-chi": "Tai chi",
-  qigong: "Qigong",
-  dancing: "Dancing",
-  aerobics: "Aerobics",
-  "home-cardio": "Home cardio",
-  stretching: "Stretching",
-  strength: "Strength training",
-  balance: "Balance exercises",
-  breathing: "Breathing exercises",
-  relaxation: "Relaxation",
-  meditation: "Meditation",
-  gardening: "Gardening",
+  walking: msg("Walking"),
+  pilates: msg("Pilates"),
+  yoga: msg("Yoga"),
+  "chair-yoga": msg("Chair yoga"),
+  "chair-exercises": msg("Chair exercises"),
+  "tai-chi": msg("Tai chi"),
+  qigong: msg("Qigong"),
+  dancing: msg("Dancing"),
+  aerobics: msg("Aerobics"),
+  "home-cardio": msg("Home cardio"),
+  stretching: msg("Stretching"),
+  strength: msg("Strength training"),
+  balance: msg("Balance exercises"),
+  breathing: msg("Breathing exercises"),
+  relaxation: msg("Relaxation"),
+  meditation: msg("Meditation"),
+  gardening: msg("Gardening"),
 };
 
 export function activityLabel(kind: ActivityKind): string {
@@ -205,18 +210,19 @@ export function activityLabel(kind: ActivityKind): string {
 export function MovementPreferences() {
   const { companion, sample } = useProfile();
   const prefs = companion.movement;
+  const t = useT();
   function save(patch: Partial<typeof prefs>) {
     commitCompanion((state) => ({ ...state, movement: { ...state.movement, ...patch } }));
   }
   return (
     <details className="lz-section">
       <summary>
-        <span>My movement preferences</span>
+        <span>{t("My movement preferences")}</span>
       </summary>
       <div className="lz-section-body">
-        {sample ? <p className="hint">Sample data is on. Preferences are not saved.</p> : null}
+        {sample ? <p className="hint">{t("Sample data is on. Preferences are not saved.")}</p> : null}
         <fieldset className="field">
-          <legend>Which activities do you enjoy?</legend>
+          <legend>{t("Which activities do you enjoy?")}</legend>
           <div className="check-grid">
             {ENJOY_CHOICES.map((kind) => (
               <label key={kind} className="check-row">
@@ -230,13 +236,13 @@ export function MovementPreferences() {
                     })
                   }
                 />
-                <span>{KIND_LABEL[kind]}</span>
+                <span>{t(KIND_LABEL[kind])}</span>
               </label>
             ))}
           </div>
         </fieldset>
         <fieldset className="field">
-          <legend>Anything you would rather not do?</legend>
+          <legend>{t("Anything you would rather not do?")}</legend>
           <div className="check-grid">
             {ENJOY_CHOICES.map((kind) => (
               <label key={kind} className="check-row">
@@ -250,47 +256,47 @@ export function MovementPreferences() {
                     })
                   }
                 />
-                <span>{KIND_LABEL[kind]}</span>
+                <span>{t(KIND_LABEL[kind])}</span>
               </label>
             ))}
           </div>
         </fieldset>
         <label className="field">
-          <span>Your current fitness level</span>
-          <span className="hint">LifeZoi uses this, your experience, and any limits you reported. Age alone never sets the level.</span>
+          <span>{t("Your current fitness level")}</span>
+          <span className="hint">{t("LifeZoi uses this, your experience, and any limits you reported. Age alone never sets the level.")}</span>
           <select value={prefs.level} onChange={(event) => save({ level: event.target.value as FitnessLevel | "" })}>
-            <option value="">Not sure</option>
+            <option value="">{t("Not sure")}</option>
             {FITNESS_LEVELS.map((level) => (
               <option key={level} value={level}>
-                {level[0]?.toUpperCase() + level.slice(1)}
+                {t(LEVEL_LABEL[level])}
               </option>
             ))}
           </select>
         </label>
         <label className="field">
-          <span>Exercise experience</span>
+          <span>{t("Exercise experience")}</span>
           <select value={prefs.experience} onChange={(event) => save({ experience: event.target.value as Experience | "" })}>
-            <option value="">Not sure</option>
+            <option value="">{t("Not sure")}</option>
             {EXPERIENCE.map((value) => (
               <option key={value} value={value}>
-                {value === "new" ? "New to exercise" : value === "some" ? "Some experience" : "I exercise regularly"}
+                {value === "new" ? t("New to exercise") : value === "some" ? t("Some experience") : t("I exercise regularly")}
               </option>
             ))}
           </select>
         </label>
         <label className="field">
-          <span>Usual session length</span>
+          <span>{t("Usual session length")}</span>
           <select value={prefs.minutes} onChange={(event) => save({ minutes: Number(event.target.value) as typeof prefs.minutes })}>
             {DURATION_OPTIONS.map((value) => (
               <option key={value} value={value}>
-                {value} minutes
+                {t("{minutes} minutes", { minutes: value })}
               </option>
             ))}
           </select>
         </label>
         <label className="check-row">
           <input type="checkbox" checked={prefs.wantsChallenge} onChange={(event) => save({ wantsChallenge: event.target.checked })} />
-          <span>I would like my sessions to be more challenging</span>
+          <span>{t("I would like my sessions to be more challenging")}</span>
         </label>
       </div>
     </details>
@@ -299,10 +305,11 @@ export function MovementPreferences() {
 
 /** Shown when the person says no to an outdoor walk. */
 export function IndoorAlternative({ activityId }: { activityId: string }) {
+  const t = useT();
   return (
-    <div className="lz-card" role="region" aria-label="Indoor alternatives">
-      <h3>No problem! Let&apos;s exercise at home today.</h3>
-      <p>What type of activity would you enjoy? Choose one and how long you have.</p>
+    <div className="lz-card" role="region" aria-label={t("Indoor alternatives")}>
+      <h3>{t("No problem! Let's exercise at home today.")}</h3>
+      <p>{t("What type of activity would you enjoy? Choose one and how long you have.")}</p>
       <MovementFinder activityId={activityId} choices={[...INDOOR_CHOICES, "tai-chi", "qigong", "breathing"]} compact />
     </div>
   );

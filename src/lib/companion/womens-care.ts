@@ -94,7 +94,7 @@ type Focus = {
   tags?: Recipe["tags"];
 };
 
-const FOCUS: Record<FocusId, Focus> = {
+export const FOCUS: Record<FocusId, Focus> = {
   iron: {
     label: "Iron-rich foods",
     why: "Some iron is lost with menstrual blood. Iron-rich foods help you get enough from what you eat.",
