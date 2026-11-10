@@ -1,0 +1,245 @@
+/*
+ * Lifestyle assessment (questionnaire) controls.
+ * Every answer area is visible before it is touched, labels sit above fields,
+ * and selected cards show purple with a check mark. Sized for comfortable
+ * reading and tapping by people aged 50 and over.
+ */
+.qz {
+  /* Lavender-purple border: 4.2:1 against white, above the 3:1 needed for a control outline. */
+  --qz-border: #9466cc;
+  --qz-selected-bg: #ebdff9;
+  --qz-placeholder: #5b6690;
+}
+
+.qz-form { padding: clamp(1.1rem, 3.5vw, 2rem); gap: 1.5rem; }
+
+.qz-instructions {
+  background: var(--sky);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.qz-body { border: 0; padding: 0; margin: 0; min-width: 0; gap: 2rem; }
+
+.qz-field { display: grid; gap: 0.5rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+
+.qz-label {
+  display: block;
+  padding: 0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+/* Floated so the question sits inside the box like other content, also when the group is highlighted. */
+.qz-group > legend { float: left; width: 100%; }
+
+.qz-hint { color: var(--muted); font-size: 1.05rem; line-height: 1.5; }
+
+/* Typing boxes */
+.qz-input-wrap { position: relative; display: flex; align-items: center; }
+
+.qz .qz-input,
+.qz .qz-select {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: var(--ink);
+  background: #ffffff;
+  border: 2px solid var(--qz-border);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 3px rgba(23, 37, 84, 0.08);
+  caret-color: var(--royal);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.qz .qz-input-wrap:has(.qz-unit) .qz-input { padding-right: 6.25rem; }
+.qz-input::placeholder { color: var(--qz-placeholder); opacity: 1; }
+.qz .qz-input:hover { border-color: var(--royal); }
+.qz .qz-input:focus,
+.qz .qz-input:focus-visible {
+  outline: none;
+  border-color: var(--royal);
+  box-shadow: 0 0 0 4px rgba(106, 61, 168, 0.28);
+}
+.qz .qz-textarea { min-height: 8rem; resize: vertical; }
+
+.qz-unit {
+  position: absolute;
+  right: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  background: var(--sky);
+  color: var(--deep);
+  font-weight: 700;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Choice cards (one answer) and check cards (several answers) */
+.qz-options {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+}
+
+.qz-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 3.75rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border: 2px solid var(--qz-border);
+  border-radius: 14px;
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.qz-option:hover { border-color: var(--royal); background: #faf6fe; }
+
+/* The real radio or checkbox stays in the page for keyboards and screen readers. */
+.qz-option-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.qz-option:has(.qz-option-input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+.qz-option-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  background: #ffffff;
+  border: 2px solid var(--qz-border);
+  border-radius: 50%;
+  color: #ffffff;
+}
+.qz-option-checkbox .qz-option-box { border-radius: 7px; }
+.qz-option-text { flex: 1; font-weight: 600; }
+.qz-option-state { font-size: 0.95rem; font-weight: 700; color: var(--deep); }
+
+.qz-option.is-selected {
+  background: var(--qz-selected-bg);
+  border-color: var(--royal);
+  box-shadow: inset 0 0 0 1px var(--royal);
+}
+.qz-option.is-selected .qz-option-box { background: var(--royal); border-color: var(--royal); }
+
+.qz-body:disabled .qz-option,
+.qz-body:disabled .qz-input { cursor: not-allowed; opacity: 0.75; }
+
+/* Errors */
+.qz-error {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  color: var(--danger);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.qz-error-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #ffffff;
+  font-size: 1rem;
+}
+.qz .qz-invalid .qz-input { border-color: var(--danger); background: #fffafa; }
+.qz .qz-invalid .qz-input:focus { box-shadow: 0 0 0 4px rgba(138, 47, 40, 0.22); }
+.qz-group.qz-invalid {
+  padding: 0.9rem;
+  border: 2px solid var(--danger);
+  border-radius: 14px;
+  background: var(--danger-bg);
+}
+
+.qz-summary {
+  border: 2px solid var(--danger);
+  background: var(--danger-bg);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  color: var(--danger);
+}
+.qz-summary-title { font-weight: 700; font-size: 1.15rem; }
+.qz-summary ul { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+.qz-summary-link {
+  min-height: 44px;
+  padding: 0.35rem 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--danger);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Food reactions */
+.qz-reaction { display: grid; gap: 0.75rem; }
+.qz-sublabel { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+.qz-add,
+.qz-skip {
+  min-height: 3.25rem;
+  padding: 0.6rem 1.25rem;
+  border: 2px solid var(--qz-border);
+  font-size: 1.1rem;
+  color: var(--deep);
+}
+.qz-skip { justify-self: start; }
+.qz .chip-remove { width: 2.5rem; height: 2.5rem; }
+
+/* Back, Continue, Save answers */
+.qz-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.qz-nav-btn {
+  min-height: 3.5rem;
+  min-width: 10rem;
+  padding: 0.7rem 1.6rem;
+  font-size: 1.2rem;
+  border-width: 2px;
+}
+.qz-nav .btn-secondary { border-color: var(--qz-border); color: var(--deep); }
+.qz-nav-next { margin-left: auto; }
+
+.qz .review-list .btn { min-height: 44px; margin-top: 0.3rem; border: 2px solid var(--qz-border); color: var(--deep); }
+
+@media (min-width: 640px) {
+  .qz-reaction { grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr) auto; align-items: end; }
+}
+
+@media (max-width: 520px) {
+  .qz-nav { flex-direction: column-reverse; }
+  .qz-nav-btn { width: 100%; }
+  .qz-nav-next { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qz-input, .qz-option { transition: none; }
+}

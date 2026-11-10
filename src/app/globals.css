@@ -397,7 +397,7 @@ a { color: var(--forest); }
 .hint { color: var(--muted); font-size: 0.98rem; }
 .field-error { color: var(--danger); font-weight: 650; }
 
-input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="password"], textarea, select {
+input:not([type]), input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="password"], textarea, select {
   width: 100%;
   min-height: 48px;
   border-radius: 12px;
