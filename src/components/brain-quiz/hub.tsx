@@ -13,12 +13,14 @@ import {
   QUIZ_TITLE,
   type Difficulty,
 } from "@/lib/brain-quiz/progress";
+import { useT } from "@/components/locale-provider";
 import { RebusArt } from "@/components/brain-quiz/rebus-art";
 import { useBrainProgress } from "@/components/brain-quiz/use-brain-progress";
 
 const LEVELS: Difficulty[] = ["easy", "medium", "hard"];
 
 export function BrainQuizHub() {
+  const t = useT();
   const { progress, storageNote, ready } = useBrainProgress();
   const [level, setLevel] = useState<Difficulty>("easy");
   const today = ready ? localISODate() : "2026-11-06";
@@ -38,6 +40,7 @@ export function BrainQuizHub() {
           <Link className="btn btn-primary" href="/brain-quiz/daily">START DAILY CHALLENGE</Link>
           <Link className="btn btn-secondary" href="/brain-quiz/journey">My Brain Journey</Link>
           <Link className="btn btn-secondary" href="/brain-quiz/games">Sudoku, memory, and logic games</Link>
+          <Link className="btn btn-secondary" href="/focus">{t("Focus & Brain Training")}</Link>
         </div>
       </section>
       <p className={"quiz-notice"}>{QUIZ_NOTICE}</p>

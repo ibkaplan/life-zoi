@@ -5,7 +5,7 @@ const RULES: [RegExp, Department][] = [
   [/^\/(academy\/meals|food-plan|food-labels|sugar-detective|nutrition)/, "nutrition"],
   [/^\/academy\/move\/library/, "yoga"],
   [/^\/(academy\/move|balance-challenge)/, "movement"],
-  [/^\/brain-quiz/, "brain"],
+  [/^\/(brain-quiz|focus)/, "brain"],
   [/^\/library\/(music|books)/, "reading"],
   [/^\/(library|academy)/, "reading"],
   [/^\/(breathe|emotional-wellness|wellness-coach|nature|urges|life-matters|ai-assistant|habit-transformation|habits|choices)/, "wellness"],

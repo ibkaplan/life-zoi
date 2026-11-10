@@ -1,0 +1,227 @@
+/* Focus & Brain Training. LifeZoi palette; large text and buttons for comfortable use. */
+.focus-page { --focus-accent: var(--royal); --break-accent: var(--teal); --long-accent: #B7791F; }
+
+.focus-hero { background: linear-gradient(145deg, #52288A 0%, #6A3DA8 45%, #2F8F83 100%); }
+
+.focus-timer {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: clamp(1.1rem, 4vw, 2rem);
+  border-width: 2px;
+  --phase-accent: var(--focus-accent);
+  --phase-tint: #F4EDFC;
+  background: linear-gradient(180deg, var(--phase-tint) 0%, var(--surface) 60%);
+}
+.focus-timer[data-phase="short"] { --phase-accent: var(--break-accent); --phase-tint: #E8F4F1; }
+.focus-timer[data-phase="long"] { --phase-accent: var(--long-accent); --phase-tint: #FDF4E4; }
+
+.focus-phases {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.focus-phases li {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 650;
+  font-size: 1rem;
+}
+.focus-phases li[aria-current="step"] { color: #fff; border-color: transparent; }
+.focus-phases li[aria-current="step"][data-phase="focus"] { background: var(--focus-accent); }
+.focus-phases li[aria-current="step"][data-phase="short"] { background: var(--break-accent); }
+.focus-phases li[aria-current="step"][data-phase="long"] { background: #8A5A12; }
+
+.focus-phase-title { margin: 0.25rem 0 0; font-size: clamp(1.9rem, 6vw, 2.6rem); color: var(--phase-accent); }
+.focus-timer[data-phase="long"] .focus-phase-title { color: #8A5A12; }
+.focus-round { margin: 0; font-size: 1.15rem; color: var(--muted); font-weight: 600; }
+
+.focus-dots { display: flex; gap: 0.6rem; }
+.focus-dots span {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  border: 2px solid var(--phase-accent);
+  background: transparent;
+}
+.focus-dots span[data-done="true"] { background: var(--phase-accent); }
+.focus-dots span[data-current="true"] { box-shadow: 0 0 0 4px rgba(106, 61, 168, 0.18); }
+
+.focus-clock { position: relative; width: min(78vw, 320px); aspect-ratio: 1; }
+.focus-clock svg { width: 100%; height: 100%; display: block; }
+.focus-ring-bg { fill: var(--surface); stroke: var(--line); stroke-width: 14; }
+.focus-ring {
+  fill: none;
+  stroke: var(--phase-accent);
+  stroke-width: 14;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.25s linear;
+}
+.focus-time {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: clamp(3.4rem, 17vw, 5.2rem);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  font-family: var(--font-sans-family), "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+.focus-bar {
+  width: min(100%, 420px);
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.focus-bar span { display: block; height: 100%; background: var(--phase-accent); transition: width 0.25s linear; }
+
+.focus-cheer { margin: 0; font-size: 1.2rem; max-width: 34rem; }
+.focus-announce {
+  margin: 0;
+  padding: 0.6rem 1rem;
+  border-radius: 14px;
+  background: var(--phase-tint);
+  border: 1px solid var(--line);
+  font-weight: 650;
+}
+.focus-announce[data-empty="true"] { display: none; }
+
+.focus-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+  width: min(100%, 560px);
+}
+.focus-big {
+  min-height: 64px;
+  font-size: 1.2rem;
+  border-radius: 16px;
+  padding: 0.6rem 0.7rem;
+}
+.focus-timer .btn-primary { background: var(--phase-accent); }
+.focus-timer[data-phase="long"] .btn-primary { background: #8A5A12; }
+.focus-new-cycle { min-height: 48px; }
+
+.focus-task { display: grid; gap: 0.35rem; width: min(100%, 560px); text-align: left; font-weight: 650; }
+.focus-task input,
+.focus-voice select {
+  min-height: 52px;
+  font: inherit;
+  font-weight: 400;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.focus-task small { font-weight: 400; }
+
+.focus-break { border-left: 6px solid var(--teal-brand); display: grid; gap: 0.6rem; }
+.focus-break.is-now { background: linear-gradient(180deg, #E8F4F1 0%, var(--surface) 70%); border-left-color: var(--teal); }
+.focus-break h2 { margin: 0; }
+.focus-steps, .focus-how { margin: 0; padding-left: 1.4rem; display: grid; gap: 0.45rem; font-size: 1.15rem; }
+.focus-break .btn { min-height: 52px; }
+.focus-voice { display: grid; gap: 0.3rem; max-width: 420px; font-weight: 650; }
+
+.focus-grid { display: grid; gap: 1.25rem; }
+@media (min-width: 900px) {
+  .focus-grid { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+.focus-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.focus-preset {
+  display: grid;
+  gap: 0.15rem;
+  min-height: 84px;
+  padding: 0.6rem;
+  border-radius: 16px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+.focus-preset strong { font-size: 1.15rem; }
+.focus-preset span { color: var(--muted); }
+.focus-preset em { font-style: normal; font-size: 0.85rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; }
+.focus-preset[aria-checked="true"] { border-color: var(--royal); background: #F4EDFC; box-shadow: 0 0 0 3px rgba(106, 61, 168, 0.15); }
+
+.focus-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.focus-chip {
+  min-height: 52px;
+  min-width: 88px;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.focus-chip[aria-checked="true"] { border-color: var(--royal); background: #F4EDFC; }
+
+.focus-toggle { display: flex; gap: 0.75rem; align-items: center; min-height: 52px; cursor: pointer; }
+.focus-toggle input { width: 1.6rem; height: 1.6rem; accent-color: var(--royal); flex: none; }
+.focus-test { justify-self: start; min-height: 48px; }
+
+.focus-music { border-top: 6px solid var(--gold); }
+.focus-music h2 { margin: 0; }
+.focus-volume { display: grid; gap: 0.3rem; font-weight: 650; }
+.focus-volume input { width: 100%; min-height: 44px; accent-color: var(--royal); }
+
+.focus-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.7rem; }
+.focus-stats p {
+  margin: 0;
+  padding: 0.8rem;
+  border-radius: 16px;
+  background: #F4EDFC;
+  display: grid;
+  gap: 0.1rem;
+  text-align: center;
+}
+.focus-stats p:nth-child(2) { background: #E8F4F1; }
+.focus-stats p:nth-child(3) { background: #FDF4E4; }
+.focus-stats strong { font-size: 2rem; line-height: 1.1; color: var(--deep); }
+
+.focus-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.4rem; align-items: end; }
+.focus-day { display: grid; justify-items: center; gap: 0.2rem; font-size: 0.9rem; }
+.focus-day-bar {
+  width: 100%;
+  max-width: 2.6rem;
+  height: 110px;
+  border-radius: 10px;
+  background: var(--sky);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.focus-day-bar span { display: block; width: 100%; background: linear-gradient(180deg, var(--lavender-brand), var(--royal)); border-radius: 10px 10px 0 0; }
+.focus-day[data-today="true"] .focus-day-name { font-weight: 700; color: var(--royal); }
+.focus-day-minutes { color: var(--muted); white-space: nowrap; font-size: 0.8rem; }
+
+@media (max-width: 520px) {
+  .focus-controls { grid-template-columns: 1fr; }
+  .focus-presets { grid-template-columns: 1fr; }
+  .focus-preset { min-height: 64px; grid-auto-flow: column; justify-content: space-between; align-items: center; text-align: left; }
+  .focus-stats { grid-template-columns: 1fr; }
+  .focus-stats p { grid-auto-flow: column; justify-content: start; gap: 0.6rem; align-items: center; text-align: left; }
+  .focus-stats strong { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-ring, .focus-bar span { transition: none; }
+}

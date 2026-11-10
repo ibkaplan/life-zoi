@@ -59,6 +59,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/food-labels", label: "Food Intelligence" },
   { href: "/balance-challenge", label: "Balance and Brain Challenge" },
   { href: "/brain-quiz", label: "Brain & Habit Quiz" },
+  { href: "/focus", label: "Focus & Brain Training" },
   { href: "/settings", label: "Settings" },
   { href: "/privacy", label: "Privacy" },
 ];

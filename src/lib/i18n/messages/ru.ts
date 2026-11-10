@@ -144,6 +144,7 @@ export const ru: Messages = {
     "/food-labels": "Умные этикетки",
     "/balance-challenge": "Челлендж равновесия и ума",
     "/brain-quiz": "Викторина о мозге и привычках",
+    "/focus": "Фокус и тренировка мозга",
     "/settings": "Настройки",
     "/privacy": "Конфиденциальность",
   },
