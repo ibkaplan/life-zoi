@@ -2671,8 +2671,25 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .bf-bar span[data-phase="hum"] { background: var(--gold); }
 .bf-bar span[data-phase="natural"] { background: var(--sage-brand); }
 .bf-scale { min-width: 3rem; min-height: 3rem; font-size: 1.15rem; }
+/* breathing ball: moved every frame by the player, so no CSS transition on transform */
+.bf-ball-wrap { position: relative; width: min(82vw, 22rem); aspect-ratio: 1; display: grid; place-items: center; margin: 0.4rem auto; }
+.bf-ball { position: absolute; inset: 0; border-radius: 50%; transform: scale(0.55); will-change: transform;
+  background: radial-gradient(circle at 34% 28%, #F4ECFC 0%, #D9C3F2 22%, var(--lavender-brand) 55%, var(--royal) 100%);
+  box-shadow: 0 0 0 14px rgba(185, 142, 229, 0.18), 0 0 60px rgba(106, 61, 168, 0.28), inset -18px -24px 50px rgba(82, 40, 138, 0.25);
+  transition: background 1.2s ease, box-shadow 1.2s ease; }
+.bf-ball[data-phase="out"] { background: radial-gradient(circle at 34% 28%, #EEF7F5 0%, #CFE7E2 22%, var(--sage-brand) 55%, var(--teal-brand) 100%);
+  box-shadow: 0 0 0 14px rgba(47, 143, 131, 0.14), 0 0 60px rgba(47, 143, 131, 0.25), inset -18px -24px 50px rgba(35, 112, 106, 0.25); }
+.bf-ball[data-phase="hum"] { background: radial-gradient(circle at 34% 28%, #FFF6E6 0%, #FBE3BC 25%, var(--gold) 60%, #C98A2E 100%); }
+.bf-ball[data-phase="natural"] { background: radial-gradient(circle at 34% 28%, #FFFFFF 0%, #F9F7F2 25%, var(--sage-brand) 65%, var(--teal-brand) 100%); }
+.bf-ball-count { position: relative; z-index: 1; font-size: clamp(3.4rem, 15vw, 5.5rem); font-weight: 700; color: #fff; text-shadow: 0 2px 14px rgba(23, 37, 84, 0.35); font-variant-numeric: tabular-nums; animation: bf-count-in 0.6s ease-out; }
+@keyframes bf-count-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+.bf-beat { display: flex; justify-content: center; gap: 0.5rem; margin: 0; text-align: center !important; }
+.bf-beat span { min-width: 2.2rem; min-height: 2.2rem; display: grid; place-items: center; border-radius: 999px; background: var(--line); color: var(--muted); font-weight: 700; transition: background 0.6s ease, color 0.6s ease; }
+.bf-beat span[data-on="true"] { background: var(--royal); color: #fff; }
 @media (prefers-reduced-motion: reduce) {
   .bf-circle { transform: none !important; transition: none; animation: none; }
+  .bf-ball { transform: scale(0.8) !important; }
+  .bf-ball-count { animation: none; }
   .bf-ripple { animation: none; opacity: 0.6; }
 }
 
@@ -3048,3 +3065,27 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 @media (prefers-reduced-motion: reduce) {
   .music-bars i { animation: none; transform: scaleY(0.7); }
 }
+
+/* read-aloud voice bar (shared by every Listen button) */
+.voice-bar { display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--sky); }
+.voice-bar-compact { padding: 0.5rem 0.65rem; }
+.voice-bar-active { border-color: var(--lavender-brand); box-shadow: 0 0 0 3px rgba(185, 142, 229, 0.25); }
+.voice-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.voice-buttons .btn { min-height: 48px; }
+.voice-play { display: inline-flex; align-items: center; gap: 0.45rem; background: var(--teal); color: #fff; border-color: var(--teal); }
+.voice-play:hover { background: var(--deep); border-color: var(--deep); }
+.voice-icon { flex: none; }
+.voice-options summary { cursor: pointer; font-weight: 650; color: var(--deep); min-height: 32px; display: flex; align-items: center; }
+.voice-choices { display: grid; gap: 0.65rem; margin-top: 0.5rem; }
+.voice-choices label { display: grid; gap: 0.3rem; font-weight: 650; color: var(--ink); }
+.voice-choices select { min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 0 0.7rem; font: inherit; max-width: 100%; }
+.voice-status { margin: 0; color: var(--muted); min-height: 0; }
+.voice-status:empty { display: none; }
+.voice-note { margin: 0; color: var(--ink); background: var(--surface); border-left: 4px solid var(--gold); padding: 0.5rem 0.7rem; border-radius: 8px; }
+.voice-page { justify-self: start; max-width: 100%; }
+.voice-settings-lang { border-top: 1px solid var(--line); padding-top: 0.75rem; }
+@media (max-width: 560px) {
+  .voice-buttons .btn { flex: 1 1 calc(50% - 0.5rem); justify-content: center; }
+  .voice-page { justify-self: stretch; }
+}
+@media print { .voice-bar { display: none; } }

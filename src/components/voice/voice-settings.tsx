@@ -2,7 +2,7 @@
 
 import { useLocale, useT } from "@/components/locale-provider";
 import { languageName, useSpeechSupport, useVoicePrefs, useVoiceState, VoiceChoices } from "@/components/voice/read-aloud";
-import { LOCALES } from "@/lib/i18n/config";
+import { LOCALE_META, LOCALES } from "@/lib/i18n/config";
 import { player } from "@/lib/voice/engine";
 import { segmentsFromText, type VoiceLang } from "@/lib/voice/voices";
 
@@ -34,7 +34,7 @@ export function VoiceSettings() {
         const trying = state.owner === OWNER && state.status !== "idle" && state.lang === lang;
         return (
           <div key={lang} className="voice-settings-lang stack">
-            <h3>{languageName(t, lang)}</h3>
+            <h3>{LOCALE_META[lang].nativeName}</h3>
             <VoiceChoices lang={lang} steps={lang === locale} rate={prefs.rate} stepWait={prefs.stepWait} />
             <div className="voice-buttons">
               {trying ? (

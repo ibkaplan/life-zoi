@@ -65,7 +65,7 @@ export type BreatheState = {
   past: PastChallenge[];
   voice: boolean;
   pace: "gentle" | "standard";
-  length: "short" | "full";
+  length: "quick" | "short" | "full";
 };
 
 export const BREATHE_LIMITS = { sessions: 365, checkIns: 40, extras: 40, past: 12, feeling: 280 } as const;
@@ -196,7 +196,7 @@ export function sanitizeBreathe(input: unknown): BreatheState {
     past,
     voice: row.voice !== false,
     pace: row.pace === "standard" ? "standard" : "gentle",
-    length: row.length === "short" ? "short" : "full",
+    length: row.length === "short" || row.length === "quick" ? row.length : "full",
   };
 }
 

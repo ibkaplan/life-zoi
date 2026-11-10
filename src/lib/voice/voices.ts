@@ -135,6 +135,8 @@ export function detectTextLanguage(text: string, siteLocale: VoiceLang): VoiceLa
 export function speakableText(text: string): string {
   return text
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, " ")
+    // Pages show some labels in capitals with CSS; a voice may spell those out letter by letter.
+    .replace(/\p{Lu}{5,}/gu, (word) => word.charAt(0) + word.slice(1).toLowerCase())
     .replace(/[•·|]/g, ", ")
     .replace(/[→←↑↓▶►◀]/g, " ")
     .replace(/\s+([,.;:!?])/g, "$1")

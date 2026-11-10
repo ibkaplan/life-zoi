@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Caveat, Fraunces, Noto_Serif_Display, Source_Sans_3 } from "next/font/google";
 import { BackgroundMusicProvider } from "@/components/background-music/provider";
 import { LocaleProvider } from "@/components/locale-provider";
@@ -61,7 +62,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <LocaleProvider>
           <SkipLink />
           <TitleSync />
-          <VoiceRouteGuard />
+          <Suspense fallback={null}>
+            <VoiceRouteGuard />
+          </Suspense>
           <BackgroundMusicProvider>
             <SessionProvider>{children}</SessionProvider>
           </BackgroundMusicProvider>

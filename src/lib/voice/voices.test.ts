@@ -65,6 +65,7 @@ describe("sentences and pauses", () => {
       "Finally, add dressing?",
     ]);
     expect(speakableText("Rest 🌿 · then → repeat")).toBe("Rest, then repeat");
+    expect(speakableText("WALKING with USDA data")).toBe("Walking with USDA data");
   });
 
   it("keeps long sentences under the length some browsers cut off", () => {

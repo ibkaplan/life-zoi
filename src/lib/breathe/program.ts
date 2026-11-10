@@ -27,15 +27,26 @@ export type SessionStep = {
   pattern: { phase: Exclude<Phase, "natural">; seconds: number }[];
 };
 
+/**
+ * The default is a calm 4 seconds in and 6 seconds out. The earlier 3-and-4 default
+ * felt rushed: people could not finish breathing in before the next count started.
+ */
 export const PACES: Record<Pace, { label: string; inhale: number; exhale: number; hum: number }> = {
-  gentle: { label: "Gentle pace: in for 3, out for 4", inhale: 3, exhale: 4, hum: 5 },
-  standard: { label: "Slower pace: in for 4, out for 6", inhale: 4, exhale: 6, hum: 7 },
+  gentle: { label: "Calm pace: in for 4, out for 6 (recommended)", inhale: 4, exhale: 6, hum: 7 },
+  standard: { label: "Shorter out-breath: in for 4, out for 5", inhale: 4, exhale: 5, hum: 6 },
 };
 
 /** Minutes for each step: the full session follows the suggested 2 + 2 + 3 + 1½ minutes. */
 const LENGTHS: Record<Length, Record<StepId, number>> = {
   full: { nasal: 120, bhramari: 120, diaphragm: 180, rest: 90 },
   short: { nasal: 60, bhramari: 90, diaphragm: 90, rest: 60 },
+  quick: { nasal: 40, bhramari: 40, diaphragm: 60, rest: 30 },
+};
+
+export const LENGTH_LABEL: Record<Length, string> = {
+  quick: "About 3 minutes",
+  short: "About 5 minutes",
+  full: "About 9 minutes",
 };
 
 export const STEP_TEXT: Record<StepId, { title: string; intro: string; cues: string[] }> = {
@@ -84,7 +95,11 @@ export function buildSession(length: Length, pace: Pace, focus: SessionFocus = "
               { phase: "in", seconds: p.inhale },
               { phase: "out", seconds: p.exhale },
             ];
-    return { id, title: text.title, intro: text.intro, cues: text.cues, seconds: time[id] + extra, pattern };
+    // Whole breaths only: a step never cuts a breath short, so the guide never jumps mid-breath.
+    const cycle = pattern.reduce((sum, item) => sum + item.seconds, 0);
+    const planned = time[id] + extra;
+    const seconds = cycle > 0 ? Math.max(1, Math.round(planned / cycle)) * cycle : planned;
+    return { id, title: text.title, intro: text.intro, cues: text.cues, seconds, pattern };
   });
 }
 
