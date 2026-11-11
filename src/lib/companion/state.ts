@@ -1,5 +1,6 @@
 import { isRealISODate, mondayOf } from "@/lib/dates";
 import { emptyBreathe, isEmptyBreathe, sanitizeBreathe, type BreatheState } from "@/lib/breathe/state";
+import { emptyFocus, isEmptyFocus, sanitizeFocus, type FocusState } from "@/lib/focus/progress";
 
 /**
  * Companion state: the guidance mode, preferences, daily logs, weekly
@@ -233,6 +234,8 @@ export type CompanionState = {
   games: GameRecord[];
   /** Breathe for Life sessions, weekly days, and the 30-day challenge. */
   breathe: BreatheState;
+  /** Focus & Brain Training: finished focus sessions and breaks by day, and timer settings. */
+  focus: FocusState;
   womensCare: WomensCarePrefs;
 };
 
@@ -290,6 +293,7 @@ export function emptyCompanion(): CompanionState {
     media: { favorites: [], recent: [], positions: {}, bookmarks: {}, ratings: {} },
     games: [],
     breathe: emptyBreathe(),
+    focus: emptyFocus(),
     womensCare: emptyWomensCare(),
   };
 }
@@ -327,6 +331,7 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     state.food.liked.length === 0 &&
     state.food.disliked.length === 0 &&
     isEmptyBreathe(state.breathe) &&
+    isEmptyFocus(state.focus) &&
     !state.womensCare.identifiesAsWoman &&
     !state.womensCare.relevant
   );
@@ -614,6 +619,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
       .filter((item): item is GameRecord => item !== null)
       .slice(0, LIMITS.games),
     breathe: sanitizeBreathe(record.breathe),
+    focus: sanitizeFocus(record.focus),
     womensCare: sanitizeWomensCare(record.womensCare),
   };
 }

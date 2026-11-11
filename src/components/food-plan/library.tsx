@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useFoodFormat } from "@/components/food-plan/frame";
@@ -112,6 +113,12 @@ function RecipeBlock({ food, saved, onSave }: { food: SeasonalFood; saved: boole
     <section className="card stack">
       <h2>{t(recipe.name)}</h2>
       <p>{t("{minutes} minutes. {servings}. These are kitchen amounts, not a nutrient analysis.", { minutes: recipe.minutes, servings: t(recipe.servingsNote) })}</p>
+      <ListenToSteps
+        title={t(recipe.name)}
+        list={{ heading: t("Ingredients"), items: recipe.ingredients.map((item) => t("{amount} {item}", { amount: t(item.amount), item: t(item.item) })) }}
+        steps={recipe.steps.map((step) => t(step))}
+        compact
+      />
       <ul>{recipe.ingredients.map((item) => <li key={item.item}>{t("{amount} {item}", { amount: t(item.amount), item: t(item.item) })}</li>)}</ul>
       <ol>{recipe.steps.map((step) => <li key={step}>{t(step)}</li>)}</ol>
       <p>{recipe.highlights.map((line) => t(line)).join(" ")}</p>

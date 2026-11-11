@@ -127,6 +127,12 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 5. Outstanding: only two of the listed sources (Pinto et al. 2023 in PMC, and the ADA 2016 position statement in PMC) could be read from the build environment. StatPearls lymphatic physiology, PubMed 21486777, the calf-pump article in Advances in Physiology Education, PMC6985064, and PubMed 39630056 are marked in `src/lib/movement-breaks/content.ts` as still to be read by a person. All copy is English in one object (`MB`) ready for translation keys. The breathing section links to the existing breathing sounds until the Breathe for Life program lands.
 6. Next action: a person reads the five unread sources and the medical copy, then the owner reviews the pull request.
 
+### My Music (branch `claude/project-thread-9rthjc`, PR open for review)
+
+- Done: "Relaxing music" renamed to My Music in all four languages; six categories; one site-wide player (`src/components/background-music/`) with previous/next, progress bar, volume, Music ON/OFF; music plays softly under videos, guided breathing, and speech (`audio-focus.ts` kinds `video`, `voice`, `sound`); catalog in `src/lib/music-library/catalog.ts`.
+- Not done: no Pixabay track is included. pixabay.com was blocked from the cloud environment, so no licence was read. Add tracks with `public/audio/library/CREDITS.md`.
+- New features that speak or play sound (for example a focus timer) should call `useAudioFocus(active, id, "voice")` so music lowers under them.
+
 ## What is not in progress
 
 No GitHub issues were confirmed in this refresh. `main` is one product: accounts when configured, tab storage otherwise, mock assistant, and educational tools. Pull request #1 is closed historical work. Document upload and a paid model are not started.
@@ -146,3 +152,19 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 4. Rules: used only after the person ticks both "I identify as a woman" and "cycle or menopause nutrition is relevant". Never inferred. Answers live in the companion state (browser, or the account `companion_state` row) and are not sent to an AI or outside service. Extra recipe ideas go through the same `checkRecipe` allergy, diet, religious, and exclusion checks; example foods use `ingredientAllowed`. Qualitative wording only; clinician pointer for heavy bleeding, severe symptoms, or iron worries.
 5. Files: `src/lib/companion/womens-care.ts`, `src/components/companion/womens-care-view.tsx`, tests in `src/lib/companion/womens-care.test.ts`.
 6. Outstanding: translation keys once the four-language work lands (all copy is in `womens-care.ts` and the view); medical copy review before launch.
+
+### Natural read-aloud voice and calm breathing ball (2026-11-10)
+
+1. Name: Shared read-aloud voice; slower breathing guide with an animated ball.
+2. Objective: one Listen control across lifeZoi with the most natural free voice on the device, in the site language, and a breathing exercise that is no longer rushed.
+3. Assigned agent: Claude project thread, branch `claude/project-thread-7ws1e7`.
+4. Status: pull request open for the owner's review. Not merged, not deployed.
+5. Completed:
+   - `src/lib/voice/` is the only speech player (Web Speech API, no paid or remote service called by lifeZoi). It ranks device voices per language (natural, neural, premium, online first; novelty and robotic voices last or hidden), reads sentence by sentence with pauses, keeps one voice at a time, and never reads with a voice for another language. Pause stops the sentence and Resume reads it again, the same on every device.
+   - `src/components/voice/` holds `ReadAloud` (Listen, Pause, Resume, Stop, Replay, Previous and Next step, speed, voice, wait between steps), `ListenToSteps`, a "Listen to this page" bar in the app shell, voice settings, and a guard that stops speech on navigation.
+   - Pages that can show the person's own data read with on-device voices only (`src/components/voice/page-listen.tsx`). Online voices send the read text to the browser's provider, which the settings copy says.
+   - Background music gets quieter (20 percent) while the voice speaks instead of pausing; on iPhone and iPad, where pages cannot change volume, it pauses as before.
+   - Breathing: default 4 seconds in and 6 out, whole breaths per step, an eased ball drawn every frame from the session clock, a visible count, spoken "Breathe in" and counting on the same clock, Restart, a 3-minute length, and "I feel dizzy or unwell. Stop now".
+6. Files: `src/lib/voice/*`, `src/components/voice/*`, `src/components/breathe/player.tsx`, `src/lib/breathe/program.ts`, `src/lib/breathe/state.ts`, `src/components/background-music/provider.tsx`, `src/lib/background-music/audio-focus.ts`, books, assistant, recipe, exercise, movement-break and settings views, `src/app/layout.tsx`, `src/app/globals.css`, and the uk, ru, el `core.json` catalogs.
+7. Outstanding: nobody has listened to the voices yet. Checks used a stand-in speech engine in headless Chromium, which confirmed timing, voice choice, language, and controls but not sound quality. Breathing-page text is still English only. Translations of the new controls need a native-speaker read.
+8. Next action: owner listens on a phone and a computer, then approves or asks for changes.

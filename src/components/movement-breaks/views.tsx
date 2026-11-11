@@ -200,7 +200,7 @@ export function BreathingSection() {
       <p className="alert">{t(MB.breathing.safety)}</p>
       <p className="hint">
         <Rich
-          text={t("For a guided tone to breathe with, open the breathing sounds in <0>Relaxing music</0>.")}
+          text={t("For a guided tone to breathe with, open the breathing sounds in <0>My Music</0>.")}
           parts={[(label) => <Link href="/library/music">{label}</Link>]}
         />{" "}
         {t(MB.breathing.followUp)}

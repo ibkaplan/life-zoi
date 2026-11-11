@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PagePhoto } from "@/components/page-photo";
@@ -262,6 +263,12 @@ export function MoveDetail({ slug }: { slug: string }) {
       <p className="kicker">{t(item.category)}</p>
       <h1>{t(item.title)}</h1>
       <ActivitySketch kind={item.sketch} />
+      <ListenToSteps
+        title={t(item.title)}
+        intro={`${t("Time or repetitions.")} ${t(item.duration)}`}
+        steps={item.steps.map((step) => t(step))}
+        closing={[`${t("Beginner change.")} ${t(item.beginner)}`, `${t("Another way.")} ${t(item.accessible)}`, `${t("Safety.")} ${t(item.safety)}`]}
+      />
       <p><strong>{t("Time or repetitions.")}</strong> {t(item.duration)}</p>
       <ol>
         {item.steps.map((step) => (

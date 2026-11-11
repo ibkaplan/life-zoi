@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AccountPanel } from "@/components/account-panel";
 import { LanguageChoice } from "@/components/language-choice";
+import { VoiceSettingsSection } from "@/components/voice/voice-settings";
 import { useMessages, useT } from "@/components/locale-provider";
 import { msg } from "@/lib/i18n/translate";
 import { fmt } from "@/lib/i18n/config";
@@ -58,6 +59,7 @@ export function SettingsView() {
         <p>{t.languageText}</p>
         <LanguageChoice />
       </section>
+      <VoiceSettingsSection />
       <AccountPanel />
       <section className="card stack">
         <h2>{t.storage}</h2>
