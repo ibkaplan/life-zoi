@@ -1,5 +1,6 @@
 "use client";
 
+import { SessionMusicControls } from "@/components/background-music/controls";
 import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -232,6 +233,7 @@ function PlayerDialog({ video, onClose }: { video: StudioVideo | null; onClose: 
           ) : (
             <p className="alert">{t("This video cannot play inside LifeZoi. Use {button}, then come back here to mark it completed.", { button: t(T.openOnYoutube) })}</p>
           )}
+          <SessionMusicControls />
           <p className="hint">{t(T.playerNote)}</p>
           <p className="studio-safety-line">
             {t(T.sturdyChair)} {t(T.stopIf)} {video.studio.balance ? t(T.balanceVideo) : ""} {t(T.notTreatment)}

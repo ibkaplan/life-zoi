@@ -1,5 +1,6 @@
 "use client";
 
+import { SessionMusicControls } from "@/components/background-music/controls";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { commitBreathe, saveBreatheSession, useBreathe } from "@/components/breathe/use-breathe";
 import { ScalePicker } from "@/components/breathe/shared";
@@ -60,8 +61,8 @@ export function BreathingPlayer() {
   const total = sessionSeconds(steps);
 
   const [status, setStatus] = useState<Status>("ready");
-  // Background music pauses for the whole guided session, spoken cues or not.
-  useAudioFocus(status === "running" || status === "paused", "guided-breathing");
+  // Background music plays softly under the whole guided session (or pauses, if the person chose that).
+  useAudioFocus(status === "running" || status === "paused", "guided-breathing", "voice");
   const [elapsed, setElapsed] = useState(0);
   const [breathCues, setBreathCues] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -170,6 +171,7 @@ export function BreathingPlayer() {
   return (
     <section className="card stack bf-player" aria-labelledby="bf-player-title">
       <h2 id="bf-player-title">{t("Guided breathing session")}</h2>
+      <SessionMusicControls />
 
       {!active ? (
         <div className="stack">

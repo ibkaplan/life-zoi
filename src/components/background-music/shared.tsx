@@ -3,21 +3,40 @@
 import { useLocale } from "@/components/locale-provider";
 import { isSounding, MUSIC_CONTROL_ATTR, useBackgroundMusic, type MusicStatus } from "@/components/background-music/provider";
 import type { Messages } from "@/lib/i18n/messages";
-import type { BackgroundPiece } from "@/lib/background-music/tracks";
+import type { LibraryPiece } from "@/lib/music-library/catalog";
 
 export const controlProps = { [MUSIC_CONTROL_ATTR]: "" };
 
-export function pieceTitle(m: Messages, piece: BackgroundPiece | null): string {
+export function pieceTitle(m: Messages, piece: LibraryPiece | null): string {
   if (!piece) return "";
-  if (piece.kind === "file") return piece.recording.title;
+  if (piece.kind === "file") return piece.title;
   const titles = m.music.tracks as Record<string, string>;
   return titles[piece.id] ?? piece.track.title;
 }
 
-export function statusText(m: Messages, status: MusicStatus, holdReason: "sound" | "video" | null): string {
+/** Who made it: the Pixabay uploader, or LifeZoi for its own in-browser pieces. */
+export function pieceArtist(m: Messages, piece: LibraryPiece | null): string {
+  if (!piece) return "";
+  return piece.kind === "file" ? piece.artist : m.music.library.builtIn;
+}
+
+export function pieceNote(m: Messages, piece: LibraryPiece | null): string {
+  if (!piece || piece.kind === "file") return "";
+  const notes = m.music.trackNotes as Record<string, string>;
+  return notes[piece.id] ?? piece.track.description;
+}
+
+/** Minutes and seconds, for example 3:07. Unknown lengths show as --:--. */
+export function clock(seconds: number | null): string {
+  if (seconds === null || !Number.isFinite(seconds)) return "--:--";
+  const safe = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(safe / 60)}:${String(safe % 60).padStart(2, "0")}`;
+}
+
+export function statusText(m: Messages, status: MusicStatus, holdReason: "sound" | "video" | null, ducked = false): string {
   switch (status) {
     case "playing":
-      return m.music.statusPlaying;
+      return ducked ? m.music.statusDucked : m.music.statusPlaying;
     case "starting":
       return m.music.statusStarting;
     case "paused":

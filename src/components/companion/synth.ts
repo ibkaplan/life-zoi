@@ -108,7 +108,38 @@ export class Synth {
     }
   }
 
-  private noise(kind: "rain" | "waves" | "wind") {
+  private birdTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** A short rising-and-falling whistle, like a small bird. Original sound design. */
+  private chirp() {
+    if (this.ctx.state === "closed") return;
+    const start = this.ctx.currentTime + 0.05;
+    const notes = 2 + Math.floor(Math.random() * 4);
+    const base = 2400 + Math.random() * 1600;
+    for (let i = 0; i < notes; i += 1) {
+      const at = start + i * (0.11 + Math.random() * 0.06);
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(base, at);
+      osc.frequency.exponentialRampToValueAtTime(base * (1.2 + Math.random() * 0.4), at + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(base * 0.9, at + 0.09);
+      gain.gain.setValueAtTime(0, at);
+      gain.gain.linearRampToValueAtTime(0.025, at + 0.015);
+      gain.gain.linearRampToValueAtTime(0, at + 0.09);
+      osc.connect(gain).connect(this.master);
+      osc.start(at);
+      osc.stop(at + 0.12);
+      this.track(osc);
+    }
+    this.birdTimer = setTimeout(() => this.chirp(), 1800 + Math.random() * 5000);
+  }
+
+  private noise(kind: "rain" | "waves" | "wind" | "birds" | "stream") {
+    if (kind === "birds") {
+      this.birdTimer = setTimeout(() => this.chirp(), 800);
+      kind = "wind";
+    }
     const length = this.ctx.sampleRate * 2;
     const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -123,6 +154,21 @@ export class Synth {
       filter.frequency.value = 2500;
       filter.Q.value = 0.4;
       gain.gain.value = 0.12;
+    } else if (kind === "stream") {
+      filter.type = "bandpass";
+      filter.frequency.value = 1200;
+      filter.Q.value = 0.8;
+      gain.gain.value = 0.1;
+      // Quick, uneven ripples in the filter sound like water over stones.
+      for (const [rate, amount] of [[0.7, 350], [2.3, 180]] as const) {
+        const lfo = this.ctx.createOscillator();
+        const depth = this.ctx.createGain();
+        lfo.frequency.value = rate;
+        depth.gain.value = amount;
+        lfo.connect(depth).connect(filter.frequency);
+        lfo.start();
+        this.track(lfo);
+      }
     } else {
       filter.type = "lowpass";
       filter.frequency.value = kind === "waves" ? 700 : 450;
@@ -148,6 +194,8 @@ export class Synth {
   stop() {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
+    if (this.birdTimer) clearTimeout(this.birdTimer);
+    this.birdTimer = null;
     void this.ctx.close().catch(() => undefined);
   }
 }

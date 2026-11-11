@@ -465,7 +465,6 @@
  "Reduce or stop smoking": "Меньше курить или бросить",
  "Reduce stress": "Снизить стресс",
  "Regular meals most days": "Регулярно ем большинство дней",
- "Relaxing music": "Спокойная музыка",
  "Remove {food}": "Убрать {food}",
  "Remove {item}": "Удалить {item}",
  "Required. A rough number from 0 to 24 is enough.": "Обязательно. Достаточно примерного числа от 0 до 24.",
@@ -716,5 +715,6 @@
  "{hours} hours, {quality}": "{hours} ч, {quality}",
  "{value} cm": "{value} см",
  "{value} hours": "{value} ч",
- "{value} kg": "{value} кг"
+ "{value} kg": "{value} кг",
+ "My Music": "Моя музыка"
 }
