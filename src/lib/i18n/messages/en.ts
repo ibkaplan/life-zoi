@@ -123,6 +123,7 @@ export const en = {
       breatheOut: "Breathe out",
       aboutTitle: "About this music",
       aboutBuiltIn: "Pieces marked “Played by LifeZoi in your browser” are created by LifeZoi with your browser's sound engine. The classical ones are LifeZoi's own soft performances of music whose composers died long ago, so the compositions are in the public domain. They are not recordings of a pianist or orchestra. Nothing is downloaded or streamed for them.",
+      aboutRecordings: "The classical recordings are real performances shared on Wikimedia Commons. The compositions are in the public domain, and each recording is used under the licence named beside it. Its original page is linked.",
       aboutPixabay: "Pixabay recordings are downloaded once and stored with LifeZoi. Each one is used under the Pixabay Content License, and its original page is linked below.",
       licenseLink: "Pixabay Content License",
       sourceLink: "Original page",

@@ -97,6 +97,16 @@ export const MUSIC_CONTROL_ATTR = "data-music-control";
  * between pages never restarts it, and only one piece plays at a time. Only the
  * piece that is playing is loaded; nothing else is downloaded.
  */
+
+/**
+ * Sets a recording's loudness. iPhone and iPad Safari ignore `volume` on media
+ * elements, so silence also sets `muted`, which every browser honours.
+ */
+function setElementVolume(element: HTMLAudioElement, volume: number) {
+  element.volume = volume;
+  element.muted = volume === 0;
+}
+
 export function BackgroundMusicProvider({ children }: { children: React.ReactNode }) {
   // False while the server page hydrates, true afterwards, so saved choices never cause a mismatch.
   const ready = useSyncExternalStore(subscribeNothing, clientReady, serverReady);
@@ -157,7 +167,7 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
 
   const applyVolume = useCallback(() => {
     const volume = currentVolume();
-    if (audioRef.current) audioRef.current.volume = volume;
+    if (audioRef.current) setElementVolume(audioRef.current, volume);
     synthRef.current?.setVolume(volume);
   }, [currentVolume]);
 
@@ -194,7 +204,7 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
         const element = audioElement();
         if (!element.src.endsWith(piece.file)) element.src = piece.file;
         if (fromStart) element.currentTime = 0;
-        element.volume = volume;
+        setElementVolume(element, volume);
         try {
           await element.play();
         } catch (error) {

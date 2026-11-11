@@ -10,6 +10,7 @@ import { controlProps, pieceArtist, pieceNote, pieceTitle } from "@/components/b
 import { commitCompanion } from "@/lib/companion/store";
 import { addRecent, toggleFavorite, withDay } from "@/lib/companion/state";
 import { breathPhase, type Track } from "@/lib/companion/music";
+import { RECORDINGS } from "@/lib/background-music/tracks";
 import { localISODate } from "@/lib/dates";
 import { fmt } from "@/lib/i18n/config";
 import {
@@ -271,6 +272,21 @@ export function MusicView() {
       <details className="card music-about">
         <summary>{L.aboutTitle}</summary>
         <p>{L.aboutBuiltIn}</p>
+        {RECORDINGS.length > 0 ? (
+          <>
+            <p>{L.aboutRecordings}</p>
+            <ul>
+              {RECORDINGS.map((recording) => (
+                <li key={recording.id}>
+                  {recording.title} · {recording.attribution} · {recording.license} ·{" "}
+                  <a href={recording.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    {L.sourceLink}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
         {PIXABAY_RECORDINGS.length > 0 ? (
           <>
             <p>{L.aboutPixabay}</p>
