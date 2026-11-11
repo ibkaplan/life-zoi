@@ -11,7 +11,7 @@ lifeZoi is a responsive web app for habit reflection, WHAT IF? lifestyle illustr
 | Repository | https://github.com/ibkaplan/life-zoi |
 | Default branch | `main` |
 | Visibility | Public |
-| Homepage recorded on the repo | https://life-zoi.vercel.app |
+| Production site | https://www.lifezoi.com (lifezoi.com and life-zoi.vercel.app redirect there with 308) |
 | Product owner named in the project brief | Igor Kaplansky (GitHub login `ibkaplan`) |
 | Other contributor | Igor’s wife, in a separate Cursor setup. Her agents and tracker are not visible from this project. |
 | Snapshot used for these docs | `main` at `1d6a333` (2026-11-05 inspection) |

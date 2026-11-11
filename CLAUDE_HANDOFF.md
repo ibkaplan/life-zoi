@@ -55,7 +55,7 @@ lifeZoi is a responsive educational wellness web app. The product name is **life
 
 People use it to reflect on everyday habits, compare a lifestyle change with public guidance, and keep a simple progress record. It is educational wellness only. It does not diagnose, recommend medication changes, or predict lifespan. It does not show a personal “years gained” figure or a date of death. The Life outlook page may show a copied Social Security population figure only with the existing “not an individual prediction” label.
 
-The owner on the GitHub repo is Igor Kaplansky (`ibkaplan`). The recorded homepage is https://life-zoi.vercel.app. The repository is public. Search indexing stays off.
+The owner on the GitHub repo is Igor Kaplansky (`ibkaplan`). Production is https://www.lifezoi.com since 2026-11-11. lifezoi.com and the old https://life-zoi.vercel.app redirect there. The repository is public. Search indexing stays off.
 
 Source for the internal-testing status: the launch report at `/cursor/stores/self/docs/launch-readiness.md` (pull request #24). That report’s checks were not repeated for this handoff.
 

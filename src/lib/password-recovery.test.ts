@@ -11,7 +11,7 @@ import {
 
 describe("resetRedirectUrl", () => {
   it("points at the reset page on the same origin", () => {
-    expect(resetRedirectUrl("https://life-zoi.vercel.app")).toBe("https://life-zoi.vercel.app/reset-password");
+    expect(resetRedirectUrl("https://www.lifezoi.com")).toBe("https://www.lifezoi.com/reset-password");
     expect(resetRedirectUrl("http://localhost:3000")).toBe("http://localhost:3000/reset-password");
   });
 

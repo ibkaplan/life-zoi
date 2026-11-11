@@ -135,7 +135,7 @@ describe("invitation links", () => {
     expect(resolveShareOrigin(true, "http://localhost:3000")).toBe(PRODUCTION_SITE_ORIGIN);
     expect(resolveShareOrigin(false, "http://localhost:3000")).toBe("http://localhost:3000");
     expect(invitationUrl(resolveShareOrigin(true, "http://localhost:3000"), tokenFrom(1))).toContain(
-      "https://life-zoi.vercel.app/welcome?invite=",
+      "https://www.lifezoi.com/welcome?invite=",
     );
   });
 
