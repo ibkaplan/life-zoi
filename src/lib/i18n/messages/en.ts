@@ -149,6 +149,7 @@ export const en = {
     "/food-labels": "Food Intelligence",
     "/balance-challenge": "Balance and Brain Challenge",
     "/brain-quiz": "Brain & Habit Quiz",
+    "/focus": "Focus & Brain Training",
     "/settings": "Settings",
     "/privacy": "Privacy",
   },

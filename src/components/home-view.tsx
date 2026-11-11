@@ -66,7 +66,7 @@ const footerLinks = [
   "/dashboard", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
   "/academy/meals", "/academy/move", "/academy/move/resources", "/choices", "/urges", "/nature", "/ai-assistant",
   "/emotional-wellness", "/life-matters", "/change-lab", "/brain-quiz", "/habit-transformation", "/food-plan",
-  "/academy/move/library", "/library/music", "/library/books", "/brain-quiz/games", "/my-day", "/settings",
+  "/academy/move/library", "/library/music", "/library/books", "/brain-quiz/games", "/focus", "/my-day", "/settings",
   "/profile", "/privacy",
 ] as const;
 
