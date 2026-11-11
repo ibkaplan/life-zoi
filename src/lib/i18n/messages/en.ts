@@ -232,6 +232,7 @@ export const en = {
     "/academy/move": "Movement",
     "/breathe": "Breathe for Life",
     "/academy/move/breaks": "Movement breaks",
+    "/academy/move/studio/daily-movement": "Daily Movement",
     "/academy/move/studio/chair-yoga": "Chair Yoga Studio",
     "/my-day": "My Day",
     "/plan": "My Plan",

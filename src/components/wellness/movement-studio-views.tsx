@@ -5,6 +5,7 @@ import { ListenToSteps } from "@/components/voice/read-aloud";
 import { AudioFocusClaim } from "@/components/background-music/use-audio-focus";
 import Link from "next/link";
 import { STUDIO_PATH } from "@/lib/wellness-library/chair-yoga";
+import { DAILY_PATH } from "@/lib/wellness-library/daily-movement";
 import { useState, useSyncExternalStore } from "react";
 import { useLocale, useT } from "@/components/locale-provider";
 import { msg } from "@/lib/i18n/translate";
@@ -202,6 +203,34 @@ export function ChairYogaBanner() {
   );
 }
 
+/** Entry to Daily Movement: standing and active classes for people without mobility limits. */
+export function DailyMovementBanner() {
+  const t = useT();
+  return (
+    <section className="cy-banner dm-banner" aria-labelledby="dm-banner">
+      <div>
+        <p className="kicker">{t("New · Video library")}</p>
+        <h2 id="dm-banner">{t("Daily Movement")}</h2>
+        <p>{t("Morning aerobics, stretching, balance, and light strength, standing and active. With a morning and evening plan from your questionnaire.")}</p>
+      </div>
+      <Link className="btn btn-primary" href={DAILY_PATH}>
+        ▶ {t("Open Daily Movement")}
+      </Link>
+    </section>
+  );
+}
+
+/** The two video libraries side by side: Daily Movement and Chair Yoga Studio. */
+export function MovementChoices() {
+  const t = useT();
+  return (
+    <section className="move-choices" aria-label={t("Movement video libraries")}>
+      <DailyMovementBanner />
+      <ChairYogaBanner />
+    </section>
+  );
+}
+
 export function MovementStudioHome() {
   const t = useT();
   return (
@@ -212,7 +241,7 @@ export function MovementStudioHome() {
         {t("Official films play here only when the player and the length were checked. Everything else stays written, with Coming Soon, until a real recording exists.")}
       </p>
       <SafetyNote />
-      <ChairYogaBanner />
+      <MovementChoices />
       <section className="stack-lg" aria-labelledby="choose-movement">
         <h2 id="choose-movement">{t(STUDIO_SECTION)}</h2>
         {studioCategories.map((category) => (
