@@ -257,7 +257,7 @@ export function MealCard({ suggestion, showKcal }: { suggestion: MealSuggestion;
           }),
         }}
         steps={recipe.steps}
-        label="Read the recipe aloud"
+        label={t("Read the recipe aloud")}
         compact
       />
       <details>

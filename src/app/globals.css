@@ -2942,6 +2942,17 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .site-account .music-button[aria-expanded="true"] { background: var(--lavender); border-color: var(--royal); }
 .site-account .music-button[data-state="on"] { background: var(--royal); border-color: var(--royal); color: #ffffff; }
 .site-account .music-button[data-state="off"] { color: var(--muted); }
+.music-switch { gap: 0.15rem; }
+.site-account .music-quick {
+  justify-content: center;
+  width: 28px;
+  padding: 0;
+  border-color: var(--lavender-brand);
+  background: var(--ivory);
+  color: var(--royal);
+}
+.site-account .music-quick:hover,
+.site-account .music-quick[aria-expanded="true"] { background: var(--lavender); border-color: var(--royal); }
 
 .music-bars {
   position: absolute;

@@ -49,6 +49,7 @@ import {
   recognitionFailureMessage,
   recognitionSupportServerSnapshot,
   recognitionSupportSnapshot,
+  SPEECH_LANG,
   subscribeEnglishVoices,
   transcriptFromResults,
   voicesForLanguage,

@@ -109,7 +109,7 @@ export function MovementBreakRoutine() {
             if (!event.target.checked) player.stop("movement-break");
           }}
         />
-        <span>Read each step aloud when it starts</span>
+        <span>{t("Read each step aloud when it starts")}</span>
       </label>
 
       {run.finished ? (

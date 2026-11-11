@@ -8,9 +8,9 @@ import { CategorySelect, MusicProgress, MusicVolume, NowPlaying, TransportContro
 import { controlProps, MusicNoteIcon } from "@/components/background-music/shared";
 import { fmt } from "@/lib/i18n/config";
 
-/** The small ♪ button in the header. It opens the controls for the one background player. */
+/** The ♪ button in the header opens My Music. The small arrow beside it opens quick controls for the one background player. */
 export function HeaderMusicButton() {
-  const { messages: m } = useLocale();
+  const { messages: m, t } = useLocale();
   const music = useBackgroundMusic();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -49,20 +49,29 @@ export function HeaderMusicButton() {
           <span aria-hidden="true">▶</span> {m.music.playMusic}
         </button>
       ) : null}
-      <button
-        ref={buttonRef}
-        type="button"
+      <Link
+        href="/library/music"
         className="music-button"
         data-state={off ? "off" : on ? "on" : "idle"}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={open ? panelId : undefined}
-        aria-label={label}
-        title={m.music.headerLabel}
-        onClick={() => setOpen((value) => !value)}
+        aria-label={`${m.music.openLibrary}. ${label}`}
+        title={m.music.openLibrary}
+        onClick={() => setOpen(false)}
       >
         <MusicNoteIcon />
         {on ? <span className="music-bars" aria-hidden="true"><i /><i /><i /></span> : null}
+      </Link>
+      <button
+        ref={buttonRef}
+        type="button"
+        className="music-quick"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-controls={open ? panelId : undefined}
+        aria-label={t("Quick music controls")}
+        title={t("Quick music controls")}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span aria-hidden="true">▾</span>
       </button>
       {open ? (
         <div className="music-panel stack" id={panelId} role="dialog" aria-label={m.music.headerLabel}>
@@ -72,6 +81,11 @@ export function HeaderMusicButton() {
               ×
             </button>
           </div>
+          <p>
+            <Link className="btn btn-secondary music-open-library" href="/library/music" onClick={() => setOpen(false)}>
+              <span aria-hidden="true">♪</span> {m.music.openLibrary}
+            </Link>
+          </p>
           {off ? (
             <>
               <p>{m.music.offNote}</p>
@@ -92,11 +106,6 @@ export function HeaderMusicButton() {
               </div>
               <MusicVolume session={music.ducked} />
               <CategorySelect />
-              <p>
-                <Link className="btn btn-ghost" href="/library/music" onClick={() => setOpen(false)}>
-                  {m.music.openLibrary}
-                </Link>
-              </p>
               <details className="music-credits">
                 <summary>{m.music.credits}</summary>
                 {music.piece?.kind === "file" ? (
