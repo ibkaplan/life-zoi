@@ -43,6 +43,7 @@ export const en = {
     creditsSynth:
       "These pieces are played by LifeZoi in your browser from melodies whose composers died long ago, so the compositions are in the public domain. No recording is downloaded or streamed, and nothing is sent anywhere.",
     creditsFiles: "These recordings are stored with LifeZoi and used under the licence shown for each one.",
+    creditsStreamed: "This recording streams to your browser from Wikimedia Commons while it plays. LifeZoi does not store a copy.",
     licence: "Licence: {licence}",
     source: "Source page",
     saveNote: "Your music choice is saved in this browser only. It holds no health information.",
@@ -88,7 +89,7 @@ export const en = {
       },
       nature: {
         name: "Nature Sounds",
-        blurb: "Ocean waves, rain, birds in the forest, and flowing water.",
+        blurb: "Ocean waves, morning birdsong, and flowing water.",
       },
       morning: {
         name: "Happy & Positive Music",
@@ -112,6 +113,7 @@ export const en = {
       minutes: "{minutes} min",
       builtIn: "Played by LifeZoi in your browser",
       pixabay: "Pixabay recording",
+      streamed: "Streamed from Wikimedia Commons",
       listenedToday: "You have listened for {minutes} minutes today.",
       favorites: "My favorite pieces",
       addFavorite: "☆ Add to favorites",
@@ -122,10 +124,14 @@ export const en = {
       hold: "Hold",
       breatheOut: "Breathe out",
       aboutTitle: "About this music",
-      aboutBuiltIn: "Pieces marked “Played by LifeZoi in your browser” are created by LifeZoi with your browser's sound engine. The classical ones are LifeZoi's own soft performances of music whose composers died long ago, so the compositions are in the public domain. They are not recordings of a pianist or orchestra. Nothing is downloaded or streamed for them.",
+      aboutBuiltIn: "Pieces marked “Played by LifeZoi in your browser”, such as the breathing guides, are made by LifeZoi with your browser's sound engine. Nothing is downloaded or streamed for them.",
+      aboutStreamed: "Pieces marked “Streamed from Wikimedia Commons” are real recordings that are in the public domain or shared under a Creative Commons licence. Your browser plays them directly from Wikimedia Commons, so Wikimedia receives your IP address while one plays. LifeZoi does not download or store them. Each recording, its licence, any credit the licence asks for, and its original page are listed here.",
       aboutPixabay: "Pixabay recordings are downloaded once and stored with LifeZoi. Each one is used under the Pixabay Content License, and its original page is linked below.",
       licenseLink: "Pixabay Content License",
       sourceLink: "Original page",
+      spotifyTitle: "Prefer Spotify?",
+      spotifyIntro: "If you use Spotify, you can open Spotify's own playlist for this type of music. It opens on Spotify, not inside LifeZoi. Full tracks may need a Spotify account, and Spotify's terms and privacy policy apply there. LifeZoi does not send Spotify anything.",
+      spotifyLink: "Open “{playlist}” on Spotify",
       sampleNote: "You are looking at the sample visitor, so favorites and listening time are not saved.",
     },
     tracks: {

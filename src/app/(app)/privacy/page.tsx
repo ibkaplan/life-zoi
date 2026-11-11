@@ -51,6 +51,15 @@ export default function PrivacyPage() {
         </p>
       </section>
       <section className="card stack">
+        <h2><T text="Music" /></h2>
+        <p>
+          <T text="Music in My Music plays only after you press Play. Real recordings stream to your browser directly from Wikimedia Commons, so Wikimedia receives your IP address and the address of the recording while it plays. LifeZoi does not download, store, or pass on those recordings, and it sends Wikimedia no health information. The breathing guides are made in your browser and are not streamed." />
+        </p>
+        <p>
+          <T text="Each category also offers a link to a Spotify playlist. LifeZoi does not embed Spotify. Nothing is sent to Spotify unless you open that link, and then Spotify’s own terms and privacy policy apply. Your music choice and volume are saved in this browser only." />
+        </p>
+      </section>
+      <section className="card stack">
         <h2><T text="Deletion" /></h2>
         <p>
           <T text="Settings can clear the saved rows for the signed-in account, or delete the account. Deleting the account removes the login and that person’s rows. Closing the tab clears only the copy kept in the tab. Clearing data does not promise that a host or Supabase has erased every backup or log." />

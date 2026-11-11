@@ -1,5 +1,10 @@
 # Background music recordings
 
+> **Superseded on 2026-11-11.** The owner decided LifeZoi streams music and does not
+> download or store it. Do not add audio files here. Real recordings are listed in
+> `src/lib/music-library/streams.ts` and stream from Wikimedia Commons. This file is
+> kept only as a record of the earlier plan.
+
 This folder holds the recordings LifeZoi's background music may play. Every file
 here must have an entry in `src/lib/background-music/tracks.ts` (`RECORDINGS`)
 with its licence, attribution, and the page where a person read that licence.
