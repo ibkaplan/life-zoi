@@ -1,9 +1,10 @@
+import { SITE_ORIGIN } from "@/lib/site";
 import { makeTranslate, type Translate } from "@/lib/i18n/translate";
 
 const english = makeTranslate(null);
 
 /** Published LifeZoi site. Invitation links use this origin in production. */
-export const PRODUCTION_SITE_ORIGIN = "https://life-zoi.vercel.app";
+export const PRODUCTION_SITE_ORIGIN = SITE_ORIGIN;
 
 export const SHARE_HEADING = "Share the Care";
 export const SHARE_TAGLINE = "A Little Care Can Make a Big Difference";

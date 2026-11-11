@@ -101,7 +101,7 @@ There is no separate backend service, queue, or background worker. `@supabase/su
 | ESLint | 9 with `eslint-config-next` 16.4.3 |
 | Tests | Vitest 5, `vitest.config.ts`, `src/**/*.test.ts` |
 | Fonts | Fraunces and Source Sans 3 |
-| Host intended for production | Vercel. Repo homepage https://life-zoi.vercel.app. Team slug recorded in `README.md`: `risi-0778846f`. |
+| Host intended for production | Vercel. Production https://www.lifezoi.com (lifezoi.com and life-zoi.vercel.app redirect there). Team slug recorded in `README.md`: `risi-0778846f`. |
 
 `package.json` name is `life-zoi`. The closed pull request #1 branch names the package `lifezoi`. Node on the documentation host was not rechecked on 2026-11-05; the README still requires Node.js 22.
 
@@ -118,7 +118,7 @@ Account tables, used by the app when the public config is present: `profiles` (i
 | Supabase Auth and Postgres | Active code path. Public URL and anon key required at runtime. Service role is not in `.env.example` and must not be added as `NEXT_PUBLIC_`. |
 | AI provider | Mock only. Env names in `.env.example` are planning labels. A non-mock provider is refused. |
 | MedlinePlus Connect | `https://connect.medlineplus.gov/service`, LOINC only, 12-hour cache, 20 outbound calls per minute in `src/lib/medlineplus.ts`. |
-| Vercel | Host. Homepage recorded as https://life-zoi.vercel.app. This refresh did not request it. |
+| Vercel | Host. Production at https://www.lifezoi.com. This refresh did not request it. |
 | Public health pages | `src/lib/sources.ts` and `src/lib/wellness/sources.ts`, plus the SSA period life table URL in `src/lib/life-table.ts`. |
 | Stripe, email, SMS | Not present |
 | GitHub Actions | No workflows (`total_count` 0 on 2026-11-05) |
