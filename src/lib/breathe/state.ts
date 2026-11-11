@@ -66,6 +66,8 @@ export type BreatheState = {
   voice: boolean;
   pace: "gentle" | "standard";
   length: "quick" | "short" | "full";
+  /** The shape that guides the breath: the original circle, or a balloon. */
+  guide: "circle" | "balloon";
 };
 
 export const BREATHE_LIMITS = { sessions: 365, checkIns: 40, extras: 40, past: 12, feeling: 280 } as const;
@@ -76,7 +78,7 @@ export function emptyHabits(): BreatheHabits {
 }
 
 export function emptyBreathe(): BreatheState {
-  return { days: [...DEFAULT_DAYS], sessions: [], challenge: null, past: [], voice: true, pace: "gentle", length: "full" };
+  return { days: [...DEFAULT_DAYS], sessions: [], challenge: null, past: [], voice: true, pace: "gentle", length: "full", guide: "circle" };
 }
 
 export function isEmptyBreathe(state: BreatheState): boolean {
@@ -197,6 +199,7 @@ export function sanitizeBreathe(input: unknown): BreatheState {
     voice: row.voice !== false,
     pace: row.pace === "standard" ? "standard" : "gentle",
     length: row.length === "short" || row.length === "quick" ? row.length : "full",
+    guide: row.guide === "balloon" ? "balloon" : "circle",
   };
 }
 
