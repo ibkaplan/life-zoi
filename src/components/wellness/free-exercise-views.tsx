@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenToSteps } from "@/components/voice/read-aloud";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useLocale, useT } from "@/components/locale-provider";
@@ -151,6 +152,7 @@ export function CategoryPage({ slug }: { slug: string }) {
       <p className="kicker">{t("Free exercise resources")}</p>
       <h1>{t(category.title)}</h1>
       <p className="lede">{t(category.intro)}</p>
+      <ListenToSteps title={t(category.title)} intro={t(category.intro)} steps={category.steps.map((step) => t(step))} closing={[t(category.safety)]} />
       <ol className="free-steps">
         {category.steps.map((step) => (
           <li key={step}>{t(step)}</li>

@@ -141,13 +141,18 @@ describe("guided session", () => {
   it("follows the suggested 2 + 2 + 3 + 1½ minute session, between 5 and 10 minutes", () => {
     const full = buildSession("full", "gentle");
     expect(full.map((step) => step.id)).toEqual(["nasal", "bhramari", "diaphragm", "rest"]);
-    expect(full.map((step) => step.seconds)).toEqual([120, 120, 180, 90]);
+    // Whole breaths: 12 breaths of 10 s, 11 hums of 11 s, 18 breaths of 10 s, then rest.
+    expect(full.map((step) => step.seconds)).toEqual([120, 121, 180, 90]);
     const short = buildSession("short", "gentle");
     for (const steps of [full, short, buildSession("full", "standard", "foundations"), buildSession("short", "standard", "foundations")]) {
       const minutes = sessionSeconds(steps) / 60;
-      expect(minutes).toBeGreaterThanOrEqual(5);
+      // "About 5" to "about 9" minutes: whole breaths can move a session by a few seconds.
+      expect(minutes).toBeGreaterThanOrEqual(4.5);
       expect(minutes).toBeLessThanOrEqual(10);
     }
+    const quick = sessionSeconds(buildSession("quick", "gentle")) / 60;
+    expect(quick).toBeGreaterThanOrEqual(2.5);
+    expect(quick).toBeLessThanOrEqual(3.5);
   });
 
   it("has no hold phase, keeps breaths slow, and never makes the out-breath shorter", () => {
@@ -165,27 +170,36 @@ describe("guided session", () => {
     expect(buildSession("full", "gentle", "foundations").map((step) => step.id)).toEqual(["nasal", "diaphragm", "rest"]);
   });
 
+  it("uses a calm default of 4 seconds in and 6 out", () => {
+    expect(PACES.gentle).toMatchObject({ inhale: 4, exhale: 6 });
+    expect(PACES.standard.exhale).toBeGreaterThanOrEqual(5);
+  });
+
+  it("never cuts a breath short at the end of a step", () => {
+    for (const length of ["quick", "short", "full"] as const)
+      for (const pace of ["gentle", "standard"] as const)
+        for (const step of buildSession(length, pace)) {
+          const cycle = step.pattern.reduce((sum, item) => sum + item.seconds, 0);
+          if (cycle > 0) expect(step.seconds % cycle).toBe(0);
+        }
+  });
+
   it("moves through breaths and steps on a timer", () => {
-    const steps = buildSession("full", "gentle"); // in 3, out 4, hum 5
-    expect(phaseAt(steps, 0)).toMatchObject({ stepIndex: 0, phase: "in", phaseLength: 3 });
-    expect(phaseAt(steps, 3.5)).toMatchObject({ stepIndex: 0, phase: "out", phaseElapsed: 0.5 });
-    expect(phaseAt(steps, 7)).toMatchObject({ phase: "in" });
+    const steps = buildSession("full", "gentle"); // in 4, out 6, hum 7
+    expect(phaseAt(steps, 0)).toMatchObject({ stepIndex: 0, phase: "in", phaseLength: 4 });
+    expect(phaseAt(steps, 3.9)).toMatchObject({ stepIndex: 0, phase: "in" });
+    expect(phaseAt(steps, 4.5)).toMatchObject({ stepIndex: 0, phase: "out", phaseElapsed: 0.5, phaseLength: 6 });
+    expect(phaseAt(steps, 10)).toMatchObject({ phase: "in" });
     expect(phaseAt(steps, 121)).toMatchObject({ stepIndex: 1, phase: "in" });
-    expect(phaseAt(steps, 124)).toMatchObject({ stepIndex: 1, phase: "hum", phaseLength: 5 });
-    expect(phaseAt(steps, 421)).toMatchObject({ stepIndex: 3, phase: "natural" });
-    expect(phaseAt(steps, 510).done).toBe(true);
-    expect(phaseAt(steps, 0).totalRemaining).toBe(510);
+    expect(phaseAt(steps, 125)).toMatchObject({ stepIndex: 1, phase: "hum", phaseLength: 7 });
+    expect(phaseAt(steps, 422)).toMatchObject({ stepIndex: 3, phase: "natural" });
+    expect(phaseAt(steps, 511).done).toBe(true);
+    expect(phaseAt(steps, 0).totalRemaining).toBe(511);
     // each new phase gets a new key
     expect(phaseAt(steps, 1).phaseKey).not.toBe(phaseAt(steps, 4).phaseKey);
     expect(phaseAt(steps, 1).phaseKey).toBe(phaseAt(steps, 2).phaseKey);
   });
 
-  it("cuts the last breath of a step short instead of running into the next step", () => {
-    const steps = buildSession("full", "standard"); // in 4, out 6 → 120 is 12 cycles exactly; check the hum step 120..240 with 11-second cycles
-    const state = phaseAt(steps, 239);
-    expect(state.stepIndex).toBe(1);
-    expect(state.phaseElapsed + (state.phaseLength - state.phaseElapsed)).toBeLessThanOrEqual(state.phaseElapsed + state.stepRemaining + 1e-9);
-  });
 });
 
 describe("weekly calendar", () => {

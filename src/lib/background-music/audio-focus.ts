@@ -9,6 +9,9 @@
  * Any new feature that speaks or plays sound (for example a focus timer) should
  * claim focus with `useAudioFocus` from `src/components/background-music/use-audio-focus.ts`.
  *
+ * A `voice` claim (the read-aloud voice) does not pause music: the music gets
+ * quieter instead, so the voice stays clear over it.
+ *
  * This is an in-page signal only. It never inspects what the other audio is.
  */
 export type FocusKind = "sound" | "video" | "voice";
@@ -36,8 +39,13 @@ export function createAudioFocus() {
     claims(): readonly Claim[] {
       return claims;
     },
+    /** Sound that music should pause for. */
     busy(): boolean {
-      return claims.length > 0;
+      return claims.some((item) => item.kind !== "voice");
+    },
+    /** A voice is speaking, so music should play quietly underneath. */
+    ducked(): boolean {
+      return claims.some((item) => item.kind === "voice");
     },
     subscribe(listener: Listener): () => void {
       listeners.add(listener);

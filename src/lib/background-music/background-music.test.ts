@@ -194,3 +194,16 @@ describe("music library", () => {
     expect(Object.keys(en.music.tracks).sort()).toEqual([...ids].sort());
   });
 });
+
+describe("audio focus for the read-aloud voice", () => {
+  it("lowers music for a voice instead of pausing it", () => {
+    const focus = createAudioFocus();
+    focus.claim("read-aloud", "voice");
+    expect(focus.busy()).toBe(false);
+    expect(focus.ducked()).toBe(true);
+    focus.claim("video", "video");
+    expect(focus.busy()).toBe(true);
+    focus.release("read-aloud");
+    expect(focus.ducked()).toBe(false);
+  });
+});

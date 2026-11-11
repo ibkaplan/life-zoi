@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ReadAloud } from "@/components/voice/read-aloud";
 import { Art } from "@/components/companion/art";
 import { useLocale } from "@/components/locale-provider";
 import { LOCALE_META } from "@/lib/i18n/config";
@@ -36,9 +37,7 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
   const key = `book:${book.id}`;
   const start = Math.min(book.pages.length - 1, companion.media.positions[key] ?? 0);
   const [page, setPage] = useState(start);
-  const [speaking, setSpeaking] = useState(false);
   const spokeSince = useRef<number | null>(null);
-  const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
   const bookmarks = companion.media.bookmarks[key] ?? [];
   const paragraphs = (book.pages[page] ?? []).map((text) => t(text));
 
@@ -46,43 +45,29 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
     if (!sample) commitCompanion(change);
   }
 
-  function stopSpeaking() {
-    if (!canSpeak) return;
-    window.speechSynthesis.cancel();
-    setSpeaking(false);
-    if (spokeSince.current !== null) {
-      const minutes = Math.round((nowMs() - spokeSince.current) / 60000);
+  // Listening minutes count toward the day, the same as before the shared voice player.
+  const onListening = useCallback(
+    (active: boolean) => {
+      if (active) {
+        spokeSince.current = Date.now();
+        return;
+      }
+      if (spokeSince.current === null) return;
+      const minutes = Math.round((Date.now() - spokeSince.current) / 60000);
       spokeSince.current = null;
-      if (minutes > 0) commit((state) => withDay(state, localISODate(), (day) => ({ ...day, listeningMinutes: day.listeningMinutes + minutes })));
-    }
-  }
+      if (minutes > 0 && !sample) commitCompanion((state) => withDay(state, localISODate(), (day) => ({ ...day, listeningMinutes: day.listeningMinutes + minutes })));
+    },
+    [sample],
+  );
 
   function go(next: number) {
-    stopSpeaking();
     const clamped = Math.max(0, Math.min(book.pages.length - 1, next));
     setPage(clamped);
     commit((state) => savePage(state, book, clamped));
   }
 
-  function listen() {
-    if (!canSpeak) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(paragraphs.join(" "));
-    utterance.lang = LOCALE_META[locale].htmlLang;
-    utterance.rate = 0.9;
-    utterance.onend = () => {
-      stopSpeaking();
-    };
-    spokeSince.current = nowMs();
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  }
-
   useEffect(() => {
     if (!sample) commitCompanion((state) => addRecent(savePage(state, book, start), key, new Date().toISOString()));
-    return () => {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -94,10 +79,7 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => {
-              stopSpeaking();
-              onClose();
-            }}
+            onClick={() => onClose()}
           >
             {t("Back to all books")}
           </button>
@@ -117,17 +99,6 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
         <button className="btn btn-primary" type="button" onClick={() => go(page + 1)} disabled={page >= book.pages.length - 1}>
           {t("Next page")}
         </button>
-        {canSpeak ? (
-          speaking ? (
-            <button className="btn btn-teal" type="button" onClick={stopSpeaking}>
-              {t("Stop listening")}
-            </button>
-          ) : (
-            <button className="btn btn-teal" type="button" onClick={listen}>
-              {t("Listen to this page")}
-            </button>
-          )
-        ) : null}
         <button
           className="btn btn-ghost"
           type="button"
@@ -144,8 +115,7 @@ export function Reader({ book, onClose }: { book: Book; onClose?: () => void }) 
         </button>
         <FavoriteButton id={key} label={msg("this book")} />
       </div>
-      {!canSpeak ? <p className="hint">{t("This browser cannot read aloud, so listening is not available here.")}</p> : null}
-      {canSpeak ? <p className="hint">{t("Listening uses your device's built-in voice. The words stay on your device.")}</p> : null}
+      <ReadAloud key={page} text={paragraphs} label={t("Listen to this page")} onActiveChange={onListening} />
       {bookmarks.length > 0 ? (
         <p>
           {t("Bookmarks:")}{" "}
