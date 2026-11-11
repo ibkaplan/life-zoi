@@ -110,7 +110,9 @@ export function HeaderMusicButton() {
                 <summary>{m.music.credits}</summary>
                 {music.piece?.kind === "file" ? (
                   <p className="hint">
-                    {m.music.creditsFiles} {fmt(m.music.licence, { licence: music.piece.license })}.{" "}
+                    {music.piece.streamed ? m.music.creditsStreamed : m.music.creditsFiles}{" "}
+                    {fmt(m.music.licence, { licence: music.piece.license })}.{" "}
+                    {music.piece.attribution ? `${music.piece.attribution}. ` : ""}
                     <a href={music.piece.sourceUrl} target="_blank" rel="noopener noreferrer">
                       {m.music.source}
                     </a>

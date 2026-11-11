@@ -12,10 +12,12 @@ import {
   nextIndex,
   PIXABAY_RECORDINGS,
   previousIndex,
+  SPOTIFY_PLAYLISTS,
   startIndex,
   type LibraryRecording,
 } from "@/lib/music-library/catalog";
-import { trackById } from "@/lib/companion/music";
+import { TRACKS, trackById } from "@/lib/companion/music";
+import { STREAMED_RECORDINGS, streamedRecordingProblems } from "@/lib/music-library/streams";
 import { en } from "@/lib/i18n/messages/en";
 import { MESSAGES } from "@/lib/i18n/messages";
 
@@ -145,11 +147,43 @@ describe("music library", () => {
     }
   });
 
-  it("offers Moonlight Sonata and Für Elise as LifeZoi's own labelled performances", () => {
-    for (const id of ["moonlight-opening", "fur-elise"]) {
-      const track = trackById(id);
-      expect(track?.credit).toMatch(/Beethoven.*public domain.*synthesized by LifeZoi/);
-      expect(BUILT_IN_BY_CATEGORY.classical).toContain(id);
+  it("offers real recordings of Moonlight Sonata and Für Elise in Classical", () => {
+    const classical = categoryPlaylist("classical", [], []);
+    for (const id of ["moonlight-sonata-adagio", "fur-elise-piano"]) {
+      const piece = classical.find((item) => item.id === id);
+      expect(piece, id).toMatchObject({ kind: "file", streamed: true });
+    }
+  });
+
+  it("plays real recordings instead of in-browser music, keeping only the breathing guides", () => {
+    for (const category of LIBRARY_CATEGORIES) {
+      const playlist = categoryPlaylist(category, [], []);
+      expect(playlist.filter((piece) => piece.kind === "file").length, category).toBeGreaterThanOrEqual(3);
+      for (const piece of playlist) if (piece.kind === "synth") expect(piece.track.breath, piece.id).not.toBeNull();
+    }
+  });
+
+  it("lists only streamed recordings whose entry is complete, each once", () => {
+    for (const recording of STREAMED_RECORDINGS) expect(streamedRecordingProblems(recording), recording.id).toEqual([]);
+    expect(new Set(STREAMED_RECORDINGS.map((recording) => recording.id)).size).toBe(STREAMED_RECORDINGS.length);
+    expect(new Set(STREAMED_RECORDINGS.map((recording) => recording.stream)).size).toBe(STREAMED_RECORDINGS.length);
+  });
+
+  it("refuses streamed entries that are not on Wikimedia Commons, lack credit, or have a non-commercial licence", () => {
+    const good = STREAMED_RECORDINGS.find((recording) => recording.license === "CC BY 3.0")!;
+    expect(streamedRecordingProblems(good)).toEqual([]);
+    expect(streamedRecordingProblems({ ...good, stream: "https://example.com/song.mp3" })).toHaveLength(1);
+    expect(streamedRecordingProblems({ ...good, stream: "/audio/library/sleep/song.mp3" })).toHaveLength(1);
+    expect(streamedRecordingProblems({ ...good, sourceUrl: "https://pixabay.com/music/x-1/" })).toHaveLength(1);
+    expect(streamedRecordingProblems({ ...good, attribution: "" })).toEqual(["attribution is required for a CC BY or CC BY-SA recording"]);
+    expect(streamedRecordingProblems({ ...good, license: "CC BY-NC 4.0" as never })).toEqual(["license is not one LifeZoi accepts"]);
+    expect(streamedRecordingProblems({ ...good, category: "classical", composer: undefined })).toEqual(["composer is required for classical music"]);
+  });
+
+  it("links each category to a Spotify playlist on open.spotify.com", () => {
+    for (const category of LIBRARY_CATEGORIES) {
+      expect(SPOTIFY_PLAYLISTS[category].url, category).toMatch(/^https:\/\/open\.spotify\.com\/playlist\/[A-Za-z0-9]{22}$/);
+      expect(SPOTIFY_PLAYLISTS[category].name.trim(), category).not.toBe("");
     }
   });
 
@@ -191,7 +225,7 @@ describe("music library", () => {
         expect((messages.music.trackNotes as Record<string, string>)[id]?.trim(), `${locale} ${id}`).toBeTruthy();
       }
     }
-    expect(Object.keys(en.music.tracks).sort()).toEqual([...ids].sort());
+    for (const track of TRACKS) expect((en.music.tracks as Record<string, string>)[track.id], track.id).toBeTruthy();
   });
 });
 

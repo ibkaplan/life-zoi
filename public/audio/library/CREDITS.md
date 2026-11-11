@@ -1,5 +1,10 @@
 # My Music: Pixabay recordings
 
+> **Superseded on 2026-11-11.** The owner decided LifeZoi streams music and does not
+> download or store it. Do not add audio files here. Real recordings are listed in
+> `src/lib/music-library/streams.ts` and stream from Wikimedia Commons. This file is
+> kept only as a record of the earlier plan.
+
 Every audio file in this folder must have an entry in `PIXABAY_RECORDINGS` in
 `src/lib/music-library/catalog.ts`. The unit test refuses an entry without a
 Pixabay track page, the licence name, a verification date, and a file that exists.
