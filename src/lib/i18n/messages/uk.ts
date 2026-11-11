@@ -230,6 +230,7 @@ export const uk: Messages = {
     "/academy/move": "Рух",
     "/breathe": "Дихайте для життя",
     "/academy/move/breaks": "Перерви на рух",
+    "/academy/move/studio/daily-movement": "Щоденний рух",
     "/academy/move/studio/chair-yoga": "Студія йоги на стільці",
     "/my-day": "Мій день",
     "/plan": "Мій план",
