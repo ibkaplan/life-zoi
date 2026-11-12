@@ -227,6 +227,8 @@ export const el: Messages = {
     crisisLink: "SAMHSA: Γραμμή Βοήθειας 988 (στα αγγλικά)",
   },
   nav: {
+    "/start": "Ξεκινήστε",
+    "/my-health/baseline": "Το προφίλ υγείας μου",
     "/my-health": "Η υγεία μου",
     "/": "Αρχική",
     "/outlook": "Προοπτική ζωής",
