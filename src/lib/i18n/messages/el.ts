@@ -279,6 +279,7 @@ export const el: Messages = {
     dashboard: "Πίνακας",
     myHealth: "Η υγεία μου",
     food: "Τροφή και ευεξία",
+    nutrition: "Διατροφή",
     movement: "Κίνηση",
     library: "Βιβλιοθήκη ευεξίας",
     brain: "Εγκέφαλος και νους",

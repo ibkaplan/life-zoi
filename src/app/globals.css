@@ -263,7 +263,7 @@ html:lang(el) :where(h1, h2, h3, .btn, .home-btn, .card, .lz-card, dt, dd, legen
   color: #ffffff;
 }
 
-/* Main navigation: nine sections. Wide screens show them all in a bar that wraps instead of
+/* Main navigation: ten sections. Wide screens show them all in a bar that wraps instead of
    scrolling, so nothing is cut off. Narrower screens show Home, Dashboard, Movement, and Menu. */
 .site-nav { grid-area: nav; position: relative; min-width: 0; }
 
