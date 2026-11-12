@@ -796,5 +796,6 @@
  "{value} hours": "{value} ч",
  "{value} kg": "{value} кг",
  "{voice} (sounds most natural)": "{voice} (звучит естественнее всего)",
- "{voice}, online": "{voice}, онлайн"
+ "{voice}, online": "{voice}, онлайн",
+ "My Health": "Моё здоровье"
 }

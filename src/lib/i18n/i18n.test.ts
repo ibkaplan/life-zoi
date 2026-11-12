@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_ASSESSMENT, STEP_IDS } from "@/lib/types";
-import { FOOTER_LINKS, MEMBER_LINKS, PUBLIC_LINKS } from "@/lib/navigation";
+import { FOOTER_LINKS, NAV_SECTIONS } from "@/lib/navigation";
 import {
   ageLabels,
   alcoholLabels,
@@ -97,7 +97,7 @@ describe("English text matches the existing source strings", () => {
   });
 
   it("keeps every menu label", () => {
-    for (const link of [...PUBLIC_LINKS, ...MEMBER_LINKS, ...FOOTER_LINKS]) {
+    for (const link of [...NAV_SECTIONS.flatMap((section) => section.pages), ...FOOTER_LINKS]) {
       expect((en.nav as Record<string, string>)[link.href], link.href).toBe(link.label);
     }
   });

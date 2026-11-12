@@ -6,7 +6,12 @@ import { useMessages } from "@/components/locale-provider";
 import { fmt } from "@/lib/i18n/config";
 import { navLabel } from "@/lib/i18n/nav";
 import { useAccount } from "@/lib/account-store";
-import { MEMBER_LINKS } from "@/lib/navigation";
+import type { NavLink } from "@/lib/navigation";
+
+const NEXT_LINKS: readonly NavLink[] = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/my-day", label: "My Day" },
+];
 
 export function SignInView() {
   const account = useAccount();
@@ -22,7 +27,7 @@ export function SignInView() {
         <section className="card stack">
           <p>{fmt(m.signIn.signedInAs, { email: account.email ?? m.common.yourAccount })}</p>
           <div className="actions">
-            {MEMBER_LINKS.slice(0, 2).map((link) => (
+            {NEXT_LINKS.map((link) => (
               <Link key={link.href} className="btn btn-primary" href={link.href}>
                 {navLabel(m, link)}
               </Link>
