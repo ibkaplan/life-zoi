@@ -2633,6 +2633,8 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .bf-aging p { margin: 0.15rem 0 0; }
 .bf-steps { display: grid; gap: 0.4rem; }
 .bf-safety { border-top-color: var(--gold) !important; }
+.bf-video-title { margin: 0; font-size: 1.1rem; overflow-wrap: anywhere; }
+.bf-video .video-frame { max-width: none; }
 
 /* week calendar */
 .bf-progress-line { font-size: 1.2rem; margin: 0; }
@@ -2692,6 +2694,53 @@ a.home-companion-card:hover { transform: translateY(-2px); }
   .bf-ball-count { animation: none; }
   .bf-ripple { animation: none; opacity: 0.6; }
 }
+
+/* breathing balloon: an alternative to the ball, scaled every frame by the same player clock */
+.bf-balloon-stage { display: grid; justify-items: center; gap: 0.2rem; }
+.bf-balloon-cue { margin: 0; text-align: center !important; font-size: clamp(2rem, 8vw, 3rem); font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--royal); transition: color 0.8s ease; }
+.bf-balloon-cue[data-phase="out"] { color: var(--teal); }
+.bf-balloon-cue[data-phase="hum"] { color: #8A5A0B; }
+.bf-balloon-cue[data-phase="natural"] { color: var(--muted); }
+.bf-balloon-wrap { position: relative; width: min(66vw, 17rem); display: grid; justify-items: center; margin: 0.2rem auto 0; }
+.bf-balloon { position: relative; width: 100%; aspect-ratio: 200 / 226; transform: scale(0.55); transform-origin: 50% 100%; will-change: transform; display: grid; place-items: center; }
+.bf-balloon-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 10px 24px rgba(106, 61, 168, 0.3)); }
+.bf-balloon-knot { fill: #6A3DA8; }
+.bf-balloon-count { margin-top: -12%; color: #3B1F66; text-shadow: 0 1px 10px rgba(255, 255, 255, 0.7); }
+.bf-balloon-string { width: 1.4rem; height: 6.5rem; margin-top: -2px; fill: none; stroke: #8E79A8; stroke-width: 2.5; stroke-linecap: round; }
+@media (prefers-reduced-motion: reduce) {
+  .bf-balloon { transform: scale(0.8) !important; }
+}
+
+/* Explore Breathing Practices */
+.bp { --bp-lavender: var(--royal); --bp-teal: var(--teal); --bp-gold: #B0731A; --bp-rose: #B2477A; }
+.bp-banner {
+  border-radius: var(--radius); padding: 1.3rem 1.4rem; color: #fff;
+  background: linear-gradient(120deg, var(--royal) 0%, #8457C2 50%, #B98EE5 100%);
+}
+.bp-banner h2, .bp-banner .kicker { color: #fff; margin: 0; }
+.bp-banner h2 { font-size: clamp(1.6rem, 5vw, 2.1rem); }
+.bp-banner p { margin: 0.4rem 0 0; font-size: 1.1rem; }
+.bp-safety { border-left: 6px solid var(--gold); background: #FFF9EE; }
+.bp-safety h3 { margin: 0; }
+.bp-safety ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; font-size: 1.08rem; }
+.bp-card { border-top-color: var(--bp-lavender); }
+.bp-card[data-tone="teal"] { border-top-color: var(--bp-teal); }
+.bp-card[data-tone="gold"] { border-top-color: var(--bp-gold); }
+.bp-card[data-tone="rose"] { border-top-color: var(--bp-rose); }
+.bp-card h3 { font-size: 1.35rem; }
+.bp-card p { font-size: 1.05rem; }
+.bp-tag-beginner { background: #DDEFEB !important; color: #1C5650 !important; }
+.bp-title { font-weight: 500; }
+.bp-thumb-fallback { font-size: 1.2rem; }
+.bp-thumb[data-tone="teal"] .cy-thumb-fallback { background: linear-gradient(135deg, var(--teal), var(--teal-brand)); }
+.bp-thumb[data-tone="gold"] .cy-thumb-fallback { background: linear-gradient(135deg, #B0731A, var(--gold)); }
+.bp-thumb[data-tone="rose"] .cy-thumb-fallback { background: linear-gradient(135deg, #B2477A, #D98BB0); }
+.bp-more summary { cursor: pointer; font-weight: 700; color: var(--royal); min-height: 44px; display: flex; align-items: center; }
+.bp-more[open] { display: grid; gap: 0.5rem; }
+.bp-hands { background: var(--lavender); border-radius: 14px; padding: 0.8rem 1rem; }
+.bp-hands-title { margin: 0 0 0.4rem; font-weight: 700; }
+.bp-hands ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.35rem; }
+.bp-stop { background: #FFF7E8; border-left: 5px solid var(--gold); border-radius: 10px; padding: 0.7rem 0.9rem; margin: 0; }
 
 /* life changes */
 .bf-life { display: grid; gap: 0.8rem; }

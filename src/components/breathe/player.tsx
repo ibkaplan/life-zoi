@@ -54,6 +54,46 @@ export function ballScale(phase: string, progress: number, phaseElapsed: number)
 /** What the guide says as each breath begins. Short, so the counting that follows stays on the beat. */
 const CUE: Record<string, string> = { in: msg("Breathe in"), out: msg("Breathe out"), hum: msg("Hum softly") };
 const SHOWN_CUE: Record<string, string> = { in: msg("Breathe in slowly"), out: msg("Now breathe out gently"), hum: msg("Hum softly"), natural: msg("Breathe naturally") };
+/** Big words over the balloon. The same phrases the guide speaks. */
+const BALLOON_CUE: Record<string, string> = { in: msg("Breathe in"), out: msg("Breathe out"), hum: msg("Hum softly"), natural: msg("Breathe naturally") };
+type Guide = "circle" | "balloon";
+
+/** A soft balloon drawn in SVG. The player scales its wrapper, so it fills and empties with the breath. */
+function BalloonShape() {
+  return (
+    <svg viewBox="0 0 200 228" className="bf-balloon-svg" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="bf-balloon-fill" cx="36%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="#F7F0FD" />
+          <stop offset="28%" stopColor="#D9C3F2" />
+          <stop offset="65%" stopColor="#B98EE5" />
+          <stop offset="100%" stopColor="#6A3DA8" />
+        </radialGradient>
+      </defs>
+      <path className="bf-balloon-body" d="M100 8 C 158 8 192 52 192 102 C 192 156 146 200 106 214 L 94 214 C 54 200 8 156 8 102 C 8 52 42 8 100 8 Z" fill="url(#bf-balloon-fill)" />
+      <path className="bf-balloon-knot" d="M92 214 L 108 214 L 104 226 L 96 226 Z" />
+      <ellipse cx="66" cy="62" rx="20" ry="30" fill="#FFFFFF" opacity="0.45" transform="rotate(-24 66 62)" />
+    </svg>
+  );
+}
+
+function GuideChoice({ guide, onChange }: { guide: Guide; onChange: (guide: Guide) => void }) {
+  const { t } = useLocale();
+  return (
+    <fieldset className="field">
+      <legend>{t("Choose your breathing guide")}</legend>
+      <div className="lz-tabs">
+        {(["circle", "balloon"] as const).map((shape) => (
+          <button key={shape} type="button" className="lz-tab" aria-pressed={guide === shape} onClick={() => onChange(shape)}>
+            {shape === "circle" ? t("Circle") : t("Balloon")}
+          </button>
+        ))}
+      </div>
+      {guide === "balloon" ? <span className="hint">{t("The balloon slowly inflates as you breathe in and deflates as you breathe out.")}</span> : null}
+    </fieldset>
+  );
+}
+
 const NUMBER = ["", msg("One"), msg("Two"), msg("Three"), msg("Four"), msg("Five"), msg("Six"), msg("Seven"), msg("Eight"), msg("Nine"), msg("Ten")];
 
 export function BreathingPlayer() {
@@ -72,6 +112,13 @@ export function BreathingPlayer() {
   useAudioFocus(status === "running" || status === "paused", "guided-breathing");
   const [elapsed, setElapsed] = useState(0);
   const [breathCues, setBreathCues] = useState(true);
+  // The choice is saved with the other breathing settings. With sample data on it still works, for this visit only.
+  const [guideNow, setGuideNow] = useState<Guide | null>(null);
+  const guide: Guide = guideNow ?? breathe.guide;
+  const chooseGuide = (next: Guide) => {
+    setGuideNow(next);
+    if (!sample) commitBreathe((s) => ({ ...s, guide: next }));
+  };
   const [countAloud, setCountAloud] = useState(true);
   const ballRef = useRef<HTMLDivElement>(null);
   const introSpeaking = useRef(false);
@@ -176,7 +223,7 @@ export function BreathingPlayer() {
     };
     draw();
     return () => cancelAnimationFrame(frame);
-  }, [status, steps, total]);
+  }, [status, steps, total, guide]);
 
   useEffect(() => () => hush(), []);
 
@@ -264,6 +311,7 @@ export function BreathingPlayer() {
             </div>
             <span className="hint">{t("Choose whatever feels easy. If a count feels long, use the gentle pace or simply breathe at your own rhythm.")}</span>
           </fieldset>
+          <GuideChoice guide={guide} onChange={chooseGuide} />
           <label className="check-row">
             <input type="checkbox" checked={breathe.voice} disabled={sample} onChange={(event) => commitBreathe((s) => ({ ...s, voice: event.target.checked }))} />
             <span>{t("Spoken instructions (uses your device's voice)")}</span>
@@ -294,16 +342,37 @@ export function BreathingPlayer() {
             {t("Step {current} of {total} · {time} left in this step", { current: state.stepIndex + 1, total: steps.length, time: formatClock(state.stepRemaining) })}
           </p>
           <h3>{t(state.step.title)}</h3>
-          <div className="bf-ball-wrap" aria-hidden="true">
-            <div ref={ballRef} className="bf-ball" data-phase={state.phase}>
-              {state.phase === "hum" && status === "running" ? <span className="bf-ripple" /> : null}
+          {guide === "balloon" ? (
+            <div className="bf-balloon-stage">
+              <p className="bf-balloon-cue" data-phase={state.phase} aria-hidden="true">
+                {status === "paused" ? t("Paused. Breathe normally.") : t(BALLOON_CUE[state.phase] ?? "")}
+              </p>
+              <div className="bf-balloon-wrap" aria-hidden="true">
+                <div ref={ballRef} className="bf-balloon" data-phase={state.phase}>
+                  <BalloonShape />
+                  {beat > 0 ? (
+                    <span key={`${state.phaseKey}-${beat}`} className="bf-ball-count bf-balloon-count">
+                      {beat}
+                    </span>
+                  ) : null}
+                </div>
+                <svg className="bf-balloon-string" viewBox="0 0 20 120" aria-hidden="true" focusable="false">
+                  <path d="M10 0 C 2 30 18 60 10 90 C 6 104 12 112 10 120" />
+                </svg>
+              </div>
             </div>
-            {beat > 0 ? (
-              <span key={`${state.phaseKey}-${beat}`} className="bf-ball-count">
-                {beat}
-              </span>
-            ) : null}
-          </div>
+          ) : (
+            <div className="bf-ball-wrap" aria-hidden="true">
+              <div ref={ballRef} className="bf-ball" data-phase={state.phase}>
+                {state.phase === "hum" && status === "running" ? <span className="bf-ripple" /> : null}
+              </div>
+              {beat > 0 ? (
+                <span key={`${state.phaseKey}-${beat}`} className="bf-ball-count">
+                  {beat}
+                </span>
+              ) : null}
+            </div>
+          )}
           <p className="bf-cue" aria-live="polite">
             {status === "paused" ? t("Paused. Breathe normally.") : t(SHOWN_CUE[state.phase] ?? "")}
           </p>
@@ -358,6 +427,7 @@ export function BreathingPlayer() {
               {t("I feel dizzy or unwell. Stop now")}
             </button>
           </div>
+          <GuideChoice guide={guide} onChange={chooseGuide} />
         </div>
       ) : null}
 
