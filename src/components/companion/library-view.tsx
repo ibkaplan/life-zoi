@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { FavoriteButton, RatingControl, SaveNote, VideoPlayer } from "@/components/companion/shared";
-import { MovementFinder, MovementPreferences } from "@/components/companion/movement-finder";
+import { MovementPreferences } from "@/components/companion/movement-finder";
+import { VideoLibrary } from "@/components/companion/video-library";
 import { useProfile } from "@/components/companion/use-profile";
 import { useLocale, useT } from "@/components/locale-provider";
 import { ChairYogaBanner } from "@/components/wellness/movement-studio-views";
@@ -11,7 +11,7 @@ import { useAccount } from "@/lib/account-store";
 import { LOCALE_META, type Locale } from "@/lib/i18n/config";
 import { msg, type Translate } from "@/lib/i18n/translate";
 import { COST_TEXT, reviewQueue, SOURCES, VIDEOS, visibleVideos, type VideoItem } from "@/lib/wellness-library/catalog";
-import { CATEGORY_INFO, LIBRARY_CATEGORIES, type LibraryCategory } from "@/lib/wellness-library/moves";
+import { CATEGORY_INFO } from "@/lib/wellness-library/moves";
 
 /** Same output as formatTimestamp in English, in the chosen language otherwise. */
 function shownTimestamp(iso: string, locale: Locale, t: Translate): string {
@@ -42,16 +42,14 @@ function shownProblem(problem: string, t: Translate): string {
 export function WellnessLibraryView() {
   const { t, locale } = useLocale();
   const { ready, companion } = useProfile();
-  const [category, setCategory] = useState<LibraryCategory>("pilates");
   if (!ready) return <p className="hint">{t("Loading the library…")}</p>;
-  const videos = visibleVideos();
-  const inCategory = videos.filter((video) => video.category === category);
+  // Chair Yoga Studio has its own page; the rest of the earlier catalog stays reachable here.
+  const catalogVideos = visibleVideos().filter((video) => video.sourceId !== "youtube-studio");
   const byId = new Map(VIDEOS.map((video) => [`video:${video.id}`, video]));
   const favorites = companion.media.favorites.map((id) => byId.get(id)).filter((video): video is VideoItem => Boolean(video));
   const recent = companion.media.recent
     .filter((item) => item.id.startsWith("video:") || item.id.startsWith("session:"))
     .slice(0, 6);
-  const info = CATEGORY_INFO[category];
   return (
     <div className="stack-lg">
       <div className="lz-hello">
@@ -60,44 +58,29 @@ export function WellnessLibraryView() {
         </p>
         <h1>{t("Wellness Library")}</h1>
         <p>{t("Choose an activity and how long you have. Your session plays right here.")}</p>
-        <p className="hint">
-          {t("Suggestions follow your level, experience, mobility, and any limits you reported. Age alone never makes a session harder.")}
-        </p>
+        <p>{t("Every class is a real video with an instructor, played with YouTube's official player inside LifeZoi.")}</p>
       </div>
       <SaveNote />
       <ChairYogaBanner />
-      <div className="lz-tabs" role="group" aria-label={t("Library category")}>
-        {LIBRARY_CATEGORIES.map((value) => (
-          <button key={value} type="button" className="lz-tab" aria-pressed={value === category} onClick={() => setCategory(value)}>
-            {t(CATEGORY_INFO[value].title)}
-          </button>
-        ))}
-      </div>
+      <VideoLibrary />
       <section className="card stack">
-        <h2>{t(info.title)}</h2>
-        <p>{t(info.summary)}</p>
-        {category === "brain-training" ? (
-          <div className="stack">
-            <p>{t("Brain games live in the Brain & Habit Quiz section. They are for enjoyment and focus, not a medical or cognitive test.")}</p>
-            <div className="lz-buttons">
-              <Link className="btn btn-primary" href="/brain-quiz/games">
-                {t("Open brain games")}
-              </Link>
-              <Link className="btn btn-secondary" href="/brain-quiz">
-                {t("Brain & Habit Quiz")}
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <MovementFinder key={category} activityId={`library-${category}`} initialCategory={category} choices={[category]} compact />
-        )}
-        {inCategory.length > 0 ? (
+        <h2>{t("Brain games")}</h2>
+        <p>{t("Brain games live in the Brain & Habit Quiz section. They are for enjoyment and focus, not a medical or cognitive test.")}</p>
+        <div className="lz-buttons">
+          <Link className="btn btn-primary" href="/brain-quiz/games">
+            {t("Open brain games")}
+          </Link>
+          <Link className="btn btn-secondary" href="/brain-quiz">
+            {t("Brain & Habit Quiz")}
+          </Link>
+        </div>
+      </section>
+      {catalogVideos.length > 0 ? (
+        <section className="card stack">
           <details>
-            <summary>
-              {t("{category} videos in the catalog ({count})", { category: t(info.title), count: inCategory.length })}
-            </summary>
+            <summary>{t("More videos from the earlier catalog ({count})", { count: catalogVideos.length })}</summary>
             <div className="lz-grid">
-              {inCategory.map((video) => (
+              {catalogVideos.map((video) => (
                 <article key={video.id} className="lz-card">
                   <h3>{video.title}</h3>
                   <p>{t(video.description)}</p>
@@ -108,15 +91,8 @@ export function WellnessLibraryView() {
               ))}
             </div>
           </details>
-        ) : category !== "brain-training" ? (
-          <p className="hint">
-            {t(
-              "No approved {category} video is in the catalog yet, so LifeZoi's own guided session is shown. New videos appear here after an administrator approves them.",
-              { category: t(info.title).toLocaleLowerCase(LOCALE_META[locale].htmlLang) },
-            )}
-          </p>
-        ) : null}
-      </section>
+        </section>
+      ) : null}
       <MovementPreferences />
       {favorites.length > 0 ? (
         <section className="card stack">
