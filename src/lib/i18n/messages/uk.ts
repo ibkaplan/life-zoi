@@ -279,6 +279,7 @@ export const uk: Messages = {
     dashboard: "Панель",
     myHealth: "Моє здоров’я",
     food: "Їжа і добробут",
+    nutrition: "Харчування",
     movement: "Рух",
     library: "Бібліотека добробуту",
     brain: "Мозок і розум",

@@ -1,7 +1,7 @@
 /**
  * Site navigation.
  *
- * The header shows nine main sections in a fixed order. Each section groups the pages
+ * The header shows ten main sections in a fixed order. Each section groups the pages
  * that already exist, so no page is removed or renamed; the section row under the header
  * lists the pages of the section you are in. The footer still lists every page.
  */
@@ -12,6 +12,7 @@ export type SectionKey =
   | "dashboard"
   | "myHealth"
   | "food"
+  | "nutrition"
   | "movement"
   | "library"
   | "brain"
@@ -66,10 +67,15 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     pages: [
       { href: "/food-plan", label: "Food & Wellness" },
       { href: "/food-plan/today", label: "Today's meals" },
-      { href: "/academy/meals", label: "Nutrition" },
       { href: "/sugar-detective", label: "Sugar Detective" },
       { href: "/food-labels", label: "Food Intelligence" },
     ],
+  },
+  {
+    key: "nutrition",
+    href: "/academy/meals",
+    label: "Nutrition",
+    pages: [{ href: "/academy/meals", label: "Nutrition" }],
   },
   {
     key: "movement",
