@@ -2635,6 +2635,10 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .bf-safety { border-top-color: var(--gold) !important; }
 .bf-video-title { margin: 0; font-size: 1.1rem; overflow-wrap: anywhere; }
 .bf-video .video-frame { max-width: none; }
+.bf-recipe { align-content: start; }
+.bf-recipe-video { display: grid; gap: 0.75rem; }
+.bf-recipe-video > summary { cursor: pointer; font-weight: 700; color: var(--royal); min-height: 44px; display: flex; align-items: center; }
+.bf-recipe-video .bf-video { box-shadow: none; padding: 0; border: 0; }
 
 /* week calendar */
 .bf-progress-line { font-size: 1.2rem; margin: 0; }
