@@ -6,7 +6,22 @@ import { useT } from "@/components/locale-provider";
 import { TECHNIQUES } from "@/lib/breathe/content";
 import { BREATHE_VIDEO_TEXT as T, BREATHE_VIDEOS_CHECKED_ON, type BreatheVideo, videosForTechnique } from "@/lib/breathe/videos";
 
-function VideoCard({ video, playing, onPlay, onClose }: { video: BreatheVideo; playing: boolean; onPlay: () => void; onClose: () => void }) {
+type EmbedVideo = Pick<BreatheVideo, "id" | "title" | "channel" | "channelUrl" | "note" | "originalUrl" | "embedUrl" | "thumbnailUrl">;
+
+export function VideoCard({
+  video,
+  playing,
+  onPlay,
+  onClose,
+  footnote,
+}: {
+  video: EmbedVideo;
+  playing: boolean;
+  onPlay: () => void;
+  onClose: () => void;
+  /** An extra line under the note, for example the video's license. */
+  footnote?: string;
+}) {
   const [failed, setFailed] = useState(false);
   const t = useT();
   return (
@@ -44,6 +59,7 @@ function VideoCard({ video, playing, onPlay, onClose }: { video: BreatheVideo; p
         </a>
       </p>
       <p>{t(video.note)}</p>
+      {footnote ? <p className="hint">{footnote}</p> : null}
       <div className="lz-buttons">
         {playing ? (
           <button type="button" className="btn btn-secondary" onClick={onClose}>
