@@ -2,6 +2,8 @@
 
 Owner's requests: "Complete user journey, personal dashboard and long-term health tracking", "Navigation and header correction", and "Complete website organization". Rule for every stage: organize and connect what exists. Nothing is deleted or renamed. Each stage is its own pull request. Nothing is merged or deployed without the owner's approval.
 
+Standing rule from the owner (2026-11-12): the phone version must look as polished as the computer version, never cramped. Every stage is designed for both and shown with phone and desktop screenshots.
+
 ## What exists today (inventory, `main` at f34c83a)
 
 - About 140 pages. The header showed 5 public links plus a "My space" row (7 links) only when signed in. Dashboard, Wellness Library, Brain games, Lab results and 25 more pages were reachable only from the footer.
