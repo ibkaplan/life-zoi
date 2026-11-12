@@ -2,20 +2,61 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
 import { HeaderMusicButton } from "@/components/background-music/header-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useMessages } from "@/components/locale-provider";
 import { Logo } from "@/components/logo";
 import { signOutAccount, useAccount } from "@/lib/account-store";
 import { navLabel } from "@/lib/i18n/nav";
-import { isCurrentLink, MEMBER_LINKS, PUBLIC_LINKS } from "@/lib/navigation";
+import {
+  currentPageIn,
+  isCurrentLink,
+  NAV_SECTIONS,
+  PHONE_QUICK_SECTIONS,
+  sectionFor,
+  type NavSection,
+} from "@/lib/navigation";
 
-/** One header for every page. The public links never change; signed-in people also get "My space". */
+/**
+ * One header for every page.
+ * Wide screens: the nine main sections in one bar that wraps instead of scrolling, so no item is cut off.
+ * Phones and small tablets: Home, Dashboard, Movement, and a Menu button that opens every section.
+ * Under the bar, the pages of the current section.
+ */
 export function SiteNav() {
   const pathname = usePathname() ?? "/";
   const account = useAccount();
   const m = useMessages();
   const signedIn = account.phase === "ready";
+  const current = sectionFor(pathname);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuId = useId();
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  // Close the phone menu after moving to another page.
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    setMenuOpen(false);
+  }
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuButton.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  const sectionLabel = (section: NavSection) => m.sections[section.key];
+  const isCurrentSection = (section: NavSection) => current?.key === section.key;
+  const quick = NAV_SECTIONS.filter((section) => PHONE_QUICK_SECTIONS.includes(section.key));
+  const currentPage = current ? currentPageIn(current, pathname) : null;
 
   return (
     <header className="page site-header">
@@ -44,22 +85,105 @@ export function SiteNav() {
           </Link>
         )}
       </div>
+
       <nav className="site-nav" aria-label={m.shell.mainNav}>
-        {PUBLIC_LINKS.map((link) => (
-          <Link key={link.href} href={link.href} aria-current={isCurrentLink(pathname, link.href) ? "page" : undefined}>
-            {navLabel(m, link)}
-          </Link>
-        ))}
-      </nav>
-      {signedIn ? (
-        <nav className="site-subnav" aria-label={m.shell.mySpace}>
-          <span className="site-subnav-label">{m.shell.mySpace}</span>
-          {MEMBER_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} aria-current={isCurrentLink(pathname, link.href) ? "page" : undefined}>
-              {navLabel(m, link)}
+        <ul className="site-nav-wide">
+          {NAV_SECTIONS.map((section) => (
+            <li key={section.key}>
+              <Link
+                href={section.href}
+                data-section={section.key}
+                aria-current={isCurrentSection(section) ? (pathname === section.href ? "page" : "true") : undefined}
+              >
+                {sectionLabel(section)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <div className="site-nav-quick">
+          {quick.map((section) => (
+            <Link
+              key={section.key}
+              href={section.href}
+              data-section={section.key}
+              aria-current={isCurrentSection(section) ? (pathname === section.href ? "page" : "true") : undefined}
+            >
+              {sectionLabel(section)}
             </Link>
           ))}
-        </nav>
+          <button
+            ref={menuButton}
+            type="button"
+            className="site-menu-button"
+            aria-expanded={menuOpen}
+            aria-controls={menuId}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span aria-hidden="true" className="site-menu-icon">
+              {menuOpen ? "✕" : "☰"}
+            </span>
+            {menuOpen ? m.shell.closeMenu : m.shell.menu}
+          </button>
+        </div>
+        <div id={menuId} className="site-menu" hidden={!menuOpen}>
+          <p className="site-menu-title">{m.shell.allSections}</p>
+          <ul className="site-menu-sections">
+            {NAV_SECTIONS.map((section) => (
+              <li key={section.key} className="site-menu-section" data-current={isCurrentSection(section) || undefined}>
+                <Link
+                  className="site-menu-main"
+                  href={section.href}
+                  data-section={section.key}
+                  aria-current={pathname === section.href ? "page" : undefined}
+                >
+                  {sectionLabel(section)}
+                </Link>
+                {section.pages.length > 1 ? (
+                  <ul className="site-menu-pages">
+                    {section.pages
+                      .filter((page) => page.href !== section.href)
+                      .map((page) => (
+                        <li key={page.href}>
+                          <Link href={page.href} aria-current={pathname === page.href ? "page" : undefined}>
+                            {navLabel(m, page)}
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+
+      {current && current.pages.length > 1 ? (
+        <>
+          <nav className="site-subnav site-subnav-wide" aria-label={`${sectionLabel(current)}: ${m.shell.sectionPages}`}>
+            <span className="site-subnav-label">{sectionLabel(current)}</span>
+            {current.pages.map((page) => (
+              <Link key={page.href} href={page.href} aria-current={currentPage === page.href ? "page" : undefined}>
+                {navLabel(m, page)}
+              </Link>
+            ))}
+          </nav>
+          <details key={current.key} className="site-subnav site-subnav-phone">
+            <summary>
+              <span className="site-subnav-label">{sectionLabel(current)}</span>
+              <span className="site-subnav-current">
+                {currentPage ? navLabel(m, current.pages.find((page) => page.href === currentPage)!) : m.shell.sectionPages}
+              </span>
+              <span className="site-subnav-more">{m.shell.sectionPages}</span>
+            </summary>
+            <nav aria-label={`${sectionLabel(current)}: ${m.shell.sectionPages}`}>
+              {current.pages.map((page) => (
+                <Link key={page.href} href={page.href} aria-current={currentPage === page.href ? "page" : undefined}>
+                  {navLabel(m, page)}
+                </Link>
+              ))}
+            </nav>
+          </details>
+        </>
       ) : null}
     </header>
   );

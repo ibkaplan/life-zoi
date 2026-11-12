@@ -182,3 +182,11 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 6. Files: the two files above, their test, `src/components/breathe/player.tsx`, `src/components/breathe/views.tsx`, `src/lib/breathe/state.ts`, `src/app/globals.css`, and the uk, ru, el `companion.json` catalogs (three new strings).
 7. Outstanding: the build machine cannot reach youtube.com or i.ytimg.com, so no video has been played inside lifeZoi or watched end to end. Nobody has checked each video for breath holds, sound, or language. Seven of ten lengths are unknown. Most chosen videos are shorter tutorials, not 10 to 15 minute sessions.
 8. Next action: owner (or a session whose network allows youtube.com, www.youtube-nocookie.com, i.ytimg.com) opens each card on a phone and a computer, watches the videos, and approves or asks for swaps.
+
+### Connected journey, stage 1: navigation and homepage (2026-11-12)
+
+1. Name: Nine-section navigation, phone menu, My Health hub, shorter homepage hero.
+2. Objective: the owner's "Navigation and header correction" and stage 1 of [JOURNEY_PLAN.md](JOURNEY_PLAN.md).
+3. Branch: `claude/project-thread-5yqy0i`. Pull request open for review. Not merged, not deployed.
+4. Completed: `src/lib/navigation.ts` now holds `NAV_SECTIONS` (Home, Dashboard, My Health, Food & Wellness, Movement, Wellness Library, Brain & Mind, Progress, My Profile) with every former menu page filed under one section; `PUBLIC_LINKS` and `MEMBER_LINKS` were replaced. The header bar wraps instead of scrolling (the old centered scroller clipped Home and Movement). Under 1000 px: Home, Dashboard, Movement and a Menu button. New `/my-health` page. Homepage: shorter hero, "Open my Dashboard" button, Life Outlook moved below the main content. Footer still lists every page.
+5. Outstanding: uk, ru, el labels for the new sections need a native-speaker read. Signed-in header not checked in a browser (no Supabase in the build environment); the account buttons are now on their own row so they cannot squeeze the menu.

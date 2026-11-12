@@ -63,7 +63,7 @@ const steps = [
 ] as const;
 
 const footerLinks = [
-  "/dashboard", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
+  "/dashboard", "/my-health", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
   "/academy/meals", "/academy/move", "/academy/move/resources", "/choices", "/urges", "/nature", "/ai-assistant",
   "/emotional-wellness", "/life-matters", "/change-lab", "/brain-quiz", "/habit-transformation", "/food-plan",
   "/academy/move/library", "/library/music", "/library/books", "/brain-quiz/games", "/focus", "/my-day", "/settings",
@@ -94,6 +94,10 @@ export function HomeView() {
                 <span>{h.cta}</span>
                 <small>{h.ctaSub}</small>
               </Link>
+              <Link className="home-btn home-btn-dashboard" href="/dashboard">
+                <span>{h.dashboardCta}</span>
+                <small>{h.dashboardCtaSub}</small>
+              </Link>
             </div>
             <p className="home-disclaimer" role="note">
               {h.disclaimer}
@@ -111,8 +115,6 @@ export function HomeView() {
             />
           </figure>
         </section>
-
-        <HomeGauge />
 
         <section className="page home-companion" aria-labelledby="home-companion-title">
           <div className="home-section-head">
@@ -153,6 +155,9 @@ export function HomeView() {
             {h.openInMovement}
           </Link>
         </section>
+
+        {/* Life Outlook stays on the homepage, below the main content. */}
+        <HomeGauge />
 
         <section className="page home-works" aria-labelledby="home-works-title">
           <div className="home-section-head">
