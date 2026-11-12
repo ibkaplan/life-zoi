@@ -80,7 +80,7 @@ These match `main`, not pull request #1.
 
 - Pretending Supabase is connected because env vars exist.
 - Using the service role to read user data.
-- Showing a health score, biological age, or lifespan.
+- Showing a health score, biological age, or lifespan. Exception (owner request, 2026-11-12): the dashboard’s “My Wellness Score & Progress” counts habit areas from the person’s own saved assessments that match public guidance (for example “5 of 7”). It is labeled as not a medical test, diagnosis, or prediction, and it is empty until an assessment is saved.
 - Inventing check-ins the person did not enter.
 - Treating sample layouts as saved personal data.
 - Claiming compliance because HTTPS or row level security exists on paper.
