@@ -229,6 +229,8 @@ export const en = {
     crisisLink: "SAMHSA: 988 Suicide & Crisis Lifeline",
   },
   nav: {
+    "/start": "Get started",
+    "/my-health/baseline": "My health profile",
     "/my-health": "My Health",
     "/": "Home",
     "/outlook": "Life outlook",

@@ -38,6 +38,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     label: "Dashboard",
     pages: [
       { href: "/dashboard", label: "Dashboard" },
+      { href: "/start", label: "Get started" },
       { href: "/my-day", label: "My Day" },
       { href: "/plan", label: "My Plan" },
       { href: "/choices", label: "Daily choices" },
@@ -50,6 +51,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     label: "My Health",
     pages: [
       { href: "/my-health", label: "My Health" },
+      { href: "/my-health/baseline", label: "My health profile" },
       { href: "/assessment", label: "Lifestyle assessment" },
       { href: "/outlook", label: "Life outlook" },
       { href: "/what-if", label: "WHAT IF?" },
@@ -178,6 +180,8 @@ export function currentPageIn(section: NavSection, pathname: string): string | n
 export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/my-health", label: "My Health" },
+  { href: "/start", label: "Get started" },
+  { href: "/my-health/baseline", label: "My health profile" },
   { href: "/assessment", label: "Lifestyle assessment" },
   { href: "/outlook", label: "Life outlook" },
   { href: "/what-if", label: "WHAT IF?" },

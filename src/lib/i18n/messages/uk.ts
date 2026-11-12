@@ -227,6 +227,8 @@ export const uk: Messages = {
     crisisLink: "SAMHSA: Лінія допомоги 988 (англійською)",
   },
   nav: {
+    "/start": "Почати",
+    "/my-health/baseline": "Мій профіль здоров’я",
     "/my-health": "Моє здоров’я",
     "/": "Головна",
     "/outlook": "Життєвий прогноз",

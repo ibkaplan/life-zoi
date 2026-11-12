@@ -63,7 +63,7 @@ const steps = [
 ] as const;
 
 const footerLinks = [
-  "/dashboard", "/my-health", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
+  "/dashboard", "/start", "/my-health", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
   "/academy/meals", "/academy/move", "/academy/move/resources", "/choices", "/urges", "/nature", "/ai-assistant",
   "/emotional-wellness", "/life-matters", "/change-lab", "/brain-quiz", "/habit-transformation", "/food-plan",
   "/academy/move/library", "/library/music", "/library/books", "/brain-quiz/games", "/focus", "/my-day", "/settings",
@@ -90,7 +90,7 @@ export function HomeView() {
             <p className="home-support">{h.support}</p>
             <p className="home-intro">{h.intro}</p>
             <div className="home-actions">
-              <Link className="home-btn home-btn-primary" href="/assessment">
+              <Link className="home-btn home-btn-primary" href="/start">
                 <span>{h.cta}</span>
                 <small>{h.ctaSub}</small>
               </Link>
