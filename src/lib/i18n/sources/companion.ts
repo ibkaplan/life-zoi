@@ -66,6 +66,7 @@ import {
 import { CHALLENGE_WEEKS, compareHabits, generalNewLife, HABIT_LABELS, PACES, PHASE_WORD, STEP_TEXT, WEEKDAY_NAMES } from "@/lib/breathe/program";
 import { emptyHabits } from "@/lib/breathe/state";
 import { BREATHE_VIDEO_TEXT, breatheVideos } from "@/lib/breathe/videos";
+import { RECIPE_VIDEO_LICENSE_TEXT, RECIPE_VIDEO_TEXT, recipeVideos } from "@/lib/breathe/recipe-videos";
 import { MB, REFERENCES, ROUTINE } from "@/lib/movement-breaks/content";
 import {
   AUDIENCE_TEXT as DAILY_AUDIENCE,
@@ -176,6 +177,10 @@ const sources: unknown[] = [
   FOOD_TIPS,
   { title: ORAL_BACTERIA.title, text: ORAL_BACTERIA.text, mouthwash: ORAL_BACTERIA.mouthwash },
   BREATHE_RECIPES.map(({ title, ingredients, steps }) => ({ title, ingredients, steps })),
+  // Recipe videos (YouTube titles and channel names stay as published)
+  Object.values(RECIPE_VIDEO_TEXT),
+  Object.values(RECIPE_VIDEO_LICENSE_TEXT),
+  recipeVideos.map((video) => video.note),
   Object.values(PACES).map(({ label }) => label),
   Object.values(STEP_TEXT),
   Object.values(PHASE_WORD),

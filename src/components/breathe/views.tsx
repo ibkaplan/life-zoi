@@ -8,7 +8,7 @@ import { BreathingPlayer } from "@/components/breathe/player";
 import { PracticeLibrary } from "@/components/breathe/practice-library";
 import { BreatheNav, EvidenceBadge, EvidenceLegend, SafetyCard, SourcesList } from "@/components/breathe/shared";
 import { useBreathe } from "@/components/breathe/use-breathe";
-import { BreatheVideos } from "@/components/breathe/videos";
+import { BreatheVideos, VideoCard } from "@/components/breathe/videos";
 import { SaveNote } from "@/components/companion/shared";
 import {
   AGING_INFLAMMATION,
@@ -32,6 +32,7 @@ import {
   TECHNIQUES,
 } from "@/lib/breathe/content";
 import { challengeSummary } from "@/lib/breathe/program";
+import { RECIPE_VIDEO_LICENSE_TEXT, RECIPE_VIDEO_TEXT, RECIPE_VIDEOS_CHECKED_ON, videoForRecipe } from "@/lib/breathe/recipe-videos";
 import { localISODate } from "@/lib/dates";
 import { useT } from "@/components/locale-provider";
 import { Rich } from "@/components/companion/i18n";
@@ -250,6 +251,7 @@ export function BreathePractice() {
 export function BreatheFoods() {
   const { ready, companion } = useBreathe();
   const [chosen, setChosen] = useState<string | null>(null);
+  const [playing, setPlaying] = useState<string | null>(null);
   const t = useT();
   const exclusions = useMemo(() => [...companion.food.exclusions, ...companion.food.disliked], [companion.food]);
   if (!ready) return <p className="hint">{t("Loading foods…")}</p>;
@@ -294,8 +296,9 @@ export function BreatheFoods() {
         <div className="bf-cards">
           {recipes.map((recipe) => {
             const hits = flagged(recipe.ingredients);
+            const video = videoForRecipe(recipe.id);
             return (
-              <article key={recipe.id} className="card stack">
+              <article key={recipe.id} className="card stack bf-recipe">
                 <h3>{t(recipe.title)}</h3>
                 <p className="hint">{t("About {minutes} minutes", { minutes: recipe.minutes })}</p>
                 {hits.length > 0 ? <p className="alert">{t("Contains something you excluded or dislike ({list}). Swap it or skip this one.", { list: hits.join(", ") })}</p> : null}
@@ -311,6 +314,26 @@ export function BreatheFoods() {
                     <li key={step}>{t(step)}</li>
                   ))}
                 </ol>
+                {video ? (
+                  <details
+                    className="bf-recipe-video"
+                    onToggle={(event) => {
+                      // Closing the panel stops the video, so it does not keep playing out of sight.
+                      if (!event.currentTarget.open && playing === video.id) setPlaying(null);
+                    }}
+                  >
+                    <summary>▶ {t(RECIPE_VIDEO_TEXT.heading)}</summary>
+                    <VideoCard
+                      video={video}
+                      playing={playing === video.id}
+                      onPlay={() => setPlaying(video.id)}
+                      onClose={() => setPlaying(null)}
+                      footnote={t(RECIPE_VIDEO_LICENSE_TEXT[video.license])}
+                    />
+                  </details>
+                ) : (
+                  <p className="hint">{t(RECIPE_VIDEO_TEXT.none)}</p>
+                )}
               </article>
             );
           })}
@@ -321,6 +344,8 @@ export function BreatheFoods() {
             parts={[(label) => <Link href="/food-plan/preferences">{label}</Link>]}
           />
         </p>
+        <p className="hint">{t(RECIPE_VIDEO_TEXT.note)}</p>
+        <p className="hint">{t(RECIPE_VIDEO_TEXT.checked, { date: RECIPE_VIDEOS_CHECKED_ON })}</p>
       </section>
       <section className="card stack">
         <h2>{t(ORAL_BACTERIA.title)}</h2>
