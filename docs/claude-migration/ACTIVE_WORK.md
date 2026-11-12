@@ -190,3 +190,10 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 3. Branch: `claude/project-thread-5yqy0i`. Pull request open for review. Not merged, not deployed.
 4. Completed: `src/lib/navigation.ts` now holds `NAV_SECTIONS` (Home, Dashboard, My Health, Food & Wellness, Movement, Wellness Library, Brain & Mind, Progress, My Profile) with every former menu page filed under one section; `PUBLIC_LINKS` and `MEMBER_LINKS` were replaced. The header bar wraps instead of scrolling (the old centered scroller clipped Home and Movement). Under 1000 px: Home, Dashboard, Movement and a Menu button. New `/my-health` page. Homepage: shorter hero, "Open my Dashboard" button, Life Outlook moved below the main content. Footer still lists every page.
 5. Outstanding: uk, ru, el labels for the new sections need a native-speaker read. Signed-in header not checked in a browser (no Supabase in the build environment); the account buttons are now on their own row so they cannot squeeze the menu.
+
+### Phone layout polish (2026-11-12)
+
+1. Name: Phone header in one row, bottom tab bar, full-screen menu.
+2. Branch: `claude/project-thread-5yqy0i` (restarted from `main` after #49 merged). Pull request open for review.
+3. Completed: under 1000 px the header is the logo, music and language in one row (the language button shows the globe and code under 560 px; its accessible name still says Language). Home, Dashboard, Movement and Menu sit in a tab bar fixed to the bottom of the screen, centered on tablets. Menu opens a full-height panel with every section, plus Account and Sign out when signed in (those leave the header on phones). The status note and the Listen control take less room on phones. Desktop is unchanged.
+4. Outstanding: signed-in phone header and menu not checked in a browser (no Supabase here).
