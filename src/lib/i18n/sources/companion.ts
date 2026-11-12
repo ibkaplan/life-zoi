@@ -65,6 +65,7 @@ import {
 } from "@/lib/breathe/content";
 import { CHALLENGE_WEEKS, compareHabits, generalNewLife, HABIT_LABELS, PACES, PHASE_WORD, STEP_TEXT, WEEKDAY_NAMES } from "@/lib/breathe/program";
 import { emptyHabits } from "@/lib/breathe/state";
+import { BREATHE_VIDEO_TEXT, breatheVideos } from "@/lib/breathe/videos";
 import { MB, REFERENCES, ROUTINE } from "@/lib/movement-breaks/content";
 import {
   AUDIENCE_TEXT as DAILY_AUDIENCE,
@@ -169,6 +170,8 @@ const sources: unknown[] = [
   AGING_STEPS,
   TECHNIQUES.map(({ title, subtitle, steps, science }) => ({ title, subtitle, steps, science: science.map(({ text }) => text) })),
   SAFETY_RULES,
+  Object.values(BREATHE_VIDEO_TEXT),
+  breatheVideos.map((video) => video.note),
   FOODS.map(({ name, tip }) => ({ name, tip })),
   FOOD_TIPS,
   { title: ORAL_BACTERIA.title, text: ORAL_BACTERIA.text, mouthwash: ORAL_BACTERIA.mouthwash },
