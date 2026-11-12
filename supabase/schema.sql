@@ -130,18 +130,38 @@ create trigger profiles_enforce_role
   before insert or update on public.profiles
   for each row execute function public.enforce_profile_role();
 
--- New accounts are closed. Only the allowlisted email may have a login.
+-- Registration is by invitation only. A login may exist only for the owner's email
+-- or for an email with a valid, unused invitation in public.registration_invites
+-- (created by the server for an administrator invite or a Share the Care link).
 -- This backs up the "Allow new users to sign up" switch in Supabase Auth: even if
 -- that switch is turned on by mistake, or someone adds a user in the dashboard,
--- the database refuses any other email. To open accounts later, replace this
--- function body with `select true` (or a longer list) and run the file again.
+-- the database refuses any email without an invitation.
+-- plpgsql, so this file can define it before the invitations table further down.
 create or replace function public.account_email_allowed(candidate text)
 returns boolean
-language sql
-immutable
+language plpgsql
+stable
+security definer
 set search_path = public
 as $$
-  select lower(btrim(coalesce(candidate, ''))) in ('tatyanaserikovaru@gmail.com');
+declare
+  normalized text := lower(btrim(coalesce(candidate, '')));
+begin
+  if normalized in ('tatyanaserikovaru@gmail.com') then
+    return true;
+  end if;
+  if normalized = '' or to_regclass('public.registration_invites') is null then
+    return false;
+  end if;
+  return exists (
+    select 1
+    from public.registration_invites i
+    where i.email = normalized
+      and i.used_at is null
+      and i.revoked_at is null
+      and i.expires_at > now()
+  );
+end;
 $$;
 
 revoke all on function public.account_email_allowed(text) from public;
@@ -311,6 +331,11 @@ begin
   end if;
   if to_regclass('public.companion_state') is not null then
     delete from public.companion_state where user_id = actor;
+  end if;
+  if to_regclass('public.registration_invites') is not null then
+    delete from public.registration_invites
+    where used_by = actor
+       or email = (select lower(btrim(email)) from auth.users where id = actor);
   end if;
   delete from public.profiles where user_id = actor;
   delete from auth.users where id = actor;
@@ -492,3 +517,155 @@ create policy companion_state_own_rows on public.companion_state
   for all
   using (auth.uid() = user_id and public.auth_session_may_use_rows())
   with check (auth.uid() = user_id and public.auth_session_may_use_rows());
+
+-- Invitation-only registration.
+--
+-- This section is in the repository only. The app does not run it. Apply it in
+-- the Supabase SQL editor only when a person chooses to (or run the migration
+-- supabase/migrations/2026-11-12-invite-registration.sql). Until then, the
+-- server cannot record invitations and nobody new can register. Existing
+-- logins keep working.
+--
+-- A row is written by the server (service role) when the administrator invites
+-- an email address, or when someone enters their email on an active Share the
+-- Care link. The auth.users trigger above allows a new login only for an email
+-- with an unused, unrevoked, unexpired row. When the login is created, the row
+-- is marked used. Browsers cannot read or write this table.
+-- A row holds the invited email address, who invited, and the link token if
+-- any. It holds no health information. Unused rows are deleted by the app
+-- 30 days after they expire, and account deletion removes the person's rows.
+
+alter table public.care_invitations add column if not exists max_registrations integer not null default 3;
+alter table public.care_invitations add column if not exists expires_at timestamptz;
+alter table public.care_invitations drop constraint if exists care_invitations_max_registrations_range;
+alter table public.care_invitations add constraint care_invitations_max_registrations_range
+  check (max_registrations between 0 and 50);
+
+-- A member's own new link always starts with the default limit and no expiry.
+drop policy if exists care_invitations_insert_own on public.care_invitations;
+create policy care_invitations_insert_own on public.care_invitations
+  for insert
+  with check (
+    auth.uid() = user_id
+    and public.auth_session_may_use_rows()
+    and revoked_at is null
+    and opened_count = 0
+    and registered_count = 0
+    and max_registrations = 3
+    and expires_at is null
+  );
+
+create table if not exists public.registration_invites (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  source text not null,
+  invited_by uuid references auth.users (id) on delete set null,
+  care_token text references public.care_invitations (token) on delete set null,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  used_by uuid references auth.users (id) on delete set null,
+  revoked_at timestamptz,
+  constraint registration_invites_email_shape check (
+    email = lower(btrim(email)) and char_length(email) between 3 and 320 and position('@' in email) > 1
+  ),
+  constraint registration_invites_source check (source in ('admin', 'share_care')),
+  constraint registration_invites_link_source check (
+    (source = 'share_care' and care_token is not null) or source = 'admin'
+  )
+);
+
+create index if not exists registration_invites_open_email_idx
+  on public.registration_invites (email)
+  where used_at is null and revoked_at is null;
+
+create index if not exists registration_invites_care_token_idx
+  on public.registration_invites (care_token)
+  where care_token is not null;
+
+alter table public.registration_invites enable row level security;
+
+-- No policies: only the server's service role (which bypasses row level security) uses it.
+revoke all on table public.registration_invites from public, anon, authenticated;
+
+-- Marks the invitation used when its login is created, and counts a Share the Care registration.
+create or replace function public.claim_registration_invite()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  claimed_token text;
+  claimed_id uuid;
+begin
+  if tg_op = 'UPDATE' and new.email is not distinct from old.email then
+    return new;
+  end if;
+  select i.id, i.care_token into claimed_id, claimed_token
+  from public.registration_invites i
+  where i.email = lower(btrim(coalesce(new.email, '')))
+    and i.used_at is null
+    and i.revoked_at is null
+    and i.expires_at > now()
+  order by i.created_at
+  limit 1;
+  if claimed_id is null then
+    return new;
+  end if;
+  update public.registration_invites
+    set used_at = now(), used_by = new.id
+    where id = claimed_id;
+  if claimed_token is not null then
+    update public.care_invitations
+      set registered_count = registered_count + 1
+      where token = claimed_token;
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function public.claim_registration_invite() from public;
+
+drop trigger if exists auth_users_claim_invite on auth.users;
+create trigger auth_users_claim_invite
+  after insert or update of email on auth.users
+  for each row execute function public.claim_registration_invite();
+
+-- Opening a Share the Care link is still counted from the browser. Registrations
+-- are now counted by the trigger above, so the browser can no longer add one.
+create or replace function public.note_care_invitation(invite_token text, event_kind text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated integer;
+begin
+  if invite_token is null or invite_token !~ '^[A-Za-z0-9_-]{43}$' then
+    return false;
+  end if;
+  if event_kind <> 'open' then
+    return false;
+  end if;
+  update public.care_invitations
+    set opened_count = opened_count + 1
+    where token = invite_token
+      and revoked_at is null
+      and (expires_at is null or expires_at > now());
+  get diagnostics updated = row_count;
+  return updated = 1;
+end;
+$$;
+
+revoke all on function public.note_care_invitation(text, text) from public;
+grant execute on function public.note_care_invitation(text, text) to anon, authenticated;
+
+-- Extra hardening. Row level security already returns nothing to a signed-out
+-- request; this also removes the default table rights of the signed-out role.
+revoke all on table public.profiles from anon;
+revoke all on table public.assessments from anon;
+revoke all on table public.scenarios from anon;
+revoke all on table public.habit_goals from anon;
+revoke all on table public.check_ins from anon;

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SittingReminder } from "@/components/movement-breaks/tracker";
-import { CareInviteWatcher } from "@/components/care-invite-watcher";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
 import { PageListen } from "@/components/voice/page-listen";
@@ -49,7 +48,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {m.shell.sampleBanner}
           </p>
         ) : null}
-        <CareInviteWatcher />
         <SittingReminder />
         <PageListen pathname={pathname} />
         {children}

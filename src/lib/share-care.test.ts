@@ -284,7 +284,6 @@ describe("invitation visits", () => {
       "src/lib/share-care-store.ts",
       "src/components/share-care-view.tsx",
       "src/components/welcome-view.tsx",
-      "src/components/care-invite-watcher.tsx",
     ]) {
       const source = readFileSync(file, "utf8");
       expect(source).not.toContain("service_role");
@@ -295,8 +294,9 @@ describe("invitation visits", () => {
     expect(shell).toContain("Share the Care");
     const welcome = readFileSync("src/components/welcome-view.tsx", "utf8");
     expect(welcome).toContain("WELCOME_HEADING");
-    expect(welcome).toContain('href="/sign-in"');
-    const page = readFileSync("src/app/(app)/welcome/page.tsx", "utf8");
+    expect(welcome).toContain('"/sign-in"');
+    expect(welcome).toContain('"/api/register"');
+    const page = readFileSync("src/app/(public)/welcome/page.tsx", "utf8");
     expect(page).toContain("WELCOME_HEADING");
     expect(page).toContain("WELCOME_BODY");
   });

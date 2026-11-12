@@ -1,5 +1,10 @@
-import { HomeView } from "@/components/home-view";
+import { LandingView } from "@/components/landing-view";
 
-export default function HomePage() {
-  return <HomeView />;
+/**
+ * The public landing page: logo, introductory image, short description, Log in,
+ * and how to join by invitation. A signed-in member is served the members' home
+ * here instead (see src/proxy.ts).
+ */
+export default function LandingPage() {
+  return <LandingView />;
 }

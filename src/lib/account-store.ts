@@ -11,7 +11,6 @@ import {
   type AccountRead,
   type AccountWrite,
 } from "@/lib/account-records";
-import { isAdminEmail } from "@/lib/admin-allowlist";
 import { writeBrowserStore } from "@/lib/browser-store";
 import {
   authenticatorQrSrc,
@@ -31,7 +30,7 @@ import {
   validateNewPassword,
 } from "@/lib/password-recovery";
 import { loadStoredSession } from "@/lib/session";
-import { getBrowserSupabase } from "@/lib/supabase-browser";
+import { getBrowserSupabase, moveLegacyBrowserSession } from "@/lib/supabase-browser";
 import { emptySession, type UserSession } from "@/lib/types";
 
 const SAVE_ERROR = msg("Saved answers could not be stored. Try again.");
@@ -132,6 +131,7 @@ async function boot() {
     publish({ ...signedOut(), phase: "off" });
     return;
   }
+  await moveLegacyBrowserSession();
   supabase.auth.onAuthStateChange((event) => {
     if (event === "SIGNED_OUT") {
       generation += 1;
@@ -444,23 +444,6 @@ export async function clearAccountRecords(): Promise<string | null> {
   return null;
 }
 
-export async function signUpWithPassword(
-  email: string,
-  password: string,
-): Promise<{ error: string | null; confirmEmail: boolean }> {
-  const invalid = validateAccountCredentials(email, password);
-  if (invalid) return { error: invalid, confirmEmail: false };
-  // New accounts are closed. Supabase sign-ups are off and the database refuses other emails too.
-  if (!isAdminEmail(email)) return { error: msg("New accounts are not open yet."), confirmEmail: false };
-  const supabase = getBrowserSupabase();
-  if (!supabase) return { error: msg("Account sign-in is not configured in this environment."), confirmEmail: false };
-  const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-  if (error) return { error: publicAuthMessage(error.message, msg("The account could not be created.")), confirmEmail: false };
-  if (!data.session) return { error: null, confirmEmail: true };
-  await refreshFromAuth();
-  return { error: null, confirmEmail: false };
-}
-
 export async function signInWithPassword(email: string, password: string): Promise<string | null> {
   const invalid = validateAccountCredentials(email, password);
   if (invalid) return invalid;
@@ -542,6 +525,8 @@ export async function signOutAccount(): Promise<void> {
   const supabase = getBrowserSupabase();
   publish(signedOut());
   if (supabase) await supabase.auth.signOut();
+  // Members' pages need a sign-in, so go back to the public landing page.
+  if (typeof window !== "undefined") window.location.assign("/");
 }
 
 export async function deleteSignedInAccount(): Promise<string | null> {
@@ -554,6 +539,7 @@ export async function deleteSignedInAccount(): Promise<string | null> {
   writeBrowserStore(emptySession(), false);
   await supabase.auth.signOut();
   publish(signedOut());
+  if (typeof window !== "undefined") window.location.assign("/");
   return null;
 }
 

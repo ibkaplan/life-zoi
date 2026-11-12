@@ -570,7 +570,6 @@
  "Signed in. Your assessment, habits, and check-ins are saved to your account. Daily activities, reading, and games are saved on this device until the account's daily-progress table is set up.": "Вы вошли. Оценка, привычки и ежедневные отметки сохраняются в вашем аккаунте. Ежедневные занятия, чтение и игры сохраняются на этом устройстве, пока в аккаунте не настроена таблица ежедневного прогресса.",
  "Signed in. Your assessment, habits, plans, and daily progress are saved to your account. Sample data is never written to the account.": "Вы вошли. Оценка, привычки, планы и ежедневный прогресс сохраняются в вашем аккаунте. Пример данных никогда не записывается в аккаунт.",
  "Signed-in answers are stored for that account under row level security. Without an account, they stay in this browser tab. Sample data is labeled and is not written into an account.": "Ответы после входа хранятся в аккаунте с защитой на уровне строк (row level security). Без аккаунта они остаются в этой вкладке браузера. Пример данных помечен и в аккаунт не записывается.",
- "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). Without an account, answers stay in this browser tab. Sample data is not saved to an account.": "После входа ответы оценки, сценарии, цели и отметки хранятся в строках Supabase этого человека. Защита на уровне строк использует auth.uid(). Без учётной записи ответы остаются в этой вкладке браузера. Демонстрационные данные в учётную запись не сохраняются.",
  "Simple protein, simple meals": "Простой белок, простые блюда",
  "Sitting or reclining": "Сидя или лёжа",
  "Six": "Шесть",
@@ -609,9 +608,7 @@
  "Sudoku, memory, words, and logic, just for enjoyment.": "Судоку, память, слова и логика — просто для удовольствия.",
  "Sugar Detective": "Сахарный детектив",
  "Sunrise piano": "Фортепиано на рассвете",
- "Supabase URL and anon key are not set. There is no account sign-in and no database storage. Answers stay in this browser tab. Requests are not saved on the server.": "URL и публичный ключ Supabase не заданы. Входа в учётную запись и хранения в базе данных нет. Ответы остаются в этой вкладке браузера. Запросы не сохраняются на сервере.",
  "Supabase account": "учётная запись Supabase",
- "Supabase variables are present, but this environment is not using the account adapter. Answers stay in this browser tab. Requests are not saved on the server.": "Переменные Supabase заданы, но эта среда не использует сохранение в учётной записи. Ответы остаются в этой вкладке браузера. Запросы не сохраняются на сервере.",
  "Take your time. Tap Next step when you are ready.": "Не торопитесь. Нажмите «Следующий шаг», когда будете готовы.",
  "Ten": "Десять",
  "The QR code could not be shown. Enter the secret in your authenticator app.": "Не удалось показать QR-код. Введите секретный ключ в приложении-аутентификаторе.",
@@ -797,5 +794,13 @@
  "{value} kg": "{value} кг",
  "{voice} (sounds most natural)": "{voice} (звучит естественнее всего)",
  "{voice}, online": "{voice}, онлайн",
- "My Health": "Моё здоровье"
+ "My Health": "Моё здоровье",
+ "Sign in to use lifeZoi.": "Войдите, чтобы пользоваться lifeZoi.",
+ "Finish signing in with your authenticator code first.": "Сначала завершите вход кодом из приложения-аутентификатора.",
+ "This is available to the administrator only.": "Это доступно только администратору.",
+ "Invite members": "Пригласить участников",
+ "Accept your invitation": "Примите приглашение",
+ "Supabase variables are present, but this environment is not using the account adapter. Members cannot sign in here, so the members' pages stay closed.": "Переменные Supabase заданы, но эта среда не использует адаптер учётных записей. Участники не могут здесь войти, поэтому страницы для участников закрыты.",
+ "Supabase URL and anon key are not set. There is no account sign-in, so the members' pages stay closed.": "URL и анонимный ключ Supabase не заданы. Входа в учётную запись нет, поэтому страницы для участников закрыты.",
+ "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.": "Ответы анкеты, сценарии, цели и отметки вошедшего участника хранятся в его строках Supabase. Защита на уровне строк использует auth.uid(). LifeZoi — для приглашённых участников, и каждая страница и API для участников проверяет вход на сервере. Пример данных не сохраняется в учётную запись."
 }

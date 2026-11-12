@@ -120,4 +120,102 @@ do $$ begin
   if (select count(*) from auth.users) <> 2 then raise exception 'FAIL: other logins were touched'; end if;
 end $$;
 
+-- Invitation-only registration.
+-- The server (service role) writes invitations; here the test owner stands in for it.
+insert into public.care_invitations (token, user_id)
+  values ('CareLinkToken_abcdefghijklmnopqrstuvwxyz012', '00000000-0000-0000-0000-00000000000b');
+insert into public.registration_invites (email, source, invited_by, expires_at)
+  values ('invited@example.org', 'admin', '00000000-0000-0000-0000-00000000000c', now() + interval '7 days');
+insert into public.registration_invites (email, source, invited_by, care_token, expires_at)
+  values ('friend@example.org', 'share_care', '00000000-0000-0000-0000-00000000000b',
+          'CareLinkToken_abcdefghijklmnopqrstuvwxyz012', now() + interval '2 days');
+insert into public.registration_invites (email, source, expires_at)
+  values ('late@example.org', 'admin', now() - interval '1 minute');
+insert into public.registration_invites (email, source, expires_at, revoked_at)
+  values ('revoked@example.org', 'admin', now() + interval '7 days', now());
+
+-- An invited email may get a login, and the invitation is then used.
+insert into auth.users values ('00000000-0000-0000-0000-0000000000d1', ' Invited@Example.org ');
+do $$ begin
+  if not exists (select 1 from public.registration_invites
+                 where email = 'invited@example.org' and used_at is not null
+                   and used_by = '00000000-0000-0000-0000-0000000000d1') then
+    raise exception 'FAIL: the admin invitation was not marked used';
+  end if;
+end $$;
+
+-- A used invitation cannot create a second login.
+do $$ begin
+  insert into auth.users values ('00000000-0000-0000-0000-0000000000d2', 'invited@example.org');
+  raise exception 'FAIL: one invitation created two logins';
+exception when raise_exception then
+  if sqlerrm like 'FAIL%' then raise; end if;
+end $$;
+
+-- An expired or revoked invitation is refused.
+do $$ begin
+  insert into auth.users values ('00000000-0000-0000-0000-0000000000d3', 'late@example.org');
+  raise exception 'FAIL: an expired invitation created a login';
+exception when raise_exception then
+  if sqlerrm like 'FAIL%' then raise; end if;
+end $$;
+do $$ begin
+  insert into auth.users values ('00000000-0000-0000-0000-0000000000d4', 'revoked@example.org');
+  raise exception 'FAIL: a revoked invitation created a login';
+exception when raise_exception then
+  if sqlerrm like 'FAIL%' then raise; end if;
+end $$;
+
+-- A Share the Care invitation counts one registration on its link.
+insert into auth.users values ('00000000-0000-0000-0000-0000000000d5', 'friend@example.org');
+do $$ begin
+  if (select registered_count from public.care_invitations
+      where token = 'CareLinkToken_abcdefghijklmnopqrstuvwxyz012') <> 1 then
+    raise exception 'FAIL: the Share the Care registration was not counted';
+  end if;
+end $$;
+
+-- Browsers cannot read invitations or add a registration count.
+set role anon;
+do $$ begin
+  perform count(*) from public.registration_invites;
+  raise exception 'FAIL: invitations are readable by the signed-out role';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  perform count(*) from public.check_ins;
+  raise exception 'FAIL: check-ins are readable by the signed-out role';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  if public.note_care_invitation('CareLinkToken_abcdefghijklmnopqrstuvwxyz012', 'register') then
+    raise exception 'FAIL: the browser added a registration count';
+  end if;
+  if not public.note_care_invitation('CareLinkToken_abcdefghijklmnopqrstuvwxyz012', 'open') then
+    raise exception 'FAIL: opening an active link was not counted';
+  end if;
+end $$;
+set role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1', 'aal1');
+do $$ begin
+  perform count(*) from public.registration_invites;
+  raise exception 'FAIL: invitations are readable by a signed-in member';
+exception when insufficient_privilege then null;
+end $$;
+-- A member cannot give their own link a higher registration limit.
+do $$ begin
+  insert into public.care_invitations (token, user_id, max_registrations)
+    values ('CareLinkToken_zyxwvutsrqponmlkjihgfedcba987', '00000000-0000-0000-0000-0000000000d1', 50);
+  raise exception 'FAIL: a member raised their own link limit';
+exception when insufficient_privilege then null;
+end $$;
+-- Deleting the account removes that person's invitation row too.
+select public.delete_own_account();
+reset role;
+do $$ begin
+  if exists (select 1 from public.registration_invites where email = 'invited@example.org') then
+    raise exception 'FAIL: the invitation row was left after account deletion';
+  end if;
+end $$;
+
 \echo All policy checks passed.

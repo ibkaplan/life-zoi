@@ -197,3 +197,11 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 2. Branch: `claude/project-thread-5yqy0i` (restarted from `main` after #49 merged). Pull request open for review.
 3. Completed: under 1000 px the header is the logo, music and language in one row (the language button shows the globe and code under 560 px; its accessible name still says Language). Home, Dashboard, Movement and Menu sit in a tab bar fixed to the bottom of the screen, centered on tablets. Menu opens a full-height panel with every section, plus Account and Sign out when signed in (those leave the header on phones). The status note and the Listen control take less room on phones. Desktop is unchanged.
 4. Outstanding: signed-in phone header and menu not checked in a browser (no Supabase here).
+
+### Members-only access and invitation-only registration (2026-11-12)
+
+1. Name: Protect every page and API for signed-in members; register only by invitation.
+2. Branch: `claude/project-thread-if53gm`. Pull request open for review. Not merged, not deployed.
+3. Completed: cookie sessions (`@supabase/ssr`, an earlier browser sign-in is moved over once), `src/proxy.ts` gate, `MemberGate` in the members' layout, `requireMember`/`requireAdmin` on every API, public landing page, invitation flow (`/admin/invitations`, `POST /api/register`, `/accept-invite`), migration `supabase/migrations/2026-11-12-invite-registration.sql` with SQL tests on a throwaway Postgres.
+4. Waiting on the owner, in this order: apply the migration in Supabase, set `SUPABASE_SERVICE_ROLE_KEY` in Vercel (server only), add `/accept-invite` to Supabase redirect URLs, keep public sign-up off, set a custom SMTP sender. Then a real invite and sign-in need a check in a browser.
+5. Not done on purpose: per-account browser copies are not cleared on sign-out, because daily activities live only in the browser until `companion_state` is applied.
