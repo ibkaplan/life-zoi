@@ -569,7 +569,6 @@
  "Signed in. Your assessment, habits, and check-ins are saved to your account. Daily activities, reading, and games are saved on this device until the account's daily-progress table is set up.": "Έχετε συνδεθεί. Η αξιολόγηση, οι συνήθειες και οι καταγραφές σας αποθηκεύονται στον λογαριασμό σας. Οι καθημερινές δραστηριότητες, η ανάγνωση και τα παιχνίδια αποθηκεύονται σε αυτή τη συσκευή, μέχρι να ρυθμιστεί ο πίνακας καθημερινής προόδου του λογαριασμού.",
  "Signed in. Your assessment, habits, plans, and daily progress are saved to your account. Sample data is never written to the account.": "Έχετε συνδεθεί. Η αξιολόγηση, οι συνήθειες, τα πλάνα και η καθημερινή σας πρόοδος αποθηκεύονται στον λογαριασμό σας. Τα δεδομένα παραδείγματος δεν γράφονται ποτέ στον λογαριασμό.",
  "Signed-in answers are stored for that account under row level security. Without an account, they stay in this browser tab. Sample data is labeled and is not written into an account.": "Οι απαντήσεις μετά τη σύνδεση αποθηκεύονται στον λογαριασμό με προστασία σε επίπεδο γραμμής (row level security). Χωρίς λογαριασμό μένουν σε αυτή την καρτέλα. Τα δεδομένα παραδείγματος έχουν σήμανση και δεν γράφονται σε λογαριασμό.",
- "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). Without an account, answers stay in this browser tab. Sample data is not saved to an account.": "Μετά τη σύνδεση, οι απαντήσεις της αξιολόγησης, τα σενάρια, οι στόχοι και οι καταγραφές αποθηκεύονται στις γραμμές Supabase του ατόμου. Η ασφάλεια σε επίπεδο γραμμής χρησιμοποιεί το auth.uid(). Χωρίς λογαριασμό, οι απαντήσεις μένουν σε αυτή την καρτέλα. Τα δείγματα δεδομένων δεν αποθηκεύονται σε λογαριασμό.",
  "Simple protein, simple meals": "Απλή πρωτεΐνη, απλά γεύματα",
  "Sitting or reclining": "Καθιστή ή ξαπλωτή θέση",
  "Six": "Έξι",
@@ -608,9 +607,7 @@
  "Sudoku, memory, words, and logic, just for enjoyment.": "Sudoku, μνήμη, λέξεις και λογική, απλώς για ευχαρίστηση.",
  "Sugar Detective": "Ντετέκτιβ ζάχαρης",
  "Sunrise piano": "Πιάνο της ανατολής",
- "Supabase URL and anon key are not set. There is no account sign-in and no database storage. Answers stay in this browser tab. Requests are not saved on the server.": "Η διεύθυνση URL και το δημόσιο κλειδί του Supabase δεν έχουν οριστεί. Δεν υπάρχει σύνδεση σε λογαριασμό ούτε αποθήκευση σε βάση δεδομένων. Οι απαντήσεις μένουν σε αυτή την καρτέλα. Τα αιτήματα δεν αποθηκεύονται στον διακομιστή.",
  "Supabase account": "λογαριασμός Supabase",
- "Supabase variables are present, but this environment is not using the account adapter. Answers stay in this browser tab. Requests are not saved on the server.": "Οι μεταβλητές του Supabase υπάρχουν, αλλά αυτό το περιβάλλον δεν χρησιμοποιεί αποθήκευση σε λογαριασμό. Οι απαντήσεις μένουν σε αυτή την καρτέλα. Τα αιτήματα δεν αποθηκεύονται στον διακομιστή.",
  "Take your time. Tap Next step when you are ready.": "Πάρτε τον χρόνο σας. Πατήστε «Επόμενο βήμα» όταν είστε έτοιμοι.",
  "Ten": "Δέκα",
  "The QR code could not be shown. Enter the secret in your authenticator app.": "Ο κωδικός QR δεν μπόρεσε να εμφανιστεί. Εισαγάγετε το μυστικό κλειδί στην εφαρμογή ελέγχου ταυτότητας.",
@@ -796,5 +793,13 @@
  "{value} kg": "{value} κιλά",
  "{voice} (sounds most natural)": "{voice} (ακούγεται πιο φυσική)",
  "{voice}, online": "{voice}, online",
- "My Health": "Η υγεία μου"
+ "My Health": "Η υγεία μου",
+ "Sign in to use lifeZoi.": "Συνδεθείτε για να χρησιμοποιήσετε το lifeZoi.",
+ "Finish signing in with your authenticator code first.": "Ολοκληρώστε πρώτα τη σύνδεση με τον κωδικό της εφαρμογής ελέγχου ταυτότητας.",
+ "This is available to the administrator only.": "Αυτό είναι διαθέσιμο μόνο στον διαχειριστή.",
+ "Invite members": "Πρόσκληση μελών",
+ "Accept your invitation": "Αποδεχτείτε την πρόσκληση",
+ "Supabase variables are present, but this environment is not using the account adapter. Members cannot sign in here, so the members' pages stay closed.": "Οι μεταβλητές Supabase υπάρχουν, αλλά αυτό το περιβάλλον δεν χρησιμοποιεί τον προσαρμογέα λογαριασμών. Τα μέλη δεν μπορούν να συνδεθούν εδώ, οπότε οι σελίδες μελών μένουν κλειστές.",
+ "Supabase URL and anon key are not set. There is no account sign-in, so the members' pages stay closed.": "Η διεύθυνση URL και το ανώνυμο κλειδί του Supabase δεν έχουν οριστεί. Δεν υπάρχει σύνδεση λογαριασμού, οπότε οι σελίδες μελών μένουν κλειστές.",
+ "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.": "Οι απαντήσεις, τα σενάρια, οι στόχοι και τα check-in ενός συνδεδεμένου μέλους αποθηκεύονται στις δικές του γραμμές Supabase. Η ασφάλεια σε επίπεδο γραμμής χρησιμοποιεί auth.uid(). Το LifeZoi είναι για μέλη με πρόσκληση και κάθε σελίδα και API μελών ελέγχει τη σύνδεση στον διακομιστή. Τα δείγματα δεδομένων δεν αποθηκεύονται σε λογαριασμό."
 }

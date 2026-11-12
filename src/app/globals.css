@@ -3669,3 +3669,27 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
 }
 
 @media print { .site-nav-quick, .site-menu { display: none !important; } }
+
+/* Members-only access: the public landing page, visitor header and footer, and invitations. */
+.public-header { grid-template-areas: "brand account"; }
+.public-main { padding-top: 0.5rem; padding-bottom: 2rem; }
+.public-footer { border-top: 1px solid var(--line); padding-top: 1rem; margin-top: 1rem; }
+.public-footer .footer-links { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; }
+.landing .landing-hero h1 { max-width: 18ch; }
+.landing-invite { padding-bottom: 2rem; }
+.landing-invite .card { max-width: 44rem; }
+.landing-invite input { width: 100%; }
+.admin-invites { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.admin-invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.admin-invite > div { display: grid; gap: 0.15rem; min-width: 0; }
+.admin-invite strong { overflow-wrap: anywhere; }
+.admin-invite span { color: var(--muted); font-size: 0.95rem; }
