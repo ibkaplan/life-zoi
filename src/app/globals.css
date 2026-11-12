@@ -3453,6 +3453,56 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
 .dm-routine .lz-steps { margin: 0; }
 .dm-chair.is-first { border: 3px solid var(--royal); }
 
+/* ---------- Wellness Library video collection ---------- */
+.vl-categories { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+.vl-category {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; min-height: 112px; padding: 0.9rem 1rem;
+  border-radius: 18px; border: 3px solid transparent; color: var(--deep); font: inherit; text-align: left; cursor: pointer;
+  background: linear-gradient(140deg, var(--lavender), #fff); box-shadow: var(--shadow);
+}
+.vl-category:hover { border-color: var(--lavender-brand); }
+.vl-category:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+.vl-category[aria-pressed="true"] { background: linear-gradient(140deg, var(--royal), var(--deep)); color: #fff; border-color: var(--royal); }
+.vl-category-icon { font-size: 2rem; line-height: 1; }
+.vl-category-name { font-size: 1.12rem; font-weight: 750; }
+.vl-category-count { font-size: 0.92rem; opacity: 0.9; }
+.vl-cat-dance, .vl-cat-aerobics, .vl-cat-home-cardio { background: linear-gradient(140deg, #FCE4F1, #fff); }
+.vl-cat-tai-chi, .vl-cat-qigong, .vl-cat-stretching { background: linear-gradient(140deg, #E1EEE6, #fff); }
+.vl-cat-breathing, .vl-cat-meditation { background: linear-gradient(140deg, #E3ECFB, #fff); }
+.vl-cat-chair, .vl-cat-balance { background: linear-gradient(140deg, #FCEBCB, #fff); }
+.vl-section { scroll-margin-top: calc(var(--header) + 0.5rem); }
+.vl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.vl-card { display: flex; flex-direction: column; gap: 0.55rem; padding: 0.9rem; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+.vl-card h3 { margin: 0; font-size: 1.2rem; }
+.vl-title { margin: 0; color: var(--muted); font-size: 0.98rem; overflow-wrap: anywhere; }
+.vl-thumb { border-radius: 14px; }
+.vl-big { min-height: 56px; font-size: 1.08rem; }
+.vl-play { width: 100%; margin-top: auto; }
+.vl-level-beginner { background: #E1EEE6 !important; color: #1F5A45 !important; }
+.vl-level-gentle { background: #E3ECFB !important; color: #1E3A8A !important; }
+.vl-level-intermediate { background: #FCEBCB !important; color: #6B4407 !important; }
+.vl-level-advanced { background: #F8E1E7 !important; color: #7A1F3D !important; }
+.vl-card-missing { background: repeating-linear-gradient(135deg, var(--sky), var(--sky) 12px, #fff 12px, #fff 24px); border-style: dashed; justify-content: center; }
+.vl-missing-time { font-size: 2.4rem; font-weight: 800; color: var(--muted); line-height: 1; }
+.vl-missing-time small { font-size: 1rem; margin-left: 0.25rem; }
+.vl-player-box { display: flex; flex-direction: column; gap: 0.75rem; background: var(--surface); }
+.vl-player-box:fullscreen { justify-content: center; padding: 1rem; background: #0b1020; }
+.vl-frame { max-width: none; }
+.vl-player-box:fullscreen .vl-frame { flex: 1; aspect-ratio: auto; max-width: none; }
+.vl-player-box:fullscreen .vl-range span { color: #fff; }
+.vl-controls { display: flex; flex-direction: column; gap: 0.75rem; }
+.vl-buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.vl-buttons .btn { flex: 1 1 140px; }
+.vl-range { display: flex; flex-direction: column; gap: 0.3rem; font-weight: 650; }
+.vl-range input[type="range"] { width: 100%; min-height: 36px; accent-color: var(--royal); }
+.vl-volume { display: flex; align-items: center; gap: 0.6rem; }
+.vl-volume input { flex: 1; }
+@media (max-width: 520px) {
+  .vl-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vl-category { min-height: 100px; padding: 0.75rem; }
+  .vl-grid { grid-template-columns: 1fr; }
+}
+
 /* Section hub pages (My Health): large cards that open existing pages. */
 .section-hub {
   list-style: none;

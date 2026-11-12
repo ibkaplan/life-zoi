@@ -40,6 +40,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [AUTOMATIONS.md](AUTOMATIONS.md) | Schedules and triggers, including those that do not exist |
 | [CHAIR_YOGA_LIBRARY.md](CHAIR_YOGA_LIBRARY.md) | Chair Yoga Studio videos, what was verified, and how to add more |
 | [DAILY_MOVEMENT_LIBRARY.md](DAILY_MOVEMENT_LIBRARY.md) | Daily Movement videos, the morning and evening plan rules, and what was verified |
+| [WELLNESS_VIDEO_LIBRARY.md](WELLNESS_VIDEO_LIBRARY.md) | Wellness Library video collection (14 activities × 6 lengths), what was verified, missing lengths, and how to add videos |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |
