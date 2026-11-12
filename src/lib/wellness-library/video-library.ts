@@ -101,6 +101,8 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("xU3vDlJPrs4", "pilates", 20, "20 MIN BEGINNER'S PILATES WORKOUT | FULL-BODY | NO EQUIPMENT", "IsaWelly Pilates", "Isawellypilates", "beginner", "mat", D12),
   s("2mkR5LPhOC4", "pilates", 30, "30 MIN FULL BODY WORKOUT || At-Home Beginner Pilates (No Equipment)", "Move With Nicole", "MoveWithNicole", "beginner", "mat", D12),
   s("ckmmIr9Wp-8", "pilates", 45, "45-Min Live Pilates Class | Full Body Flow (Beginner Friendly, No Props)", "WE ARE AL!VE", "alive_wellness", "beginner", "mat", D12),
+  s("ebq5vPWvvOc", "pilates", 10, "10 Minute Pilates Workout for Beginners", "Jessica Valant", "Jessicasvalant", "beginner", "mat", D12),
+  s("bwkJ-Yr4hTE", "pilates", 60, "60 Min Full Body Pilates Workout | No Equipment | Burn Fat, Sculpt & Tone", "Keel Pilates", "keelpilates", "intermediate", "mat", D12),
 
   // Yoga
   s("RUS50iYq8-8", "yoga", 10, "10 minute Yoga for NECK & SHOULDER Tension Relief (all standing, no mat needed)", "SarahBethYoga", "sarahbethyoga", "gentle", "standing", D11),
@@ -108,6 +110,7 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("v7AYKMP6rOE", "yoga", 20, "Yoga For Complete Beginners - 20 Minute Home Yoga Workout!", "Yoga With Adriene", "yogawithadriene", "beginner", "mat", D12),
   s("vJKt86ayWxk", "yoga", 45, "Chair Yoga for Seniors | 45 Minute Stretch & Balance | Standing & Seated Exercises Only", "Paradigm Yoga", "ParadigmYoga", "gentle", "mixed", D10, ["chair"]),
   s("TsVdAhENb_0", "yoga", 60, "60-minute Basic Yoga", "Kaitlyn D'Onofrio", "kaitlyndonofrio1345", "beginner", "mat", D12),
+  s("GWg-siH2VEA", "yoga", 30, "Hatha Flow Yoga For Beginners (30-min) Discover the Hatha Yoga Style (All Levels) Full Class", "BrettLarkinYoga", "BrettLarkinYoga", "beginner", "mat", D12),
 
   // Aerobics
   s("62HkZd0y5sg", "aerobics", 10, "10 MIN AEROBICS CARDIO Workout | Low Impact, No Equipment, No Jumping | All Standing", "Natalia Siejka", "nataliasiejka", "beginner", "standing", D12),
@@ -115,12 +118,18 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("Uci74Cq5Q9A", "aerobics", 15, "15 MIN CARDIO AEROBICS - Move To The Beat (All Standing, Low Impact)", "MadFit", "MadFit", "beginner", "standing", D12),
   s("Zq8_bscMqac", "aerobics", 20, "Low Impact Aerobics Walking Workout for Beginners & Seniors // 20 minutes 2500 steps!", "SeniorShape Fitness", "SeniorShapeFitness", "gentle", "standing", D12),
   s("Yfmhx6UEC-Q", "aerobics", 60, "60 MIN LOW IMPACT CARDIO WORKOUT | All Standing, No Equipment", "Courtney Holland - Any Weight Fitness", "anyweightfitness", "intermediate", "standing", D12),
+  s("oFON1wxbdjw", "aerobics", 30, "30 min CARDIO AEROBICS WORKOUT ♫ | No Jumping | No Squats | Challenge Your Coordination", "fitbymik", "fitbymik", "intermediate", "standing", D12),
+  s("lL_tbxw_-z8", "aerobics", 45, "45 Minute Low Impact Cardio Workout | High or Low Impact Aerobics at Home", "CHRISTINA DORNER", "CDornerFitness", "intermediate", "standing", D12),
 
   // Dance Fitness
   s("bqVBMv_nqJ4", "dance", 10, "10 MINUTE DANCE WORKOUT | Full Body - No Equipment | (Cardio Workout at Home)", "DanceFit", "DanceFit1", "beginner", "standing", D12),
   s("89dm6fCSqKs", "dance", 10, "Fun 10 Minute Dance Cardio Workout! | No equipment needed! | Fitness at home", "Bizzy Boom", "BizzyBoom", "intermediate", "standing", D12),
   s("0xlBHBBFSik", "dance", 60, "1-Hour Full Body Dance Fitness Workout!", "Oula", "OulaFitness", "intermediate", "standing", D12),
   s("zQZit8vKt6Y", "dance", 60, "1 Hour Non Stop Dance Fitness With AJ | Burn Upto 800 Calories 🔥", "AJ DanceFit", "AJDanceFit", "advanced", "standing", D12),
+  s("fBqoipuEOAU", "dance", 15, "15 Minute- Senior/Low Impact Dance Fitness", "Erin Blackburn Fitness", "ErinBlackburnFitness", "gentle", "standing", D12),
+  s("DrlPz5p_xnc", "dance", 20, "20-min DANCE WORKOUT for Active Seniors and Beginners", "Improved Health", "ImprovedHealth", "gentle", "standing", D12),
+  s("c4qRyt6pFdY", "dance", 30, "30 Minute Zumba Gold® Dance Workout #25 | Active Older Adults and Beginners Class I We Keep Moving", "We Keep Moving", "WeKeepMoving", "gentle", "standing", D12),
+  s("CMMXByyv-Yw", "dance", 45, "45 Minute Zumba Gold® Class | Home Dance Workout #33 | Low-Impact | Over 50 Fitness I We Keep Moving", "We Keep Moving", "WeKeepMoving", "gentle", "standing", D12),
 
   // Home Cardio
   s("xVc3nSKWg74", "home-cardio", 15, "15 MIN BEGINNER CARDIO Workout (At Home No Equipment)", "MadFit", "MadFit", "beginner", "standing", D12),
@@ -132,6 +141,8 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("WLZagztHccc", "home-cardio", 30, "30 MIN At Home Fat Burning Cardio Workout (Beginner to Advanced - No Equipment)", "KatieMFitness", "KatieMFitness", "intermediate", "standing", D12),
   s("tYo0rWVEmYc", "home-cardio", 30, "30 Minute HIIT CARDIO Workout // At Home (No Equipment)", "Heather Robertson", "Heatherrobertsoncom", "advanced", "mixed", D12),
   s("0djMDrNIioI", "home-cardio", 45, "Over 5,000 Steps in 45 Minutes! | Low Impact Cardio Workout at Home", "Improved Health", "ImprovedHealth", "beginner", "standing", D12),
+  s("gUWFmn8f3H4", "home-cardio", 10, "10-Minute No-Equipment, At-Home Cardio Workout", "PS Fit", "PS_Fit", "intermediate", "standing", D12),
+  s("CGzRzkqShmE", "home-cardio", 60, "60 MIN Low Impact HIIT Workout (No Jumping) 🔥 Beginner Friendly Cardio At Home", "Christian Cruz Fitness", "ChristianCruzFitness", "intermediate", "standing", D12),
 
   // Strength Training
   s("x5y8jY6sKFQ", "strength", 10, "10-Minute Full Body Dumbbell Workout for Beginners", "Emily Daugherty", "EmilyDaugherty", "beginner", "standing", D12, ["dumbbells"]),
@@ -141,6 +152,7 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("W6wwO_gbn-o", "strength", 45, "45 MIN FULL BODY STRENGTH Workout With Weights (Warm Up & Cool Down Included)", "MadFit", "MadFit", "intermediate", "mixed", D12, ["dumbbells"]),
   s("UXVW4ka97SU", "strength", 45, "45-Minute Full Body Bodyweight Workout (No Equipment) | Follow Along", "Gritty Soldier", "GrittySoldier", "advanced", "mixed", D12),
   s("UAw3YLDLMHo", "strength", 60, "60 Minute Full Body Dumbbell Workout [Strength Training]", "Juice & Toya", "JuiceandToya", "advanced", "mixed", D12, ["dumbbells"]),
+  s("J-_Xoj7HVfs", "strength", 15, "15 Minute Total Body Beginner Strength Training Workout- No Equipment, No Jumping", "SimplyFit by Lauren", "simplyfit.bylauren", "beginner", "mixed", D12),
 
   // Chair Exercises
   s("6KiPatdnGEY", "chair", 10, "10-Minute Chair Workout for Seniors (All Seated, No Equipment)", "Move Well After 60", "MoveWellOver60", "gentle", "seated", D12, ["chair"]),
@@ -149,6 +161,7 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("slBsNXH4GW8", "chair", 30, "AT HOME Chair Exercises for SENIORS or BEGINNERS / 30 minutes (no equipment needed)", "Improved Health", "ImprovedHealth", "beginner", "seated", D12, ["chair"]),
   s("sbZzR-L2Tw4", "chair", 45, "45-Min Chair Workout for Seniors | Cardio, Strength & Stretch", "Improved Health Chair Workouts", "ImprovedHealthChairWorkouts", "beginner", "seated", D12, ["chair"]),
   s("VwVpEQVl39g", "chair", 45, "45 Minute Chair Exercises for Seniors to BOOST Cardio, Strength, Balance & Flexibility", "Improved Health Chair Workouts", "ImprovedHealthChairWorkouts", "beginner", "mixed", D12, ["chair"]),
+  s("V22m8fN3mmo", "chair", 60, "60 Minute Chair Exercises for SENIORS | 💪 Full Body Home Workout", "Improved Health Chair Workouts", "ImprovedHealthChairWorkouts", "beginner", "seated", D12, ["chair"]),
 
   // Stretching
   s("t_YEUWe6Yn8", "stretching", 10, "10 Min Full Body Stretch Routine for Beginners", "Jeffrey Peng MD", "JeffreyPengMD", "beginner", "mixed", D12),
@@ -156,14 +169,23 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("u1M0wQ07COk", "stretching", 20, "20 Min. Full Body Stretch | Deep Stretching Routine to Level Up Your Flexibility | at Home", "Fitness Train 7", "FitnessTrain7", "intermediate", "mat", D12),
   s("puw9Oviv0fA", "stretching", 30, "30 Min Beginner Full Body Stretch | Gentle & Easy Routine", "Bendy Body", "bendybodymovement", "gentle", "mat", D12),
   s("aUm3qE2dvB8", "stretching", 60, "60 Minute Full Body Active Flexibility Routine (FOLLOW ALONG) *500k Subscriber Special*", "Tom Merrick", "BodyweightWarrior", "advanced", "mat", D12),
+  s("9Xo0U1NRK7k", "stretching", 45, "45 Minute Full Body Stretch Routine | Follow Along, No Talking, No Music", "EDR Fitness", "edrfitness", "intermediate", "mat", D12),
 
   // Tai Chi
   s("aLRRYm6W4uw", "tai-chi", 10, "10 Min Daily Tai Chi Routine for Beginners (Follow Along)", "Begin with Breath Tai Chi | Dr. Adam Potts, PT", "beginwithbreathtaichi", "beginner", "standing", D12),
   s("6igZbhM3I_w", "tai-chi", 15, "15-Minute Morning Tai Chi for a New You - Increase Mobility", "Begin with Breath Tai Chi | Dr. Adam Potts, PT", "beginwithbreathtaichi", "beginner", "standing", D12),
   s("-6sM9_FSKqY", "tai-chi", 45, '45 Min "Tai Chi for Balance and Strength"', "Emory Goizueta Brain Health Institute", "EmoryGBHI", "gentle", "standing", D12),
+  s("fARe1_Wxi-U", "tai-chi", 20, "20 Min Daily Tai Chi Routine for Beginners (Follow Along)", "Begin with Breath Tai Chi | Dr. Adam Potts, PT", "beginwithbreathtaichi", "beginner", "standing", D12),
+  s("aYA3ANh2ghc", "tai-chi", 30, "30 Mins Tai Chi for Seniors, Beginners, Over 60+ - Improve Strength, Balance & Calm #taichi", "Freshfield Fitness TAI CHI ACTIVE", "FreshfieldFitnessTaiChiActive", "gentle", "standing", D12),
+  s("ZjUhhYq_M6E", "tai-chi", 60, "EASY 1Hour Tai Chi Fitness for SENIORS at Home!", "Enjoy Taichi Workout", "Enjoy_TaichiWorkout", "gentle", "standing", D12),
 
   // Qigong
   s("y2RAEnWreoE", "qigong", 15, "Shaolin Qigong 15 Minute Daily Routine", "Qigong Meditation", "QigongMeditation", "beginner", "standing", D12),
+  s("nLnT25Q9tSU", "qigong", 10, "10 Minute Qigong Routine to Start Your Day - Qigong for Beginners", "Qigong with Kseny", "qigongwithkseny", "beginner", "standing", D12),
+  s("pj4qo2KL9f4", "qigong", 20, "20 Minute Morning Qi Gong Exercise by Lee Holden", "Tyler Trahan", "TylerTrahan", "beginner", "standing", D12),
+  s("SkZRRmzO3h0", "qigong", 30, "Qigong 30 minutes daily routine for beginners", "Martin Ratté", "martinqigong", "beginner", "standing", D12),
+  s("4sKhEpZEWQA", "qigong", 45, "Qigong, Tai Chi, & Meditation: Four Elements (45 mins) | Dana-Farber Zakim Center Remote Programming", "Dana-Farber Cancer Institute", "danafarber", "gentle", "standing", D12),
+  s("1YHB38bQVVY", "qigong", 60, "Qigong Exercises with David J Coon FREE 60 Minute Qigong Class", "Qigong Awareness LLC", "QigongAwareness", "beginner", "standing", D12),
 
   // Balance Training
   s("1AaAWRvKj1k", "balance", 10, "10 Minute Balance Exercises for Seniors | Over 50 Fall Prevention Workout", "Improved Health", "ImprovedHealth", "gentle", "standing", D12, ["chair"]),
@@ -171,13 +193,22 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("MfJX0Dcz74k", "balance", 15, "Seniors: Daily 15 minute  Workout for  Balance.", "Balance Builders by Doug Weiss", "balancebuilderz", "gentle", "standing", D11),
   s("thzxbC49EKw", "balance", 30, "Seniors: Regain Your Balance| 30 Minute Class", "Balance Builders by Doug Weiss", "balancebuilderz", "gentle", "standing", D12),
   s("r7TaElp-sLo", "balance", 60, "60-minute Senior Fitness Dynamic Balance & Cardio Workout to Prevent Falls & Improve Mobility", "Ageless Balance | Balance & Fall Prevention", "agelessbalance", "intermediate", "standing", D12),
+  s("57eeOuZydWM", "balance", 20, "Seniors: 20-Minute Complete Balance Workout", "Balance Builders by Doug Weiss", "balancebuilderz", "gentle", "standing", D12),
+  s("-aGlOqj6ttU", "balance", 45, "Ageless Balance Senior Exercise: 45-Minute Seated Stretches & Standing Mobility & Balance Exercises", "Ageless Balance | Balance & Fall Prevention", "agelessbalance", "gentle", "mixed", D12, ["chair"]),
 
   // Breathing & Relaxation
   s("zaeQvUZySxM", "breathing", 30, "30 Min Conscious Breathing Meditation | Access Your Higher Guidance", "Kris Kelly", "KrisKelly", "beginner", "seated", D12),
   s("w7TzSTnf8z8", "breathing", 60, "60 Minute Parasympathetic Breathwork -  By Sandy", "The Holistic Tapes", "theholistictapes4885", "beginner", "seated", D12),
+  s("R5GbeubY558", "breathing", 10, "Guided Breathing Exercise: 10 Minutes", "GILD Coaching", "GILDCoaching", "beginner", "seated", D12),
+  s("D_cx80_wQ8k", "breathing", 15, "Deep Breathing Meditation ~ 15 Minute Meditation for Stress", "Meditation Mountain", "meditation_mountain", "beginner", "seated", D12),
+  s("twWFwCW4Z08", "breathing", 20, "Relaxation Practice: Breathing - 20 min", "LEAP Service", "LEAPService", "beginner", "seated", D12),
+  s("5mnG_R_KtXQ", "breathing", 45, "Yoga Nidra 45 minutes Guided Meditation", "Mindfulness Movement Yoga", "mindfulnessmovementyoga2798", "gentle", "mat", D12),
 
   // Brain Training
   s("kpfI17sEdj8", "brain-training", 15, "15 Min Brain + Body Workout for Seniors", "Yes2Next", "yes2next", "gentle", "standing", D11),
+  s("p8S0QFWzMG8", "brain-training", 20, "20 Minute Walking Workout That Burns Fat Like CRAZY + Brain Boost 🔥", "fabulous50s", "fabulous50s", "beginner", "standing", D12),
+  s("7t6ZMca6WM8", "brain-training", 30, "30 Minute Fat Burning Walking Workout + Brain Training Foe Women Over 50!", "fabulous50s", "fabulous50s", "beginner", "standing", D12),
+  s("RCfoMT7HCC4", "brain-training", 60, "The 1-Hour Neuroplasticity Workout to Rewire Focus, Processing & Memory", "Kris Safarova", "Kris.Safarova", "beginner", "seated", D12),
 
   // Meditation
   s("y6iTjoN407U", "meditation", 10, "Just Breathe ~ A 10 Minute Guided Meditation", "Great Meditation", "GreatMeditation", "beginner", "seated", D12),
@@ -185,6 +216,8 @@ export const LIBRARY_VIDEO_SEEDS: LibraryVideoSeed[] = [
   s("z0GtmPnqAd8", "meditation", 15, "15 Minute Guided Meditation | Strength & Grounding In Stressful Times", "Boho Beautiful Yoga", "bohobeautiful", "beginner", "seated", D12),
   s("6-iJU06UugA", "meditation", 30, "30 Minute Guided Meditation - The Silent Mind", "OnlineMeditation", "OnlineMeditation", "beginner", "seated", D12),
   s("zKAdUQHdMZU", "meditation", 60, "60-Minute Mindfulness Meditation | Calm Your Mind & Body", "Auralin", "Auralin-s1", "beginner", "seated", D12),
+  s("kuMOkcUD4xA", "meditation", 20, "20 Minute Guided Meditation for Focused Attention and Concentration (No Music, Voice Only)", "Declutter The Mind", "DeclutterTheMind", "beginner", "seated", D12),
+  s("f7pKql-ZUSg", "meditation", 45, "45 Minute Guided Mindfulness Meditation (Voice Only, No Music)", "Declutter The Mind", "DeclutterTheMind", "beginner", "seated", D12),
 ];
 
 export function toLibraryVideo(seed: LibraryVideoSeed): LibraryVideo {
