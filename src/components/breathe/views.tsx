@@ -8,6 +8,7 @@ import { BreathingPlayer } from "@/components/breathe/player";
 import { PracticeLibrary } from "@/components/breathe/practice-library";
 import { BreatheNav, EvidenceBadge, EvidenceLegend, SafetyCard, SourcesList } from "@/components/breathe/shared";
 import { useBreathe } from "@/components/breathe/use-breathe";
+import { BreatheVideos } from "@/components/breathe/videos";
 import { SaveNote } from "@/components/companion/shared";
 import {
   AGING_INFLAMMATION,
@@ -186,6 +187,8 @@ export function BreatheLearn() {
           <EvidenceBadge level="established" />
         </div>
       </section>
+      <BreatheVideos />
+      <SafetyCard compact />
       <EvidenceLegend />
       <SourcesList />
       <p className="library-disclaimer">{t(BREATHE_DISCLAIMER)}</p>

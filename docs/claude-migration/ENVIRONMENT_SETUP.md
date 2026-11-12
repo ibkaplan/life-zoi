@@ -83,7 +83,7 @@ Expect JSON with `persistence` `development` and `authentication` `not-configure
 | --- | --- |
 | Purpose | Host the Next.js app over HTTPS |
 | Config in repo | No `vercel.json`. Headers are in `next.config.ts`. Team slug `risi-0778846f` is written in `README.md`. |
-| Recorded homepage | https://life-zoi.vercel.app |
+| Production site | https://www.lifezoi.com (lifezoi.com and life-zoi.vercel.app redirect there with 308) |
 | Cloud agent | Not required for coding. A push to GitHub can trigger Vercel because the Git integration is already installed. |
 | Local agent | Optional. `npx vercel` is not part of the documented workflow. |
 | Permissions | Vercel project access for the team that owns the project, only when deploying or reading logs. |

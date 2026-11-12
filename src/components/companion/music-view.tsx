@@ -6,7 +6,8 @@ import { useProfile } from "@/components/companion/use-profile";
 import { useLocale } from "@/components/locale-provider";
 import { isSounding, useBackgroundMusic, useMusicProgress } from "@/components/background-music/provider";
 import { MusicOnOffSwitch, MusicProgress, MusicVolume, NowPlaying, TransportControls } from "@/components/background-music/controls";
-import { controlProps, pieceArtist, pieceNote, pieceTitle } from "@/components/background-music/shared";
+import { clock, controlProps, pieceArtist, pieceNote, pieceTitle } from "@/components/background-music/shared";
+import { STREAMED_RECORDINGS } from "@/lib/music-library/streams";
 import { commitCompanion } from "@/lib/companion/store";
 import { addRecent, toggleFavorite, withDay } from "@/lib/companion/state";
 import { breathPhase, type Track } from "@/lib/companion/music";
@@ -18,6 +19,7 @@ import {
   LIBRARY_CATEGORIES,
   PIXABAY_LICENSE_URL,
   PIXABAY_RECORDINGS,
+  SPOTIFY_PLAYLISTS,
   type LibraryCategory,
   type LibraryPiece,
 } from "@/lib/music-library/catalog";
@@ -224,7 +226,9 @@ export function MusicView() {
                   </p>
                   <p className="hint">
                     {pieceArtist(m, piece)}
-                    {piece.kind === "synth" ? ` · ${fmt(L.minutes, { minutes: piece.track.minutes })}` : ` · ${L.pixabay}`}
+                    {piece.kind === "synth"
+                      ? ` · ${fmt(L.minutes, { minutes: piece.track.minutes })}`
+                      : `${piece.seconds ? ` · ${clock(piece.seconds)}` : ""} · ${piece.streamed ? L.streamed : L.pixabay}`}
                   </p>
                   {pieceNote(m, piece) ? <p className="music-list-note">{pieceNote(m, piece)}</p> : null}
                 </div>
@@ -243,6 +247,16 @@ export function MusicView() {
           })}
         </ul>
         <p className="hint">{L.safety}</p>
+      </section>
+
+      <section className="card stack" aria-labelledby="music-spotify">
+        <h2 id="music-spotify">{L.spotifyTitle}</h2>
+        <p>{L.spotifyIntro}</p>
+        <p>
+          <a className="btn btn-secondary" href={SPOTIFY_PLAYLISTS[category].url} target="_blank" rel="noopener noreferrer">
+            {fmt(L.spotifyLink, { playlist: SPOTIFY_PLAYLISTS[category].name })}
+          </a>
+        </p>
       </section>
 
       {favorites.length > 0 ? (
@@ -270,6 +284,22 @@ export function MusicView() {
 
       <details className="card music-about">
         <summary>{L.aboutTitle}</summary>
+        {STREAMED_RECORDINGS.length > 0 ? (
+          <>
+            <p>{L.aboutStreamed}</p>
+            <ul>
+              {STREAMED_RECORDINGS.map((recording) => (
+                <li key={recording.id}>
+                  {recording.title} · {recording.artist} · {recording.license}
+                  {recording.attribution ? ` · ${recording.attribution}` : ""} ·{" "}
+                  <a href={recording.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    {L.sourceLink}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
         <p>{L.aboutBuiltIn}</p>
         {PIXABAY_RECORDINGS.length > 0 ? (
           <>

@@ -39,8 +39,8 @@ In **Authentication**:
 
 1. **Sign In / Providers**: turn **Allow new users to sign up** off. Keep the **Email** provider on so sign-in still works. Keep **Confirm email** on.
 2. **URL Configuration**:
-   - **Site URL**: `https://life-zoi.vercel.app`
-   - **Redirect URLs**: add `https://life-zoi.vercel.app/reset-password` and `http://localhost:3000/reset-password`. If you want reset links to work on Vercel preview deployments too, add a pattern for the preview addresses that ends in `/reset-password`.
+   - **Site URL**: `https://www.lifezoi.com`
+   - **Redirect URLs**: add `https://www.lifezoi.com/reset-password` and `http://localhost:3000/reset-password`. If you want reset links to work on Vercel preview deployments too, add a pattern for the preview addresses that ends in `/reset-password`.
 
    The app asks Supabase to send people back to `/reset-password` on the same site. If that address is not in the list, Supabase sends them to the Site URL instead and the reset does not finish.
 3. **Multi-Factor**: keep **TOTP** (authenticator app) on. Settings uses it.
@@ -69,7 +69,7 @@ In the Vercel project, under **Settings → Environment Variables**, make sure t
 
 Do not add the service-role key under a `NEXT_PUBLIC_` name. Next.js copies `NEXT_PUBLIC_` values into the page at build time, so a change only takes effect after the next deployment. Deploying is your decision.
 
-Afterwards, `https://life-zoi.vercel.app/api/status` should report `"authentication":"supabase"` and `"persistence":"account"`.
+Afterwards, `https://www.lifezoi.com/api/status` should report `"authentication":"supabase"` and `"persistence":"account"`.
 
 ## 7. Try it
 

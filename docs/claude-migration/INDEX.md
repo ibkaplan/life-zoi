@@ -11,7 +11,7 @@ lifeZoi is a responsive web app for habit reflection, WHAT IF? lifestyle illustr
 | Repository | https://github.com/ibkaplan/life-zoi |
 | Default branch | `main` |
 | Visibility | Public |
-| Homepage recorded on the repo | https://life-zoi.vercel.app |
+| Production site | https://www.lifezoi.com (lifezoi.com and life-zoi.vercel.app redirect there with 308) |
 | Product owner named in the project brief | Igor Kaplansky (GitHub login `ibkaplan`) |
 | Other contributor | Igor’s wife, in a separate Cursor setup. Her agents and tracker are not visible from this project. |
 | Snapshot used for these docs | `main` at `1d6a333` (2026-11-05 inspection) |
@@ -39,6 +39,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [CLAUDE_WORKFLOW.md](CLAUDE_WORKFLOW.md) | Coordinator and worker workflow in Claude Code |
 | [AUTOMATIONS.md](AUTOMATIONS.md) | Schedules and triggers, including those that do not exist |
 | [CHAIR_YOGA_LIBRARY.md](CHAIR_YOGA_LIBRARY.md) | Chair Yoga Studio videos, what was verified, and how to add more |
+| [DAILY_MOVEMENT_LIBRARY.md](DAILY_MOVEMENT_LIBRARY.md) | Daily Movement videos, the morning and evening plan rules, and what was verified |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |

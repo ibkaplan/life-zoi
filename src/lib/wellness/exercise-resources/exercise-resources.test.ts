@@ -108,7 +108,7 @@ describe("free exercise resources", () => {
       expect(text).toContain(guide.title);
       expect(text).toContain("These guides are not treatment.");
       expect(text).toContain("LIVE BETTER. MAKE LIFE MATTER.");
-      expect(text).toContain(`https://life-zoi.vercel.app/academy/move/resources/guides/${guide.slug}`);
+      expect(text).toContain(`https://www.lifezoi.com/academy/move/resources/guides/${guide.slug}`);
       expect(text).toContain(guide.safety.slice(0, 40));
     }
   });

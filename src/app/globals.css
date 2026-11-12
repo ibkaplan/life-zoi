@@ -2633,6 +2633,8 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .bf-aging p { margin: 0.15rem 0 0; }
 .bf-steps { display: grid; gap: 0.4rem; }
 .bf-safety { border-top-color: var(--gold) !important; }
+.bf-video-title { margin: 0; font-size: 1.1rem; overflow-wrap: anywhere; }
+.bf-video .video-frame { max-width: none; }
 
 /* week calendar */
 .bf-progress-line { font-size: 1.2rem; margin: 0; }
@@ -3313,3 +3315,30 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
   .voice-page { justify-self: stretch; }
 }
 @media print { .voice-bar { display: none; } }
+
+/* ---------- Daily Movement ---------- */
+.move-choices { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.move-choices .cy-banner { flex-direction: column; align-items: stretch; justify-content: space-between; }
+.move-choices .cy-banner .btn-primary { justify-content: center; text-align: center; }
+.dm-banner { background: linear-gradient(120deg, #B4501F 0%, #D97A2B 55%, var(--gold) 130%); }
+.dm-hero { background: linear-gradient(120deg, #B4501F 0%, #D97A2B 50%, var(--teal-brand) 125%) !important; color: #fff; }
+.dm-hero h1, .dm-hero .kicker, .dm-hero p { color: #fff; }
+.dm-studio .cy-card { border-top-color: #D97A2B; }
+.dm-tag { background: #FCE6D4 !important; color: #7A3410 !important; }
+.dm-section-title { color: #A4461A !important; }
+.dm-today {
+  border-radius: var(--radius); padding: 1.3rem; display: grid; gap: 1rem;
+  background: linear-gradient(160deg, #FFF3E6 0%, #EEF6F4 75%); border: 2px solid #D97A2B;
+}
+.dm-today h2 { margin: 0; }
+.dm-sessions { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); align-items: start; }
+.dm-session { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 1rem; box-shadow: var(--shadow); border-top: 6px solid var(--gold); }
+.dm-session[data-slot="evening"] { border-top-color: var(--royal); }
+.dm-session h3 { margin: 0; font-size: 1.4rem; letter-spacing: 0.03em; }
+.dm-session h4 { margin: 0; font-size: 1.15rem; overflow-wrap: anywhere; }
+.dm-plan-video { display: grid; gap: 0.8rem; }
+.dm-plan-video .cy-thumb { border-radius: 14px; }
+.dm-then { margin: 0; font-weight: 800; color: var(--teal); }
+.dm-routine { background: #F6F9F8; border-radius: 14px; padding: 0.8rem 1rem; }
+.dm-routine .lz-steps { margin: 0; }
+.dm-chair.is-first { border: 3px solid var(--royal); }

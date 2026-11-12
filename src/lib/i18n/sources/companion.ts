@@ -65,12 +65,32 @@ import {
 } from "@/lib/breathe/content";
 import { CHALLENGE_WEEKS, compareHabits, generalNewLife, HABIT_LABELS, PACES, PHASE_WORD, STEP_TEXT, WEEKDAY_NAMES } from "@/lib/breathe/program";
 import { emptyHabits } from "@/lib/breathe/state";
+import { BREATHE_VIDEO_TEXT, breatheVideos } from "@/lib/breathe/videos";
 import { MB, REFERENCES, ROUTINE } from "@/lib/movement-breaks/content";
+import {
+  AUDIENCE_TEXT as DAILY_AUDIENCE,
+  CATEGORY_INFO as DAILY_CATEGORY_INFO,
+  DAILY_TEXT,
+  dailyProfile,
+  dailyVideos,
+  LEVEL_TEXT as DAILY_LEVEL,
+  planDay,
+  POSITION_TEXT as DAILY_POSITION,
+  ROUTINES as DAILY_ROUTINES,
+} from "@/lib/wellness-library/daily-movement";
+import type { MobilityLimit, WellnessGoal } from "@/lib/health-profile";
 import { sittingProfile, TRACK_ITEMS } from "@/lib/movement-breaks/personal";
 
 const ALL_SYMPTOMS = Object.keys(careSymptomLabels) as CareSymptom[];
 const everyCare = { ...emptyWomensCare(), identifiesAsWoman: true, relevant: true, stage: "perimenopause" as const, symptoms: ALL_SYMPTOMS, ironConcern: true };
 const studio = libraryVideos();
+
+/** Every reason and caution Daily Movement can show, from a spread of questionnaire answers. */
+const DAILY_LIMITS: MobilityLimit[][] = [[], ["none"], ["joint-pain"], ["breathlessness"], ["balance-concerns"], ["limited-standing"], ["prefer-not"]];
+const DAILY_GOALS: WellnessGoal[][] = [[], ["energy"], ["sleep"], ["flexibility-balance"], ["stress", "flexibility-balance"]];
+const dailyPlans = DAILY_LIMITS.flatMap((mobilityLimits) =>
+  DAILY_GOALS.flatMap((wellnessGoals) => [false, true].map((chair) => planDay(dailyProfile({ mobilityLimits, wellnessGoals }, null, chair), "2026-11-11"))),
+);
 
 /** Text that is shown but built in code rather than kept in a data module. */
 const SHOWN_TEXT = [
@@ -127,6 +147,15 @@ const sources: unknown[] = [
   DURATION_BANDS.map(({ label }) => label),
   studio.map((video) => video.description),
   [...new Set(studio.flatMap((video) => video.studio.topics))],
+  // Daily Movement (YouTube titles and channel names stay as published)
+  Object.values(DAILY_TEXT),
+  Object.values(DAILY_CATEGORY_INFO).map(({ title, summary, length }) => ({ title, summary, length })),
+  Object.values(DAILY_POSITION),
+  Object.values(DAILY_LEVEL),
+  Object.values(DAILY_AUDIENCE),
+  Object.values(DAILY_ROUTINES).map(({ title, steps }) => ({ title, steps })),
+  dailyVideos.map((video) => video.note),
+  dailyPlans.map(({ reasons, cautions }) => ({ reasons, cautions })),
   // Breathe for Life (study titles and journals stay as published)
   [BREATHE_TITLE, BREATHE_SUBTITLE, BREATHE_DISCLAIMER, NOT_A_CURE, AGING_INFLAMMATION, AGING_NUANCE, STOP_SIGNS, MEDICAL_CAUTION, PROGRAM_LIMITS, REPORTED_BREATHLESSNESS],
   [SUPPLEMENT_NOTE, MEDICINE_NOTE],
@@ -141,6 +170,8 @@ const sources: unknown[] = [
   AGING_STEPS,
   TECHNIQUES.map(({ title, subtitle, steps, science }) => ({ title, subtitle, steps, science: science.map(({ text }) => text) })),
   SAFETY_RULES,
+  Object.values(BREATHE_VIDEO_TEXT),
+  breatheVideos.map((video) => video.note),
   FOODS.map(({ name, tip }) => ({ name, tip })),
   FOOD_TIPS,
   { title: ORAL_BACTERIA.title, text: ORAL_BACTERIA.text, mouthwash: ORAL_BACTERIA.mouthwash },

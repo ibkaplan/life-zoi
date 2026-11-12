@@ -11,12 +11,18 @@
  *    whose licence was not read.
  * 2. Any classical recordings from `RECORDINGS` in `src/lib/background-music/tracks.ts`
  *    (classical category only).
- * 3. LifeZoi's own in-browser pieces from `src/lib/companion/music.ts`: original
- *    sound design, and LifeZoi performances of melodies whose composers died long
- *    ago. Nothing is downloaded or streamed for these.
+ * 3. Streamed recordings (`STREAMED_RECORDINGS` in `./streams.ts`): public domain and
+ *    Creative Commons recordings that the listener's browser streams from Wikimedia
+ *    Commons while they play. LifeZoi does not store or download them.
+ * 4. The breathing guides from `src/lib/companion/music.ts` (Yoga & Wellness only).
+ *    They are tones that rise and fall with the breath, not music.
+ *
+ * `SPOTIFY_PLAYLISTS` offers each category's Spotify playlist as a plain link for
+ * people who use Spotify. LifeZoi does not embed Spotify or send it anything.
  */
 import { trackById, type Track } from "@/lib/companion/music";
 import { RECORDINGS, type Recording } from "@/lib/background-music/tracks";
+import { STREAMED_RECORDINGS, type StreamedRecording } from "@/lib/music-library/streams";
 
 export const LIBRARY_CATEGORIES = ["classical", "meditation", "yoga", "nature", "morning", "sleep"] as const;
 export type LibraryCategory = (typeof LIBRARY_CATEGORIES)[number];
@@ -37,14 +43,31 @@ export const CATEGORY_ICON: Record<LibraryCategory, string> = {
   sleep: "🌙",
 };
 
-/** LifeZoi's own pieces in each category, gentlest first. Ids are from `src/lib/companion/music.ts`. */
+/**
+ * In-browser pieces still offered in each category. Only the two breathing guides
+ * remain: every category's music is now a real recording (`./streams.ts`).
+ * Ids are from `src/lib/companion/music.ts`.
+ */
 export const BUILT_IN_BY_CATEGORY: Record<LibraryCategory, readonly string[]> = {
-  classical: ["moonlight-opening", "fur-elise", "canon-ground", "ode-to-joy"],
-  meditation: ["still-point", "garden-air", "soft-evening"],
-  yoga: ["gentle-flow", "breath-four-six", "breath-box"],
-  nature: ["sea-shore", "spring-rain", "forest-birds", "flowing-stream"],
-  morning: ["sunrise-piano", "morning-steps", "clear-desk"],
-  sleep: ["brahms-lullaby", "night-harbour", "soft-evening"],
+  classical: [],
+  meditation: [],
+  yoga: ["breath-four-six", "breath-box"],
+  nature: [],
+  morning: [],
+  sleep: [],
+};
+
+/**
+ * Spotify's own editorial playlist for each category, read on open.spotify.com on
+ * 2026-11-11. Shown as an outbound link only. Full tracks need a Spotify account.
+ */
+export const SPOTIFY_PLAYLISTS: Record<LibraryCategory, { name: string; url: string }> = {
+  classical: { name: "Classical Essentials", url: "https://open.spotify.com/playlist/37i9dQZF1DWWEJlAGA9gs0" },
+  meditation: { name: "Peaceful Meditation", url: "https://open.spotify.com/playlist/37i9dQZF1DWZqd5JICZI0u" },
+  yoga: { name: "Yoga & Meditation", url: "https://open.spotify.com/playlist/37i9dQZF1DX9uKNf5jGX6m" },
+  nature: { name: "Nature Sounds", url: "https://open.spotify.com/playlist/37i9dQZF1DX4PP3DA4J0N8" },
+  morning: { name: "Wake Up Happy", url: "https://open.spotify.com/playlist/37i9dQZF1DX0UrRvztWcAU" },
+  sleep: { name: "Sleep", url: "https://open.spotify.com/playlist/37i9dQZF1DWZd79rJ6a7lp" },
 };
 
 export const PIXABAY_LICENSE = "Pixabay Content License" as const;
@@ -81,9 +104,16 @@ export type FilePiece = {
   id: string;
   title: string;
   artist: string;
+  /** A path under `public/`, or for a streamed recording its https address on upload.wikimedia.org. */
   file: string;
   license: string;
   sourceUrl: string;
+  /** True when the browser streams the file from Wikimedia Commons instead of LifeZoi. */
+  streamed: boolean;
+  /** Credit line the licence asks for. Empty when none is required. */
+  attribution: string;
+  /** Length in seconds, when the source page states it. */
+  seconds: number | null;
 };
 
 export type SynthPiece = { kind: "synth"; id: string; track: Track };
@@ -99,6 +129,24 @@ function fromLibrary(recording: LibraryRecording): FilePiece {
     file: recording.file,
     license: recording.license,
     sourceUrl: recording.sourceUrl,
+    streamed: false,
+    attribution: "",
+    seconds: null,
+  };
+}
+
+function fromStream(recording: StreamedRecording): FilePiece {
+  return {
+    kind: "file",
+    id: recording.id,
+    title: recording.title,
+    artist: recording.artist,
+    file: recording.stream,
+    license: recording.license,
+    sourceUrl: recording.sourceUrl,
+    streamed: true,
+    attribution: recording.attribution,
+    seconds: recording.seconds,
   };
 }
 
@@ -111,18 +159,23 @@ function fromClassical(recording: Recording): FilePiece {
     file: recording.file,
     license: recording.license,
     sourceUrl: recording.sourceUrl,
+    streamed: false,
+    attribution: recording.attribution,
+    seconds: null,
   };
 }
 
-/** The playlist for a category: downloaded recordings first, then LifeZoi's own pieces. */
+/** The playlist for a category: stored recordings, then streamed recordings, then the breathing guides. */
 export function categoryPlaylist(
   category: LibraryCategory,
   pixabay: readonly LibraryRecording[] = PIXABAY_RECORDINGS,
   classical: readonly Recording[] = RECORDINGS,
+  streamed: readonly StreamedRecording[] = STREAMED_RECORDINGS,
 ): LibraryPiece[] {
   const files: FilePiece[] = [
     ...pixabay.filter((recording) => recording.category === category).map(fromLibrary),
     ...(category === "classical" ? classical.map(fromClassical) : []),
+    ...streamed.filter((recording) => recording.category === category).map(fromStream),
   ];
   const builtIn = BUILT_IN_BY_CATEGORY[category].flatMap((id) => {
     const track = trackById(id);
@@ -148,7 +201,7 @@ export function previousIndex(playlist: readonly LibraryPiece[], current: number
 /** Length in seconds, when it is known before the file loads. */
 export function pieceLength(piece: LibraryPiece | null): number | null {
   if (!piece) return null;
-  return piece.kind === "synth" ? piece.track.minutes * 60 : null;
+  return piece.kind === "synth" ? piece.track.minutes * 60 : piece.seconds;
 }
 
 /** Problems with a Pixabay entry. An empty list means the entry is complete. */

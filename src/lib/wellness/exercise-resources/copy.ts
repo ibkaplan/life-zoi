@@ -1,3 +1,5 @@
+import { SITE_ORIGIN } from "@/lib/site";
+
 /**
  * Access flag for exercise resources.
  * Everything shipped today is free. A later premium tier can mark an item
@@ -17,7 +19,7 @@ export const FREE_EXERCISE_TITLE = "FREE EXERCISE RESOURCES";
 export const FREE_EXERCISE_MESSAGE =
   "Explore free exercise videos, printable guides, and simple movement routines to help you stay active at home.";
 export const BRAND_LINE = "LIVE BETTER. MAKE LIFE MATTER.";
-export const LIFEZOI_ORIGIN = "https://life-zoi.vercel.app";
+export const LIFEZOI_ORIGIN = SITE_ORIGIN;
 export const LINK_CHECKED = "2026-11-06";
 
 export const ASK_A_PROFESSIONAL =
