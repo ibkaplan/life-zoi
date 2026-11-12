@@ -168,3 +168,17 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 6. Files: `src/lib/voice/*`, `src/components/voice/*`, `src/components/breathe/player.tsx`, `src/lib/breathe/program.ts`, `src/lib/breathe/state.ts`, `src/components/background-music/provider.tsx`, `src/lib/background-music/audio-focus.ts`, books, assistant, recipe, exercise, movement-break and settings views, `src/app/layout.tsx`, `src/app/globals.css`, and the uk, ru, el `core.json` catalogs.
 7. Outstanding: nobody has listened to the voices yet. Checks used a stand-in speech engine in headless Chromium, which confirmed timing, voice choice, language, and controls but not sound quality. Breathing-page text is still English only. Translations of the new controls need a native-speaker read.
 8. Next action: owner listens on a phone and a computer, then approves or asks for changes.
+
+### Explore Breathing Practices and the breathing balloon (2026-11-11)
+
+1. Name: Pranayama & breathing video library on `/breathe/practice`; balloon as an alternative to the breathing circle.
+2. Objective: ten guided, sitting-friendly breathing videos playing inside lifeZoi, with hand positions for alternate nostril breathing and clear safety text, and a choice of circle or balloon in the guided session.
+3. Assigned agent: Claude project thread, branch `claude/project-thread-x48ucp`.
+4. Status: pull request open for the owner's review. Not merged, not deployed.
+5. Completed:
+   - `src/lib/breathe/practice-videos.ts` lists the ten videos (Diaphragmatic, Full Yogic, Nadi Shodhana, Anulom Vilom, Bhramari, Ujjayi, Sitali, Sitkari, Sama Vritti, Extended Exhale). YouTube's oEmbed returned 200 for each on 2026-11-11 through a separate web fetch. Titles and channels are copied from it. A length is shown only when the watch page or the title states it.
+   - `src/components/breathe/practice-library.tsx` shows the cards and plays a video in a dialog through `youtube-nocookie.com`. It pauses background music like the other video players. The section is English on purpose and tells people using another language so.
+   - The player has a Circle or Balloon choice, saved as `guide` in the breathing settings (default circle). The balloon scales from the same clock as the ball.
+6. Files: the two files above, their test, `src/components/breathe/player.tsx`, `src/components/breathe/views.tsx`, `src/lib/breathe/state.ts`, `src/app/globals.css`, and the uk, ru, el `companion.json` catalogs (three new strings).
+7. Outstanding: the build machine cannot reach youtube.com or i.ytimg.com, so no video has been played inside lifeZoi or watched end to end. Nobody has checked each video for breath holds, sound, or language. Seven of ten lengths are unknown. Most chosen videos are shorter tutorials, not 10 to 15 minute sessions.
+8. Next action: owner (or a session whose network allows youtube.com, www.youtube-nocookie.com, i.ytimg.com) opens each card on a phone and a computer, watches the videos, and approves or asks for swaps.

@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { BreatheHeroArt, VesselArt } from "@/components/breathe/art";
 import { ConsistencyStrip, LifeChangesPanel, WeekCalendar } from "@/components/breathe/calendar";
 import { BreathingPlayer } from "@/components/breathe/player";
+import { PracticeLibrary } from "@/components/breathe/practice-library";
 import { BreatheNav, EvidenceBadge, EvidenceLegend, SafetyCard, SourcesList } from "@/components/breathe/shared";
 import { useBreathe } from "@/components/breathe/use-breathe";
 import { BreatheVideos } from "@/components/breathe/videos";
@@ -211,6 +212,7 @@ export function BreathePractice() {
       <SaveNote />
       <SafetyCard breathless={breathless} compact />
       <BreathingPlayer />
+      <PracticeLibrary />
       <WeekCalendar />
       <section className="stack" aria-labelledby="bf-tech">
         <h2 id="bf-tech">{t("The techniques")}</h2>
