@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { usePageFormat } from "@/components/page-format";
 import { PagePhoto } from "@/components/page-photo";
+import { useMessages } from "@/components/locale-provider";
 import type { Translate } from "@/lib/page-format";
 import { msg } from "@/lib/i18n/translate";
 import { useSession } from "@/components/session-provider";
@@ -105,6 +106,7 @@ const FOOD_PATTERN: Record<string, string> = {
 export function ProfileView() {
   const { ready, sample, session } = useSession();
   const { t, timestamp } = usePageFormat();
+  const m = useMessages();
   const account = useAccount();
   const emotional = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
   if (!ready) return <LoadingState label={t("Loading your session…")} />;
@@ -125,6 +127,14 @@ export function ProfileView() {
         <h1>{t("Only what you provided")}</h1>
         <p className="lede">{t("lifeZoi does not add age, diagnoses, or habits you did not enter.")}</p>
       </div>
+      <p className="actions">
+        <Link className="btn btn-primary" href="/dashboard">
+          {m.sections.dashboard}
+        </Link>
+        <Link className="btn btn-secondary" href="/my-health">
+          {m.sections.myHealth}
+        </Link>
+      </p>
       {latest ? (
         <section className="card stack">
           <p className="hint">{t("Latest completed assessment, {date}", { date: timestamp(latest.completedAt) })}</p>

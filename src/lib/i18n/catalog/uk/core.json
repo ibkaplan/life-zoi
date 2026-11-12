@@ -796,5 +796,6 @@
  "{value} hours": "{value} год",
  "{value} kg": "{value} кг",
  "{voice} (sounds most natural)": "{voice} (звучить найприродніше)",
- "{voice}, online": "{voice}, онлайн"
+ "{voice}, online": "{voice}, онлайн",
+ "My Health": "Моє здоров’я"
 }
