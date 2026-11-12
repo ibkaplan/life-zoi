@@ -48,7 +48,7 @@ function TabIcon({ name }: { name: "home" | "dashboard" | "movement" | "menu" | 
 
 /**
  * One header for every page.
- * Wide screens: the nine main sections in one bar that wraps instead of scrolling, so no item is cut off.
+ * Wide screens: the ten main sections in one bar that wraps instead of scrolling, so no item is cut off.
  * Phones and small tablets: a tab bar at the bottom of the screen with Home, Dashboard, Movement,
  * and Menu, which opens every section (and, when signed in, Account and Sign out).
  * Under the bar, the pages of the current section.

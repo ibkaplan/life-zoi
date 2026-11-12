@@ -279,6 +279,7 @@ export const ru: Messages = {
     dashboard: "Панель",
     myHealth: "Моё здоровье",
     food: "Еда и благополучие",
+    nutrition: "Питание",
     movement: "Движение",
     library: "Библиотека благополучия",
     brain: "Мозг и разум",

@@ -281,6 +281,7 @@ export const en = {
     dashboard: "Dashboard",
     myHealth: "My Health",
     food: "Food & Wellness",
+    nutrition: "Nutrition",
     movement: "Movement",
     library: "Wellness Library",
     brain: "Brain & Mind",
