@@ -376,9 +376,7 @@ create policy check_ins_own_rows on public.check_ins
   with check (auth.uid() = user_id and public.auth_session_may_use_rows());
 
 -- Share the Care invitation links.
--- This definition is in the repository only. It has not been applied to
--- production by the app, and the app does not run this file. Apply it in
--- the Supabase SQL editor only when a person chooses to. Until then,
+-- The app does not run this file. Until this part is in the database,
 -- invitation counts stay unavailable and no invitation row is written.
 -- A row stores a random token and three counts for the signed-in account.
 -- It does not store a recipient name, email address, contact, or health information.
@@ -489,10 +487,10 @@ grant execute on function public.note_care_invitation(text, text) to anon, authe
 
 -- LifeZoi daily companion: one row per account.
 --
--- This file is in the repository only. The app does not run it, and it has
--- not been applied to production. Apply it in the Supabase SQL editor only
--- when a person chooses to. Until then, signed-in people see "Saved in this
--- browser on this device" for daily activities, and nothing is lost.
+-- Also in supabase/migrations/20261109000000_companion_state.sql, which the
+-- "Database migrations" GitHub Action applies to production. Until the table
+-- exists, signed-in people see "Saved in this browser on this device" for
+-- daily activities, and nothing is lost.
 --
 -- The row holds the person's own daily companion data: guidance mode,
 -- movement and food preferences, personal goals, daily activity marks,
@@ -520,11 +518,10 @@ create policy companion_state_own_rows on public.companion_state
 
 -- Invitation-only registration.
 --
--- This section is in the repository only. The app does not run it. Apply it in
--- the Supabase SQL editor only when a person chooses to (or run the migration
--- supabase/migrations/2026-11-12-invite-registration.sql). Until then, the
--- server cannot record invitations and nobody new can register. Existing
--- logins keep working.
+-- Also in supabase/migrations/20261112000000_invite_registration.sql, which the
+-- "Database migrations" GitHub Action applies to production. Until it is in
+-- the database, the server cannot record invitations and nobody new can
+-- register. Existing logins keep working.
 --
 -- A row is written by the server (service role) when the administrator invites
 -- an email address, or when someone enters their email on an active Share the

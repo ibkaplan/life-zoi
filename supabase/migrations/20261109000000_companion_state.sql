@@ -1,8 +1,8 @@
 -- LifeZoi daily companion: one row per account.
 --
--- This file is in the repository only. The app does not run it, and it has
--- not been applied to production. Apply it in the Supabase SQL editor only
--- when a person chooses to. Until then, signed-in people see "Saved in this
+-- Applied to production by the "Database migrations" GitHub Action
+-- (.github/workflows/db-migrate.yml) after it merges to main. The app itself
+-- does not run it. Until the table exists, signed-in people see "Saved in this
 -- browser on this device" for daily activities, and nothing is lost.
 --
 -- The row holds the person's own daily companion data: guidance mode,

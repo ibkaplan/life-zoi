@@ -1,11 +1,10 @@
 -- lifeZoi: invitation-only registration.
 --
--- This file is in the repository only. The app does not run it, and it has not
--- been applied to production. Apply it in the Supabase SQL editor only when a
--- person chooses to. It is safe to run more than once. It drops no table and
--- deletes no row. The same statements are in supabase/schema.sql.
---
--- Run supabase/verify.sql afterwards: every line should say ok = true.
+-- Applied to production by the "Database migrations" GitHub Action
+-- (.github/workflows/db-migrate.yml) after it merges to main, with
+-- supabase/verify.sql before and after. The app itself does not run it.
+-- It is safe to run more than once. It drops no table and deletes no row.
+-- The same statements are in supabase/schema.sql.
 
 -- New logins: the owner's email, or an email with a valid invitation.
 create or replace function public.account_email_allowed(candidate text)
@@ -110,8 +109,6 @@ create policy check_ins_own_rows on public.check_ins
   using (auth.uid() = user_id and public.auth_session_may_use_rows())
   with check (auth.uid() = user_id and public.auth_session_may_use_rows());
 
--- Share the Care invitation links.
--- This definition is in the repository only. It has not been applied to
 -- Share the Care links (already in schema.sql; repeated so this file works on its own).
 create table if not exists public.care_invitations (
   token text primary key,
@@ -218,11 +215,8 @@ grant execute on function public.note_care_invitation(text, text) to anon, authe
 
 -- Invitation-only registration.
 --
--- This section is in the repository only. The app does not run it. Apply it in
--- the Supabase SQL editor only when a person chooses to (or run the migration
--- supabase/migrations/2026-11-12-invite-registration.sql). Until then, the
--- server cannot record invitations and nobody new can register. Existing
--- logins keep working.
+-- Until this section is in the database, the server cannot record invitations
+-- and nobody new can register. Existing logins keep working.
 --
 -- A row is written by the server (service role) when the administrator invites
 -- an email address, or when someone enters their email on an active Share the
