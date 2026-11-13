@@ -38,6 +38,7 @@ People: the project brief names Igor Kaplansky. The GitHub login on the reposito
 These match `main`, not pull request #1.
 
 - `main` is the canonical tree (owner decision LZ-3, 2026-11-05). Pull request #1 stays closed.
+- Database migrations are automatic (owner decision, 2026-11-13). New `supabase/migrations/YYYYMMDDHHMMSS_name.sql` files are applied to production (`vrmiaotivnxfxbviumbt`) by `.github/workflows/db-migrate.yml` after merge to `main`, with `supabase/verify.sql` before and after. Claude may apply reviewed migrations from merged pull requests without asking and reports the result. Destructive changes (dropping tables or columns, deleting or rewriting data) need the owner's written approval and a `-- destructive-approved-by:` line; `scripts/check-migrations.py` blocks them otherwise.
 
 - `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers use Supabase Auth and row level security when the public URL and anon key pass `isPublicSupabaseConfig`. `getAppStatus` reports `authentication: "supabase"` and `persistence: "account"` only then. Missing configuration stays `persistence: "development"` and `authentication: "not-configured"`, even if stray variables are present but invalid.
 - The browser client must read `process.env.NEXT_PUBLIC_SUPABASE_URL` and `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` as direct property accesses. Passing `process.env` through an argument stays empty in the client bundle (`1d6a333`).
