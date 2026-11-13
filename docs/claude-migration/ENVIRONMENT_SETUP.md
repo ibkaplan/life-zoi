@@ -61,7 +61,8 @@ File: `.env.example`. Copy only if you want the names locally. Leave values blan
 | `AI_MODEL` | Label only for that endpoint. Default in code is `gpt-4o-mini` if unset or invalid. Not called. | No |
 | `AI_PLAN` | `basic`, `premium`, or `advanced`. Planning only. There is no unlimited plan. | No |
 | `AI_PROMPT_CENTS_PER_1K` and `AI_COMPLETION_CENTS_PER_1K` | Planning estimates, not a bill. | No |
-| `GEMINI_API_KEY` | Server-only key for `/api/ai-assistant/wellness`. Empty keeps the 50 prepared answers. The code calls `gemini-3.5-flash-lite` only. | No |
+| `GEMINI_API_KEY` | Server-only key for `/api/ai-assistant/wellness` and the calorie counter's `/api/nutrition/photo`. Empty keeps the 50 prepared answers and turns photo recognition off. The code calls `gemini-3.5-flash-lite` only. | No |
+| `USDA_FDC_API_KEY` | Optional free data.gov key for USDA FoodData Central search in the calorie counter. Empty skips USDA online search; Open Food Facts and the shipped USDA foods still work. | No |
 
 `src/lib/status.ts` reports `authentication: "supabase"` and `persistence: "account"` only when `SESSION_ADAPTER` is `supabase` and both public values pass `isPublicSupabaseConfig` (https URL, anon key length 20–4096, no whitespace). Otherwise status stays `not-configured`.
 

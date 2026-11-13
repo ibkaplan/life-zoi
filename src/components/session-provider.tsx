@@ -37,6 +37,8 @@ import {
 import { HABIT_STORAGE_KEY } from "@/lib/habit-transformation/catalog";
 import { EMOTIONAL_STORAGE_KEY } from "@/lib/emotional-wellness/storage";
 import { bindEmotionalOwner, clearEmotionalStore } from "@/lib/emotional-wellness/store";
+import { bindCalorieOwner, clearCalorieStore } from "@/lib/calories/store";
+import { CALORIE_STORAGE_KEY } from "@/lib/calories/storage";
 import { clearPurpose } from "@/lib/purpose";
 import { reloadGuestMyDay } from "@/lib/my-day/client";
 import { isEmptyMyDay, loadMyDay, MY_DAY_STORAGE_KEY, sanitizeMyDay, saveMyDay as writeMyDayFile } from "@/lib/my-day/storage";
@@ -136,6 +138,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     if (account.phase === "loading") return;
     bindEmotionalOwner(userId, account.phase === "off");
     bindStudioOwner(userId);
+    bindCalorieOwner(userId);
     bindWellnessOwner(userId);
     bindCompanionOwner(userId, { sample: snapshot.sample });
     if (!userId) {
@@ -349,12 +352,14 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         clearOwnedCopies(storage, HABIT_STORAGE_KEY, userId);
         clearOwnedCopies(storage, MY_DAY_STORAGE_KEY, userId);
         clearOwnedCopies(storage, EMOTIONAL_STORAGE_KEY, userId);
+        clearOwnedCopies(storage, CALORIE_STORAGE_KEY, userId);
         const tab = typeof window === "undefined" ? null : window.sessionStorage;
         clearOwnedCopies(tab, WELLNESS_STORAGE_KEY, userId);
         clearOwnedCopies(tab, MOVEMENT_STUDIO_KEY, userId);
         clearBrainLocal(storage);
         clearHabitLocal(storage);
         clearEmotionalStore();
+        clearCalorieStore();
         resetWellnessClient();
         reloadGuestMyDay();
         if (signedIn) {
