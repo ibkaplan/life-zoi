@@ -115,7 +115,7 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 2. Objective: the owner's final master specification (brand refresh, assessment health step, food protections, Wellness Library, music, books, brain games, plan, My Day, weekly check-in, reports).
 3. Branch: `claude/project-thread-4qoczn`.
 4. Status: implemented in code with unit tests, including the 12 acceptance scenarios (`src/lib/acceptance.test.ts`).
-5. Outstanding: `supabase/migrations/20261109000000_companion_state.sql` is applied by the Database migrations GitHub Action once `SUPABASE_DB_URL` is set. Until then signed-in companion data stays on the device. Videos other than the NIA films, the NHS pages, and pending sources were not checked from the build environment; run `npm run check:library` from a machine with internet access.
+5. Outstanding: `companion_state` is applied in production (2026-11-13), so signed-in companion data can save to the account; not yet checked in a browser. Videos other than the NIA films, the NHS pages, and pending sources were not checked from the build environment; run `npm run check:library` from a machine with internet access.
 6. Next action: approve or reject pending sources in `src/lib/wellness-library/catalog.ts` through a reviewed pull request.
 
 ### Movement breaks, hydration, and the calf muscle pump
@@ -203,14 +203,14 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 1. Name: Protect every page and API for signed-in members; register only by invitation.
 2. Branch: `claude/project-thread-if53gm`. Pull request open for review. Not merged, not deployed.
 3. Completed: cookie sessions (`@supabase/ssr`, an earlier browser sign-in is moved over once), `src/proxy.ts` gate, `MemberGate` in the members' layout, `requireMember`/`requireAdmin` on every API, public landing page, invitation flow (`/admin/invitations`, `POST /api/register`, `/accept-invite`), migration `supabase/migrations/20261112000000_invite_registration.sql` with SQL tests on a throwaway Postgres.
-4. Waiting on the owner, in this order: the migration is applied by the Database migrations GitHub Action once `SUPABASE_DB_URL` is set; set `SUPABASE_SERVICE_ROLE_KEY` in Vercel (server only), add `/accept-invite` to Supabase redirect URLs, keep public sign-up off, set a custom SMTP sender. Then a real invite and sign-in need a check in a browser.
-5. Not done on purpose: per-account browser copies are not cleared on sign-out, because daily activities live only in the browser until `companion_state` is applied.
+4. Setup done (2026-11-13): migration applied in production; `SUPABASE_SERVICE_ROLE_KEY` set in Vercel Production since 2026-11-04 (sensitive, server only); owner reports `/accept-invite` redirect URLs and a custom SMTP sender (Resend) set in Supabase. Outstanding: a real invite, acceptance, and sign-in checked in a browser; confirm public sign-up is off.
+5. Not done on purpose: per-account browser copies are not cleared on sign-out, because daily activities lived only in the browser until `companion_state` was applied. Now that it is applied (2026-11-13), revisit this.
 
 ### Automatic database migrations (2026-11-13)
 
 1. Name: Apply Supabase migrations automatically after merge.
 2. Branch: `claude/project-thread-0ile9g`.
 3. Completed: migrations renamed to Supabase CLI names (`20261109000000_companion_state.sql`, `20261112000000_invite_registration.sql`); `scripts/check-migrations.py` (destructive-SQL guard); `scripts/db-migrate.sh` (verify, `supabase db push`, verify); `.github/workflows/db-migrate.yml` (pull requests: throwaway Postgres; `main`: production). Tested locally against Postgres 16 with Supabase CLI 3.1.0: before 10 checks false, after every check ok, second run a no-op.
-4. Production before (2026-11-13, read-only verify.sql through the LifeZoi Supabase connector): 47 ok, 9 false, all from the two migrations. The connector's `apply_migration` asks a confirmation question that the Claude app's project view does not show, so it timed out; nothing was applied by hand.
-5. Waiting on the owner: add the `SUPABASE_DB_URL` repository secret (docs/SUPABASE_SETUP.md), then merge. The first run applies both migrations.
+4. Production before (2026-11-13, read-only verify.sql through the LifeZoi Supabase connector): 47 ok, 9 false, all from the two migrations. The connector's `apply_migration` asks a confirmation question that the Claude app's project view does not show, so it timed out; nothing was applied through the connector.
+5. Done: the owner added `SUPABASE_DB_URL`; pull request #56 merged as `edbf7dc` and its first run (Actions run 43520905530) applied both migrations. Supabase lists versions 20261109000000 and 20261112000000; verify.sql afterwards: 56 ok, 0 failing.
 
