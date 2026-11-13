@@ -106,6 +106,7 @@ Do not deploy with a claim of HIPAA, GDPR, or other compliance.
 - Data without an account is tab-local and easy to lose. Tab storage and account storage are not encrypted by lifeZoi beyond what the host and Supabase provide.
 - Suggestions on the main flows are rules, not a clinician and not an AI model.
 - The wellness assistant uses prepared answers unless `GEMINI_API_KEY` is set on the server. That key calls only the free-tier Gemini model named in `.env.example`. It is not a clinician.
+- The Nutrition calorie counter keeps the food diary in this browser's `localStorage` under the member's own key, not in the account database, so it does not follow the member to another device. Photo recognition uses the same free Gemini key and is off without it. Gemini's free tier lets Google use the photos to improve its products, and Google's terms do not allow the free tier for users in the EEA, Switzerland, or the UK. See `docs/claude-migration/CALORIE_COUNTER.md`.
 - Quantitative personal risk, “years gained,” and dates of death are intentionally absent.
 - The GitHub token used in this environment could not change the repository from public to private.
 - Row level security is in `supabase/schema.sql` and is enabled on the account tables.

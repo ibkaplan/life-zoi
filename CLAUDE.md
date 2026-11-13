@@ -52,7 +52,7 @@ Require `npm test`, `npm run typecheck`, and `npm run lint` for application chan
 
 - Do not expose secrets, tokens, or service-role keys. Do not commit `.env` files.
 - Do not put a service-role key in the browser or in a `NEXT_PUBLIC_` variable. The anon key is public only with row level security.
-- Do not describe the mock development endpoint as a live model. Do not set `AI_PROVIDER` to anything but `mock`. The wellness page may use `GEMINI_API_KEY` on the server for `gemini-3.5-flash-lite` only. Do not add a paid model, a browser key, or a `NEXT_PUBLIC_` copy of that key.
+- Do not describe the mock development endpoint as a live model. Do not set `AI_PROVIDER` to anything but `mock`. The wellness page and the Nutrition calorie counter's photo reader (`POST /api/nutrition/photo`, owner decision 2026-11-13) may use `GEMINI_API_KEY` on the server for `gemini-3.5-flash-lite` only. Do not add a paid model, a browser key, or a `NEXT_PUBLIC_` copy of that key.
 - Do not fake authentication or secure storage. Empty Supabase variables must stay `not-configured`.
 - Do not claim HIPAA, GDPR, or other regulatory compliance.
 - Guidance stays qualitative. Do not invent citations, percentages, risk reductions, or a date of death. The Life outlook page may show a copied Social Security population figure only with the existing “not an individual prediction” label. Do not turn that figure into a personal lifespan.
