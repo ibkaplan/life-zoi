@@ -1,4 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import type { MemberState } from "@/lib/auth/session";
+
+const signIn = vi.hoisted(() => ({ state: { status: "signed-out" } as MemberState }));
+vi.mock("@/lib/auth/session", async (load) => ({
+  ...(await load<typeof import("@/lib/auth/session")>()),
+  memberFromRequest: async () => signIn.state,
+}));
 import { decideAccess } from "@/lib/access";
 import { createSampleSession } from "@/lib/sample";
 import { completeDraft, sanitizeSession } from "@/lib/session";
@@ -43,7 +50,26 @@ describe("data access rules", () => {
     expect(body.authentication).toBe("not-configured");
   });
 
+  it("refuses recommendation and scenario requests from a visitor before reading them", async () => {
+    signIn.state = { status: "signed-out" };
+    const refused = await recommendationPost(
+      new Request("http://localhost/api/recommendations", { method: "POST", body: JSON.stringify({ assessment: validAnswers() }) }),
+    );
+    expect(refused.status).toBe(401);
+    signIn.state = { status: "needs-mfa" };
+    const halfway = await whatIfPost(
+      new Request("http://localhost/api/what-if", { method: "POST", body: JSON.stringify({ habitId: "walk", assessment: null }) }),
+    );
+    expect(halfway.status).toBe(401);
+    signIn.state = { status: "not-configured" };
+    const off = await whatIfPost(
+      new Request("http://localhost/api/what-if", { method: "POST", body: JSON.stringify({ habitId: "walk", assessment: null }) }),
+    );
+    expect(off.status).toBe(503);
+  });
+
   it("rejects recommendation and scenario requests that are not a valid assessment", async () => {
+    signIn.state = { status: "member", member: { id: "00000000-0000-4000-8000-000000000001", email: "m@example.org", isAdmin: false } };
     const recommendations = await recommendationPost(
       new Request("http://localhost/api/recommendations", {
         method: "POST",

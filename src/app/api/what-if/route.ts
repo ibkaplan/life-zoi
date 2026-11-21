@@ -1,9 +1,12 @@
+import { requireMember } from "@/lib/auth/require-member";
 import { msg } from "@/lib/i18n/translate";
 import { jsonError, readJson } from "@/lib/http";
 import { buildScenario } from "@/lib/scenarios";
 import { validateScenarioRequest } from "@/lib/validation";
 
 export async function POST(request: Request) {
+  const checked = await requireMember(request);
+  if (!checked.ok) return checked.response;
   const body = await readJson(request);
   if (!body.ok) return jsonError(body.error, body.status);
   const parsed = validateScenarioRequest(body.value);

@@ -9,6 +9,7 @@ import { useSession } from "@/components/session-provider";
 import { useLocale, useT } from "@/components/locale-provider";
 import { EvidenceLine, ReadOnlyNote, WellnessSources } from "@/components/wellness/bits";
 import { BreadRecipePage, NutritionEducation } from "@/components/nutrition/education-views";
+import { CalorieCounter } from "@/components/nutrition/calorie-counter";
 import { breadRecipe } from "@/lib/nutrition/education";
 import { activities, mealModules } from "@/lib/wellness/academy";
 import { FOOD_GROUPS, foods } from "@/lib/wellness/foods";
@@ -180,6 +181,7 @@ export function MealIndex() {
         {t("Build a plate, compare labels, and keep the lessons already on this page: added sugar, homemade bread, gut health, and the meal library.")}
       </p>
       <nav className="actions" aria-label={t("Nutrition topics")}>
+        <a className="btn btn-secondary" href="#calorie-counter">{t("Calorie counter")}</a>
         <a className="btn btn-secondary" href="#healthy-plate">{t("Healthy plate")}</a>
         <a className="btn btn-secondary" href="#protein">{t("Protein")}</a>
         <a className="btn btn-secondary" href="#hidden-salt">{t("Hidden salt")}</a>
@@ -193,6 +195,7 @@ export function MealIndex() {
         <a className="btn btn-secondary" href="#feed-your-gut">{t("Gut health")}</a>
         <a className="btn btn-secondary" href="#lesson-library">{t("Lesson library")}</a>
       </nav>
+      <CalorieCounter />
       <NutritionEducation />
       <h2 id="lesson-library">{t("Lesson library")}</h2>
       {mealModules.map((module) => (

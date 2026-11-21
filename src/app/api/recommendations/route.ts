@@ -1,8 +1,11 @@
+import { requireMember } from "@/lib/auth/require-member";
 import { jsonError, readJson } from "@/lib/http";
 import { buildRecommendations } from "@/lib/recommendations";
 import { validateComplete } from "@/lib/validation";
 
 export async function POST(request: Request) {
+  const checked = await requireMember(request);
+  if (!checked.ok) return checked.response;
   const body = await readJson(request);
   if (!body.ok) return jsonError(body.error, body.status);
   const record =

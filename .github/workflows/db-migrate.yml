@@ -1,0 +1,88 @@
+name: Database migrations
+
+# After a merge to main that changes supabase/migrations, apply the new files to
+# LifeZoi's production Supabase database (ref vrmiaotivnxfxbviumbt), with
+# supabase/verify.sql before and after. Pull requests get the same checks
+# against a throwaway Postgres; they never touch production.
+#
+# Needs one repository secret: SUPABASE_DB_URL, the Session pooler connection
+# string from Supabase (Connect > Session pooler), with the database password.
+# See docs/SUPABASE_SETUP.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/verify.sql"
+      - "scripts/db-migrate.sh"
+      - "scripts/check-migrations.py"
+      - ".github/workflows/db-migrate.yml"
+  pull_request:
+    paths:
+      - "supabase/**"
+      - "scripts/db-migrate.sh"
+      - "scripts/check-migrations.py"
+      - "scripts/test-schema.sh"
+      - ".github/workflows/db-migrate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-migrate-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: false
+
+env:
+  SUPABASE_CLI_VERSION: 3.1.0
+
+jobs:
+  check:
+    name: Check migrations on a throwaway database
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+      - name: Refuse destructive SQL without approval
+        run: python3 scripts/check-migrations.py
+      - name: schema.sql twice, policy checks, verify.sql
+        run: scripts/test-schema.sh
+      - name: Apply migrations on top of schema.sql (must be safe to re-run)
+        run: |
+          createdb lz_migrate
+          psql -X -q -v ON_ERROR_STOP=1 -d lz_migrate -f supabase/test/stub-auth.sql
+          psql -X -q -v ON_ERROR_STOP=1 -d lz_migrate -c "set client_min_messages = warning" -f supabase/schema.sql
+          SUPABASE_DB_URL="postgresql://postgres:postgres@localhost:5432/lz_migrate" scripts/db-migrate.sh
+
+  apply:
+    name: Apply migrations to production
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production-database
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+      - name: Install psql
+        run: command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+      - name: Verify, apply, verify
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: scripts/db-migrate.sh

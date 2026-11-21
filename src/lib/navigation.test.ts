@@ -3,12 +3,13 @@ import { en } from "@/lib/i18n/messages/en";
 import { currentPageIn, FOOTER_LINKS, isCurrentLink, NAV_SECTIONS, PHONE_QUICK_SECTIONS, sectionFor } from "@/lib/navigation";
 
 describe("site navigation", () => {
-  it("shows the nine requested sections in the requested order", () => {
+  it("shows the ten requested sections, with Nutrition back in the main menu in the requested order", () => {
     expect(NAV_SECTIONS.map((section) => section.label)).toEqual([
       "Home",
       "Dashboard",
       "My Health",
       "Food & Wellness",
+      "Nutrition",
       "Movement",
       "Wellness Library",
       "Brain & Mind",
@@ -41,7 +42,9 @@ describe("site navigation", () => {
     expect(sectionFor("/academy/move/library")?.key).toBe("library");
     expect(sectionFor("/academy/move/studio/chair-yoga")?.key).toBe("movement");
     expect(sectionFor("/academy/move/resources/videos")?.key).toBe("movement");
-    expect(sectionFor("/academy/meals/some-recipe")?.key).toBe("food");
+    expect(sectionFor("/academy/meals")?.key).toBe("nutrition");
+    expect(sectionFor("/academy/meals/some-recipe")?.key).toBe("nutrition");
+    expect(sectionFor("/food-plan/today")?.key).toBe("food");
     expect(sectionFor("/library/music")?.key).toBe("library");
     expect(sectionFor("/brain-quiz/games")?.key).toBe("brain");
     expect(sectionFor("/progress/weekly")?.key).toBe("progress");

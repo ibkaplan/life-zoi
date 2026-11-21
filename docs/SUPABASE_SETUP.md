@@ -1,6 +1,8 @@
 # Supabase setup for lifeZoi accounts
 
-These are the steps a person with access to the Supabase dashboard and the Vercel project does by hand. Claude sessions do not have those credentials and must not run SQL against the live project. Nothing here needs a service-role key.
+These are the steps a person with access to the Supabase dashboard and the Vercel project does by hand. Nothing here needs a service-role key.
+
+Production project ref: `vrmiaotivnxfxbviumbt`. New files in `supabase/migrations/` are applied automatically after they merge to `main` (see [Automatic migrations](#automatic-migrations)). Claude may apply reviewed, non-destructive migrations from merged pull requests without asking, running `supabase/verify.sql` before and after and reporting the result. Dropping tables or columns, or deleting or rewriting data, still needs the owner's written approval (owner decision, 2026-11-13).
 
 Time needed: about 20 minutes. Use a test email address and made-up answers for every check. Do not use real health information.
 
@@ -23,13 +25,31 @@ Running the whole file also creates:
 - `care_invitations`, so Share the Care can create invitation links and show counts. A row holds a random token and three counts. It does not hold a name, an email address, or health information.
 - The five Community tables. The browser cannot read them. Community keeps using in-process storage until `SUPABASE_SERVICE_ROLE_KEY` is set on the server, which is a separate decision. Applying the tables alone does not turn that on.
 
-- `companion_state`, one row per account for the daily companion: guidance mode, movement and food choices, personal goals, My Day marks, weekly check-ins, next-week plans, music and book positions, favorites, and game history. Row level security matches the other account tables, a size check keeps a row under 256 KB, and `delete_own_account()` removes it. The same definition is in [`supabase/migrations/2026-11-09-companion-state.sql`](../supabase/migrations/2026-11-09-companion-state.sql) if you prefer to run only that part. Until it exists, signed-in people see “Saved in this browser on this device” for daily activities, and nothing is lost.
+- `companion_state`, one row per account for the daily companion: guidance mode, movement and food choices, personal goals, My Day marks, weekly check-ins, next-week plans, music and book positions, favorites, and game history. Row level security matches the other account tables, a size check keeps a row under 256 KB, and `delete_own_account()` removes it. The same definition is in [`supabase/migrations/20261109000000_companion_state.sql`](../supabase/migrations/20261109000000_companion_state.sql) if you prefer to run only that part. Until it exists, signed-in people see “Saved in this browser on this device” for daily activities, and nothing is lost.
 
 If you do not want Share the Care or Community tables yet, stop and say so before running the file. The account tables and the password changes in this guide do not depend on them.
 
 ## 3. Check again
 
 Run `supabase/verify.sql` again. Every line should now say `ok = true`. If a line is `false`, copy the result (it has no personal data) and share it in the project.
+
+## Automatic migrations
+
+`.github/workflows/db-migrate.yml` (**Database migrations** in the Actions tab) runs `scripts/db-migrate.sh`:
+
+1. `scripts/check-migrations.py` refuses any migration that drops a table, schema, or column, truncates, or deletes or updates rows outside a function body, unless the file has a line `-- destructive-approved-by: Name YYYY-MM-DD` written after the owner approved it.
+2. `supabase/verify.sql` runs and its result is printed. Lines about objects a new migration adds are expected to be `false` here.
+3. `supabase db push` applies the files not yet recorded in `supabase_migrations.schema_migrations`, in name order. Files must be named `YYYYMMDDHHMMSS_name.sql`.
+4. `supabase/verify.sql` runs again. The run fails, and GitHub emails the owner, if any line is not `ok = true`.
+
+It runs after a merge to `main` that changes a migration, and can be started by hand (**Run workflow**). On a pull request it runs the same steps against a throwaway Postgres only.
+
+One-time setup, done by the owner (Claude does not handle the database password):
+
+1. In Supabase, open the project, then **Connect** at the top. Under **Session pooler**, copy the URI. It looks like `postgresql://postgres.vrmiaotivnxfxbviumbt:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:5432/postgres`. Use the session pooler, not the direct connection: GitHub's runners cannot reach the direct address.
+2. Replace `[YOUR-PASSWORD]` with the database password (**Project Settings → Database → Reset database password** if you do not have it). If the password has characters such as `@`, `#`, `/`, or `%`, percent-encode them, or reset to a password made of letters and digits.
+3. In GitHub, open the repository, then **Settings → Secrets and variables → Actions → New repository secret**. Name: `SUPABASE_DB_URL`. Value: the URI from step 2.
+4. In the **Actions** tab, open **Database migrations** and choose **Run workflow** on `main`, or merge a pull request that changes a migration.
 
 ## 4. Authentication settings
 

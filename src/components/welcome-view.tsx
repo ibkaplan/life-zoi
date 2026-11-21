@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { CareWelcomeArt } from "@/components/care-illustrations";
-import { useLocale } from "@/components/locale-provider";
+import { useLocale, useMessages } from "@/components/locale-provider";
 import { useAccount } from "@/lib/account-store";
 import {
   isInviteToken,
@@ -28,6 +28,7 @@ export function WelcomeView() {
   const searchParams = useSearchParams();
   const { locale, messages: m } = useLocale();
   const w = m.welcome;
+  const a = m.access;
   // English keeps the approved invitation wording from share-care.ts.
   const heading = locale === "en" ? WELCOME_HEADING : w.heading;
   const body = locale === "en" ? WELCOME_BODY : w.body;
@@ -80,19 +81,19 @@ export function WelcomeView() {
         <p className="lede">{body}</p>
       </div>
       <section className="card stack">
-        <h2>{w.ownAccount}</h2>
-        <p>{w.notOpen}</p>
-        <p>{w.free}</p>
-        {invite && !isInviteToken(invite) ? (
-          <p role="status">{w.noCode}</p>
-        ) : null}
+        <h2>{a.registerTitle}</h2>
+        {phase === "ready" ? (
+          <p>{a.alreadySignedIn}</p>
+        ) : isInviteToken(invite) ? (
+          <RegisterForm token={invite} />
+        ) : (
+          <p role="status">{invite ? w.noCode : a.registerNoCode}</p>
+        )}
         {storedNote ? <p role="status">{storedNote}</p> : null}
+        <p>{w.free}</p>
         <div className="actions">
-          <Link className="btn btn-primary" href="/dashboard">
-            {w.explore}
-          </Link>
-          <Link className="btn btn-secondary" href="/sign-in">
-            {m.common.signIn}
+          <Link className="btn btn-secondary" href={phase === "ready" ? "/" : "/sign-in"}>
+            {phase === "ready" ? a.mySpace : a.alreadyMember}
           </Link>
         </div>
       </section>
@@ -109,5 +110,81 @@ export function WelcomeFallback({ heading, body }: { heading: string; body: stri
       <p className="lede">{locale === "en" ? body : w.body}</p>
       <p role="status">{w.opening}</p>
     </article>
+  );
+}
+
+type RegisterState = "idle" | "busy" | "sent" | "inactive" | "full" | "busy-limit" | "email" | "failed" | "not-set-up";
+
+/** Email only. The server checks the link and asks Supabase to send an invitation email. */
+function RegisterForm({ token }: { token: string }) {
+  const m = useMessages();
+  const a = m.access;
+  const id = useId();
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<RegisterState>("idle");
+
+  if (state === "sent") {
+    return (
+      <p className="alert alert-ok" role="status">
+        {a.registerSent}
+      </p>
+    );
+  }
+
+  const problem: Partial<Record<RegisterState, string>> = {
+    inactive: a.registerInactive,
+    full: a.registerFull,
+    "busy-limit": a.registerBusy,
+    email: a.registerEmail,
+    failed: a.registerFailed,
+    "not-set-up": a.registerNotSetUp,
+  };
+
+  return (
+    <form
+      className="stack"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setState("busy");
+        void fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, email }),
+          cache: "no-store",
+        })
+          .then(async (response) => {
+            const body = (await response.json().catch(() => ({}))) as { code?: unknown };
+            const code = typeof body.code === "string" ? body.code : "";
+            if (response.ok && code === "sent") return setState("sent");
+            if (code === "inactive" || code === "full" || code === "email" || code === "not-set-up") return setState(code);
+            if (code === "busy") return setState("busy-limit");
+            setState("failed");
+          })
+          .catch(() => setState("failed"));
+      }}
+    >
+      <p>{a.registerText}</p>
+      <label className="field" htmlFor={id}>
+        <span>{m.common.email}</span>
+        <input
+          id={id}
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+      </label>
+      <div className="actions">
+        <button className="btn btn-primary" type="submit" disabled={state === "busy"}>
+          {a.registerButton}
+        </button>
+      </div>
+      {problem[state] ? (
+        <p className="alert alert-error" role="alert">
+          {problem[state]}
+        </p>
+      ) : null}
+    </form>
   );
 }

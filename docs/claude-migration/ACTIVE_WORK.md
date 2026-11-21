@@ -115,7 +115,7 @@ Agents were not stopped. Chat history outside the tracker and git was not copied
 2. Objective: the owner's final master specification (brand refresh, assessment health step, food protections, Wellness Library, music, books, brain games, plan, My Day, weekly check-in, reports).
 3. Branch: `claude/project-thread-4qoczn`.
 4. Status: implemented in code with unit tests, including the 12 acceptance scenarios (`src/lib/acceptance.test.ts`).
-5. Outstanding: the owner applies `supabase/migrations/2026-11-09-companion-state.sql` in Supabase. Until then signed-in companion data stays on the device. Videos other than the NIA films, the NHS pages, and pending sources were not checked from the build environment; run `npm run check:library` from a machine with internet access.
+5. Outstanding: `companion_state` is applied in production (2026-11-13), so signed-in companion data can save to the account; not yet checked in a browser. Videos other than the NIA films, the NHS pages, and pending sources were not checked from the build environment; run `npm run check:library` from a machine with internet access.
 6. Next action: approve or reject pending sources in `src/lib/wellness-library/catalog.ts` through a reviewed pull request.
 
 ### Movement breaks, hydration, and the calf muscle pump
@@ -198,9 +198,26 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 3. Completed: under 1000 px the header is the logo, music and language in one row (the language button shows the globe and code under 560 px; its accessible name still says Language). Home, Dashboard, Movement and Menu sit in a tab bar fixed to the bottom of the screen, centered on tablets. Menu opens a full-height panel with every section, plus Account and Sign out when signed in (those leave the header on phones). The status note and the Listen control take less room on phones. Desktop is unchanged.
 4. Outstanding: signed-in phone header and menu not checked in a browser (no Supabase here).
 
+### Members-only access and invitation-only registration (2026-11-12)
+
+1. Name: Protect every page and API for signed-in members; register only by invitation.
+2. Branch: `claude/project-thread-if53gm`. Pull request open for review. Not merged, not deployed.
+3. Completed: cookie sessions (`@supabase/ssr`, an earlier browser sign-in is moved over once), `src/proxy.ts` gate, `MemberGate` in the members' layout, `requireMember`/`requireAdmin` on every API, public landing page, invitation flow (`/admin/invitations`, `POST /api/register`, `/accept-invite`), migration `supabase/migrations/20261112000000_invite_registration.sql` with SQL tests on a throwaway Postgres.
+4. Setup done (2026-11-13): migration applied in production; `SUPABASE_SERVICE_ROLE_KEY` set in Vercel Production since 2026-11-04 (sensitive, server only); owner reports `/accept-invite` redirect URLs and a custom SMTP sender (Resend) set in Supabase. Outstanding: a real invite, acceptance, and sign-in checked in a browser; confirm public sign-up is off.
+5. Not done on purpose: per-account browser copies are not cleared on sign-out, because daily activities lived only in the browser until `companion_state` was applied. Now that it is applied (2026-11-13), revisit this.
+
+### Automatic database migrations (2026-11-13)
+
+1. Name: Apply Supabase migrations automatically after merge.
+2. Branch: `claude/project-thread-0ile9g`.
+3. Completed: migrations renamed to Supabase CLI names (`20261109000000_companion_state.sql`, `20261112000000_invite_registration.sql`); `scripts/check-migrations.py` (destructive-SQL guard); `scripts/db-migrate.sh` (verify, `supabase db push`, verify); `.github/workflows/db-migrate.yml` (pull requests: throwaway Postgres; `main`: production). Tested locally against Postgres 16 with Supabase CLI 3.1.0: before 10 checks false, after every check ok, second run a no-op.
+4. Production before (2026-11-13, read-only verify.sql through the LifeZoi Supabase connector): 47 ok, 9 false, all from the two migrations. The connector's `apply_migration` asks a confirmation question that the Claude app's project view does not show, so it timed out; nothing was applied through the connector.
+5. Done: the owner added `SUPABASE_DB_URL`; pull request #56 merged as `edbf7dc` and its first run (Actions run 43520905530) applied both migrations. Supabase lists versions 20261109000000 and 20261112000000; verify.sql afterwards: 56 ok, 0 failing.
+
 ### Connected journey, stage 2: welcome, health profile, personal plan (2026-11-12)
 
 1. Name: Guided start (`/start`), starting health profile (`/my-health/baseline`), personal plan.
-2. Branch: `claude/project-thread-5yqy0i` (restarted from `main` after #50 merged). Pull request open for review. Not merged, not deployed.
+2. Branch: `claude/project-thread-5yqy0i` (restarted from `main` after #50 merged). Pull request #52, merged 2026-11-21 after an update from `main`.
 3. Completed: `/start` shows the four steps (welcome, questionnaire, health profile, plan) and highlights the next one. The questionnaire gained one optional question, medicines or supplements (`medicationsNote`, 280 characters, stored with the other answers in the existing `assessments.answers` jsonb, so no migration). After saving, the questionnaire links to `/my-health/baseline`, which shows height, day-1 weight and target weight, what is going well, what to focus on, what to talk about with a professional, goals, and notes for the next appointment. `src/lib/journey.ts` builds the plan: nutrition, meals, movement, sleep, stress, brain, a daily habit, plus connection or urges when the answers point there, and goals. Every item links to an existing page. `/plan` shows the same items. Homepage "Start" now opens `/start`.
 4. Outstanding: uk, ru, el text needs a native-speaker read. Signed-in flow not checked in a browser (no Supabase here). The existing "You reported …" sentences from `personalProfile` repeat the answer label with a capital letter; worth a wording pass.
+

@@ -1,10 +1,12 @@
 "use client";
 
+import "@/components/dashboard-assistant.css";
 import Link from "next/link";
 import { useLocale, useT } from "@/components/locale-provider";
 import { MorningWelcome } from "@/components/background-music/morning-welcome";
 import { NewsSections } from "@/components/news-sections";
 import { firstNameOf } from "@/lib/news/greeting";
+import { WellnessScoreCard } from "@/components/wellness-score-card";
 import { RecommendationsPanel } from "@/components/recommendations-panel";
 import { fmt, LOCALE_META } from "@/lib/i18n/config";
 import { useSession } from "@/components/session-provider";
@@ -29,34 +31,37 @@ export function DashboardView() {
   const name = latest?.answers.displayName || session.draft.displayName;
 
   return (
-    <div className="stack-lg">
+    <div className="stack-lg dash">
       <MorningWelcome firstName={sample ? undefined : firstNameOf(name)} />
-      <NewsSections />
-      <section className="stack">
+      <section className="dash-hero">
         <p className="kicker">{d.kicker}</p>
         <h1>{name ? fmt(d.welcomeName, { name }) : d.welcome}</h1>
         <p className="lede">{d.lede}</p>
       </section>
-      <article className="card assistant-card stack">
-        <p className="kicker">{d.assistantKicker}</p>
-        <h2>{d.assistantTitle}</h2>
-        <p>{d.assistantText}</p>
-        <p className="hint">{d.assistantHint}</p>
-        <Link className="btn assistant-send" href="/ai-assistant">
-          {d.assistantOpen}
-        </Link>
-      </article>
-      <article className="card stack">
-        <p className="kicker">{d.labKicker}</p>
-        <h2>{d.labTitle}</h2>
-        <p>{d.labText}</p>
-        <div className="home-actions">
-          <Link className="btn btn-primary" href="/change-lab">{d.labOpen}</Link>
-          <Link className="btn btn-secondary" href="/lab-results">{d.labExample}</Link>
-        </div>
-      </article>
-      <div className="grid-2">
-        <article className="card stack">
+      <WellnessScoreCard history={session.history} monthCheckIns={monthCheckIns} sample={sample} />
+      <section className="dash-tiles" aria-label={t("Main tools")}>
+        <article className="dash-tile dash-tile-assistant">
+          <span className="dash-tile-icon" aria-hidden="true">💬</span>
+          <p className="dash-tile-kicker">{d.assistantKicker}</p>
+          <h2>{d.assistantTitle}</h2>
+          <p>{d.assistantText}</p>
+          <p className="hint">{d.assistantHint}</p>
+          <Link className="btn btn-primary dash-btn" href="/ai-assistant">
+            {d.assistantOpen}
+          </Link>
+        </article>
+        <article className="dash-tile dash-tile-lab">
+          <span className="dash-tile-icon" aria-hidden="true">🧪</span>
+          <p className="dash-tile-kicker">{d.labKicker}</p>
+          <h2>{d.labTitle}</h2>
+          <p>{d.labText}</p>
+          <div className="dash-tile-actions">
+            <Link className="btn btn-primary dash-btn" href="/change-lab">{d.labOpen}</Link>
+            <Link className="btn btn-secondary dash-btn" href="/lab-results">{d.labExample}</Link>
+          </div>
+        </article>
+        <article className="dash-tile dash-tile-assessment">
+          <span className="dash-tile-icon" aria-hidden="true">📝</span>
           <h2>{d.assessmentTitle}</h2>
           <p>
             {latest
@@ -65,19 +70,21 @@ export function DashboardView() {
                 ? d.assessmentStarted
                 : d.assessmentEmpty}
           </p>
-          <Link className="btn btn-primary" href="/assessment">
+          <Link className="btn btn-primary dash-btn" href="/assessment">
             {latest ? d.update : draftStarted ? d.continueAssessment : d.start}
           </Link>
         </article>
-        <article className="card stack">
+        <article className="dash-tile dash-tile-whatif">
+          <span className="dash-tile-icon" aria-hidden="true">🔮</span>
           <h2>WHAT IF?</h2>
           <p>{d.whatIfText}</p>
-          <Link className="btn btn-secondary" href="/what-if">
+          <Link className="btn btn-primary dash-btn" href="/what-if">
             {d.whatIfOpen}
           </Link>
         </article>
-      </div>
-      <article className="card stack">
+      </section>
+      <NewsSections />
+      <article className="card stack dash-card dash-matters">
         <p className="kicker">{d.mattersKicker}</p>
         <h2>{d.mattersTitle}</h2>
         <p>{d.mattersText}</p>
@@ -91,7 +98,7 @@ export function DashboardView() {
           <p className="hint">{d.hopeHint}</p>
         </section>
       ) : null}
-      <section className="card stack">
+      <section className="card stack dash-card">
         <h2>{d.overview}</h2>
         {latest ? (
           <dl className="review-list">
@@ -137,7 +144,7 @@ export function DashboardView() {
           ))}
         </div>
       </section>
-      <section className="card stack">
+      <section className="card stack dash-card">
         <h2>{d.month}</h2>
         <p>{formatMonth(month, LOCALE_META[locale].htmlLang)}</p>
         {monthCheckIns.length === 0 ? (

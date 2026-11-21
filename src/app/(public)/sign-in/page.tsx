@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { LoadingText } from "@/components/localized-text";
 import { SignInView } from "@/components/sign-in-view";
 
 export const metadata: Metadata = {
@@ -7,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function SignInPage() {
-  return <SignInView />;
+  return (
+    <Suspense fallback={<p className="card" role="status"><LoadingText /></p>}>
+      <SignInView />
+    </Suspense>
+  );
 }

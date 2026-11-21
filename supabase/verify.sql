@@ -6,7 +6,7 @@
 with expected_tables(name) as (
   values
     ('profiles'), ('assessments'), ('scenarios'), ('habit_goals'), ('check_ins'),
-    ('care_invitations'), ('companion_state'),
+    ('care_invitations'), ('companion_state'), ('registration_invites'),
     ('community_profiles'), ('community_messages'), ('community_reports'),
     ('community_blocks'), ('community_mutes')
 ),
@@ -25,13 +25,13 @@ expected_functions(name) as (
   values
     ('auth_session_may_use_rows'), ('enforce_profile_role'), ('reject_sample_assessment'),
     ('delete_own_account'), ('revoke_care_invitation'), ('note_care_invitation'),
-    ('account_email_allowed'), ('enforce_account_allowlist')
+    ('account_email_allowed'), ('enforce_account_allowlist'), ('claim_registration_invite')
 ),
 expected_triggers(tbl, name) as (
   values ('profiles', 'profiles_enforce_role'), ('assessments', 'assessments_reject_sample')
 ),
 expected_columns(tbl, col) as (
-  values ('profiles', 'role'), ('profiles', 'session_state')
+  values ('profiles', 'role'), ('profiles', 'session_state'), ('care_invitations', 'max_registrations')
 )
 select 'table exists' as check, t.name as item, c.oid is not null as ok
 from expected_tables t
@@ -63,6 +63,17 @@ select 'trigger exists', 'auth.users.auth_users_allowlist', exists (
   join pg_class c on c.oid = tr.tgrelid
   where c.relname = 'users' and c.relnamespace = 'auth'::regnamespace and tr.tgname = 'auth_users_allowlist' and not tr.tgisinternal
 )
+union all
+select 'trigger exists', 'auth.users.auth_users_claim_invite', exists (
+  select 1 from pg_trigger tr
+  join pg_class c on c.oid = tr.tgrelid
+  where c.relname = 'users' and c.relnamespace = 'auth'::regnamespace and tr.tgname = 'auth_users_claim_invite' and not tr.tgisinternal
+)
+union all
+select 'browser roles cannot read invitations', 'registration_invites',
+  to_regclass('public.registration_invites') is not null
+  and not has_table_privilege('anon', 'public.registration_invites', 'select')
+  and not has_table_privilege('authenticated', 'public.registration_invites', 'select')
 union all
 select 'column exists', e.tbl || '.' || e.col, exists (
   select 1 from information_schema.columns

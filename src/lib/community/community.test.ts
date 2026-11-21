@@ -538,7 +538,7 @@ describe("community moderation", () => {
   it("documents the free provider, the empty key, and the retention window", () => {
     const provider = readFileSync("src/lib/community/provider.ts", "utf8");
     const env = readFileSync(".env.example", "utf8");
-    const privacy = readFileSync("src/app/(app)/privacy/page.tsx", "utf8");
+    const privacy = readFileSync("src/app/(public)/privacy/page.tsx", "utf8");
     const sql = readFileSync("supabase/schema.sql", "utf8");
     const view = readFileSync("src/components/community-view.tsx", "utf8");
     expect(provider).toContain(MODERATION_ENDPOINT);

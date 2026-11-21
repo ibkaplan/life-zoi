@@ -26,8 +26,8 @@ export function getAppStatus(
       authentication: "not-configured",
       supabaseVariablesPresent,
       detail: supabaseVariablesPresent
-        ? msg("Supabase variables are present, but this environment is not using the account adapter. Answers stay in this browser tab. Requests are not saved on the server.")
-        : msg("Supabase URL and anon key are not set. There is no account sign-in and no database storage. Answers stay in this browser tab. Requests are not saved on the server."),
+        ? msg("Supabase variables are present, but this environment is not using the account adapter. Members cannot sign in here, so the members' pages stay closed.")
+        : msg("Supabase URL and anon key are not set. There is no account sign-in, so the members' pages stay closed."),
     };
   }
   return {
@@ -36,7 +36,7 @@ export function getAppStatus(
     authentication: "supabase",
     supabaseVariablesPresent: true,
     detail: msg(
-      "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). Without an account, answers stay in this browser tab. Sample data is not saved to an account.",
+      "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.",
     ),
   };
 }

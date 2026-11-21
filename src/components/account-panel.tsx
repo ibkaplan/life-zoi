@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   beginAuthenticatorSetup,
@@ -66,6 +67,13 @@ export function AccountPanel() {
             {fmt(a.signedInAs, { email: account.email ?? m.common.yourAccount })}
             {account.isAdmin ? a.admin : ""}
           </p>
+          {account.isAdmin ? (
+            <div className="actions">
+              <Link className="btn btn-secondary" href="/admin/invitations">
+                {m.access.adminLink}
+              </Link>
+            </div>
+          ) : null}
           {account.factorVerified ? (
             <p>{a.mfaOn}</p>
           ) : (

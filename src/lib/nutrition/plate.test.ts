@@ -155,6 +155,7 @@ describe("nutrition plate", () => {
       "https://ods.od.nih.gov/",
     ]);
     expect(Object.keys(packageJson.dependencies).sort()).toEqual([
+      "@supabase/ssr",
       "@supabase/supabase-js",
       "next",
       "react",

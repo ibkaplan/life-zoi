@@ -6,9 +6,9 @@ Read `docs/claude-migration/INDEX.md` first, then the document that matches the 
 
 ## Architecture
 
-Next.js App Router, TypeScript, Tailwind CSS 4, React 19. `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers, scenarios, goals, and check-ins use the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are a real public config. The browser client reads those two names directly so Next can inline them (`src/lib/supabase-browser.ts`). Without that configuration, answers stay in `sessionStorage` for the current tab. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in the connected case.
+Next.js App Router, TypeScript, Tailwind CSS 4, React 19. `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers, scenarios, goals, and check-ins use the anon key and `auth.uid()` row level security when `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are a real public config. The browser client reads those two names directly so Next can inline them (`src/lib/supabase-browser.ts`). LifeZoi is members-only and invitation-only (owner decision, 2026-11-12): `src/proxy.ts` lets a visitor open only `/`, `/sign-in`, `/reset-password`, `/accept-invite`, `/welcome`, `/privacy`, `GET /api/status`, and `POST /api/register` (`src/lib/auth/public-paths.ts`). Members' pages live in `src/app/(members)/`, whose layout re-checks the sign-in cookie on the server (`MemberGate`), and every other API route calls `requireMember` or `requireAdmin`. The sign-in is a cookie from `@supabase/ssr`. Without a Supabase configuration nobody can sign in and the members' pages stay closed. `GET /api/status` reports `authentication: "supabase"` and `persistence: "account"` only in the connected case.
 
-The Wellness Assistant at `/ai-assistant` keeps 50 prepared answers. `POST /api/ai-assistant/wellness` can call Google’s free-tier model `gemini-3.5-flash-lite` only when the server has `GEMINI_API_KEY`. That call sends the current assistant session, not lab values, diagnoses, or account records. Without the key, or when the free tier cannot answer, the prepared library is the reply. `AI_PROVIDER` other than `mock` on the separate development endpoint is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
+The Wellness Assistant page at `/ai-assistant` is a prepared question-and-answer library: six topics and 28 written answers in `src/lib/wellness-assistant/guide.ts`, no typing, no voice input, and Listen reads the same blocks the page shows. The older 50-answer library and the free-model route stay on the server for a later assistant but are not shown on the page. `POST /api/ai-assistant/wellness` can call Google’s free-tier model `gemini-3.5-flash-lite` only when the server has `GEMINI_API_KEY`. That call sends the current assistant session, not lab values, diagnoses, or account records. Without the key, or when the free tier cannot answer, the prepared library is the reply. `AI_PROVIDER` other than `mock` on the separate development endpoint is refused and does not make a network call. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in `sessionStorage` even when an account exists. MedlinePlus Connect is called only with a verified LOINC code. Schema changes ship as files in `supabase/migrations/` and are applied by the Database migrations GitHub Action after merge. Document upload is not implemented (`docs/claude-migration/DOCUMENT_PROCESSING_PLAN.md`).
 
 Important paths on `main`:
 
@@ -18,7 +18,7 @@ Important paths on `main`:
 - `supabase/schema.sql` — account tables, row level security, authenticator-aware policies, admin role trigger, and account deletion
 - `README.md` — setup, deployment notes, and limitations
 
-Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/sign-in`, `/reset-password`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(app)/`. API routes: `GET /api/status`, `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `GET /api/news`, `POST /api/recommendations`, `POST /api/what-if`.
+Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/sign-in`, `/reset-password`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(members)/`; public pages are in `src/app/(public)/`. API routes: `GET /api/status`, `POST /api/register`, `GET|POST|DELETE /api/admin/invitations`, `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `GET /api/news`, `POST /api/recommendations`, `POST /api/what-if`.
 
 ## Development standards
 
@@ -32,7 +32,7 @@ Requirements: Node.js 22 and npm. Install with `npm ci`.
 | `npm run lint` | ESLint |
 | `npm run build` | Production build |
 
-Match the existing style: small typed modules, server validation beside any client check, and plain language in the UI. Do not add a health score, invented measurement, or lifespan figure. Sample data must stay labeled as sample data (`Sample visitor` on `main`) and must not be written into the person’s saved session as if it were theirs.
+Match the existing style: small typed modules, server validation beside any client check, and plain language in the UI. Do not add a health score, invented measurement, or lifespan figure. The one exception, requested by the owner on 2026-11-12, is the dashboard’s “My Wellness Score & Progress” (`src/lib/wellness-score.ts`): a count of how many of seven habit areas in the person’s own saved assessments match the public guidance the suggestions already use, with an empty state when nothing is saved. Sample data must stay labeled as sample data (`Sample visitor` on `main`) and must not be written into the person’s saved session as if it were theirs.
 
 Run the relevant tests for any behavior you change. Do not claim tests, a deploy, or compliance passed unless that was actually verified.
 
@@ -52,7 +52,7 @@ Require `npm test`, `npm run typecheck`, and `npm run lint` for application chan
 
 - Do not expose secrets, tokens, or service-role keys. Do not commit `.env` files.
 - Do not put a service-role key in the browser or in a `NEXT_PUBLIC_` variable. The anon key is public only with row level security.
-- Do not describe the mock development endpoint as a live model. Do not set `AI_PROVIDER` to anything but `mock`. The wellness page may use `GEMINI_API_KEY` on the server for `gemini-3.5-flash-lite` only. Do not add a paid model, a browser key, or a `NEXT_PUBLIC_` copy of that key.
+- Do not describe the mock development endpoint as a live model. Do not set `AI_PROVIDER` to anything but `mock`. The wellness page and the Nutrition calorie counter's photo reader (`POST /api/nutrition/photo`, owner decision 2026-11-13) may use `GEMINI_API_KEY` on the server for `gemini-3.5-flash-lite` only. Do not add a paid model, a browser key, or a `NEXT_PUBLIC_` copy of that key.
 - Do not fake authentication or secure storage. Empty Supabase variables must stay `not-configured`.
 - Do not claim HIPAA, GDPR, or other regulatory compliance.
 - Guidance stays qualitative. Do not invent citations, percentages, risk reductions, or a date of death. The Life outlook page may show a copied Social Security population figure only with the existing “not an individual prediction” label. Do not turn that figure into a personal lifespan.
@@ -60,6 +60,7 @@ Require `npm test`, `npm run typecheck`, and `npm run lint` for application chan
 - The 988 wording is for the United States and still needs review before launch.
 - Hosts can log validation request bodies even though application code does not store them.
 - Do not deploy, change infrastructure, or rotate credentials unless the task explicitly says so and a person has approved production changes.
+- Database migrations (owner decision, 2026-11-13): new files in `supabase/migrations/` (named `YYYYMMDDHHMMSS_name.sql`) are applied to the production Supabase project `vrmiaotivnxfxbviumbt` by `.github/workflows/db-migrate.yml` after merge to `main`, with `supabase/verify.sql` before and after. Claude may apply reviewed migrations from merged pull requests without asking and must report the verify result. Dropping tables or columns, or deleting or rewriting data, still needs the owner's written approval, recorded in the file as `-- destructive-approved-by: Name YYYY-MM-DD`; never add that line without it.
 - Follow GitHub branch protection. Do not merge unvalidated implementation changes. Do not bypass failed checks.
 - Preserve working behavior unless the task asks for a change.
 

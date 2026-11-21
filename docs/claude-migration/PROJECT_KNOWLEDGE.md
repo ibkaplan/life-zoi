@@ -38,10 +38,11 @@ People: the project brief names Igor Kaplansky. The GitHub login on the reposito
 These match `main`, not pull request #1.
 
 - `main` is the canonical tree (owner decision LZ-3, 2026-11-05). Pull request #1 stays closed.
+- Database migrations are automatic (owner decision, 2026-11-13). New `supabase/migrations/YYYYMMDDHHMMSS_name.sql` files are applied to production (`vrmiaotivnxfxbviumbt`) by `.github/workflows/db-migrate.yml` after merge to `main`, with `supabase/verify.sql` before and after. Claude may apply reviewed migrations from merged pull requests without asking and reports the result. Destructive changes (dropping tables or columns, deleting or rewriting data) need the owner's written approval and a `-- destructive-approved-by:` line; `scripts/check-migrations.py` blocks them otherwise.
 
 - `SESSION_ADAPTER` is `"supabase"`. Signed-in assessment answers use Supabase Auth and row level security when the public URL and anon key pass `isPublicSupabaseConfig`. `getAppStatus` reports `authentication: "supabase"` and `persistence: "account"` only then. Missing configuration stays `persistence: "development"` and `authentication: "not-configured"`, even if stray variables are present but invalid.
 - The browser client must read `process.env.NEXT_PUBLIC_SUPABASE_URL` and `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` as direct property accesses. Passing `process.env` through an argument stays empty in the client bundle (`1d6a333`).
-- Without an account, assessment answers stay in the browser tab (`sessionStorage`). Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in the tab even when an account exists. Sample data labeled `Sample visitor` is not written into an account.
+- LifeZoi is members-only and registration is invitation-only (owner decision, 2026-11-12). Visitors see only the landing page, sign-in, password reset, `/accept-invite`, `/welcome`, and `/privacy`; the public list is `src/lib/auth/public-paths.ts`, and `route-coverage.test.ts` fails if a new page or API is not behind the gate. Invitations come from the administrator or a Share the Care link (3 registrations per link by default) and are enforced by a database trigger. Guest use of features was removed. Change Lab, Your Life Matters, the assistant thread, and wellness notes stay in the tab even when an account exists. Sample data labeled `Sample visitor` is not written into an account.
 - The assistant is mock-only. `AI_PROVIDER` other than `mock` is refused with no outbound call. `.env.example` prices and `gpt-4o-mini` are labels, not a live bill or a live model.
 - Settings clear the tab, and for a signed-in person also clear that account’s rows, after a confirm button. They do not ask the person to type `delete`, and they do not export JSON. A separate control deletes the login.
 - The only admin email is `tatyanaserikovaru@gmail.com`, checked on the server and set by a database trigger. The client cannot grant admin.
@@ -80,7 +81,7 @@ These match `main`, not pull request #1.
 
 - Pretending Supabase is connected because env vars exist.
 - Using the service role to read user data.
-- Showing a health score, biological age, or lifespan.
+- Showing a health score, biological age, or lifespan. Exception (owner request, 2026-11-12): the dashboard’s “My Wellness Score & Progress” counts habit areas from the person’s own saved assessments that match public guidance (for example “5 of 7”). It is labeled as not a medical test, diagnosis, or prediction, and it is empty until an assessment is saved.
 - Inventing check-ins the person did not enter.
 - Treating sample layouts as saved personal data.
 - Claiming compliance because HTTPS or row level security exists on paper.

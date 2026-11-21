@@ -1,7 +1,10 @@
+import { requireMember } from "@/lib/auth/require-member";
 import { HEALTH_REFERENCES } from "@/lib/references/library";
 import { lookupLabReference } from "@/lib/medlineplus";
 
 export async function GET(request: Request) {
+  const checked = await requireMember(request);
+  if (!checked.ok) return checked.response;
   const loinc = new URL(request.url).searchParams.get("loinc");
   if (!loinc) {
     return Response.json({

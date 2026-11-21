@@ -10,6 +10,7 @@ import library from "./library.json";
 import companion from "./companion.json";
 import habits from "./habits.json";
 import focus from "./focus.json";
+import assistant from "./assistant.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant };
 export default catalog;
