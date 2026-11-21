@@ -44,6 +44,9 @@ export default function PrivacyPage() {
           <T text="The account email, the password held by Supabase Auth, and an optional authenticator factor. In the answer tables: an optional name and age range, sleep, movement, food and water, optional tobacco and alcohol answers, stress, mood, social connection, goals, an optional hope for what health could help you experience, notes, check-ins, and the in-progress assessment. The weekly check-in can include an energy choice from 1 to 5, items you mark, and a short note. Weight measurements are optional numbers you type, with no goal weight. Sample data is labeled “Sample visitor” and is not written into an account." />
         </p>
         <p>
+          <T text="The assessment has an optional box for medicines or supplements you take, up to 280 characters. It is a list for your own reference. It is saved with your other assessment answers in your account, and row level security lets only your account read it. It is not sent to Gemini or any other outside service. LifeZoi does not diagnose from it and never suggests starting, stopping, or changing a medicine. Clearing your saved data in Settings, or deleting the account, removes it." />
+        </p>
+        <p>
           <T text="Women's Care in Food & Wellness is optional. If you turn it on, your answers (that you identify as a woman, your life stage, cycle phase, symptoms you tick, and whether you are worried about low iron) are saved with your other daily food choices: in this browser, or in your account's companion row when you are signed in and that table is set up. They are not sent to an AI or any outside service, and LifeZoi never guesses them from your name or other answers. Turning Women's Care off clears them." />
         </p>
         <p>
