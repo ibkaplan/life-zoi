@@ -214,3 +214,10 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 4. Production before (2026-11-13, read-only verify.sql through the LifeZoi Supabase connector): 47 ok, 9 false, all from the two migrations. The connector's `apply_migration` asks a confirmation question that the Claude app's project view does not show, so it timed out; nothing was applied through the connector.
 5. Done: the owner added `SUPABASE_DB_URL`; pull request #56 merged as `edbf7dc` and its first run (Actions run 43520905530) applied both migrations. Supabase lists versions 20261109000000 and 20261112000000; verify.sql afterwards: 56 ok, 0 failing.
 
+### Connected journey, stage 2: welcome, health profile, personal plan (2026-11-12)
+
+1. Name: Guided start (`/start`), starting health profile (`/my-health/baseline`), personal plan.
+2. Branch: `claude/project-thread-5yqy0i` (restarted from `main` after #50 merged). Pull request #52, merged 2026-11-21 after an update from `main`.
+3. Completed: `/start` shows the four steps (welcome, questionnaire, health profile, plan) and highlights the next one. The questionnaire gained one optional question, medicines or supplements (`medicationsNote`, 280 characters, stored with the other answers in the existing `assessments.answers` jsonb, so no migration). After saving, the questionnaire links to `/my-health/baseline`, which shows height, day-1 weight and target weight, what is going well, what to focus on, what to talk about with a professional, goals, and notes for the next appointment. `src/lib/journey.ts` builds the plan: nutrition, meals, movement, sleep, stress, brain, a daily habit, plus connection or urges when the answers point there, and goals. Every item links to an existing page. `/plan` shows the same items. Homepage "Start" now opens `/start`.
+4. Outstanding: uk, ru, el text needs a native-speaker read. Signed-in flow not checked in a browser (no Supabase here). The existing "You reported …" sentences from `personalProfile` repeat the answer label with a capital letter; worth a wording pass.
+

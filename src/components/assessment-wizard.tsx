@@ -315,12 +315,21 @@ export function AssessmentWizard() {
         </p>
       ) : null}
       {saved ? (
-        <p className="alert alert-ok" role="status">
-          {accountReady ? t("Saved to your account as a new assessment. Earlier assessments are kept.") : t("Saved in this browser tab as a new assessment. Sign in to keep it in your account.")}{" "}
+        <div className="alert alert-ok stack" role="status">
+          <p>
+          {accountReady ? t("Saved to your account as a new assessment. Earlier assessments are kept.") : t("Saved in this browser tab as a new assessment. Sign in to keep it in your account.")}
+          </p>
+          <p>
+            <Link className="btn btn-primary" href="/my-health/baseline">
+              {t("See my health profile and plan")} <span aria-hidden="true">→</span>
+            </Link>
+          </p>
+          <p>
           <Link href="/plan">{t("Open My Life Improvement Plan")}</Link>,{" "}
           <Link href="/outlook">{t("See the educational outlook")}</Link>, <Link href="/dashboard">{t("go to the dashboard")}</Link>, {t("or")}{" "}
           <Link href="/what-if">{t("open WHAT IF?")}</Link>
-        </p>
+          </p>
+        </div>
       ) : null}
       {errors.form ? (
         <p className="alert alert-error" role="alert" id="assessment-form-error" tabIndex={-1}>
@@ -672,6 +681,16 @@ export function AssessmentWizard() {
                 maxLength={280}
                 value={draft.familyNote}
                 onChange={(familyNote) => update({ familyNote })}
+              />
+              <TextQuestion
+                id="medicationsNote"
+                label={t("Medicines or supplements you take")}
+                hint={t("Optional. A list for your own reference only. LifeZoi never suggests starting, stopping, or changing a medicine.")}
+                placeholder={t("Type any you want to remember, or leave blank")}
+                multiline
+                maxLength={280}
+                value={draft.medicationsNote}
+                onChange={(medicationsNote) => update({ medicationsNote })}
               />
               <TextQuestion
                 id="bloodPressure"
@@ -1034,6 +1053,7 @@ function Review({
     },
     { label: t("Conditions you reported"), value: draft.conditionsNote || none, step: "mind" },
     { label: t("Family history you reported"), value: draft.familyNote || none, step: "mind" },
+    { label: t("Medicines or supplements you reported"), value: draft.medicationsNote || none, step: "mind" },
     { label: t("Blood pressure you typed"), value: draft.bloodPressure || none, step: "mind" },
     { label: t("Glucose you typed"), value: draft.glucose || none, step: "mind" },
     { label: t("HbA1c you typed"), value: draft.hba1c || none, step: "mind" },

@@ -44,6 +44,7 @@ const sampleAnswers: Assessment = {
   flexibility: "",
   conditionsNote: "",
   familyNote: "",
+  medicationsNote: "",
   bloodPressure: "",
   glucose: "",
   hba1c: "",

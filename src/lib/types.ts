@@ -119,6 +119,7 @@ export type Assessment = {
   flexibility: VegetablePattern | "";
   conditionsNote: string;
   familyNote: string;
+  medicationsNote: string;
   bloodPressure: string;
   glucose: string;
   hba1c: string;
@@ -158,6 +159,7 @@ export type NormalizedAssessment = {
   flexibility: VegetablePattern | null;
   conditionsNote: string;
   familyNote: string;
+  medicationsNote: string;
   bloodPressure: string;
   glucose: string;
   hba1c: string;
@@ -288,6 +290,7 @@ export const EMPTY_ASSESSMENT: Assessment = {
   flexibility: "",
   conditionsNote: "",
   familyNote: "",
+  medicationsNote: "",
   bloodPressure: "",
   glucose: "",
   hba1c: "",

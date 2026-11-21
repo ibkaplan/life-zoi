@@ -18,8 +18,10 @@ import { safetyFlags } from "@/lib/health-profile";
 import { LoadingState } from "@/components/sources";
 import { localISODate } from "@/lib/dates";
 import { msg } from "@/lib/i18n/translate";
-import { localizeBuilt } from "@/lib/page-format";
-import { habitDelta, improvementPlan, reassessDue, RETURN_TO_NOTE } from "@/lib/improvement";
+import { habitDelta, reassessDue } from "@/lib/improvement";
+import { journeyPlan } from "@/lib/journey";
+import { PlanItems } from "@/components/journey/plan-items";
+import { validateComplete } from "@/lib/validation";
 import type { ReassessDays } from "@/lib/types";
 
 const MODE_TEXT: Record<GuidanceMode, { title: string; text: string }> = {
@@ -125,7 +127,8 @@ export function PlanView() {
   if (!ready) return <LoadingState label={t("Loading your plan…")} />;
   const latest = session.history[0]?.answers ?? null;
   const previous = session.history[1]?.answers ?? null;
-  const actions = improvementPlan(latest);
+  const parsedLatest = latest ? validateComplete(latest) : null;
+  const latestParsed = parsedLatest && parsedLatest.ok ? parsedLatest.value : null;
   const deltas = latest ? habitDelta(latest, previous) : [];
   const today = localISODate();
   const due = reassessDue(session.reassessOn, session.reassessDays, today);
@@ -158,18 +161,10 @@ export function PlanView() {
         <LifeChangesPanel heading={t("My current life, my new life: breathing and circulation")} />
       </section>
       <CurrentNewLife />
-      <section className="card stack">
-        <h2>{t("A few priorities from your assessment")}</h2>
-        <p>{t("These weekly actions come from your latest answers. They are user-reported, not measured, and not hypothetical forecasts.")}</p>
-        <ul className="record-list">
-          {actions.map((action) => (
-            <li key={action.area}>
-              <strong>{t(action.area)}</strong>
-              <p>{localizeBuilt(t, action.weekly, [RETURN_TO_NOTE])}</p>
-              <p className="hint">{t("Kind: {kind}", { kind: t("user-reported") })}</p>
-            </li>
-          ))}
-        </ul>
+      <section className="stack" aria-labelledby="plan-priorities">
+        <h2 id="plan-priorities">{t("A few priorities from your assessment")}</h2>
+        <p>{t("Each step comes from your latest answers and opens the page where you can do it. They are user-reported, not measured, and not forecasts.")}</p>
+        <PlanItems items={journeyPlan(latestParsed)} />
       </section>
       <section className="card stack">
         <h2>{t("Reassessment")}</h2>
