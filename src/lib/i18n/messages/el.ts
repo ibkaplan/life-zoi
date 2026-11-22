@@ -266,6 +266,7 @@ export const el: Messages = {
     "/ai-assistant": "Βοηθός ευεξίας",
     "/community": "Κοινότητα",
     "/emotional-wellness": "Συναισθηματική ευεξία",
+    "/mind": "LifeZoi Mind: συναισθηματική υγεία",
     "/share-the-care": "Μοιραστείτε τη φροντίδα",
     "/change-lab": "Εργαστήριο αλλαγής",
     "/lab-results": "Κατανοήστε τις εξετάσεις μου",
