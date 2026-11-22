@@ -926,5 +926,15 @@
  "Accept your invitation": "Αποδεχτείτε την πρόσκληση",
  "Supabase variables are present, but this environment is not using the account adapter. Members cannot sign in here, so the members' pages stay closed.": "Οι μεταβλητές Supabase υπάρχουν, αλλά αυτό το περιβάλλον δεν χρησιμοποιεί τον προσαρμογέα λογαριασμών. Τα μέλη δεν μπορούν να συνδεθούν εδώ, οπότε οι σελίδες μελών μένουν κλειστές.",
  "Supabase URL and anon key are not set. There is no account sign-in, so the members' pages stay closed.": "Η διεύθυνση URL και το ανώνυμο κλειδί του Supabase δεν έχουν οριστεί. Δεν υπάρχει σύνδεση λογαριασμού, οπότε οι σελίδες μελών μένουν κλειστές.",
- "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.": "Οι απαντήσεις, τα σενάρια, οι στόχοι και τα check-in ενός συνδεδεμένου μέλους αποθηκεύονται στις δικές του γραμμές Supabase. Η ασφάλεια σε επίπεδο γραμμής χρησιμοποιεί auth.uid(). Το LifeZoi είναι για μέλη με πρόσκληση και κάθε σελίδα και API μελών ελέγχει τη σύνδεση στον διακομιστή. Τα δείγματα δεδομένων δεν αποθηκεύονται σε λογαριασμό."
+ "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.": "Οι απαντήσεις, τα σενάρια, οι στόχοι και τα check-in ενός συνδεδεμένου μέλους αποθηκεύονται στις δικές του γραμμές Supabase. Η ασφάλεια σε επίπεδο γραμμής χρησιμοποιεί auth.uid(). Το LifeZoi είναι για μέλη με πρόσκληση και κάθε σελίδα και API μελών ελέγχει τη σύνδεση στον διακομιστή. Τα δείγματα δεδομένων δεν αποθηκεύονται σε λογαριασμό.",
+ "Page background": "Φόντο σελίδων",
+ "Choose a soft background for every page. Text and cards stay the same, so reading is just as clear. The choice is saved in this browser only.": "Διαλέξτε ένα απαλό φόντο για όλες τις σελίδες. Το κείμενο και οι κάρτες μένουν ίδια, ώστε η ανάγνωση να είναι εξίσου καθαρή. Η επιλογή αποθηκεύεται μόνο σε αυτό το πρόγραμμα περιήγησης.",
+ "Automatic": "Αυτόματα",
+ "Calm Blue if your saved questionnaire says male, Soft Rose if it says female, and Classic Ivory for any other answer or no answer.": "Ήρεμο Μπλε αν το αποθηκευμένο ερωτηματολόγιό σας λέει άνδρας, Απαλό Ροζ αν λέει γυναίκα, και Κλασικό Ιβουάρ για κάθε άλλη απάντηση ή χωρίς απάντηση.",
+ "Classic Ivory": "Κλασικό Ιβουάρ",
+ "Warm ivory with a touch of lavender and sage.": "Ζεστό ιβουάρ με μια νότα λεβάντας και φασκόμηλου.",
+ "Calm Blue": "Ήρεμο Μπλε",
+ "Soft sky blue with gentle waves.": "Απαλό γαλάζιο του ουρανού με ήπια κύματα.",
+ "Soft Rose": "Απαλό Ροζ",
+ "Pale pink and light blue with soft circles.": "Απαλό ροζ και ανοιχτό γαλάζιο με απαλούς κύκλους."
 }

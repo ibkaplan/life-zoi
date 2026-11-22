@@ -3696,3 +3696,89 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
 
 /* Gold star beside Reviews & Feedback in the main menu. */
 .nav-star { display: inline-block; flex: 0 0 auto; margin-right: 0.3rem; fill: var(--gold); stroke: #D99A3A; stroke-width: 1; vertical-align: -0.2em; }
+
+/*
+ * Page backgrounds ("looks"), chosen in Settings and set on <html data-look>.
+ * Each look only changes the backdrop behind the white cards, so text contrast stays as it was.
+ * The backdrop is drawn with CSS gradients and a small inline SVG: no image downloads.
+ * Peak tints are kept light enough that ink, muted, royal and teal text keep at least 4.5:1.
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--look-art, none);
+}
+
+:root[data-look="blue"] {
+  --bg: #EDF3FA;
+  --ivory: #F5F8FC;
+  --sky: #EAF0FA;
+  --sand: #E9F0F9;
+  --line: #D5DFF0;
+  --look-wash:
+    radial-gradient(900px 480px at -6% -8%, rgba(126, 170, 225, 0.2), transparent 64%),
+    radial-gradient(760px 420px at 106% 4%, rgba(185, 142, 229, 0.14), transparent 60%),
+    radial-gradient(820px 460px at 50% 112%, rgba(47, 143, 131, 0.08), transparent 66%);
+  --look-art:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%239CC3EA' fill-opacity='0.2' d='M0 190c160-40 320-60 480-30s320 90 480 80 320-70 480-80v160H0z'/%3E%3Cpath fill='%237EAAE1' fill-opacity='0.14' d='M0 240c200-50 360-40 540 0s360 50 540 10 260-50 360-40v110H0z'/%3E%3C/svg%3E") bottom / 100% 34vh no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300'%3E%3Cpath d='M0 120c100-30 200-30 300 0s200 30 300 0' fill='none' stroke='%237EAAE1' stroke-opacity='0.22' stroke-width='2'/%3E%3Cpath d='M0 150c100-30 200-30 300 0s200 30 300 0' fill='none' stroke='%237EAAE1' stroke-opacity='0.16' stroke-width='2'/%3E%3Cpath d='M0 180c100-30 200-30 300 0s200 30 300 0' fill='none' stroke='%23B98EE5' stroke-opacity='0.14' stroke-width='2'/%3E%3C/svg%3E") right -120px top 5rem / min(620px, 90vw) auto no-repeat;
+}
+
+:root[data-look="rose"] {
+  --bg: #FBF2F5;
+  --ivory: #FDF7F9;
+  --sky: #F9EEF4;
+  --sand: #F8EEF3;
+  --line: #EED8E3;
+  --look-wash:
+    radial-gradient(900px 480px at -6% -8%, rgba(240, 175, 200, 0.3), transparent 64%),
+    radial-gradient(800px 440px at 106% 2%, rgba(150, 195, 235, 0.26), transparent 60%),
+    radial-gradient(820px 460px at 50% 112%, rgba(185, 142, 229, 0.14), transparent 66%);
+  --look-art:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23F6CFDC' fill-opacity='0.4' d='M0 200c180-50 360-60 540-20s340 80 520 60 260-60 380-70v150H0z'/%3E%3Cpath fill='%2396C3EB' fill-opacity='0.16' d='M0 250c200-40 380-30 560 10s340 40 520 0 260-40 360-30v90H0z'/%3E%3C/svg%3E") bottom / 100% 32vh no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='300' cy='90' r='70' fill='%23F0AFC8' fill-opacity='0.16'/%3E%3Ccircle cx='190' cy='170' r='42' fill='%2396C3EB' fill-opacity='0.16'/%3E%3Ccircle cx='330' cy='250' r='28' fill='%23B98EE5' fill-opacity='0.12'/%3E%3Ccircle cx='110' cy='60' r='18' fill='%23F0AFC8' fill-opacity='0.18'/%3E%3C/svg%3E") right -60px top 4rem / min(420px, 70vw) auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='80' cy='300' r='56' fill='%2396C3EB' fill-opacity='0.14'/%3E%3Ccircle cx='170' cy='360' r='24' fill='%23F0AFC8' fill-opacity='0.16'/%3E%3C/svg%3E") left -40px bottom 18vh / min(320px, 55vw) auto no-repeat;
+}
+
+:root[data-look="blue"] body,
+:root[data-look="rose"] body {
+  background: var(--look-wash), var(--bg);
+}
+
+/* Settings: a small preview of each background. */
+.look-choice { grid-template-columns: auto auto 1fr; align-items: center; }
+.look-text { display: grid; gap: 0.1rem; }
+.look-swatch {
+  flex: none;
+  width: 3.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(40px 30px at 0 0, rgba(185, 142, 229, 0.45), transparent 70%),
+    radial-gradient(40px 30px at 100% 0, rgba(168, 191, 174, 0.55), transparent 70%),
+    #F9F7F2;
+}
+.look-swatch[data-swatch="blue"] {
+  background:
+    radial-gradient(40px 30px at 0 0, rgba(126, 170, 225, 0.6), transparent 70%),
+    linear-gradient(to top, rgba(156, 195, 234, 0.55) 0 30%, transparent 30%),
+    #EDF3FA;
+}
+.look-swatch[data-swatch="rose"] {
+  background:
+    radial-gradient(40px 30px at 0 0, rgba(240, 175, 200, 0.7), transparent 70%),
+    radial-gradient(36px 28px at 100% 0, rgba(150, 195, 235, 0.6), transparent 70%),
+    linear-gradient(to top, rgba(246, 207, 220, 0.8) 0 30%, transparent 30%),
+    #FBF2F5;
+}
+
+@media print {
+  body::before { display: none; }
+}
+@media (max-width: 520px) {
+  .look-swatch { width: 2.4rem; height: 1.9rem; }
+}

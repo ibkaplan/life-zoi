@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Caveat, Fraunces, Noto_Serif_Display, Source_Sans_3 } from "next/font/google";
+import { AppearanceSync } from "@/components/appearance";
 import { BackgroundMusicProvider } from "@/components/background-music/provider";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SkipLink, TitleSync } from "@/components/localized-text";
 import { SessionProvider } from "@/components/session-provider";
 import { VoiceRouteGuard } from "@/components/voice/voice-route-guard";
+import { LOOK_BOOT_SCRIPT } from "@/lib/appearance";
 import { LOCALE_BOOT_SCRIPT } from "@/lib/i18n/boot-script";
 import "./globals.css";
 
@@ -57,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LOOK_BOOT_SCRIPT }} />
       </head>
       <body>
         <LocaleProvider>
@@ -66,7 +69,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <VoiceRouteGuard />
           </Suspense>
           <BackgroundMusicProvider>
-            <SessionProvider>{children}</SessionProvider>
+            <SessionProvider>
+              <AppearanceSync />
+              {children}
+            </SessionProvider>
           </BackgroundMusicProvider>
         </LocaleProvider>
       </body>
