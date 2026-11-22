@@ -30,10 +30,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.lz-photo-credit a,
-.lz-photo-credit a:visited { color: #ffffff; text-decoration: none; }
-.lz-photo-credit a:hover,
-.lz-photo-credit a:focus-visible { text-decoration: underline; }
+/* Specific enough to win over page link colors (for example inside LifeZoi Daily). */
+.lz-photo > .lz-photo-credit a,
+.lz-photo > .lz-photo-credit a:visited { color: #ffffff; text-decoration: none; }
+.lz-photo > .lz-photo-credit a:hover,
+.lz-photo > .lz-photo-credit a:focus-visible { color: #ffffff; text-decoration: underline; }
 
 /* A strip across the top of a dashboard tile. */
 .lz-photo-tile {

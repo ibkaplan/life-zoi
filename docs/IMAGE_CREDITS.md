@@ -14,8 +14,8 @@ Every people and lifestyle photo on LifeZoi's members' pages is listed here and 
 
 | File | Where it appears | Author | License | Source |
 | --- | --- | --- | --- | --- |
-| `/imagery/daily-morning.webp` | Reserved for LifeZoi Daily (`DAILY_PHOTOS.morning`) | Shixart1985 | CC BY 2.0 | [Commons](https://commons.wikimedia.org/wiki/File:Beautiful_senior_woman_with_curly_hair_doing_yoga_at_home.jpg) |
-| `/imagery/daily-calm.webp` | Reserved for LifeZoi Daily (`DAILY_PHOTOS.calm`) | Amy Serin | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Peaceful-senior-woman-meditating-outdoors.jpg) |
+| `/imagery/daily-morning.webp` | LifeZoi Daily on the members' home, beside the welcome (desktop) | Shixart1985 | CC BY 2.0 | [Commons](https://commons.wikimedia.org/wiki/File:Beautiful_senior_woman_with_curly_hair_doing_yoga_at_home.jpg) |
+| `/imagery/daily-calm.webp` | LifeZoi Daily page `/daily`, beside the welcome (desktop) | Amy Serin | CC BY-SA 4.0 | [Commons](https://commons.wikimedia.org/wiki/File:Peaceful-senior-woman-meditating-outdoors.jpg) |
 | `/imagery/nutrition.webp` | Nutrition page, beside the heading (desktop) | Shixart1985 | CC BY 2.0 | [Commons](https://commons.wikimedia.org/wiki/File:Elderly_woman_prepares_vegetables_while_cooking_in_a_home_kitchen_during_the_day.jpg) |
 | `/imagery/change-lab.webp` | Dashboard Change Lab tile; Change Lab page | Clem Onojeghuo | CC0 | [Commons](https://commons.wikimedia.org/wiki/File:Lady_on_a_bike_(Unsplash).jpg) |
 | `/imagery/assessment.webp` | Dashboard assessment tile; first step of the Lifestyle Assessment | Shixart1985 | CC BY 2.0 | [Commons](https://commons.wikimedia.org/wiki/File:Woman_writing_notes_while_enjoying_a_fresh_fruit_platter_and_juice.jpg) |
