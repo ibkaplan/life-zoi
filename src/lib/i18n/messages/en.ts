@@ -279,6 +279,10 @@ export const en = {
     "/focus": "Focus & Brain Training",
     "/settings": "Settings",
     "/privacy": "Privacy",
+    "/feedback": "Reviews & Feedback",
+    "/feedback/members-say": "What our members say",
+    "/feedback/suggest": "Suggestions",
+    "/feedback/listened": "You asked, we listened!",
   },
   sections: {
     home: "Home",
@@ -291,6 +295,7 @@ export const en = {
     brain: "Brain & Mind",
     progress: "Progress",
     profile: "My Profile",
+    reviews: "Reviews & Feedback",
   },
   myHealth: {
     kicker: "My Health",
@@ -461,6 +466,7 @@ export const en = {
     newHereTitle: "New to LifeZoi?",
     newHereText: "Accounts are by invitation only. Use the link in your invitation email, or the invitation link a member shared with you.",
     adminLink: "Invite members",
+    adminFeedbackLink: "Review feedback",
     signInOff: "Account sign-in is not configured in this environment, so members cannot sign in here.",
     acceptKicker: "Invitation",
     acceptTitle: "Choose your password",

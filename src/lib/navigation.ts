@@ -1,7 +1,7 @@
 /**
  * Site navigation.
  *
- * The header shows ten main sections in a fixed order. Each section groups the pages
+ * The header shows eleven main sections in a fixed order. Each section groups the pages
  * that already exist, so no page is removed or renamed; the section row under the header
  * lists the pages of the section you are in. The footer still lists every page.
  */
@@ -17,6 +17,7 @@ export type SectionKey =
   | "library"
   | "brain"
   | "progress"
+  | "reviews"
   | "profile";
 
 export type NavSection = {
@@ -133,6 +134,17 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     ],
   },
   {
+    key: "reviews",
+    href: "/feedback",
+    label: "Reviews & Feedback",
+    pages: [
+      { href: "/feedback", label: "Reviews & Feedback" },
+      { href: "/feedback/members-say", label: "What our members say" },
+      { href: "/feedback/suggest", label: "Suggestions" },
+      { href: "/feedback/listened", label: "You asked, we listened!" },
+    ],
+  },
+  {
     key: "profile",
     href: "/profile",
     label: "My Profile",
@@ -233,6 +245,10 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/balance-challenge", label: "Balance and Brain Challenge" },
   { href: "/brain-quiz", label: "Brain & Habit Quiz" },
   { href: "/focus", label: "Focus & Brain Training" },
+  { href: "/feedback", label: "Reviews & Feedback" },
+  { href: "/feedback/members-say", label: "What our members say" },
+  { href: "/feedback/suggest", label: "Suggestions" },
+  { href: "/feedback/listened", label: "You asked, we listened!" },
   { href: "/settings", label: "Settings" },
   { href: "/privacy", label: "Privacy" },
 ];

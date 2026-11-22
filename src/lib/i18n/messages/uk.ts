@@ -277,6 +277,10 @@ export const uk: Messages = {
     "/focus": "Фокус і тренування мозку",
     "/settings": "Налаштування",
     "/privacy": "Конфіденційність",
+    "/feedback": "Відгуки та пропозиції",
+    "/feedback/members-say": "Що кажуть наші учасники",
+    "/feedback/suggest": "Пропозиції",
+    "/feedback/listened": "Ви просили — ми зробили!",
   },
   sections: {
     home: "Головна",
@@ -289,6 +293,7 @@ export const uk: Messages = {
     brain: "Мозок і розум",
     progress: "Прогрес",
     profile: "Мій профіль",
+    reviews: "Відгуки та пропозиції",
   },
   myHealth: {
     kicker: "Моє здоров’я",
@@ -460,6 +465,7 @@ export const uk: Messages = {
     newHereTitle: "Вперше в LifeZoi?",
     newHereText: "Облікові записи створюються лише за запрошенням. Скористайтеся посиланням із листа-запрошення або посиланням, яким поділився учасник.",
     adminLink: "Запросити учасників",
+    adminFeedbackLink: "Модерація відгуків",
     signInOff: "Вхід до облікового запису не налаштовано в цьому середовищі, тому учасники не можуть тут увійти.",
     acceptKicker: "Запрошення",
     acceptTitle: "Виберіть пароль",

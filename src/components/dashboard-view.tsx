@@ -18,6 +18,7 @@ import { formatMonth, localISODate, monthKey } from "@/lib/dates";
 import { assessmentHasAnswers } from "@/lib/labels";
 import { LoadingState } from "@/components/sources";
 import { DIGNITY_NOTE, purposeReflection } from "@/lib/purpose";
+import { ReviewInvitation } from "@/components/feedback/review-invitation";
 
 export function DashboardView() {
   const { ready, session, sample } = useSession();
@@ -43,6 +44,7 @@ export function DashboardView() {
         <p className="lede">{d.lede}</p>
       </section>
       <WellnessScoreCard history={session.history} monthCheckIns={monthCheckIns} sample={sample} />
+      {sample ? null : <ReviewInvitation />}
       <section className="dash-tiles" aria-label={t("Main tools")}>
         <article className="dash-tile dash-tile-assistant">
           <span className="dash-tile-stage"><AssistantMascot className="dash-tile-mascot" /></span>

@@ -3693,3 +3693,6 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
 .admin-invite > div { display: grid; gap: 0.15rem; min-width: 0; }
 .admin-invite strong { overflow-wrap: anywhere; }
 .admin-invite span { color: var(--muted); font-size: 0.95rem; }
+
+/* Gold star beside Reviews & Feedback in the main menu. */
+.nav-star { display: inline-block; flex: 0 0 auto; margin-right: 0.3rem; fill: var(--gold); stroke: #D99A3A; stroke-width: 1; vertical-align: -0.2em; }

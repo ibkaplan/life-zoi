@@ -277,6 +277,10 @@ export const el: Messages = {
     "/focus": "Συγκέντρωση και εξάσκηση εγκεφάλου",
     "/settings": "Ρυθμίσεις",
     "/privacy": "Απόρρητο",
+    "/feedback": "Κριτικές και σχόλια",
+    "/feedback/members-say": "Τι λένε τα μέλη μας",
+    "/feedback/suggest": "Προτάσεις",
+    "/feedback/listened": "Το ζητήσατε, το κάναμε!",
   },
   sections: {
     home: "Αρχική",
@@ -289,6 +293,7 @@ export const el: Messages = {
     brain: "Εγκέφαλος και νους",
     progress: "Πρόοδος",
     profile: "Το προφίλ μου",
+    reviews: "Κριτικές και σχόλια",
   },
   myHealth: {
     kicker: "Η υγεία μου",
@@ -461,6 +466,7 @@ export const el: Messages = {
     newHereTitle: "Νέος στο LifeZoi;",
     newHereText: "Οι λογαριασμοί δημιουργούνται μόνο με πρόσκληση. Χρησιμοποιήστε τον σύνδεσμο του email πρόσκλησης ή τον σύνδεσμο που μοιράστηκε ένα μέλος.",
     adminLink: "Πρόσκληση μελών",
+    adminFeedbackLink: "Διαχείριση κριτικών",
     signInOff: "Η σύνδεση λογαριασμού δεν έχει ρυθμιστεί σε αυτό το περιβάλλον, οπότε τα μέλη δεν μπορούν να συνδεθούν εδώ.",
     acceptKicker: "Πρόσκληση",
     acceptTitle: "Επιλέξτε κωδικό",

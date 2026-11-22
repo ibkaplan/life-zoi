@@ -72,6 +72,9 @@ export function AccountPanel() {
               <Link className="btn btn-secondary" href="/admin/invitations">
                 {m.access.adminLink}
               </Link>
+              <Link className="btn btn-secondary" href="/admin/feedback">
+                {m.access.adminFeedbackLink}
+              </Link>
             </div>
           ) : null}
           {account.factorVerified ? (
