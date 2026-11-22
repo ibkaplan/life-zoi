@@ -268,6 +268,7 @@ export const uk: Messages = {
     "/ai-assistant": "Помічник із добробуту",
     "/community": "Спільнота",
     "/emotional-wellness": "Емоційне благополуччя",
+    "/mind": "LifeZoi Mind: емоційне здоров'я",
     "/share-the-care": "Поділіться турботою",
     "/change-lab": "Лабораторія змін",
     "/lab-results": "Розібратися в аналізах",
