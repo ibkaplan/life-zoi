@@ -11,6 +11,7 @@ import { activeProvider, EVALUATED_PROVIDERS } from "@/lib/mind/provider";
 import { REFLECTIONS, summarizeReflection, REFLECTION_LABEL } from "@/lib/mind/reflections";
 import { checkSafety } from "@/lib/mind/safety";
 import { TOPICS } from "@/lib/mind/topics";
+import { listenErrorMessage, mapError } from "@/lib/mind/speech";
 
 function talk(messages: string[], start: ConversationState = initialConversation()) {
   let state = start;
@@ -340,6 +341,26 @@ describe("privacy and providers", () => {
         expect(code, name).not.toMatch(/HIPAA[- ]compliant|GDPR[- ]compliant|is compliant with/i);
         expect(code, name).not.toMatch(/\bfetch\(/);
       }
+    }
+  });
+});
+
+describe("microphone access", () => {
+  it("allows the microphone for this site in the Permissions-Policy header", () => {
+    const config = readFileSync(join(process.cwd(), "next.config.ts"), "utf8");
+    expect(config).toMatch(/microphone=\(self\)/);
+    expect(config).not.toMatch(/microphone=\(\)/);
+    expect(config).toMatch(/camera=\(\)/);
+  });
+
+  it("tells a browser block apart from a site block and a speech-service block", () => {
+    expect(mapError("not-allowed", false, false)).toBe("denied");
+    expect(mapError("not-allowed", false, true)).toBe("site-blocked");
+    expect(mapError("service-not-allowed", false, false)).toBe("service-blocked");
+    expect(mapError("service-not-allowed", true, false)).toBe("local-unavailable");
+    expect(mapError("audio-capture", false, false)).toBe("no-microphone");
+    for (const kind of ["denied", "site-blocked", "service-blocked"] as const) {
+      expect(listenErrorMessage(kind)).toMatch(/\btyp(e|ing)\b/i);
     }
   });
 });

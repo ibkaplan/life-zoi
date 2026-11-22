@@ -49,12 +49,16 @@ export async function onDeviceRecognition(lang: string): Promise<"available" | "
   }
 }
 
-export type ListenError = "denied" | "no-speech" | "network" | "no-microphone" | "local-unavailable" | "other";
+export type ListenError = "denied" | "site-blocked" | "service-blocked" | "no-speech" | "network" | "no-microphone" | "local-unavailable" | "other";
 
 export function listenErrorMessage(error: ListenError): string {
   switch (error) {
     case "denied":
-      return "The microphone is blocked. To use voice, allow the microphone for this site in your browser settings. You can keep typing in the meantime.";
+      return "The browser did not give LifeZoi the microphone. Check the microphone icon in the address bar, or the site settings, and choose Allow, then reload the page. If it already says Allow, check that your computer or phone lets the browser use the microphone (on a Mac: System Settings, Privacy & Security, Microphone). You can keep typing in the meantime.";
+    case "site-blocked":
+      return "LifeZoi itself is blocking the microphone on this page, so your browser setting can't help. This is a problem on our side, not yours. Please type for now and let us know.";
+    case "service-blocked":
+      return "The microphone is allowed, but this browser's speech-to-text service is turned off or not available. You can type instead, or try voice in Chrome, Edge, or Safari.";
     case "no-speech":
       return "I didn't hear anything. Tap the microphone and try again, or type instead.";
     case "network":
@@ -68,12 +72,28 @@ export function listenErrorMessage(error: ListenError): string {
   }
 }
 
-function mapError(code: string): ListenError {
-  if (code === "not-allowed") return "denied";
+/** True when the page's own Permissions-Policy forbids the microphone (the browser setting can't override it). */
+export function microphoneBlockedBySite(): boolean {
+  if (typeof document === "undefined") return false;
+  const d = document as unknown as {
+    permissionsPolicy?: { allowsFeature(feature: string): boolean };
+    featurePolicy?: { allowsFeature(feature: string): boolean };
+  };
+  const policy = d.permissionsPolicy ?? d.featurePolicy;
+  try {
+    return policy ? !policy.allowsFeature("microphone") : false;
+  } catch {
+    return false;
+  }
+}
+
+export function mapError(code: string, local = false, siteBlocked = microphoneBlockedBySite()): ListenError {
+  if (code === "not-allowed") return siteBlocked ? "site-blocked" : "denied";
   if (code === "no-speech") return "no-speech";
   if (code === "network") return "network";
   if (code === "audio-capture") return "no-microphone";
-  if (code === "service-not-allowed" || code === "language-not-supported") return "local-unavailable";
+  if (code === "service-not-allowed") return local ? "local-unavailable" : "service-blocked";
+  if (code === "language-not-supported") return "local-unavailable";
   return "other";
 }
 
@@ -113,7 +133,7 @@ export function listenOnce(options: {
   recognition.onerror = (event) => {
     if (event.error === "aborted") return;
     delivered = true;
-    options.onError(mapError(event.error));
+    options.onError(mapError(event.error, options.local));
   };
   recognition.onend = () => {
     if (!delivered) {
