@@ -4,6 +4,8 @@ import "@/components/daily/daily.css";
 import Link from "next/link";
 import { useState } from "react";
 import { Art } from "@/components/companion/art";
+import "@/components/imagery/imagery.css";
+import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useLocale, useT } from "@/components/locale-provider";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
@@ -24,6 +26,7 @@ import { localISODate } from "@/lib/dates";
 import { LOCALE_META } from "@/lib/i18n/config";
 import type { Translate } from "@/lib/i18n/translate";
 import { firstNameOf } from "@/lib/news/greeting";
+import { DAILY_PHOTOS } from "@/lib/imagery/registry";
 
 type Panel = "feel" | "advice" | "progress" | null;
 
@@ -105,7 +108,7 @@ export function LifeZoiDaily({ variant }: { variant: "home" | "page" }) {
           </p>
         </div>
         <div className="lzd-hero-art">
-          <Art name="day" />
+          <LzPhoto id={variant === "page" ? DAILY_PHOTOS.calm : DAILY_PHOTOS.morning} variant="inset" />
         </div>
       </section>
 

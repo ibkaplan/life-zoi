@@ -1,6 +1,8 @@
 "use client";
 
+import "@/components/imagery/imagery.css";
 import Link from "next/link";
+import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useLocale } from "@/components/locale-provider";
 import { LOCALE_META } from "@/lib/i18n/config";
 import { areaById, bandOf, SCORE_BANDS, wellnessScore, type HabitAreaId } from "@/lib/wellness-score";
@@ -33,12 +35,15 @@ export function WellnessScoreCard({
 
   return (
     <section className="ws" aria-labelledby="ws-title">
-      <div className="ws-head">
-        <p className="ws-kicker">{t("Where you are, what improved, what is next")}</p>
-        <h2 id="ws-title">{t("My Wellness Score & Progress")}</h2>
-        <p className="ws-lede">
-          {t("Your score counts how many of seven everyday habit areas from your lifestyle assessment are in line with public health guidance.")}
-        </p>
+      <div className="ws-head-row">
+        <div className="ws-head">
+          <p className="ws-kicker">{t("Where you are, what improved, what is next")}</p>
+          <h2 id="ws-title">{t("My Wellness Score & Progress")}</h2>
+          <p className="ws-lede">
+            {t("Your score counts how many of seven everyday habit areas from your lifestyle assessment are in line with public health guidance.")}
+          </p>
+        </div>
+        <LzPhoto id="progress" variant="inset" />
       </div>
 
       {!score ? (
