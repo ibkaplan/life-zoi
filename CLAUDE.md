@@ -18,7 +18,7 @@ Important paths on `main`:
 - `supabase/schema.sql` — account tables, row level security, authenticator-aware policies, admin role trigger, and account deletion
 - `README.md` — setup, deployment notes, and limitations
 
-Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/sign-in`, `/reset-password`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(members)/`; public pages are in `src/app/(public)/`. API routes: `GET /api/status`, `POST /api/register`, `GET|POST|DELETE /api/admin/invitations`, `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `GET /api/news`, `POST /api/recommendations`, `POST /api/what-if`.
+Routes include `/`, `/dashboard`, `/profile`, `/assessment`, `/what-if`, `/progress`, `/settings`, `/sign-in`, `/reset-password`, `/privacy`, `/life-matters`, `/outlook`, `/change-lab`, `/ai-assistant`, `/lab-results`, academy, urges, habits, and wellness pages under `src/app/(members)/`; public pages are in `src/app/(public)/`. API routes: `GET /api/status`, `POST /api/register`, `GET|POST|DELETE /api/admin/invitations`, `GET|POST /api/feedback`, `GET|POST /api/admin/feedback` (Reviews & Feedback, `docs/claude-migration/REVIEWS_FEEDBACK.md`), `GET /api/account`, `GET|POST /api/ai-assistant`, `GET /api/references`, `GET /api/news`, `POST /api/recommendations`, `POST /api/what-if`.
 
 ## Development standards
 

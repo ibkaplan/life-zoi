@@ -276,6 +276,10 @@ export const ru: Messages = {
     "/focus": "Фокус и тренировка мозга",
     "/settings": "Настройки",
     "/privacy": "Конфиденциальность",
+    "/feedback": "Отзывы и предложения",
+    "/feedback/members-say": "Что говорят наши участники",
+    "/feedback/suggest": "Предложения",
+    "/feedback/listened": "Вы просили — мы сделали!",
   },
   sections: {
     home: "Главная",
@@ -288,6 +292,7 @@ export const ru: Messages = {
     brain: "Мозг и разум",
     progress: "Прогресс",
     profile: "Мой профиль",
+    reviews: "Отзывы и предложения",
   },
   myHealth: {
     kicker: "Моё здоровье",
@@ -459,6 +464,7 @@ export const ru: Messages = {
     newHereTitle: "Впервые в LifeZoi?",
     newHereText: "Учётные записи создаются только по приглашению. Воспользуйтесь ссылкой из письма-приглашения или ссылкой, которой поделился участник.",
     adminLink: "Пригласить участников",
+    adminFeedbackLink: "Модерация отзывов",
     signInOff: "Вход в учётную запись не настроен в этой среде, поэтому участники не могут здесь войти.",
     acceptKicker: "Приглашение",
     acceptTitle: "Выберите пароль",
