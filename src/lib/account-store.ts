@@ -127,6 +127,12 @@ export function useAccount() {
 
 async function boot() {
   const supabase = getBrowserSupabase();
+  // DEMO BRANCH ONLY: signed in as the demo person chosen in the demo bar.
+  const demo = /(?:^|; )lz_demo=([^;]+)/.exec(document.cookie)?.[1] ?? "admin";
+  if (!supabase) {
+    publish({ ...signedOut(), phase: "ready", email: demo === "admin" ? "demo-admin@example.org" : `demo-${demo}@example.org`, userId: demo, isAdmin: demo === "admin" });
+    return;
+  }
   if (!supabase) {
     publish({ ...signedOut(), phase: "off" });
     return;

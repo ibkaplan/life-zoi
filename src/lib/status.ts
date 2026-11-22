@@ -14,7 +14,8 @@ export function getAppStatus(
   env: Record<string, string | undefined> = process.env,
   options: { adapter?: SessionAdapterKind } = {},
 ): AppStatus {
-  const url = env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
+  const url = ""; // DEMO BRANCH ONLY
+  void env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "";
   const supabaseVariablesPresent = url.length > 0 && anon.length > 0;
   const adapter = options.adapter ?? SESSION_ADAPTER;

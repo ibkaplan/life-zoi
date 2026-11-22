@@ -1,5 +1,7 @@
 "use client";
 
+import { DemoBar } from "@/components/demo-bar";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SittingReminder } from "@/components/movement-breaks/tracker";
@@ -23,6 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <DemoBar />
       <SiteNav />
       <main id="main" className="page app-main stack-lg" data-dept={departmentFor(pathname)}>
         <p className="banner" role="status">

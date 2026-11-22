@@ -1,7 +1,7 @@
 import { createServerClient, parseCookieHeader } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { isAdminEmail } from "@/lib/admin-allowlist";
-import { readPublicSupabaseConfig, type PublicSupabaseConfig } from "@/lib/supabase-config";
+import { DEMO_WITHOUT_SUPABASE, readPublicSupabaseConfig, type PublicSupabaseConfig } from "@/lib/supabase-config";
 
 /**
  * Server-side sign-in checks. Every check uses the public anon key and the
@@ -108,6 +108,26 @@ export function cookieClient(config: PublicSupabaseConfig, cookies: CookieAdapte
  * Otherwise the token is confirmed with Supabase Auth, which also sees a revoked login.
  */
 export async function memberFromCookies(
+  cookies: CookieAdapter,
+  options: { env?: Env; quick?: boolean } = {},
+): Promise<MemberState> {
+  // DEMO BRANCH ONLY: everyone is signed in as a demo person. Default: the administrator.
+  if (DEMO_WITHOUT_SUPABASE) {
+    const demo = cookies.getAll().find((cookie) => cookie.name === "lz_demo")?.value ?? "admin";
+    const n = demo === "admin" ? 170 : Math.min(9, Math.max(1, Number(demo.replace(/\D/g, "")) || 1));
+    return {
+      status: "member",
+      member: {
+        id: `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`,
+        email: demo === "admin" ? "demo-admin@example.org" : `demo-member-${n}@example.org`,
+        isAdmin: demo === "admin",
+      },
+    };
+  }
+  return realMemberFromCookies(cookies, options);
+}
+
+async function realMemberFromCookies(
   cookies: CookieAdapter,
   options: { env?: Env; quick?: boolean } = {},
 ): Promise<MemberState> {

@@ -1,6 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { isPublicSupabaseConfig } from "@/lib/supabase-config";
+import { DEMO_WITHOUT_SUPABASE, isPublicSupabaseConfig } from "@/lib/supabase-config";
 
 let client: SupabaseClient | null = null;
 let legacyMove: Promise<void> | null = null;
@@ -10,6 +10,8 @@ let legacyMove: Promise<void> | null = null;
  * Reading them from a `process.env` argument stays empty on the client.
  */
 function readBrowserSupabaseConfig(): { url: string; anonKey: string } | null {
+  // DEMO BRANCH ONLY: no Supabase in the browser either.
+  if (DEMO_WITHOUT_SUPABASE) return null;
   const url = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
   const anonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim();
   if (!isPublicSupabaseConfig(url, anonKey)) return null;

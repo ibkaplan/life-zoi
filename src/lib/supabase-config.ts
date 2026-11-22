@@ -1,3 +1,6 @@
+/** DEMO BRANCH ONLY: this branch never talks to Supabase. Do not merge. */
+export const DEMO_WITHOUT_SUPABASE = true;
+
 export type PublicSupabaseConfig = {
   url: string;
   anonKey: string;
@@ -17,6 +20,8 @@ export function isPublicSupabaseConfig(url: string, anonKey: string): boolean {
 export function readPublicSupabaseConfig(
   env: Record<string, string | undefined> = process.env,
 ): PublicSupabaseConfig | null {
+  // DEMO BRANCH ONLY: never contact Supabase, so this preview cannot touch the live database.
+  if (DEMO_WITHOUT_SUPABASE) return null;
   const url = env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
   const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "";
   if (!isPublicSupabaseConfig(url, anonKey)) return null;
