@@ -221,3 +221,9 @@ No GitHub issues were confirmed in this refresh. `main` is one product: accounts
 3. Completed: `/start` shows the four steps (welcome, questionnaire, health profile, plan) and highlights the next one. The questionnaire gained one optional question, medicines or supplements (`medicationsNote`, 280 characters, stored with the other answers in the existing `assessments.answers` jsonb, so no migration). After saving, the questionnaire links to `/my-health/baseline`, which shows height, day-1 weight and target weight, what is going well, what to focus on, what to talk about with a professional, goals, and notes for the next appointment. `src/lib/journey.ts` builds the plan: nutrition, meals, movement, sleep, stress, brain, a daily habit, plus connection or urges when the answers point there, and goals. Every item links to an existing page. `/plan` shows the same items. Homepage "Start" now opens `/start`.
 4. Outstanding: uk, ru, el text needs a native-speaker read. Signed-in flow not checked in a browser (no Supabase here). The existing "You reported …" sentences from `personalProfile` repeat the answer label with a capital letter; worth a wording pass.
 
+### LifeZoi Daily — Your Wellness Journey (2026-11-22)
+
+1. Name: Simplify the daily wellness experience. LifeZoi Daily is at the top of the members' home and has its own page at `/daily`.
+2. Branch: `claude/project-thread-9c7ukj`. A pull request is open for review and is not merged.
+3. Completed: one idea a day picked from the saved assessment, with Explore more; one sourced tip; an optional Great, Okay, or Low Energy tap with Skip; three separate indicators (assessment, lifestyle, engagement); a weekly report built only from recorded data. The data is stored in companion state, so no migration is needed. Details are in [LIFEZOI_DAILY.md](LIFEZOI_DAILY.md).
+4. Outstanding: a native-speaker read of uk, ru, and el, and a check with real sign-in.

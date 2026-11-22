@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomeGauge } from "@/components/home-gauge";
+import { LifeZoiDaily } from "@/components/daily/lifezoi-daily";
 import { Art, type ArtName } from "@/components/companion/art";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
@@ -63,7 +64,7 @@ const steps = [
 ] as const;
 
 const footerLinks = [
-  "/dashboard", "/start", "/my-health", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
+  "/daily", "/dashboard", "/start", "/my-health", "/assessment", "/outlook", "/plan", "/what-if", "/progress", "/wellness-coach", "/academy",
   "/academy/meals", "/academy/move", "/academy/move/resources", "/choices", "/urges", "/nature", "/ai-assistant",
   "/emotional-wellness", "/life-matters", "/change-lab", "/brain-quiz", "/habit-transformation", "/food-plan",
   "/academy/move/library", "/library/music", "/library/books", "/brain-quiz/games", "/focus", "/my-day", "/settings",
@@ -81,6 +82,11 @@ export function HomeView() {
     <div className="home">
       <SiteNav />
       <main id="main">
+        {/* LifeZoi Daily comes first after logging in. The rest of the homepage is unchanged below it. */}
+        <div className="page home-daily">
+          <LifeZoiDaily variant="home" />
+        </div>
+
         <section className="page home-hero">
           <div className="home-copy">
             <p className="home-kicker">{h.kicker}</p>

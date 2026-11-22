@@ -39,6 +39,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     label: "Dashboard",
     pages: [
       { href: "/dashboard", label: "Dashboard" },
+      { href: "/daily", label: "LifeZoi Daily" },
       { href: "/start", label: "Get started" },
       { href: "/my-day", label: "My Day" },
       { href: "/plan", label: "My Plan" },
@@ -184,6 +185,7 @@ export function currentPageIn(section: NavSection, pathname: string): string | n
 
 /** Every other page, listed in the footer so nothing becomes unreachable without a menu. */
 export const FOOTER_LINKS: readonly NavLink[] = [
+  { href: "/daily", label: "LifeZoi Daily" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/my-health", label: "My Health" },
   { href: "/start", label: "Get started" },

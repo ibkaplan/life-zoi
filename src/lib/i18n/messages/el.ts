@@ -239,6 +239,7 @@ export const el: Messages = {
     "/academy/move/breaks": "Διαλείμματα κίνησης",
     "/academy/move/studio/daily-movement": "Καθημερινή κίνηση",
     "/academy/move/studio/chair-yoga": "Στούντιο γιόγκα στην καρέκλα",
+    "/daily": "LifeZoi κάθε μέρα",
     "/my-day": "Η μέρα μου",
     "/plan": "Το πλάνο μου",
     "/progress": "Πρόοδος",
