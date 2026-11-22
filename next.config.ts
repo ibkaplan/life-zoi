@@ -25,7 +25,8 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            // Microphone is allowed for this site only (LifeZoi Mind voice input). Camera and location stay off.
+            value: "camera=(), microphone=(self), geolocation=()",
           },
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],

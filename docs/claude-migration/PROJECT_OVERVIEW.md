@@ -44,7 +44,7 @@ Life outlook can show one number copied from the SSA Period Life Table for an ex
 
 Session keys `lifezoi.session.v1` and `lifezoi.sample.v1` remain in `sessionStorage`. Change Lab, purpose notes, the assistant thread, and wellness notes use their own session keys. Closing the tab drops them. Signed-in assessment data is additionally stored in Supabase. Sample data stays labeled `Sample visitor` and is not written into an account.
 
-Security headers from `next.config.ts`: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` with camera, microphone, and geolocation disabled, and `X-Robots-Tag: noindex, nofollow`. The root layout sets the same robots metadata. `poweredByHeader` is false.
+Security headers from `next.config.ts`: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` with camera and geolocation disabled and the microphone allowed for this site only (`microphone=(self)`, for LifeZoi Mind voice input), and `X-Robots-Tag: noindex, nofollow`. The root layout sets the same robots metadata. `poweredByHeader` is false.
 
 ## Pull request history that matters
 

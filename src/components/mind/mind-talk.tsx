@@ -175,7 +175,7 @@ export function MindTalk() {
           } else {
             setVoiceError(listenErrorMessage(error));
           }
-          if (error === "denied") setHandsFree(false);
+          if (error === "denied" || error === "site-blocked" || error === "service-blocked") setHandsFree(false);
         },
         onEnd: () => {
           setListening(false);
