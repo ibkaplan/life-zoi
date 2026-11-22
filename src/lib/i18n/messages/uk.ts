@@ -245,6 +245,8 @@ export const uk: Messages = {
     "/progress": "Прогрес",
     "/food-plan": "Їжа і добробут",
     "/library": "Бібліотека здоров’я",
+    "/encyclopedia": "Енциклопедія здоров’я",
+    "/lifezoi-ai": "Помічник LifeZoi AI",
     "/nature": "Природа",
     "/habit-transformation": "Зміна звичок",
     "/dashboard": "Панель",
