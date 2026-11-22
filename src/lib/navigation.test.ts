@@ -3,7 +3,7 @@ import { en } from "@/lib/i18n/messages/en";
 import { currentPageIn, FOOTER_LINKS, isCurrentLink, NAV_SECTIONS, PHONE_QUICK_SECTIONS, sectionFor } from "@/lib/navigation";
 
 describe("site navigation", () => {
-  it("shows the ten requested sections, with Nutrition back in the main menu in the requested order", () => {
+  it("shows the eleven requested sections, with Nutrition back in the main menu and Reviews & Feedback before My Profile", () => {
     expect(NAV_SECTIONS.map((section) => section.label)).toEqual([
       "Home",
       "Dashboard",
@@ -14,6 +14,7 @@ describe("site navigation", () => {
       "Wellness Library",
       "Brain & Mind",
       "Progress",
+      "Reviews & Feedback",
       "My Profile",
     ]);
     for (const section of NAV_SECTIONS) expect(en.sections[section.key]).toBe(section.label);
@@ -50,6 +51,8 @@ describe("site navigation", () => {
     expect(sectionFor("/progress/weekly")?.key).toBe("progress");
     expect(sectionFor("/what-if/abc")?.key).toBe("myHealth");
     expect(sectionFor("/settings")?.key).toBe("profile");
+    expect(sectionFor("/feedback")?.key).toBe("reviews");
+    expect(sectionFor("/feedback/members-say")?.key).toBe("reviews");
   });
 
   it("marks one page in the section row", () => {
