@@ -927,5 +927,15 @@
  "Accept your invitation": "Примите приглашение",
  "Supabase variables are present, but this environment is not using the account adapter. Members cannot sign in here, so the members' pages stay closed.": "Переменные Supabase заданы, но эта среда не использует адаптер учётных записей. Участники не могут здесь войти, поэтому страницы для участников закрыты.",
  "Supabase URL and anon key are not set. There is no account sign-in, so the members' pages stay closed.": "URL и анонимный ключ Supabase не заданы. Входа в учётную запись нет, поэтому страницы для участников закрыты.",
- "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.": "Ответы анкеты, сценарии, цели и отметки вошедшего участника хранятся в его строках Supabase. Защита на уровне строк использует auth.uid(). LifeZoi — для приглашённых участников, и каждая страница и API для участников проверяет вход на сервере. Пример данных не сохраняется в учётную запись."
+ "Signed-in assessment answers, scenarios, goals, and check-ins are stored in that person’s Supabase rows. Row level security uses auth.uid(). LifeZoi is for invited members, and every members' page and API checks the sign-in on the server. Sample data is not saved to an account.": "Ответы анкеты, сценарии, цели и отметки вошедшего участника хранятся в его строках Supabase. Защита на уровне строк использует auth.uid(). LifeZoi — для приглашённых участников, и каждая страница и API для участников проверяет вход на сервере. Пример данных не сохраняется в учётную запись.",
+ "Page background": "Фон страниц",
+ "Choose a soft background for every page. Text and cards stay the same, so reading is just as clear. The choice is saved in this browser only.": "Выберите мягкий фон для всех страниц. Текст и карточки не меняются, поэтому читать так же удобно. Выбор сохраняется только в этом браузере.",
+ "Automatic": "Автоматически",
+ "Calm Blue if your saved questionnaire says male, Soft Rose if it says female, and Classic Ivory for any other answer or no answer.": "Спокойный голубой, если в вашей сохранённой анкете указан мужской пол, Нежная роза, если женский, и Классический айвори при любом другом ответе или без ответа.",
+ "Classic Ivory": "Классический айвори",
+ "Warm ivory with a touch of lavender and sage.": "Тёплый цвет слоновой кости с оттенками лаванды и шалфея.",
+ "Calm Blue": "Спокойный голубой",
+ "Soft sky blue with gentle waves.": "Мягкий небесно-голубой с плавными волнами.",
+ "Soft Rose": "Нежная роза",
+ "Pale pink and light blue with soft circles.": "Бледно-розовый и светло-голубой с мягкими кругами."
 }
