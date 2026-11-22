@@ -46,9 +46,19 @@ function TabIcon({ name }: { name: "home" | "dashboard" | "movement" | "menu" | 
   );
 }
 
+/** A small gold star beside Reviews & Feedback. Decorative; the label is the name. */
+function SectionMark({ section }: { section: NavSection }) {
+  if (section.key !== "reviews") return null;
+  return (
+    <svg className="nav-star" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <path d="M12 2.8l2.75 5.6 6.15.9-4.45 4.33 1.05 6.12L12 16.87l-5.5 2.88 1.05-6.12L3.1 9.3l6.15-.9z" />
+    </svg>
+  );
+}
+
 /**
  * One header for every page.
- * Wide screens: the ten main sections in one bar that wraps instead of scrolling, so no item is cut off.
+ * Wide screens: the eleven main sections in one bar that wraps instead of scrolling, so no item is cut off.
  * Phones and small tablets: a tab bar at the bottom of the screen with Home, Dashboard, Movement,
  * and Menu, which opens every section (and, when signed in, Account and Sign out).
  * Under the bar, the pages of the current section.
@@ -124,6 +134,7 @@ export function SiteNav() {
                 data-section={section.key}
                 aria-current={isCurrentSection(section) ? (pathname === section.href ? "page" : "true") : undefined}
               >
+                <SectionMark section={section} />
                 {sectionLabel(section)}
               </Link>
             </li>
@@ -174,6 +185,7 @@ export function SiteNav() {
                   data-section={section.key}
                   aria-current={pathname === section.href ? "page" : undefined}
                 >
+                  <SectionMark section={section} />
                   {sectionLabel(section)}
                 </Link>
                 {section.pages.length > 1 ? (

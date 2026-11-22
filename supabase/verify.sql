@@ -8,7 +8,8 @@ with expected_tables(name) as (
     ('profiles'), ('assessments'), ('scenarios'), ('habit_goals'), ('check_ins'),
     ('care_invitations'), ('companion_state'), ('registration_invites'),
     ('community_profiles'), ('community_messages'), ('community_reports'),
-    ('community_blocks'), ('community_mutes')
+    ('community_blocks'), ('community_mutes'),
+    ('feedback_reviews'), ('feedback_suggestions'), ('feedback_announcements')
 ),
 expected_policies(tbl, name) as (
   values
@@ -86,4 +87,14 @@ select 'browser roles cannot read community tables', t.name,
   and not has_table_privilege('authenticated', 'public.' || t.name, 'select')
 from expected_tables t
 where t.name like 'community_%' and to_regclass('public.' || t.name) is not null
+union all
+select 'browser roles cannot use feedback tables', t.name,
+  not has_table_privilege('anon', 'public.' || t.name, 'select')
+  and not has_table_privilege('authenticated', 'public.' || t.name, 'select')
+  and not has_table_privilege('anon', 'public.' || t.name, 'insert')
+  and not has_table_privilege('authenticated', 'public.' || t.name, 'insert')
+  and not has_table_privilege('authenticated', 'public.' || t.name, 'update')
+  and not has_table_privilege('authenticated', 'public.' || t.name, 'delete')
+from expected_tables t
+where t.name like 'feedback_%' and to_regclass('public.' || t.name) is not null
 order by 1, 2;

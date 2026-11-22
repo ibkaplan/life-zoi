@@ -218,4 +218,72 @@ do $$ begin
   end if;
 end $$;
 
+-- Reviews & Feedback: browser roles cannot read or write any feedback table,
+-- a review cannot be published without consent, and account deletion removes rows.
+alter table auth.users disable trigger auth_users_allowlist;
+insert into auth.users values ('00000000-0000-0000-0000-0000000000e1', 'reviewer@example.org');
+alter table auth.users enable trigger auth_users_allowlist;
+insert into public.feedback_reviews (id, user_id, rating, liked_text, publish_consent, status, admin_note)
+  values ('00000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-0000000000e1', 2, 'Honest note', true, 'published', 'private note');
+insert into public.feedback_suggestions (user_id, category, title, admin_note)
+  values ('00000000-0000-0000-0000-0000000000e1', 'feature', 'Dark mode', 'private note');
+insert into public.feedback_announcements (title, description, implemented_on, published)
+  values ('You asked, we listened', 'Added a section', '2026-11-22', true);
+do $$ begin
+  insert into public.feedback_reviews (user_id, rating, publish_consent, status)
+    values ('00000000-0000-0000-0000-0000000000e1', 5, false, 'published');
+  raise exception 'FAIL: a review without consent was published';
+exception when check_violation then null;
+end $$;
+do $$ begin
+  insert into public.feedback_reviews (user_id, rating, publish_consent, display_name)
+    values ('00000000-0000-0000-0000-0000000000e1', 5, false, 'Anna');
+  raise exception 'FAIL: a name was kept without consent';
+exception when check_violation then null;
+end $$;
+do $$ begin
+  insert into public.feedback_announcements (title, description, implemented_on, image_path)
+    values ('x', 'y', '2026-11-22', 'https://example.org/a.png');
+  raise exception 'FAIL: an outside image address was accepted';
+exception when check_violation then null;
+end $$;
+set role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000e1', 'aal1');
+do $$ begin
+  perform count(*) from public.feedback_reviews;
+  raise exception 'FAIL: a signed-in member read the reviews table directly';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  perform count(*) from public.feedback_suggestions;
+  raise exception 'FAIL: a signed-in member read the suggestions table directly';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.feedback_reviews (user_id, rating, publish_consent, status)
+    values ('00000000-0000-0000-0000-0000000000e1', 5, true, 'published');
+  raise exception 'FAIL: a signed-in member published their own review';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  update public.feedback_announcements set published = false;
+  raise exception 'FAIL: a signed-in member changed an announcement';
+exception when insufficient_privilege then null;
+end $$;
+set role anon;
+select pg_temp.as_user('', '');
+do $$ begin
+  perform count(*) from public.feedback_announcements;
+  raise exception 'FAIL: a signed-out visitor read announcements directly';
+exception when insufficient_privilege then null;
+end $$;
+reset role;
+delete from auth.users where id = '00000000-0000-0000-0000-0000000000e1';
+do $$ begin
+  if exists (select 1 from public.feedback_reviews where user_id = '00000000-0000-0000-0000-0000000000e1')
+     or exists (select 1 from public.feedback_suggestions where user_id = '00000000-0000-0000-0000-0000000000e1') then
+    raise exception 'FAIL: feedback rows were left after the account was deleted';
+  end if;
+end $$;
+
 \echo All policy checks passed.
