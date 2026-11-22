@@ -1,5 +1,6 @@
 import { isUrgentMessage, SAFETY_NOTICE } from "@/lib/assistant";
 import type { Answer, AnswerLength, ChatTurn } from "@/lib/encyclopedia/ai/answer";
+import { isModelLanguage } from "@/lib/encyclopedia/ai/cloudflare";
 import type { AnswerProvider, ProviderChoice } from "@/lib/encyclopedia/ai/provider";
 import type { Article } from "@/lib/encyclopedia/types";
 import { msg } from "@/lib/i18n/translate";
@@ -76,7 +77,7 @@ export type AiResult = { status: number; body: Record<string, unknown> };
  * get a clear limit, with the education that follows still grounded in articles.
  */
 export async function handleQuestion(
-  input: { memberId: string; turns: unknown; length: unknown; focusSlug: unknown },
+  input: { memberId: string; turns: unknown; length: unknown; focusSlug: unknown; language?: unknown },
   deps: { choice: ProviderChoice; articles: readonly Article[]; now?: Date },
 ): Promise<AiResult> {
   const turns = cleanTurns(input.turns);
@@ -90,6 +91,7 @@ export async function handleQuestion(
 
   const length: AnswerLength = input.length === "detailed" ? "detailed" : "short";
   const focusSlug = typeof input.focusSlug === "string" && /^[a-z0-9-]{1,80}$/.test(input.focusSlug) ? input.focusSlug : undefined;
+  const language = isModelLanguage(input.language) ? input.language : "en";
   const provider: AnswerProvider = deps.choice.provider;
 
   if (isUrgentMessage(latest.text)) {
@@ -106,7 +108,7 @@ export async function handleQuestion(
 
   let answer: Answer;
   try {
-    answer = await provider.answer({ turns, length, articles: deps.articles, focusSlug });
+    answer = await provider.answer({ turns, length, articles: deps.articles, focusSlug, language });
   } catch {
     return { status: 503, body: { code: "unavailable", error: BUSY_TEXT } };
   }

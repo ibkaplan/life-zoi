@@ -48,7 +48,6 @@
   "Suggested health topics": "Предлагаемые темы о здоровье",
   "How LifeZoi AI handles your questions": "Как LifeZoi AI обрабатывает ваши вопросы",
   "Your question is sent over an encrypted connection to the LifeZoi server, which looks it up in the encyclopedia and sends back an answer.": "Ваш вопрос отправляется по зашифрованному соединению на сервер LifeZoi, который ищет ответ в энциклопедии и возвращает его.",
-  "It is not sent to any outside AI company, and LifeZoi does not store it in a database or use it to train AI.": "Он не отправляется никакой внешней компании ИИ, и LifeZoi не хранит его в базе данных и не использует для обучения ИИ.",
   "Our hosting provider may keep short technical request logs, as most websites do.": "Наш хостинг-провайдер может хранить краткие технические журналы запросов, как и большинство сайтов.",
   "The conversation is kept only in this browser tab, for your account. It disappears when you close the tab, or right away when you choose Delete this conversation.": "Разговор хранится только в этой вкладке браузера, для вашей учётной записи. Он исчезает, когда вы закрываете вкладку, или сразу, когда вы выбираете «Удалить этот разговор».",
   "Do not type names, addresses, or other details that identify you. They are not needed for an answer.": "Не вводите имена, адреса или другие данные, по которым вас можно узнать. Они не нужны для ответа.",
@@ -232,5 +231,11 @@
   "2010–2020": "2010–2020",
   "2020–2026": "2020–2026",
   "Future developments": "Будущие разработки",
-  "Encyclopedia editor": "Редактор энциклопедии"
+  "Encyclopedia editor": "Редактор энциклопедии",
+  "This explanation was written by an AI model from the encyclopedia articles below. It can make mistakes, so check the articles and talk with a health professional about your own situation.": "Это объяснение написала модель ИИ на основе статей энциклопедии ниже. Она может ошибаться, поэтому проверяйте статьи и обсуждайте свою ситуацию с медицинским специалистом.",
+  "AI explanations": "Объяснения ИИ",
+  "LifeZoi AI finds the matching encyclopedia articles, then a free AI model from Cloudflare explains them in plain words in your language. It only answers topics the encyclopedia covers, and the articles are linked below each answer.": "LifeZoi AI находит подходящие статьи энциклопедии, а затем бесплатная модель ИИ от Cloudflare объясняет их простыми словами на вашем языке. Она отвечает только на темы, которые охватывает энциклопедия, а статьи приведены под каждым ответом.",
+  "When AI explanations are on, the text of your question, your earlier questions in this conversation, and the matching article text are processed by Cloudflare Workers AI to write the answer. Cloudflare says it does not use this content to train AI models and does not keep it after the answer is made. No account details, assessment answers, or lab values are sent.": "Когда объяснения ИИ включены, текст вашего вопроса, ваши предыдущие вопросы в этом разговоре и текст подходящих статей обрабатывает Cloudflare Workers AI, чтобы написать ответ. Cloudflare заявляет, что не использует это содержимое для обучения моделей ИИ и не хранит его после создания ответа. Данные учётной записи, ответы на оценку и результаты анализов не отправляются.",
+  "It is not sent to any outside AI company.": "Он не отправляется никакой внешней компании ИИ.",
+  "LifeZoi does not store your questions in a database or use them to train AI.": "LifeZoi не хранит ваши вопросы в базе данных и не использует их для обучения ИИ."
 }

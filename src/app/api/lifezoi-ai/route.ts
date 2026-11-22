@@ -1,6 +1,6 @@
 import { requireMember } from "@/lib/auth/require-member";
 import { handleQuestion } from "@/lib/encyclopedia/ai/handle";
-import { chooseProvider } from "@/lib/encyclopedia/ai/provider";
+import { chooseProvider, cloudflareConfigured } from "@/lib/encyclopedia/ai/provider";
 import { visibleArticles, type EditorialRecord } from "@/lib/encyclopedia/catalog";
 import { encyclopediaStoreFromEnv } from "@/lib/encyclopedia/store";
 import { jsonError, readJson } from "@/lib/http";
@@ -25,18 +25,28 @@ async function publishedRecords(): Promise<EditorialRecord[]> {
   return records;
 }
 
+/** Which mode LifeZoi AI is in, so the page can say truthfully where questions go. No keys are returned. */
+export async function GET(request: Request) {
+  const checked = await requireMember(request);
+  if (!checked.ok) return checked.response;
+  const choice = chooseProvider();
+  const mode = choice.ok && choice.provider.id === "cloudflare" && cloudflareConfigured() ? "cloudflare" : "library";
+  return Response.json({ mode }, { headers: NO_STORE });
+}
+
 /**
  * LifeZoi AI. Members only. The question is answered on this server from the
- * encyclopedia articles; it is not stored and not sent to any outside AI service.
+ * encyclopedia articles. In Cloudflare mode the question and the matching
+ * article text are also sent to Cloudflare Workers AI. Nothing is stored.
  */
 export async function POST(request: Request) {
   const checked = await requireMember(request);
   if (!checked.ok) return checked.response;
   const body = await readJson(request, 12_000);
   if (!body.ok) return jsonError(body.error, body.status);
-  const value = (body.value && typeof body.value === "object" ? body.value : {}) as { turns?: unknown; length?: unknown; focus?: unknown };
+  const value = (body.value && typeof body.value === "object" ? body.value : {}) as { turns?: unknown; length?: unknown; focus?: unknown; language?: unknown };
   const result = await handleQuestion(
-    { memberId: checked.member.id, turns: value.turns, length: value.length, focusSlug: value.focus },
+    { memberId: checked.member.id, turns: value.turns, length: value.length, focusSlug: value.focus, language: value.language },
     { choice: chooseProvider(), articles: visibleArticles(await publishedRecords()) },
   );
   return Response.json(result.body, { status: result.status, headers: NO_STORE });

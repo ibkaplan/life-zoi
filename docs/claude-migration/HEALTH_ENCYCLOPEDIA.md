@@ -59,11 +59,23 @@ Under the project's rule, the Database migrations workflow applies it to product
 
 ## LifeZoi AI
 
-### What it does now: library mode
+### Two modes
 
-The route answers from encyclopedia articles only, with no outside model and no network call. It matches the question to articles, takes the most relevant sections, and returns a short or detailed answer with article cards and evidence labels. Follow-ups reuse the earlier question when the new one refers back ("Is it safe?"). When nothing matches, it says that no dedicated article exists yet and points to MedlinePlus, NIH, WHO, and a clinician.
+**Cloudflare mode** (owner decision by Tetyana, 2026-11-22, Health Encyclopedia only, not LifeZoi Mind). It is on only when the server has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_WORKERS_AI_TOKEN` (`src/lib/encyclopedia/ai/cloudflare.ts`):
 
-`ENCYCLOPEDIA_AI_PROVIDER` defaults to `library`. Any other value is refused and the page shows a busy message. No call is made.
+- The server first finds the matching articles, exactly as in library mode. If none match, no model is called and the honest "no dedicated article yet" answer is returned.
+- It sends the free model `@cf/google/gemma-4-26b-a4b-it` the question, up to six earlier turns of the conversation (earlier answers are reduced to their topic), and up to 6,000 characters of the matching articles. No account, profile, assessment, or lab data is sent.
+- The model is told to use only that text, write in the member's interface language, and not diagnose, mention medicine changes or doses, or add figures. A reply that names a dose or a percentage the articles do not contain is thrown away.
+- Article cards and evidence labels still come from the articles. The answer says it was written by an AI model and can make mistakes.
+- Urgent symptoms, medicine and diagnosis checks run before and around the model exactly as in library mode.
+- At most 250 model calls per server instance per UTC day (about 25 Neurons each, well under the free 10,000 Neurons a day). On the Workers Free plan Cloudflare returns an error, not a charge, once the free allocation is used. Over the cap, on an error, after 12 seconds, or with an empty or refused reply, the library answer is returned. There is no paid fallback.
+- The page asks `GET /api/lifezoi-ai` which mode is on, and its privacy list says that Cloudflare processes the question text only in Cloudflare mode.
+
+Sources checked on 2026-11-22: Workers AI pricing (https://developers.cloudflare.com/workers-ai/platform/pricing/, "10,000 Neurons per day at no charge"; on Free, "further operations will fail with an error"), the 2026-07-28 changelog (some models need Workers Paid; gemma-4-26b-a4b-it is listed as still on Free), and Data usage (https://developers.cloudflare.com/workers-ai/platform/data-usage/: "Cloudflare does not use Customer Content processed by Workers AI to train AI models", and inputs and outputs are not kept after they are needed; operational metadata such as token counts is kept).
+
+**Library mode** (the default, and the fallback). The route answers from encyclopedia articles only, with no outside model and no network call. It matches the question to articles, takes the most relevant sections, and returns a short or detailed answer with article cards and evidence labels. Follow-ups reuse the earlier question when the new one refers back ("Is it safe?"). When nothing matches, it says that no dedicated article exists yet and points to MedlinePlus, NIH, WHO, and a clinician.
+
+`ENCYCLOPEDIA_AI_PROVIDER` may be empty (Cloudflare when both Cloudflare settings exist, otherwise library), `library` (model off), or `cloudflare`. Any other value is refused and the page shows a busy message. No call is made.
 
 ### Safety
 
@@ -99,7 +111,7 @@ Because LifeZoi AI answers health questions, has Greek-language members who may 
 
 **Self-hosted open-weight model.** An open-weight model run on a server LifeZoi controls would keep questions off third-party AI services. It is not free to run: it needs a GPU or CPU host, and the model's license must be checked. It is not built.
 
-**Recommendation.** Launch LifeZoi AI in library mode. Grow the encyclopedia so more questions have a dedicated article. Add a model only after the owner approves a specific provider, its terms, its cost, and a privacy notice that matches it. The provider interface (`src/lib/encyclopedia/ai/provider.ts`) is ready for that. A model answer would still have to cite articles and pass through the same safety rules.
+**Decision (2026-11-22).** Tetyana chose Cloudflare Workers AI on the free plan, described under Two modes above. Gemini stays limited to the wellness page and the photo reader.
 
 ## Configuration
 
@@ -107,9 +119,10 @@ Because LifeZoi AI answers health questions, has Greek-language members who may 
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Sign-in, as for the rest of the app | Already set |
 | `SUPABASE_SERVICE_ROLE_KEY` (server only) | Reading published editorial versions and the editor | Already used by invitations |
-| `ENCYCLOPEDIA_AI_PROVIDER` | LifeZoi AI | `library` (do not set anything else) |
+| `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_WORKERS_AI_TOKEN` (server only) | LifeZoi AI Cloudflare mode. Use the Workers Free plan; the token needs only Workers AI Read | Empty: library mode |
+| `ENCYCLOPEDIA_AI_PROVIDER` | Optional. `library` turns the model off | Empty |
 
-No new secrets and no paid services.
+No paid services. The Cloudflare token is the only new secret, and it is optional.
 
 ## Still to do
 
@@ -119,4 +132,4 @@ No new secrets and no paid services.
 - Translate article bodies, the timeline, and the glossary.
 - Categories and the timeline are edited in code, not in the editor.
 - Use a shared store such as the database for rate limits if strict limits across server instances are needed.
-- Decide on a model provider, as above.
+- Check real answers in Cloudflare mode in each language once the key is set. Model answers were tested only with a stubbed Cloudflare response.

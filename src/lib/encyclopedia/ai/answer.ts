@@ -20,7 +20,7 @@ export type ChatTurn = { role: "user" | "assistant"; text: string };
 export type AnswerLength = "short" | "detailed";
 
 export type AnswerBlock =
-  | { kind: "paragraph"; text: string }
+  | { kind: "paragraph"; text: string; /** Set when the words are not English, such as a model reply. */ lang?: string }
   | { kind: "points"; items: string[] }
   | { kind: "evidence"; claim: string; level: EvidenceLevel; label: string };
 
