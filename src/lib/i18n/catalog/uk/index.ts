@@ -13,6 +13,7 @@ import focus from "./focus.json";
 import assistant from "./assistant.json";
 import daily from "./daily.json";
 import reviews from "./reviews.json";
+import encyclopedia from "./encyclopedia.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...reviews };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...reviews, ...encyclopedia };
 export default catalog;

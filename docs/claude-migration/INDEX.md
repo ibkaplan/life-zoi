@@ -45,6 +45,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [REVIEWS_FEEDBACK.md](REVIEWS_FEEDBACK.md) | Reviews & Feedback: ratings, reviews, suggestions, moderation dashboard, You asked, we listened!, storage and privacy rules |
+| [HEALTH_ENCYCLOPEDIA.md](HEALTH_ENCYCLOPEDIA.md) | Health Encyclopedia and LifeZoi AI: content rules, editorial workflow, migration, AI library mode, free-model research, and what is not done yet |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |
 
