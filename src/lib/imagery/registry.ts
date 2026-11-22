@@ -75,7 +75,7 @@ export const PHOTOS = {
     alt: msg("A woman in sunglasses rides a bicycle with a wicker basket down a cobbled street."),
     credit: { author: "Clem Onojeghuo", license: "CC0", source: commons("Lady_on_a_bike_(Unsplash).jpg") },
     ages: "50s",
-    focus: "50% 35%",
+    focus: "50% 12%",
   },
   assessment: {
     src: "/imagery/assessment.webp",
@@ -110,7 +110,7 @@ export const PHOTOS = {
     alt: msg("A man and a woman in a bright yellow dress dance salsa together at a street festival."),
     credit: { author: "Ryan (Toronto)", license: "CC BY 2.0", source: commons("Salsa_dancing_(7564732146).jpg") },
     ages: "30s",
-    focus: "50% 30%",
+    focus: "50% 12%",
   },
   "nutrition-topic": {
     src: "/imagery/nutrition-topic.webp",

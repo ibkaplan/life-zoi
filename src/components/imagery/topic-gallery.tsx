@@ -35,9 +35,9 @@ export function TopicGallery() {
                     loading="lazy"
                     style={"focus" in item && item.focus ? { objectPosition: item.focus } : undefined}
                   />
-                  <span className="lz-topic-badge"><TopicGlyph id={topic.id} /></span>
                 </span>
                 <span className="lz-topic-body">
+                  <span className="lz-topic-badge"><TopicGlyph id={topic.id} /></span>
                   <span className="lz-topic-title">{t(topic.title)}</span>
                   <span className="lz-topic-text">{t(topic.text)}</span>
                 </span>

@@ -81,12 +81,20 @@
   .lz-mascot-wave .lz-mascot-arm { animation: none; }
 }
 
-/* On the dashboard tile, in place of the emoji. */
-.dash-tile-mascot {
-  width: 5.2rem;
-  height: 5.2rem;
-  margin: -0.4rem 0 -0.3rem -0.4rem;
+/* On the dashboard tile: a soft band the same height as the photo strips on the other tiles. */
+.dash-tile-stage {
+  display: grid;
+  place-items: center;
+  margin: -1.5rem -1.5rem 0.2rem;
+  width: calc(100% + 3rem);
+  height: 9.5rem;
+  background:
+    radial-gradient(220px 140px at 80% 20%, rgba(242, 182, 93, 0.28), transparent 70%),
+    linear-gradient(135deg, #F1E8FC 0%, #E9E0FA 55%, #E3F2EF 100%);
 }
+@media (min-width: 760px) { .dash-tile-stage { height: 10.5rem; } }
+.dash-tile-mascot { width: 8.5rem; height: 8.5rem; }
+@media (min-width: 760px) { .dash-tile-mascot { width: 9.5rem; height: 9.5rem; } }
 
 /* On the Wellness Assistant page hero. */
 .wa-hero-mascot {
@@ -138,15 +146,15 @@
 .lz-topic-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .lz-topic-link, .lz-topic-link:hover { transition: none; transform: none; } }
 
-.lz-topic-media { position: relative; display: block; aspect-ratio: 4 / 3; background: var(--lavender); }
-.lz-topic-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.lz-topic-media { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--lavender); }
+.lz-topic-media img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
 .lz-topic-longevity .lz-topic-media { aspect-ratio: 8 / 3; }
 @media (min-width: 640px) and (max-width: 999px) { .lz-topic-longevity .lz-topic-media { aspect-ratio: 4 / 1; } }
 
 .lz-topic-badge {
   position: absolute;
   left: 0.6rem;
-  bottom: -1.1rem;
+  top: -1.2rem;
   display: grid;
   place-items: center;
   width: 2.4rem;
@@ -159,7 +167,7 @@
 }
 .lz-glyph { width: 1.35rem; height: 1.35rem; }
 
-.lz-topic-body { display: grid; gap: 0.25rem; padding: 1.4rem 0.85rem 0.9rem; }
+.lz-topic-body { position: relative; display: grid; gap: 0.25rem; padding: 1.4rem 0.85rem 0.9rem; }
 .lz-topic-title { font-weight: 750; font-size: 1.08rem; color: var(--topic-ink, #52288A); line-height: 1.25; }
 .lz-topic-text { font-size: 0.98rem; color: var(--muted); line-height: 1.4; }
 @media (max-width: 420px) { .lz-topic-text { font-size: 0.92rem; } }
@@ -179,7 +187,7 @@
 
 .ws-head-row { display: grid; gap: 1rem; align-items: center; }
 @media (min-width: 760px) { .ws-head-row { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
-.ws-head-row .lz-photo { height: 8.5rem; }
+.ws-head-row .lz-photo { width: 100%; height: 8.5rem; max-height: none; aspect-ratio: auto; }
 @media (min-width: 760px) { .ws-head-row .lz-photo { height: 9.5rem; } }
 
 /* Keep the dashboard tile's colored top line above a tile photo. */

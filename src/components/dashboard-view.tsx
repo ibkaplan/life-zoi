@@ -45,7 +45,7 @@ export function DashboardView() {
       <WellnessScoreCard history={session.history} monthCheckIns={monthCheckIns} sample={sample} />
       <section className="dash-tiles" aria-label={t("Main tools")}>
         <article className="dash-tile dash-tile-assistant">
-          <AssistantMascot className="dash-tile-mascot" />
+          <span className="dash-tile-stage"><AssistantMascot className="dash-tile-mascot" /></span>
           <p className="dash-tile-kicker">{d.assistantKicker}</p>
           <h2>{d.assistantTitle}</h2>
           <p>{d.assistantText}</p>
