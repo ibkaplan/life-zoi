@@ -218,6 +218,26 @@ export type DayCustomization = {
   picks: Record<string, string>;
 };
 
+/**
+ * LifeZoi Daily: the optional one-tap feeling, the days it was skipped, and
+ * which daily topics the person opened. Nothing here is required, and a day
+ * without an entry means only that nothing was recorded.
+ */
+export const DAILY_FEELINGS = ["great", "okay", "low"] as const;
+export type DailyFeeling = (typeof DAILY_FEELINGS)[number];
+
+export const DAILY_TOPICS = ["energy", "eating", "weight", "sleep", "brain", "walking", "balance", "aging"] as const;
+export type DailyTopic = (typeof DAILY_TOPICS)[number];
+
+export type DailyState = {
+  /** The feeling the person tapped, by date. */
+  feelings: Record<string, DailyFeeling>;
+  /** Dates when the person chose to skip the feeling question. */
+  skipped: string[];
+  /** Daily topics the person opened, newest first. */
+  explored: { date: string; topic: DailyTopic }[];
+};
+
 export type CompanionState = {
   version: 1;
   updatedAt: string;
@@ -237,6 +257,7 @@ export type CompanionState = {
   /** Focus & Brain Training: finished focus sessions and breaks by day, and timer settings. */
   focus: FocusState;
   womensCare: WomensCarePrefs;
+  daily: DailyState;
 };
 
 /** One break every 30 minutes across a whole day is 48. More than that is not a real count. */
@@ -250,6 +271,8 @@ export const LIMITS = {
   recent: 30,
   favorites: 200,
   goals: 30,
+  dailyDays: 200,
+  explored: 200,
   exclusions: 60,
   text: 280,
   word: 40,
@@ -277,6 +300,10 @@ export function emptyWomensCare(): WomensCarePrefs {
   return { identifiesAsWoman: false, relevant: false, stage: "", phase: "", symptoms: [], ironConcern: false, updatedOn: "" };
 }
 
+export function emptyDaily(): DailyState {
+  return { feelings: {}, skipped: [], explored: [] };
+}
+
 export function emptyCompanion(): CompanionState {
   return {
     version: 1,
@@ -295,6 +322,7 @@ export function emptyCompanion(): CompanionState {
     breathe: emptyBreathe(),
     focus: emptyFocus(),
     womensCare: emptyWomensCare(),
+    daily: emptyDaily(),
   };
 }
 
@@ -333,7 +361,10 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     isEmptyBreathe(state.breathe) &&
     isEmptyFocus(state.focus) &&
     !state.womensCare.identifiesAsWoman &&
-    !state.womensCare.relevant
+    !state.womensCare.relevant &&
+    Object.keys(state.daily.feelings).length === 0 &&
+    state.daily.skipped.length === 0 &&
+    state.daily.explored.length === 0
   );
 }
 
@@ -500,6 +531,30 @@ export function sanitizeWomensCare(value: unknown): WomensCarePrefs {
   };
 }
 
+export function sanitizeDaily(value: unknown): DailyState {
+  const row = asRecord(value);
+  const feelings: Record<string, DailyFeeling> = {};
+  const dates = Object.keys(asRecord(row.feelings)).filter(isRealISODate).sort().slice(-LIMITS.dailyDays);
+  for (const date of dates) {
+    const feeling = oneOf(asRecord(row.feelings)[date], DAILY_FEELINGS);
+    if (feeling) feelings[date] = feeling;
+  }
+  const skipped = [...new Set((Array.isArray(row.skipped) ? row.skipped : []).filter((d): d is string => typeof d === "string" && isRealISODate(d)))]
+    .sort()
+    .slice(-LIMITS.dailyDays);
+  const explored = (Array.isArray(row.explored) ? row.explored : [])
+    .map((item) => {
+      const entry = asRecord(item);
+      const date = typeof entry.date === "string" && isRealISODate(entry.date) ? entry.date : "";
+      const topic = oneOf(entry.topic, DAILY_TOPICS);
+      return date && topic ? { date, topic } : null;
+    })
+    .filter((item): item is { date: string; topic: DailyTopic } => item !== null)
+    .filter((item, index, all) => all.findIndex((other) => other.date === item.date && other.topic === item.topic) === index)
+    .slice(0, LIMITS.explored);
+  return { feelings, skipped, explored };
+}
+
 export function sanitizeCompanion(input: unknown): CompanionState {
   const record = asRecord(input);
   const movement = asRecord(record.movement);
@@ -621,6 +676,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
     breathe: sanitizeBreathe(record.breathe),
     focus: sanitizeFocus(record.focus),
     womensCare: sanitizeWomensCare(record.womensCare),
+    daily: sanitizeDaily(record.daily),
   };
 }
 
@@ -693,4 +749,26 @@ export function addGame(state: CompanionState, record: GameRecord): CompanionSta
     ...day,
     brainGames: day.brainGames + (record.completed ? 1 : 0),
   }));
+}
+
+/** Save today's feeling. Choosing the same feeling again clears it. */
+export function setFeeling(state: CompanionState, date: string, feeling: DailyFeeling | null): CompanionState {
+  const feelings = { ...state.daily.feelings };
+  if (feeling === null || feelings[date] === feeling) delete feelings[date];
+  else feelings[date] = feeling;
+  const skipped = state.daily.skipped.filter((day) => day !== date);
+  return { ...state, daily: { ...state.daily, feelings, skipped } };
+}
+
+/** The person chose to skip the feeling question today. */
+export function skipFeeling(state: CompanionState, date: string): CompanionState {
+  if (state.daily.skipped.includes(date)) return state;
+  return { ...state, daily: { ...state.daily, skipped: [...state.daily.skipped, date].slice(-LIMITS.dailyDays) } };
+}
+
+/** Remember that a daily topic was opened today. Opening it again the same day changes nothing. */
+export function addExplored(state: CompanionState, date: string, topic: DailyTopic): CompanionState {
+  if (state.daily.explored.some((item) => item.date === date && item.topic === topic)) return state;
+  const explored = [{ date, topic }, ...state.daily.explored].slice(0, LIMITS.explored);
+  return { ...state, daily: { ...state.daily, explored } };
 }
