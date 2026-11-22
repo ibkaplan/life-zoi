@@ -666,3 +666,21 @@ revoke all on table public.assessments from anon;
 revoke all on table public.scenarios from anon;
 revoke all on table public.habit_goals from anon;
 revoke all on table public.check_ins from anon;
+
+-- Health Encyclopedia editorial records. Also in
+-- supabase/migrations/20261122160000_encyclopedia_articles.sql. Server (service role) only.
+create table if not exists public.encyclopedia_articles (
+  slug text primary key,
+  category text not null,
+  status text not null default 'draft',
+  article jsonb not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  updated_by uuid references auth.users (id) on delete set null,
+  constraint encyclopedia_articles_slug check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(slug) <= 80),
+  constraint encyclopedia_articles_status check (status in ('draft', 'in_review', 'published', 'archived')),
+  constraint encyclopedia_articles_size check (octet_length(article::text) <= 262144)
+);
+create index if not exists encyclopedia_articles_status_idx on public.encyclopedia_articles (status);
+alter table public.encyclopedia_articles enable row level security;
+revoke all on table public.encyclopedia_articles from public, anon, authenticated;
