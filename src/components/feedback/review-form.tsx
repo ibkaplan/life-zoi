@@ -9,7 +9,7 @@ import { DISPLAY_NAME_MAX, REVIEW_TEXT_MAX, REVIEW_THOUGHTS_MAX } from "@/lib/fe
 import { APP_SECTIONS, RECOMMEND_LABELS, RECOMMEND_OPTIONS, type Rating, type Recommend } from "@/lib/feedback/types";
 import { markReviewSent } from "@/lib/feedback/invitation";
 
-type Props = { disabledUntil: string | null; onSent: () => void };
+type Props = { disabledUntil: string | null; sentNotice: string | null; onSent: (notice: string) => void };
 
 function SectionChips({ legend, value, onChange }: { legend: string; value: string[]; onChange: (next: string[]) => void }) {
   const t = useT();
@@ -38,7 +38,7 @@ function SectionChips({ legend, value, onChange }: { legend: string; value: stri
 }
 
 /** The five questions plus a larger box. Only the star rating is needed; everything else is optional. */
-export function ReviewForm({ disabledUntil, onSent }: Props) {
+export function ReviewForm({ disabledUntil, sentNotice, onSent }: Props) {
   const t = useT();
   const { locale } = useLocale();
   const ids = { rating: useId(), liked: useId(), improve: useId(), features: useId(), thoughts: useId(), name: useId(), recommend: useId() };
@@ -62,6 +62,7 @@ export function ReviewForm({ disabledUntil, onSent }: Props) {
     return (
       <section className="fb-card fb-thanks" aria-labelledby="fb-thanks-title">
         <h2 id="fb-thanks-title">{t("Thank you for your review!")}</h2>
+        {sentNotice ? <p className="fb-notice" role="status">{sentNotice}</p> : null}
         <p>
           {t("You can send another review after {date}. Until then, you can share ideas and report problems on the Suggestions page.", {
             date: new Date(disabledUntil).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" }),
@@ -106,7 +107,7 @@ export function ReviewForm({ disabledUntil, onSent }: Props) {
       markReviewSent();
       setResult({ ok: true, text: t(sent.notice) });
       setRequestId(newRequestId());
-      onSent();
+      onSent(t(sent.notice));
       return;
     }
     setResult({ ok: false, text: t(sent.error), field: sent.field });

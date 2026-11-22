@@ -154,7 +154,7 @@ function Overview({ data }: { data: AdminOverview }) {
           ) : (
             <p className="hint">{t("No themes yet.")}</p>
           )}
-          {a.unthemed ? <p className="hint">{t("{count} open suggestions have no theme yet.", { count: a.unthemed })}</p> : null}
+          {a.unthemed ? <p className="hint">{t("Open suggestions without a theme: {count}.", { count: a.unthemed })}</p> : null}
         </section>
         <section className="fb-card stack">
           <h3>{t("Suggestions by topic")}</h3>

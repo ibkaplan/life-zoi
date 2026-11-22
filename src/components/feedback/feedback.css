@@ -319,3 +319,6 @@
   .fb-way, .fb-picker-star { transition: none; }
   .fb-way:hover, .fb-picker-star:hover { transform: none; }
 }
+
+/* Beside the "ways to take part" links the card is narrow, so the score sits above the bars. */
+.fb-grid-2 .fb-summary { grid-template-columns: 1fr; }

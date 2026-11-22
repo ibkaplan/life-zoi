@@ -2,6 +2,7 @@
 
 import "@/components/feedback/feedback.css";
 import Link from "next/link";
+import { useState } from "react";
 import { useAccount } from "@/lib/account-store";
 import { useT } from "@/components/locale-provider";
 import { useFeedbackBoard } from "@/components/feedback/client";
@@ -17,6 +18,7 @@ export function FeedbackHome() {
   const account = useAccount();
   const { state, reload } = useFeedbackBoard();
   const board = state.phase === "ready" ? state.board : null;
+  const [sentNotice, setSentNotice] = useState<string | null>(null);
 
   return (
     <div className="stack-lg fb">
@@ -72,7 +74,14 @@ export function FeedbackHome() {
         </nav>
       </div>
 
-      {board ? <ReviewForm disabledUntil={board.nextReviewAt} onSent={() => void reload()} /> : null}
+      {board ? <ReviewForm
+          disabledUntil={board.nextReviewAt}
+          sentNotice={sentNotice}
+          onSent={(notice) => {
+            setSentNotice(notice);
+            void reload();
+          }}
+        /> : null}
 
       {board && board.announcements.length > 0 ? (
         <section className="stack" aria-labelledby="fb-latest-listened">

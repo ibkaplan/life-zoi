@@ -2,8 +2,9 @@ import { createMemoryFeedbackRepository, type FeedbackRepository } from "@/lib/f
 import { createSupabaseFeedbackRepository } from "@/lib/feedback/supabase-repository";
 import { getAdminSupabase } from "@/lib/supabase-admin";
 
-let memory: FeedbackRepository | null = null;
 let remote: FeedbackRepository | null = null;
+// Kept on globalThis so development hot reloads do not empty the in-memory store.
+const holder = globalThis as typeof globalThis & { __lifezoiFeedbackMemory?: FeedbackRepository };
 
 /**
  * Supabase when the server has the public config and the service role key,
@@ -18,6 +19,6 @@ export function getFeedbackRepository(env: Record<string, string | undefined> = 
     if (client) remote = createSupabaseFeedbackRepository(client);
   }
   if (remote) return { repo: remote, storage: "account" };
-  if (!memory) memory = createMemoryFeedbackRepository();
-  return { repo: memory, storage: "memory" };
+  holder.__lifezoiFeedbackMemory ??= createMemoryFeedbackRepository();
+  return { repo: holder.__lifezoiFeedbackMemory, storage: "memory" };
 }
