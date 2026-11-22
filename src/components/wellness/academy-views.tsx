@@ -4,6 +4,8 @@ import { ListenToSteps } from "@/components/voice/read-aloud";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PagePhoto } from "@/components/page-photo";
+import "@/components/imagery/imagery.css";
+import { LzPhoto } from "@/components/imagery/lz-photo";
 import { FreeExerciseSection } from "@/components/wellness/free-exercise-views";
 import { useSession } from "@/components/session-provider";
 import { useLocale, useT } from "@/components/locale-provider";
@@ -175,11 +177,16 @@ export function MealIndex() {
   return (
     <div className="learn stack-lg">
       <PagePhoto id="nutrition" />
-      <p className="kicker">{t("Nutrition")}</p>
-      <h1>{t("Nutrition")}</h1>
-      <p className="lede">
-        {t("Build a plate, compare labels, and keep the lessons already on this page: added sugar, homemade bread, gut health, and the meal library.")}
-      </p>
+      <div className="lz-intro">
+        <div className="stack">
+          <p className="kicker">{t("Nutrition")}</p>
+          <h1>{t("Nutrition")}</h1>
+          <p className="lede">
+            {t("Build a plate, compare labels, and keep the lessons already on this page: added sugar, homemade bread, gut health, and the meal library.")}
+          </p>
+        </div>
+        <LzPhoto id="nutrition" variant="inset" className="lz-hide-phone" />
+      </div>
       <nav className="actions" aria-label={t("Nutrition topics")}>
         <a className="btn btn-secondary" href="#calorie-counter">{t("Calorie counter")}</a>
         <a className="btn btn-secondary" href="#healthy-plate">{t("Healthy plate")}</a>

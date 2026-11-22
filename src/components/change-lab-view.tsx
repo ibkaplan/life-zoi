@@ -1,6 +1,8 @@
 "use client";
 
+import "@/components/imagery/imagery.css";
 import Link from "next/link";
+import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useSyncExternalStore, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
@@ -101,6 +103,7 @@ export function ChangeLabView() {
 
   return (
     <div className="change-lab stack-lg">
+      <div className="lz-intro">
       <div className="stack">
         <p className="kicker">{t("LifeZoi Change Lab")}</p>
         <h1>{t("Your personal health and lifestyle experiment")}</h1>
@@ -110,6 +113,8 @@ export function ChangeLabView() {
           )}{" "}
           <Link href="/life-matters">{t("Your Life Matters")}</Link>.
         </p>
+      </div>
+        <LzPhoto id="change-lab" variant="inset" />
       </div>
       <p className="banner" role="status">
         {t("Saved in this browser tab only. Nothing here is sent to an AI provider or to MedlinePlus.")}

@@ -1,6 +1,8 @@
 "use client";
 
+import "@/components/imagery/imagery.css";
 import Link from "next/link";
+import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useState } from "react";
 import { activitiesFor, CATEGORIES } from "@/lib/brain-quiz/catalog";
 import { featuredRebus } from "@/lib/brain-quiz/daily";
@@ -33,6 +35,7 @@ export function BrainQuizHub() {
 
   return (
     <div className="stack-lg">
+      <LzPhoto id="brain" variant="banner" />
       <section className={`hero-panel quiz-hero`}>
         <p className="kicker">LifeZoi</p>
         <h1>{t(QUIZ_TITLE)}</h1>

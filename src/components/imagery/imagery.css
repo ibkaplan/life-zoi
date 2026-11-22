@@ -1,0 +1,189 @@
+/* Shared imagery: photos, the Wellness Assistant character, topic cards.
+   Brand colors come from :root in globals.css. Images stay modest in size. */
+
+/* ---------- Photo with credit ---------- */
+
+.lz-photo {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--lavender, #EFE5FA);
+}
+.lz-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lz-photo-credit {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.45rem;
+  max-width: calc(100% - 1rem);
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(23, 20, 46, 0.55);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lz-photo-credit a,
+.lz-photo-credit a:visited { color: #ffffff; text-decoration: none; }
+.lz-photo-credit a:hover,
+.lz-photo-credit a:focus-visible { text-decoration: underline; }
+
+/* A strip across the top of a dashboard tile. */
+.lz-photo-tile {
+  margin: -1.5rem -1.5rem 0.2rem;
+  width: calc(100% + 3rem);
+  height: 9.5rem;
+  border-radius: 0;
+}
+@media (min-width: 760px) { .lz-photo-tile { height: 10.5rem; } }
+
+/* A page banner, lower than the existing page photos. */
+.lz-photo-banner { height: 11rem; box-shadow: var(--shadow); border: 1px solid rgba(113, 54, 200, 0.14); }
+@media (min-width: 900px) { .lz-photo-banner { height: 14rem; } }
+
+/* A photo beside a heading. */
+.lz-photo-inset { aspect-ratio: 4 / 3; max-height: 15rem; box-shadow: var(--shadow); }
+
+/* A heading with a photo beside it; the photo goes under the text on phones. */
+.lz-intro {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+}
+@media (min-width: 760px) {
+  .lz-intro { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1.5rem; }
+}
+@media (max-width: 759px) {
+  .lz-intro .lz-photo-inset { aspect-ratio: auto; height: 10rem; }
+}
+
+/* ---------- Wellness Assistant character ---------- */
+
+.lz-mascot { display: block; width: 100%; height: auto; }
+.lz-mascot-wave .lz-mascot-arm {
+  transform-origin: 80px 168px;
+  animation: lz-wave 2.6s ease-in-out 0.6s 2;
+}
+@keyframes lz-wave {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(10deg); }
+  40% { transform: rotate(-6deg); }
+  60% { transform: rotate(8deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lz-mascot-wave .lz-mascot-arm { animation: none; }
+}
+
+/* On the dashboard tile, in place of the emoji. */
+.dash-tile-mascot {
+  width: 5.2rem;
+  height: 5.2rem;
+  margin: -0.4rem 0 -0.3rem -0.4rem;
+}
+
+/* On the Wellness Assistant page hero. */
+.wa-hero-mascot {
+  flex: none;
+  width: 7.5rem;
+  height: 7.5rem;
+  margin: -0.6rem 0 -0.6rem -0.4rem;
+  filter: drop-shadow(0 8px 18px rgba(23, 10, 50, 0.25));
+}
+@media (min-width: 760px) { .wa-hero-mascot { width: 9rem; height: 9rem; } }
+@media (max-width: 480px) { .wa-hero-mascot { width: 6.5rem; height: 6.5rem; margin: -0.5rem 0 -0.3rem; } }
+
+/* ---------- Seven wellness topics ---------- */
+
+.lz-topics { display: grid; gap: 1rem; }
+.lz-topics-head { display: grid; gap: 0.35rem; }
+.lz-topics-head h2 { color: var(--deep, #52288A); }
+.lz-topics-lede { color: var(--muted); font-size: 1.08rem; }
+
+.lz-topic-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 640px) { .lz-topic-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .lz-topic-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* The last card is wider: it closes the grid on phones and on wide screens. */
+.lz-topic-longevity { grid-column: span 2; }
+@media (min-width: 640px) and (max-width: 999px) { .lz-topic-longevity { grid-column: span 3; } }
+
+.lz-topic-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #E6DAF7;
+  box-shadow: 0 8px 24px rgba(23, 37, 84, 0.06);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.lz-topic-link:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(106, 61, 168, 0.13); }
+.lz-topic-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .lz-topic-link, .lz-topic-link:hover { transition: none; transform: none; } }
+
+.lz-topic-media { position: relative; display: block; aspect-ratio: 4 / 3; background: var(--lavender); }
+.lz-topic-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.lz-topic-longevity .lz-topic-media { aspect-ratio: 8 / 3; }
+@media (min-width: 640px) and (max-width: 999px) { .lz-topic-longevity .lz-topic-media { aspect-ratio: 4 / 1; } }
+
+.lz-topic-badge {
+  position: absolute;
+  left: 0.6rem;
+  bottom: -1.1rem;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  background: var(--topic-soft, #F3ECFB);
+  color: var(--topic-ink, #52288A);
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(23, 37, 84, 0.12);
+}
+.lz-glyph { width: 1.35rem; height: 1.35rem; }
+
+.lz-topic-body { display: grid; gap: 0.25rem; padding: 1.4rem 0.85rem 0.9rem; }
+.lz-topic-title { font-weight: 750; font-size: 1.08rem; color: var(--topic-ink, #52288A); line-height: 1.25; }
+.lz-topic-text { font-size: 0.98rem; color: var(--muted); line-height: 1.4; }
+@media (max-width: 420px) { .lz-topic-text { font-size: 0.92rem; } }
+
+.lz-topic-energy { --topic-soft: #FDF1DC; --topic-ink: #8A5A0B; }
+.lz-topic-nutrition { --topic-soft: #E8F1EA; --topic-ink: #2F5A44; }
+.lz-topic-movement { --topic-soft: #F1E8FC; --topic-ink: #52288A; }
+.lz-topic-sleep { --topic-soft: #ECE9FA; --topic-ink: #3F3486; }
+.lz-topic-brain { --topic-soft: #F6E9F7; --topic-ink: #6D2F7A; }
+.lz-topic-heart { --topic-soft: #E3F2EF; --topic-ink: #1E625C; }
+.lz-topic-longevity { --topic-soft: #FBF3E2; --topic-ink: #6A4A0E; }
+
+.lz-topics-credits { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.lz-topics-credits a { color: inherit; }
+
+/* ---------- Wellness score photo ---------- */
+
+.ws-head-row { display: grid; gap: 1rem; align-items: center; }
+@media (min-width: 760px) { .ws-head-row { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+.ws-head-row .lz-photo { height: 8.5rem; }
+@media (min-width: 760px) { .ws-head-row .lz-photo { height: 9.5rem; } }
+
+/* Keep the dashboard tile's colored top line above a tile photo. */
+.dash-tile::before { z-index: 2; }
+
+/* A second photo that would crowd a phone screen. */
+@media (max-width: 759px) { .lz-hide-phone { display: none; } }

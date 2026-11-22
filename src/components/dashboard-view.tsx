@@ -1,12 +1,16 @@
 "use client";
 
 import "@/components/dashboard-assistant.css";
+import "@/components/imagery/imagery.css";
 import Link from "next/link";
 import { useLocale, useT } from "@/components/locale-provider";
 import { MorningWelcome } from "@/components/background-music/morning-welcome";
 import { NewsSections } from "@/components/news-sections";
 import { firstNameOf } from "@/lib/news/greeting";
 import { WellnessScoreCard } from "@/components/wellness-score-card";
+import { AssistantMascot } from "@/components/imagery/assistant-mascot";
+import { LzPhoto } from "@/components/imagery/lz-photo";
+import { TopicGallery } from "@/components/imagery/topic-gallery";
 import { RecommendationsPanel } from "@/components/recommendations-panel";
 import { fmt, LOCALE_META } from "@/lib/i18n/config";
 import { useSession } from "@/components/session-provider";
@@ -41,7 +45,7 @@ export function DashboardView() {
       <WellnessScoreCard history={session.history} monthCheckIns={monthCheckIns} sample={sample} />
       <section className="dash-tiles" aria-label={t("Main tools")}>
         <article className="dash-tile dash-tile-assistant">
-          <span className="dash-tile-icon" aria-hidden="true">💬</span>
+          <AssistantMascot className="dash-tile-mascot" />
           <p className="dash-tile-kicker">{d.assistantKicker}</p>
           <h2>{d.assistantTitle}</h2>
           <p>{d.assistantText}</p>
@@ -51,7 +55,7 @@ export function DashboardView() {
           </Link>
         </article>
         <article className="dash-tile dash-tile-lab">
-          <span className="dash-tile-icon" aria-hidden="true">🧪</span>
+          <LzPhoto id="change-lab" variant="tile" />
           <p className="dash-tile-kicker">{d.labKicker}</p>
           <h2>{d.labTitle}</h2>
           <p>{d.labText}</p>
@@ -61,7 +65,7 @@ export function DashboardView() {
           </div>
         </article>
         <article className="dash-tile dash-tile-assessment">
-          <span className="dash-tile-icon" aria-hidden="true">📝</span>
+          <LzPhoto id="assessment" variant="tile" />
           <h2>{d.assessmentTitle}</h2>
           <p>
             {latest
@@ -75,7 +79,7 @@ export function DashboardView() {
           </Link>
         </article>
         <article className="dash-tile dash-tile-whatif">
-          <span className="dash-tile-icon" aria-hidden="true">🔮</span>
+          <LzPhoto id="what-if" variant="tile" />
           <h2>WHAT IF?</h2>
           <p>{d.whatIfText}</p>
           <Link className="btn btn-primary dash-btn" href="/what-if">
@@ -83,6 +87,7 @@ export function DashboardView() {
           </Link>
         </article>
       </section>
+      <TopicGallery />
       <NewsSections />
       <article className="card stack dash-card dash-matters">
         <p className="kicker">{d.mattersKicker}</p>

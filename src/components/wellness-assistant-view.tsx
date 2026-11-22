@@ -1,6 +1,8 @@
 "use client";
 
 import "@/components/dashboard-assistant.css";
+import "@/components/imagery/imagery.css";
+import { AssistantMascot } from "@/components/imagery/assistant-mascot";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
@@ -72,7 +74,7 @@ export function WellnessAssistantView() {
     <div className="wa">
       {view === "home" ? (
         <header className="wa-hero">
-          <span className="wa-hero-icon" aria-hidden="true">💬</span>
+          <AssistantMascot className="wa-hero-mascot" />
           <div className="wa-hero-text">
             <p className="wa-kicker">{t("Prepared educational information")}</p>
             <h1 ref={headingRef} tabIndex={-1}>{t(GUIDE_TITLE)}</h1>

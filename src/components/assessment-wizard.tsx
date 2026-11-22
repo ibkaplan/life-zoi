@@ -1,6 +1,8 @@
 "use client";
 
+import "@/components/imagery/imagery.css";
 import Link from "next/link";
+import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useEffect, useState } from "react";
 import { useSession } from "@/components/session-provider";
 import { useMessages, useT } from "@/components/locale-provider";
@@ -288,6 +290,7 @@ export function AssessmentWizard() {
 
   return (
     <div className="stack-lg narrow qz">
+      {session.draftStep === 0 ? <LzPhoto id="assessment" variant="banner" /> : null}
       <div>
         <p className="kicker">{t("Lifestyle assessment")}</p>
         <h1>{t(copy.title)}</h1>
