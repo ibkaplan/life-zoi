@@ -114,7 +114,7 @@ function AnswerView({ answer, onOpen }: { answer: Answer; onOpen: (slug: string)
         if (block.kind === "paragraph") {
           const shown = t(block.text);
           return (
-            <p key={index} lang={shown === block.text ? "en" : undefined} className={index === 0 && answer.safety ? "ency-ai-safety" : undefined}>
+            <p key={index} lang={block.lang ?? (shown === block.text ? "en" : undefined)} className={index === 0 && answer.safety ? "ency-ai-safety" : undefined}>
               {shown}
             </p>
           );
@@ -133,6 +133,9 @@ function AnswerView({ answer, onOpen }: { answer: Answer; onOpen: (slug: string)
           </p>
         );
       })}
+      {answer.source === "model" ? (
+        <p className="hint">{t("This explanation was written by an AI model from the encyclopedia articles below. It can make mistakes, so check the articles and talk with a health professional about your own situation.")}</p>
+      ) : null}
       {answer.safety === "urgent" ? (
         <p className="hint">{t("LifeZoi AI does not answer health questions that may be emergencies. Please get help now.")}</p>
       ) : null}
@@ -195,9 +198,30 @@ function Reader({ slug, onBack }: { slug: string; onBack: () => void }) {
   );
 }
 
+type AiMode = "unknown" | "library" | "cloudflare";
+
+/** Asks the server which mode LifeZoi AI is in, so the notices say truthfully where questions go. */
+function useAiMode(): AiMode {
+  const [mode, setMode] = useState<AiMode>("unknown");
+  useEffect(() => {
+    let live = true;
+    fetch("/api/lifezoi-ai", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { mode?: unknown } | null) => {
+        if (live) setMode(body?.mode === "cloudflare" ? "cloudflare" : body?.mode === "library" ? "library" : "unknown");
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
+  return mode;
+}
+
 function AiInner() {
   const t = useT();
   const { locale } = useLocale();
+  const mode = useAiMode();
   const params = useSearchParams();
   const articles = useArticles();
   const [convo, save] = useConversation();
@@ -227,7 +251,7 @@ function AiInner() {
       const response = await fetch("/api/lifezoi-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ turns: history, length: convo.length, focus: focusArticle?.slug }),
+        body: JSON.stringify({ turns: history, length: convo.length, focus: focusArticle?.slug, language: locale }),
       });
       const body = (await response.json().catch(() => ({}))) as { answer?: Answer; error?: string };
       const next: Turn = body.answer
@@ -264,9 +288,15 @@ function AiInner() {
         </div>
       </header>
 
-      <p className="ency-ai-mode" role="note">
-        <strong>{t("Library mode")}</strong> {t("Answers come only from LifeZoi Health Encyclopedia articles, with their sources. No outside AI service is used, so LifeZoi AI can only answer topics the encyclopedia covers. Answers are in English for now.")}
-      </p>
+      {mode === "library" ? (
+        <p className="ency-ai-mode" role="note">
+          <strong>{t("Library mode")}</strong> {t("Answers come only from LifeZoi Health Encyclopedia articles, with their sources. No outside AI service is used, so LifeZoi AI can only answer topics the encyclopedia covers. Answers are in English for now.")}
+        </p>
+      ) : mode === "cloudflare" ? (
+        <p className="ency-ai-mode" role="note">
+          <strong>{t("AI explanations")}</strong> {t("LifeZoi AI finds the matching encyclopedia articles, then a free AI model from Cloudflare explains them in plain words in your language. It only answers topics the encyclopedia covers, and the articles are linked below each answer.")}
+        </p>
+      ) : null}
 
       {focusArticle ? (
         <p className="ency-ai-focus">
@@ -340,7 +370,7 @@ function AiInner() {
             {t("Ask LifeZoi")}
           </button>
         </div>
-        {locale !== "en" ? <p className="hint">{t("Questions work best in English for now, because the articles are in English.")}</p> : null}
+        {locale !== "en" && mode !== "cloudflare" ? <p className="hint">{t("Questions work best in English for now, because the articles are in English.")}</p> : null}
       </form>
 
       {convo.turns.length > 0 ? (
@@ -373,7 +403,14 @@ function AiInner() {
           <summary>{t("How LifeZoi AI handles your questions")}</summary>
           <ul>
             <li>{t("Your question is sent over an encrypted connection to the LifeZoi server, which looks it up in the encyclopedia and sends back an answer.")}</li>
-            <li>{t("It is not sent to any outside AI company, and LifeZoi does not store it in a database or use it to train AI.")}</li>
+            {mode === "cloudflare" ? (
+              <li>
+                {t("When AI explanations are on, the text of your question, your earlier questions in this conversation, and the matching article text are processed by Cloudflare Workers AI to write the answer. Cloudflare says it does not use this content to train AI models and does not keep it after the answer is made. No account details, assessment answers, or lab values are sent.")}
+              </li>
+            ) : mode === "library" ? (
+              <li>{t("It is not sent to any outside AI company.")}</li>
+            ) : null}
+            <li>{t("LifeZoi does not store your questions in a database or use them to train AI.")}</li>
             <li>{t("Our hosting provider may keep short technical request logs, as most websites do.")}</li>
             <li>{t("The conversation is kept only in this browser tab, for your account. It disappears when you close the tab, or right away when you choose Delete this conversation.")}</li>
             <li>{t("Do not type names, addresses, or other details that identify you. They are not needed for an answer.")}</li>

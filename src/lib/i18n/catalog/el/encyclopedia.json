@@ -48,7 +48,6 @@
   "Suggested health topics": "Προτεινόμενα θέματα υγείας",
   "How LifeZoi AI handles your questions": "Πώς το LifeZoi AI χειρίζεται τις ερωτήσεις σας",
   "Your question is sent over an encrypted connection to the LifeZoi server, which looks it up in the encyclopedia and sends back an answer.": "Η ερώτησή σας αποστέλλεται μέσω κρυπτογραφημένης σύνδεσης στον διακομιστή της LifeZoi, ο οποίος την αναζητά στην εγκυκλοπαίδεια και στέλνει πίσω μια απάντηση.",
-  "It is not sent to any outside AI company, and LifeZoi does not store it in a database or use it to train AI.": "Δεν αποστέλλεται σε καμία εξωτερική εταιρεία τεχνητής νοημοσύνης, και η LifeZoi δεν την αποθηκεύει σε βάση δεδομένων ούτε τη χρησιμοποιεί για την εκπαίδευση τεχνητής νοημοσύνης.",
   "Our hosting provider may keep short technical request logs, as most websites do.": "Ο πάροχος φιλοξενίας μας μπορεί να κρατά σύντομα τεχνικά αρχεία καταγραφής αιτημάτων, όπως οι περισσότεροι ιστότοποι.",
   "The conversation is kept only in this browser tab, for your account. It disappears when you close the tab, or right away when you choose Delete this conversation.": "Η συνομιλία φυλάσσεται μόνο σε αυτή την καρτέλα του προγράμματος περιήγησης, για τον λογαριασμό σας. Χάνεται όταν κλείσετε την καρτέλα ή αμέσως όταν επιλέξετε «Διαγραφή αυτής της συνομιλίας».",
   "Do not type names, addresses, or other details that identify you. They are not needed for an answer.": "Μην πληκτρολογείτε ονόματα, διευθύνσεις ή άλλα στοιχεία που σας ταυτοποιούν. Δεν χρειάζονται για μια απάντηση.",
@@ -232,5 +231,11 @@
   "2010–2020": "2010–2020",
   "2020–2026": "2020–2026",
   "Future developments": "Μελλοντικές εξελίξεις",
-  "Encyclopedia editor": "Επεξεργαστής εγκυκλοπαίδειας"
+  "Encyclopedia editor": "Επεξεργαστής εγκυκλοπαίδειας",
+  "This explanation was written by an AI model from the encyclopedia articles below. It can make mistakes, so check the articles and talk with a health professional about your own situation.": "Αυτή την εξήγηση την έγραψε ένα μοντέλο τεχνητής νοημοσύνης από τα παρακάτω άρθρα της εγκυκλοπαίδειας. Μπορεί να κάνει λάθη, γι’ αυτό ελέγξτε τα άρθρα και μιλήστε με έναν επαγγελματία υγείας για τη δική σας περίπτωση.",
+  "AI explanations": "Εξηγήσεις τεχνητής νοημοσύνης",
+  "LifeZoi AI finds the matching encyclopedia articles, then a free AI model from Cloudflare explains them in plain words in your language. It only answers topics the encyclopedia covers, and the articles are linked below each answer.": "Το LifeZoi AI βρίσκει τα σχετικά άρθρα της εγκυκλοπαίδειας και στη συνέχεια ένα δωρεάν μοντέλο τεχνητής νοημοσύνης της Cloudflare τα εξηγεί με απλά λόγια στη γλώσσα σας. Απαντά μόνο σε θέματα που καλύπτει η εγκυκλοπαίδεια, και τα άρθρα εμφανίζονται κάτω από κάθε απάντηση.",
+  "When AI explanations are on, the text of your question, your earlier questions in this conversation, and the matching article text are processed by Cloudflare Workers AI to write the answer. Cloudflare says it does not use this content to train AI models and does not keep it after the answer is made. No account details, assessment answers, or lab values are sent.": "Όταν οι εξηγήσεις τεχνητής νοημοσύνης είναι ενεργές, το κείμενο της ερώτησής σας, οι προηγούμενες ερωτήσεις σας σε αυτή τη συνομιλία και το κείμενο των σχετικών άρθρων επεξεργάζονται από το Cloudflare Workers AI για να γραφτεί η απάντηση. Η Cloudflare αναφέρει ότι δεν χρησιμοποιεί αυτό το περιεχόμενο για την εκπαίδευση μοντέλων τεχνητής νοημοσύνης και δεν το κρατά αφού δημιουργηθεί η απάντηση. Δεν αποστέλλονται στοιχεία λογαριασμού, απαντήσεις αξιολόγησης ή τιμές εξετάσεων.",
+  "It is not sent to any outside AI company.": "Δεν αποστέλλεται σε καμία εξωτερική εταιρεία τεχνητής νοημοσύνης.",
+  "LifeZoi does not store your questions in a database or use them to train AI.": "Η LifeZoi δεν αποθηκεύει τις ερωτήσεις σας σε βάση δεδομένων ούτε τις χρησιμοποιεί για την εκπαίδευση τεχνητής νοημοσύνης."
 }
