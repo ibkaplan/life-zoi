@@ -4,17 +4,30 @@
  * voice assistant can replace: give `speakGuide` a different speaker.
  */
 
+import { readVoicePrefs } from "@/lib/voice/engine";
+import { chooseVoice, DEFAULT_VOICE_TONE, voiceLanguage, type VoiceTone } from "@/lib/voice/voices";
+
 export type GuideVoice = { name: string; lang: string };
 
-/** Voice names that browsers use for their more natural voices. */
-const NATURAL_HINT = /natural|neural|premium|enhanced|online|google/i;
+/**
+ * The best voice for a language, ranked like every other Listen button: the
+ * person's saved voice, then the chosen voice type (soft female by default),
+ * then the more natural voices. Null when no voice speaks the language.
+ */
+export function pickGuideVoice<V extends GuideVoice>(
+  voices: readonly V[],
+  lang: string,
+  saved?: { voice?: string | null; tone?: VoiceTone },
+): V | null {
+  const base = voiceLanguage({ lang });
+  if (!base) return null;
+  return chooseVoice(voices, base, saved?.voice, saved?.tone ?? DEFAULT_VOICE_TONE);
+}
 
-/** The best voice for a language: same language first, then a more natural one. Null when none speaks it. */
-export function pickGuideVoice<V extends GuideVoice>(voices: readonly V[], lang: string): V | null {
-  const base = lang.toLowerCase().split(/[-_]/)[0] ?? "";
-  const same = voices.filter((voice) => voice.lang.toLowerCase().split(/[-_]/)[0] === base);
-  if (same.length === 0) return null;
-  return same.find((voice) => NATURAL_HINT.test(voice.name)) ?? same[0] ?? null;
+function savedChoice(lang: string): { voice?: string; tone: VoiceTone } {
+  const base = voiceLanguage({ lang });
+  const prefs = readVoicePrefs();
+  return { voice: base ? prefs.voices[base] : undefined, tone: prefs.tone };
 }
 
 export function guideSpeechSupported(): boolean {
@@ -29,7 +42,7 @@ export function speakGuide(text: string, lang: string, onEnd?: () => void): bool
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
   utterance.rate = 0.9;
-  const voice = pickGuideVoice(synth.getVoices(), lang);
+  const voice = pickGuideVoice(synth.getVoices(), lang, savedChoice(lang));
   if (voice) utterance.voice = voice;
   if (onEnd) {
     utterance.onend = onEnd;

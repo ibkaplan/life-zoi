@@ -151,8 +151,10 @@ export function saveVoicePrefs(change: Partial<VoicePrefs>) {
   const current = readVoicePrefs();
   const next: VoicePrefs = {
     rate: clampRate(change.rate ?? current.rate),
-    voices: { ...current.voices, ...(change.voices ?? {}) },
+    // A new voice type starts fresh: voices picked by name before would hide the change.
+    voices: change.tone && change.tone !== current.tone && !change.voices ? {} : { ...current.voices, ...(change.voices ?? {}) },
     stepWait: change.stepWait !== undefined ? change.stepWait : current.stepWait,
+    tone: change.tone ?? current.tone,
   };
   prefsCache = next;
   try {
@@ -162,7 +164,7 @@ export function saveVoicePrefs(change: Partial<VoicePrefs>) {
   }
   window.dispatchEvent(new Event(PREFS_EVENT));
   // A new speed or voice takes effect from the sentence being read.
-  if (change.rate !== undefined || change.voices) player.restartSentence();
+  if (change.rate !== undefined || change.voices || change.tone) player.restartSentence();
 }
 
 export function subscribeVoicePrefs(listener: Listener): () => void {
@@ -183,7 +185,8 @@ export function subscribeVoicePrefs(listener: Listener): () => void {
 /** The voice that will read `lang`, or null when the device has none for it. */
 export function voiceFor(lang: VoiceLang, localOnly = false): SpeechSynthesisVoice | null {
   const voices = localOnly ? deviceVoices().filter((voice) => voice.localService !== false) : deviceVoices();
-  return chooseVoice(voices, lang, readVoicePrefs().voices[lang]);
+  const prefs = readVoicePrefs();
+  return chooseVoice(voices, lang, prefs.voices[lang], prefs.tone);
 }
 
 // ---- Player -------------------------------------------------------------------

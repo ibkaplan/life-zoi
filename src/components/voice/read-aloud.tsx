@@ -26,6 +26,7 @@ import {
   segmentsFromText,
   STEP_WAIT_CHOICES,
   voiceLabel,
+  voiceTone,
   type Block,
   type Segment,
   type StepWait,
@@ -259,8 +260,8 @@ export function VoiceChoices({ lang, steps, rate, stepWait }: { lang: VoiceLang;
   const id = useId();
   const voices = useDeviceVoices();
   const prefs = useVoicePrefs();
-  const ranked = rankVoices(voices, lang);
-  const chosen = chooseVoice(voices, lang, prefs.voices[lang]);
+  const ranked = rankVoices(voices, lang, prefs.tone);
+  const chosen = chooseVoice(voices, lang, prefs.voices[lang], prefs.tone);
   return (
     <div className="voice-choices">
       <label htmlFor={`${id}-rate`}>
@@ -315,7 +316,9 @@ export function VoiceChoices({ lang, steps, rate, stepWait }: { lang: VoiceLang;
 }
 
 function optionLabel(t: Translate, voice: SpeechSynthesisVoice, best: boolean): string {
-  const name = voice.localService === false ? t("{voice}, online", { voice: voiceLabel(voice) }) : voiceLabel(voice);
+  const kind = voiceTone(voice);
+  const base = kind === "soft" ? t("{voice}, female", { voice: voiceLabel(voice) }) : kind === "deep" ? t("{voice}, male", { voice: voiceLabel(voice) }) : voiceLabel(voice);
+  const name = voice.localService === false ? t("{voice}, online", { voice: base }) : base;
   return best ? t("{voice} (sounds most natural)", { voice: name }) : name;
 }
 

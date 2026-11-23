@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { readVoicePrefs } from "@/lib/voice/engine";
+import { chooseVoice, rankVoices, voiceLanguage } from "@/lib/voice/voices";
 
 export type ReadAloudStatus = "idle" | "speaking" | "paused";
 
@@ -32,14 +34,18 @@ function voicesSnapshot(): VoiceOption[] {
   return cache;
 }
 
-const natural = /natural|neural|premium|enhanced|google|siri/i;
-
-/** Voices for a language such as "uk", the more natural sounding ones first where the browser marks them. */
+/**
+ * Voices for a language such as "uk", ranked the same way as every other Listen
+ * button: the voice type chosen in Settings (a soft female voice unless changed)
+ * and the more natural voices first. The voice chosen in Settings comes first.
+ */
 export function voicesFor(voices: readonly VoiceOption[], lang: string): VoiceOption[] {
-  const prefix = lang.toLowerCase().split("-")[0];
-  return voices
-    .filter((voice) => voice.lang.toLowerCase().replace("_", "-").split("-")[0] === prefix)
-    .sort((a, b) => Number(natural.test(b.name)) - Number(natural.test(a.name)));
+  const base = voiceLanguage({ lang });
+  if (!base) return [];
+  const prefs = readVoicePrefs();
+  const ranked = rankVoices(voices, base, prefs.tone);
+  const saved = chooseVoice(voices, base, prefs.voices[base], prefs.tone);
+  return saved ? [saved, ...ranked.filter((voice) => voice !== saved)] : ranked;
 }
 
 function cancelSpeech() {

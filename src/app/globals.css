@@ -3420,6 +3420,11 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
 .voice-note { margin: 0; color: var(--ink); background: var(--surface); border-left: 4px solid var(--gold); padding: 0.5rem 0.7rem; border-radius: 8px; }
 .voice-page { justify-self: start; max-width: 100%; }
 .voice-settings-lang { border-top: 1px solid var(--line); padding-top: 0.75rem; }
+.voice-tone { display: grid; gap: 0.3rem; font-weight: 650; color: var(--ink); }
+.voice-tone select { min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 0 0.7rem; font: inherit; max-width: 100%; }
+.voice-help { border-top: 1px solid var(--line); padding-top: 0.75rem; }
+.voice-help summary { cursor: pointer; font-weight: 650; min-height: 44px; display: flex; align-items: center; }
+.voice-help ul { padding-left: 1.2rem; display: grid; gap: 0.5rem; }
 @media (max-width: 560px) {
   .voice-buttons .btn { flex: 1 1 calc(50% - 0.5rem); justify-content: center; }
   .voice-page { justify-self: stretch; }

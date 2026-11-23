@@ -8,6 +8,7 @@ import {
   serializeVoicePrefs,
   speakableText,
   splitSentences,
+  voiceTone,
   type DeviceVoice,
 } from "./voices";
 
@@ -90,9 +91,53 @@ describe("sentences and pauses", () => {
 
 describe("saved voice choice", () => {
   it("survives a round trip and ignores bad values", () => {
-    const prefs = parseVoicePrefs(serializeVoicePrefs({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null }));
-    expect(prefs).toEqual({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null });
+    const prefs = parseVoicePrefs(serializeVoicePrefs({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null, tone: "soft" }));
+    expect(prefs).toEqual({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null, tone: "soft" });
     expect(parseVoicePrefs("{not json").rate).toBe(0.95);
-    expect(parseVoicePrefs(JSON.stringify({ rate: 9, voices: { xx: "a", en: 5 }, stepWait: 7 }))).toEqual({ rate: 1.5, voices: {}, stepWait: 0 });
+    expect(parseVoicePrefs(JSON.stringify({ rate: 9, voices: { xx: "a", en: 5 }, stepWait: 7 }))).toEqual({ rate: 1.5, voices: {}, stepWait: 0, tone: "soft" });
+  });
+});
+
+describe("voice type", () => {
+  // What Chrome on Windows offers on the device itself: David is the system default.
+  const WINDOWS = [
+    { name: "Microsoft David - English (United States)", lang: "en-US", localService: true, default: true },
+    { name: "Microsoft Mark - English (United States)", lang: "en-US", localService: true },
+    { name: "Microsoft Zira - English (United States)", lang: "en-US", localService: true },
+    { name: "Microsoft Pavel - Russian (Russia)", lang: "ru-RU", localService: true },
+    { name: "Microsoft Irina - Russian (Russia)", lang: "ru-RU", localService: true },
+    { name: "Google UK English Male", lang: "en-GB", localService: false },
+    { name: "Google UK English Female", lang: "en-GB", localService: false },
+  ];
+
+  it("guesses female and male voices from their names", () => {
+    expect(voiceTone({ name: "Microsoft Zira - English (United States)" })).toBe("soft");
+    expect(voiceTone({ name: "Microsoft David - English (United States)" })).toBe("deep");
+    expect(voiceTone({ name: "Google UK English Male" })).toBe("deep");
+    expect(voiceTone({ name: "Google UK English Female" })).toBe("soft");
+    expect(voiceTone({ name: "Google русский" })).toBe("soft");
+    expect(voiceTone({ name: "Microsoft Polina Online (Natural) - Ukrainian (Ukraine)" })).toBe("soft");
+    expect(voiceTone({ name: "Microsoft Ostap Online (Natural) - Ukrainian (Ukraine)" })).toBe("deep");
+    expect(voiceTone({ name: "Basic English" })).toBeNull();
+  });
+
+  it("picks a soft female voice by default, even over the system's male default", () => {
+    const local = WINDOWS.filter((voice) => voice.localService);
+    expect(chooseVoice(local, "en")?.name).toContain("Zira");
+    expect(chooseVoice(local, "ru")?.name).toContain("Irina");
+    expect(chooseVoice(WINDOWS, "en")?.name).toBe("Google UK English Female");
+  });
+
+  it("follows the chosen voice type, and a voice chosen by name still wins", () => {
+    expect(chooseVoice(WINDOWS, "ru", null, "deep")?.name).toContain("Pavel");
+    expect(rankVoices(WINDOWS, "en", "any").length).toBe(5);
+    expect(chooseVoice(WINDOWS, "en", "Microsoft David - English (United States)")?.name).toContain("David");
+  });
+
+  it("saves the voice type and falls back to soft", () => {
+    expect(parseVoicePrefs(null).tone).toBe("soft");
+    expect(parseVoicePrefs('{"tone":"deep"}').tone).toBe("deep");
+    expect(parseVoicePrefs('{"tone":"loud"}').tone).toBe("soft");
+    expect(parseVoicePrefs(serializeVoicePrefs({ ...parseVoicePrefs(null), tone: "any" })).tone).toBe("any");
   });
 });
