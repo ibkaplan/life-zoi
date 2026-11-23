@@ -1,21 +1,20 @@
 import type { Locale } from "@/lib/i18n/config";
 import ru from "./ru.json";
 import { russianCues } from "./ru-cues";
+import el from "./el.json";
+import { greekCues } from "./el-cues";
 import uk from "./uk.json";
 import { ukrainianCues } from "./uk-cues";
 
-/**
- * Languages LifeZoi Mind's written conversation can hold. Others see the English
- * conversation, with a note in their own language.
- */
-export type MindLang = "en" | "ru" | "uk";
+/** Languages LifeZoi Mind's written conversation can hold: every language the site offers. */
+export type MindLang = "en" | "ru" | "uk" | "el";
 
 export type MindTranslate = (english: string, values?: Record<string, string | number>) => string;
 
-export const MIND_TEXT: Record<Exclude<MindLang, "en">, Record<string, string>> = { ru, uk };
+export const MIND_TEXT: Record<Exclude<MindLang, "en">, Record<string, string>> = { ru, uk, el };
 
 export function mindLangFor(locale: Locale): MindLang {
-  return locale === "ru" || locale === "uk" ? locale : "en";
+  return locale === "ru" || locale === "uk" || locale === "el" ? locale : "en";
 }
 
 function fill(text: string, values?: Record<string, string | number>): string {
@@ -34,5 +33,8 @@ export function mindTranslator(lang: MindLang): MindTranslate {
 
 /** The keywords the conversation's patterns read, for a message in `lang`. */
 export function mindCues(lang: MindLang, text: string): string {
-  return lang === "ru" ? russianCues(text) : lang === "uk" ? ukrainianCues(text) : text;
+  if (lang === "ru") return russianCues(text);
+  if (lang === "uk") return ukrainianCues(text);
+  if (lang === "el") return greekCues(text);
+  return text;
 }
