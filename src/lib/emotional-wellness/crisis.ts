@@ -109,11 +109,11 @@ export function detectCrisis(text: string): CrisisKind[] {
 export function standingCrisisNotice(country: CountryChoice, t: Translate = english): string {
   if (showsUsCrisisResources(country)) {
     return t(
-      "If you may be in danger of suicide, self-harm, or immediate harm, call or text 988, visit https://988lifeline.org/, or call 911 for immediate danger. This notice stays up even when the companion is off.",
+      "If you may be in danger of suicide, self-harm, or immediate harm, call or text 988, visit https://988lifeline.org/, or call 911 for immediate danger. This help stays on the page at all times.",
     );
   }
   return t(
-    "If you may be in danger, contact your local emergency services. This page does not list a United States crisis number for the country you set, and it will not invent a local number. This notice stays up even when the companion is off.",
+    "If you may be in danger, please contact your local emergency services right away. This help stays on the page at all times.",
   );
 }
 
@@ -133,7 +133,7 @@ export function crisisReply(kinds: readonly CrisisKind[], country: CountryChoice
   } else {
     sentences.push(
       t(
-        "Contact your local emergency services. This page does not list a United States crisis number for the country you set, and it will not invent a local number.",
+        "Please contact your local emergency services right away.",
       ),
     );
   }

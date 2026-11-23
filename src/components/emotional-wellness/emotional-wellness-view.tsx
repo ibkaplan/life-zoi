@@ -198,7 +198,7 @@ export function EmotionalWellnessView() {
           <legend>{t("Country for crisis numbers")}</legend>
           <p className="hint">
             {t(
-              "Call, text, and immediate-danger numbers for the United States are shown when the country is the United States or not set. Another country does not add a guessed local number.",
+              "If you are in the United States, or haven't chosen a country, this page shows United States crisis numbers. In another country, please contact your local emergency services.",
             )}
           </p>
           {(
@@ -235,7 +235,7 @@ export function EmotionalWellnessView() {
         <h2 id="ew-companion">{t("Companion")}</h2>
         <p className="hint">
           {t(
-            "One question at a time. Written replies can be paused. The crisis check keeps running, and no paid model is called either way.",
+            "The companion asks one question at a time. You can pause its written replies whenever you like. Crisis help stays on this page either way.",
           )}
         </p>
         <div className="actions">
@@ -452,10 +452,10 @@ export function EmotionalWellnessView() {
       <section className="card stack" id="real-person" aria-labelledby="ew-real">
         <h2 id="ew-real">{t("Talk to a real person")}</h2>
         <p className="hint">
-          {t("These are published organizations. This page does not invent phone numbers.")}{" "}
+          {t("These are real organizations with trained people who can help.")}{" "}
           {usNumbers
-            ? t("United States crisis numbers are included because a country is not set or is the United States.")
-            : t("United States crisis numbers are hidden because a different country is set.")}
+            ? t("United States crisis numbers are shown below.")
+            : t("United States crisis numbers are hidden because you chose another country. Please contact your local emergency services.")}
         </p>
         <ul className="stack">
           {REAL_ORGS.filter((org) => org.id !== "lifeline" || usNumbers).map((org) => {
@@ -493,7 +493,7 @@ export function EmotionalWellnessView() {
         <h2 id="ew-sources">{t("Sources")}</h2>
         <p className="hint">
           {t(
-            "The words on this page are original. The sources below are named so the ideas can be checked. They are not a claim that this page was clinically validated.",
+            "The words on this page were written for LifeZoi. The sources below are listed so you can read more about the ideas.",
           )}
         </p>
         <ul className="source-list">
