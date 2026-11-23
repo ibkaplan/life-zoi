@@ -3,8 +3,17 @@
 import { useLocale, useT } from "@/components/locale-provider";
 import { languageName, useSpeechSupport, useVoicePrefs, useVoiceState, VoiceChoices } from "@/components/voice/read-aloud";
 import { LOCALE_META, LOCALES } from "@/lib/i18n/config";
-import { player } from "@/lib/voice/engine";
-import { segmentsFromText, type VoiceLang } from "@/lib/voice/voices";
+import { player, saveVoicePrefs } from "@/lib/voice/engine";
+import { segmentsFromText, VOICE_TONES, type VoiceLang, type VoiceTone } from "@/lib/voice/voices";
+import type { Translate } from "@/lib/i18n/translate";
+
+function toneLabel(t: Translate, tone: VoiceTone): string {
+  if (tone === "soft") return t("Soft female voice (recommended)");
+  if (tone === "deep") return t("Male voice");
+  return t("Any voice, most natural first");
+}
+
+
 
 /** A short greeting in each language, written in that language, for trying a voice. */
 const SAMPLE: Record<VoiceLang, string> = {
@@ -30,6 +39,17 @@ export function VoiceSettings() {
   return (
     <div className="stack voice-settings">
       <p>{t("Every Listen button uses these choices. They are saved in this browser only.")}</p>
+      <label className="voice-tone">
+        {t("Voice type")}
+        <select value={prefs.tone} onChange={(event) => saveVoicePrefs({ tone: event.target.value as VoiceTone })}>
+          {VOICE_TONES.map((tone) => (
+            <option key={tone} value={tone}>
+              {toneLabel(t, tone)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="hint">{t("Changing the voice type picks the best matching voice for every language again. You can still choose a voice by name below.")}</p>
       {order.map((lang) => {
         const trying = state.owner === OWNER && state.status !== "idle" && state.lang === lang;
         return (
@@ -55,7 +75,36 @@ export function VoiceSettings() {
           </div>
         );
       })}
+      <BetterVoicesHelp />
     </div>
+  );
+}
+
+/** Free ways to add warmer, more natural voices to the device itself. */
+function BetterVoicesHelp() {
+  const t = useT();
+  return (
+    <details className="voice-help">
+      <summary>{t("How to add more pleasant voices for free")}</summary>
+      <div className="stack">
+        <p>{t("lifeZoi reads with the voices your device already has. Most devices can download better female voices at no cost. After adding one, reload this page and choose it above.")}</p>
+        <ul>
+          <li>
+            <strong>{t("iPhone and iPad")}</strong>: {t("Settings, Accessibility, Spoken Content, Voices. Choose the language and download a voice marked Enhanced or Premium, for example Ava (English), Milena (Russian), or Lesya (Ukrainian).")}
+          </li>
+          <li>
+            <strong>{t("Mac")}</strong>: {t("System Settings, Accessibility, Spoken Content, System voice, Manage Voices. Download Ava, Zoe, Milena, or Lesya.")}
+          </li>
+          <li>
+            <strong>{t("Windows")}</strong>: {t("Settings, Time and language, Speech, Add voices. In the Edge browser you also get free natural voices such as Aria, Jenny, Svetlana (Russian), and Polina (Ukrainian), marked online.")}
+          </li>
+          <li>
+            <strong>{t("Android")}</strong>: {t("Settings, Accessibility, Text-to-speech output. Choose Speech Services by Google, open its settings, Install voice data, and pick a female voice for each language.")}
+          </li>
+        </ul>
+        <p className="hint">{t("Voices marked online send the words being read to your browser's provider. LifeZoi Mind never uses online voices, because your conversation stays on your device.")}</p>
+      </div>
+    </details>
   );
 }
 

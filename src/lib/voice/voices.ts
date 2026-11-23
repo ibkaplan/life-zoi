@@ -51,13 +51,37 @@ const ONLINE = /\bonline\b|-network\b/i;
 // Apple voices with a warm, clear reading style in their compact form too.
 const PLEASANT = /\b(ava|zoe|allison|evan|nathan|serena|susan|karen|moira|tessa|daniel|kate|milena|katya|yuri|lesya|melina|nikos|aria|jenny|guy|sonia|libby|ryan|svetlana|dmitry|polina|ostap|athina|nestoras)\b/i;
 
+/** Which kind of voice the person prefers. Most people find a soft female voice the calmest for guidance. */
+export const VOICE_TONES = ["soft", "deep", "any"] as const;
+export type VoiceTone = (typeof VOICE_TONES)[number];
+export const DEFAULT_VOICE_TONE: VoiceTone = "soft";
+
+// Browsers do not say whether a voice is female or male, so lifeZoi guesses from the
+// names the big platforms use (Windows, macOS and iOS, Android and Chrome, Edge).
+const FEMALE =
+  /\b(female|woman|zira|hazel|susan|heera|catherine|linda|eva|irina|ekaterina|svetlana|dariya|polina|natasha|milena|katya|lesya|ava|zoe|allison|samantha|karen|moira|tessa|serena|kate|fiona|victoria|veena|aria|jenny|sonia|libby|michelle|emma|clara|maisie|ana|amy|joanna|salli|kimberly|ivy|kendra|tatyana|melina|athina|anna|alena|sara|isla|natalie|molly|elizabeth|nicole|olivia|ruby|tatiana|oksana|mariya|maria)\b/i;
+const MALE =
+  /\b(male|man|david|mark|george|richard|pavel|ostap|dmitry|dmitri|daniel|alex|aaron|arthur|gordon|lee|oliver|rishi|yuri|guy|ryan|eric|christopher|roger|steffan|thomas|andrew|brian|nikos|nestoras|evan|nathan|tom|james|william|liam|matthew|justin|joey|maxim|denis|ruslan|stefanos|tony|jacob)\b/i;
+// Chrome's own voices are female unless the name says Male.
+const GOOGLE_FEMALE = /^google\s/i;
+
+/** A guess at the voice type from its name: "soft" (female), "deep" (male), or null when unknown. */
+export function voiceTone(voice: Pick<DeviceVoice, "name">): Exclude<VoiceTone, "any"> | null {
+  const name = voice.name.replace(/\bonline\b|\(natural\)|\(premium\)|\(enhanced\)/gi, " ");
+  if (/\bmale\b/i.test(name) && !/\bfemale\b/i.test(name)) return "deep";
+  if (FEMALE.test(name)) return "soft";
+  if (MALE.test(name)) return "deep";
+  if (GOOGLE_FEMALE.test(name)) return "soft";
+  return null;
+}
+
 /**
  * A score for how pleasant a voice is likely to sound for `lang`. Higher is better.
  * Voices for another language score `-Infinity`. The score is a guess from the
  * voice name and type: lifeZoi cannot hear the voice, so the person can always
  * choose another one.
  */
-export function voiceScore(voice: DeviceVoice, lang: VoiceLang): number {
+export function voiceScore(voice: DeviceVoice, lang: VoiceLang, tone: VoiceTone = DEFAULT_VOICE_TONE): number {
   if (voiceLanguage(voice) !== lang) return Number.NEGATIVE_INFINITY;
   const name = voice.name;
   const tag = normalTag(voice.lang);
@@ -74,23 +98,34 @@ export function voiceScore(voice: DeviceVoice, lang: VoiceLang): number {
   if (voice.default) score += 2;
   // People find the plain compact "Samantha" voice flat. Its enhanced version still ranks well.
   if (/\bsamantha\b/i.test(name) && !ENHANCED.test(name)) score -= 20;
+  if (tone !== "any") {
+    const kind = voiceTone(voice);
+    // Strong enough to beat "natural" or "online" on its own: a harsh voice of the wrong kind is what people notice first.
+    if (kind === tone) score += 70;
+    else if (kind !== null) score -= 70;
+  }
   if (ROBOTIC.test(name)) score -= 60;
   if (NOVELTY.test(name)) score -= 200;
   return score;
 }
 
 /** Voices for `lang`, best first. Novelty voices are left out entirely. */
-export function rankVoices<V extends DeviceVoice>(voices: readonly V[], lang: VoiceLang): V[] {
+export function rankVoices<V extends DeviceVoice>(voices: readonly V[], lang: VoiceLang, tone: VoiceTone = DEFAULT_VOICE_TONE): V[] {
   return voices
-    .map((voice, index) => ({ voice, index, score: voiceScore(voice, lang) }))
+    .map((voice, index) => ({ voice, index, score: voiceScore(voice, lang, tone) }))
     .filter((item) => item.score > -150)
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map((item) => item.voice);
 }
 
 /** The voice to use: the person's saved choice if the device still has it, otherwise the best ranked one. */
-export function chooseVoice<V extends DeviceVoice>(voices: readonly V[], lang: VoiceLang, preferred?: string | null): V | null {
-  const ranked = rankVoices(voices, lang);
+export function chooseVoice<V extends DeviceVoice>(
+  voices: readonly V[],
+  lang: VoiceLang,
+  preferred?: string | null,
+  tone: VoiceTone = DEFAULT_VOICE_TONE,
+): V | null {
+  const ranked = rankVoices(voices, lang, tone);
   if (preferred) {
     const saved = ranked.find((voice) => voice.name === preferred) ?? voices.find((voice) => voice.name === preferred && voiceLanguage(voice) === lang);
     if (saved) return saved;
@@ -265,9 +300,11 @@ export type VoicePrefs = {
   rate: number;
   voices: Partial<Record<VoiceLang, string>>;
   stepWait: StepWait;
+  /** The kind of voice picked when the person has not chosen one by name. */
+  tone: VoiceTone;
 };
 
-export const DEFAULT_VOICE_PREFS: VoicePrefs = { rate: DEFAULT_RATE, voices: {}, stepWait: 0 };
+export const DEFAULT_VOICE_PREFS: VoicePrefs = { rate: DEFAULT_RATE, voices: {}, stepWait: 0, tone: DEFAULT_VOICE_TONE };
 
 export function clampRate(rate: unknown): number {
   const value = typeof rate === "number" && Number.isFinite(rate) ? rate : DEFAULT_RATE;
@@ -286,12 +323,13 @@ export function parseVoicePrefs(raw: string | null | undefined): VoicePrefs {
       }
     }
     const stepWait = (STEP_WAIT_CHOICES as readonly unknown[]).includes(value.stepWait) ? (value.stepWait as StepWait) : 0;
-    return { rate: clampRate(value.rate), voices, stepWait };
+    const tone = (VOICE_TONES as readonly unknown[]).includes(value.tone) ? (value.tone as VoiceTone) : DEFAULT_VOICE_TONE;
+    return { rate: clampRate(value.rate), voices, stepWait, tone };
   } catch {
     return { ...DEFAULT_VOICE_PREFS, voices: {} };
   }
 }
 
 export function serializeVoicePrefs(prefs: VoicePrefs): string {
-  return JSON.stringify({ rate: clampRate(prefs.rate), voices: prefs.voices, stepWait: prefs.stepWait });
+  return JSON.stringify({ rate: clampRate(prefs.rate), voices: prefs.voices, stepWait: prefs.stepWait, tone: prefs.tone });
 }
