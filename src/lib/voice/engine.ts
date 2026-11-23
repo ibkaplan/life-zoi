@@ -1,4 +1,6 @@
 import { audioFocus } from "@/lib/background-music/audio-focus";
+import { NEURAL_VOICES } from "@/lib/voice/neural/catalog";
+import { neuralActive, playClip, stopClip, synthesize, unlockNeuralAudio } from "@/lib/voice/neural/client";
 import {
   chooseVoice,
   clampRate,
@@ -219,8 +221,16 @@ function createPlayer() {
     timer = tick = watchdog = null;
   }
 
+  // Languages whose natural voice failed on this page: the device voice reads them instead.
+  const neuralBroken = new Set<VoiceLang>();
+
+  function naturalFor(lang: VoiceLang): boolean {
+    return !neuralBroken.has(lang) && neuralActive(lang);
+  }
+
   function cancelSpeech() {
     current = null;
+    stopClip();
     try {
       synth()?.cancel();
     } catch {
@@ -281,10 +291,56 @@ function createPlayer() {
     }, gap);
   }
 
+  /** Reads one sentence with the lifeZoi natural voice, made on this device. */
+  function speakNeuralAt(at: number) {
+    const segment = segments[at];
+    if (!segment) {
+      finish();
+      return;
+    }
+    ticket += 1;
+    const mine = ticket;
+    const rate = clampRate(readVoicePrefs().rate * (options.rateFactor ?? 1));
+    set({
+      status: "playing",
+      index: at,
+      block: segment.block,
+      lang: segment.lang,
+      voiceName: NEURAL_VOICES[segment.lang].name,
+      waitLeft: null,
+      problem: null,
+      problemLang: null,
+    });
+    const fallBack = () => {
+      if (mine !== ticket) return;
+      neuralBroken.add(segment.lang);
+      speakAt(at);
+    };
+    // A slow phone can take a while for the first sentence; after that, give up and use the device voice.
+    watchdog = setTimeout(fallBack, 25000);
+    synthesize(segment.lang, segment.text, rate)
+      .then((clip) => {
+        if (mine !== ticket) return;
+        if (watchdog) clearTimeout(watchdog);
+        watchdog = null;
+        // Make the next sentence while this one plays, so there is no gap.
+        const next = segments[at + 1];
+        if (next && naturalFor(next.lang)) void synthesize(next.lang, next.text, rate).catch(() => undefined);
+        return playClip(clip).then(() => {
+          if (mine === ticket) afterSentence(at);
+        });
+      })
+      .catch(fallBack);
+  }
+
   function speakAt(at: number) {
     clearTimers();
     const engine = synth();
     const segment = segments[at];
+    if (segment && naturalFor(segment.lang)) {
+      speakNeuralAt(at);
+      return;
+    }
     if (!engine || !segment) {
       finish();
       return;
@@ -370,13 +426,15 @@ function createPlayer() {
     },
     /** Starts reading. Anything already being read is stopped first. */
     play(owner: string, next: Segment[], opts: PlayOptions = {}, startAt = 0) {
+      // Called from a tap: phones only let sound start from one.
+      unlockNeuralAudio();
       const previous = options.onEnd;
       const previousOwner = state.owner;
       clearTimers();
       ticket += 1;
       cancelSpeech();
       if (previousOwner && previousOwner !== owner) previous?.();
-      if (!speechSupported()) {
+      if (!speechSupported() && !next.some((segment) => naturalFor(segment.lang))) {
         set({ ...IDLE, owner, problem: "unsupported" });
         return;
       }
@@ -417,6 +475,7 @@ function createPlayer() {
     },
     resume() {
       if (state.status !== "paused") return;
+      unlockNeuralAudio();
       if (pausedWait !== undefined) {
         const left = pausedWait;
         pausedWait = undefined;

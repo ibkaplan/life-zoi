@@ -954,5 +954,16 @@
  "Settings, Time and language, Speech, Add voices. In the Edge browser you also get free natural voices such as Aria, Jenny, Svetlana (Russian), and Polina (Ukrainian), marked online.": "Ρυθμίσεις, Ώρα και γλώσσα, Ομιλία, Προσθήκη φωνών. Στον browser Edge υπάρχουν επίσης δωρεάν φυσικές φωνές, όπως Aria, Jenny, Svetlana (Ρωσικά) και Polina (Ουκρανικά), με την ένδειξη online.",
  "Android": "Android",
  "Settings, Accessibility, Text-to-speech output. Choose Speech Services by Google, open its settings, Install voice data, and pick a female voice for each language.": "Ρυθμίσεις, Προσβασιμότητα, Έξοδος μετατροπής κειμένου σε ομιλία. Επιλέξτε τις Υπηρεσίες ομιλίας από την Google, ανοίξτε τις ρυθμίσεις τους, Εγκατάσταση φωνητικών δεδομένων, και διαλέξτε γυναικεία φωνή για κάθε γλώσσα.",
- "Voices marked online send the words being read to your browser's provider. LifeZoi Mind never uses online voices, because your conversation stays on your device.": "Οι φωνές με την ένδειξη online στέλνουν το κείμενο που διαβάζεται στον πάροχο του browser σας. Το LifeZoi Mind δεν χρησιμοποιεί ποτέ online φωνές, επειδή η συνομιλία σας μένει στη συσκευή σας."
+ "Voices marked online send the words being read to your browser's provider. LifeZoi Mind never uses online voices, because your conversation stays on your device.": "Οι φωνές με την ένδειξη online στέλνουν το κείμενο που διαβάζεται στον πάροχο του browser σας. Το LifeZoi Mind δεν χρησιμοποιεί ποτέ online φωνές, επειδή η συνομιλία σας μένει στη συσκευή σας.",
+ "lifeZoi natural voice: {name}": "Φυσική φωνή lifeZoi: {name}",
+ "Use the natural voice for {language}": "Χρήση της φυσικής φωνής για: {language}",
+ "Remove from this device": "Αφαίρεση από αυτή τη συσκευή",
+ "Download progress": "Πρόοδος λήψης",
+ "Downloading and checking the voice: {percent}%. You can keep using lifeZoi.": "Λήψη και έλεγχος της φωνής: {percent}%. Μπορείτε να συνεχίσετε να χρησιμοποιείτε το lifeZoi.",
+ "A free, more natural voice that runs on this device, so the words being read never leave it. It downloads about {size} MB once. Wi-Fi is best.": "Μια δωρεάν, πιο φυσική φωνή που λειτουργεί σε αυτή τη συσκευή, οπότε το κείμενο που διαβάζεται δεν φεύγει από αυτήν. Κατεβαίνει μία φορά, περίπου {size} MB. Καλύτερα με Wi-Fi.",
+ "The natural voice could not be downloaded or did not start on this device. lifeZoi keeps using the device voice.": "Η φυσική φωνή δεν μπόρεσε να κατέβει ή να ξεκινήσει σε αυτή τη συσκευή. Το lifeZoi συνεχίζει με τη φωνή της συσκευής.",
+ "Download natural voice": "Λήψη φυσικής φωνής",
+ "Voice license: {license}.": "Άδεια φωνής: {license}.",
+ "The lifeZoi natural voice {name} reads this language. The voice below is used only if it cannot start.": "Αυτή τη γλώσσα τη διαβάζει η φυσική φωνή lifeZoi {name}. Η φωνή παρακάτω χρησιμοποιείται μόνο αν εκείνη δεν ξεκινήσει.",
+ "The lifeZoi natural voices are free Piper voices. The voice file comes from huggingface.co and the speech program from cdn.jsdelivr.net, once. The voice then runs in this browser, and the words being read stay on this device.": "Οι φυσικές φωνές lifeZoi είναι δωρεάν φωνές Piper. Το αρχείο φωνής κατεβαίνει μία φορά από το huggingface.co και το πρόγραμμα ομιλίας από το cdn.jsdelivr.net. Μετά η φωνή λειτουργεί σε αυτόν τον browser και το κείμενο μένει στη συσκευή."
 }
