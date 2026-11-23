@@ -1,4 +1,5 @@
 import { respond, type ConversationState, type MindReply } from "@/lib/mind/conversation";
+import type { MindLang } from "@/lib/mind/lang";
 
 /**
  * The seam where an AI model could later be added to LifeZoi Mind without rebuilding it.
@@ -27,7 +28,7 @@ export type MindProviderInfo = {
 
 export interface MindProvider {
   info: MindProviderInfo;
-  respond(state: ConversationState, message: string): Promise<{ reply: MindReply; state: ConversationState }>;
+  respond(state: ConversationState, message: string, lang?: MindLang): Promise<{ reply: MindReply; state: ConversationState }>;
 }
 
 export const RULES_PROVIDER: MindProvider = {
@@ -40,8 +41,8 @@ export const RULES_PROVIDER: MindProvider = {
     cost: "Free. No service is called.",
     notes: "Replies are written in advance and chosen by rules. It recognizes common situations and asks one question at a time, but it does not understand language the way an AI model does.",
   },
-  async respond(state, message) {
-    return respond(state, message);
+  async respond(state, message, lang = "en") {
+    return respond(state, message, lang);
   },
 };
 
