@@ -16,7 +16,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const article = articleBySlug(slug);
   if (!article) notFound();
   return (
-    <MindShell title={article.title}>
+    <MindShell translated title={article.title}>
       <MindArticle article={article} />
     </MindShell>
   );

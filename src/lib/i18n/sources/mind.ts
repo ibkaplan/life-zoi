@@ -1,4 +1,5 @@
 import { MIND_AREAS } from "@/lib/mind/areas";
+import { ARTICLES } from "@/lib/mind/articles";
 import { compareResults, INSTRUMENTS, ITEM9_MESSAGE, NOT_INCLUDED, PHQ9 } from "@/lib/mind/assessments";
 import { EVIDENCE_LABELS } from "@/lib/mind/evidence";
 import { MIND_EXERCISES } from "@/lib/mind/exercises";
@@ -32,6 +33,8 @@ const sources: unknown[] = [
   REFLECTION_LABEL,
   REFLECTION_SCALE,
   comparisonText(),
+  // Psychology Encyclopedia articles. Reference titles stay in their original language.
+  ARTICLES.map((article) => [article.title, article.category, article.summary, article.sections.map((section) => [section.heading, section.paragraphs]), article.example.title, article.example.text]),
   LISTEN_ERRORS.map((error) => listenErrorMessage(error)),
   MIND_AREAS,
 ];
