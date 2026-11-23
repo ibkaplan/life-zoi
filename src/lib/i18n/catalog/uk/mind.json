@@ -259,7 +259,6 @@
  "Talk with LifeZoi Mind": "Поговоріть з LifeZoi Mind",
  "Your words stay in this browser tab and are cleared when you close it.": "Ваші слова залишаються в цій вкладці браузера й стираються, коли ви її закриваєте.",
  "How this works": "Як це працює",
- "LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian to talk in Russian.": "Цією мовою відповіді LifeZoi Mind поки що англійською. Можна писати англійською або перемкнути сайт на російську, щоб розмовляти російською.",
  "You (spoken)": "Ви (голосом)",
  "You (listening…)": "Ви (слухаю…)",
  "Suggested replies": "Запропоновані відповіді",
@@ -312,5 +311,7 @@
  "An optional, flexible week of small practices that you choose.": "Необов'язковий гнучкий тиждень невеликих практик, які ви обираєте самі.",
  "Plain-language articles with sources and evidence labels.": "Статті простою мовою з джерелами й позначками доказовості.",
  "Optional, private, and deletable. Off unless you turn it on.": "Необов'язково, приватно, можна видалити. Вимкнено, доки ви не ввімкнете.",
- "What happens to your words, and what LifeZoi Mind can and cannot do.": "Що відбувається з вашими словами і що LifeZoi Mind може й чого не може."
+ "What happens to your words, and what LifeZoi Mind can and cannot do.": "Що відбувається з вашими словами і що LifeZoi Mind може й чого не може.",
+ "This device has no Ukrainian voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.": "На цьому пристрої немає українського голосу, що працює на самому пристрої, тому відповіді показано лише текстом. LifeZoi Mind використовує для читання вашої розмови лише голоси на пристрої.",
+ "LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian or Ukrainian to talk in that language.": "Цією мовою відповіді LifeZoi Mind поки що англійською. Можна писати англійською або перемкнути сайт на російську чи українську, щоб розмовляти цією мовою."
 }
