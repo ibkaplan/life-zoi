@@ -10,7 +10,7 @@ function titleFor(id: string): string | null {
   const instrument = instrumentById(id);
   if (instrument) return instrument.name;
   const reflection = reflectionById(id);
-  return reflection ? `Self-reflection: ${reflection.title}` : null;
+  return reflection ? reflection.title : null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -23,7 +23,7 @@ export default async function AssessmentPage({ params }: { params: Promise<{ id:
   const title = titleFor(id);
   if (!title) notFound();
   return (
-    <MindShell title={title}>
+    <MindShell translated title={title}>
       <MindAssessment id={id} />
     </MindShell>
   );
