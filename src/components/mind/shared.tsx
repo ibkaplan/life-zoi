@@ -141,9 +141,7 @@ export function ArticleLinks({ slugs, title }: { slugs: readonly string[]; title
       <ul>
         {list.map((article) => (
           <li key={article.slug}>
-            <Link href={`/mind/library/${article.slug}`} lang="en">
-              {article.title}
-            </Link>{" "}
+            <Link href={`/mind/library/${article.slug}`}>{t(article.title)}</Link>{" "}
             <span className="hint">· {t("{minutes} min read", { minutes: article.minutes })}</span>
           </li>
         ))}

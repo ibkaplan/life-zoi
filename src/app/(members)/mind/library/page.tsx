@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function LibraryPage() {
   return (
-    <MindShell title="Psychology Encyclopedia" intro="Understand the mind in plain language, with links to the original sources.">
+    <MindShell translated title="Psychology Encyclopedia" intro="Understand the mind in plain language, with links to the original sources.">
       <MindLibrary />
     </MindShell>
   );
