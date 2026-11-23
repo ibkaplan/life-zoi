@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useLocale, useT } from "@/components/locale-provider";
 import { useDeviceVoices, useSpeechSupport, useVoicePrefs, useVoiceState, VoiceChoices } from "@/components/voice/read-aloud";
 import { ArticleLinks, ExerciseLinks, SafetyActions } from "@/components/mind/shared";
 import { initialConversation, OPENING_TEXT, OPENING_TOPICS, resultOpening, spokenReply, type ConversationState, type MindReply } from "@/lib/mind/conversation";
+import { mindLangFor, mindTranslator, type MindLang } from "@/lib/mind/lang";
 import { clearConversation, readConversation, writeConversation, type MindTurn } from "@/lib/mind/conversation-store";
 import { newId } from "@/lib/mind/progress";
 import { activeProvider } from "@/lib/mind/provider";
@@ -15,7 +17,6 @@ import { segmentsFromText } from "@/lib/voice/voices";
 const OWNER = "lifezoi-mind-talk";
 const VOICE_CONSENT_KEY = "lifezoi.mind.voice-consent.v1";
 const SPEAK_KEY = "lifezoi.mind.speak-replies.v1";
-const LANG = "en-US";
 
 type VoiceConsent = "none" | "local" | "browser";
 
@@ -36,8 +37,15 @@ function writeLocal(key: string, value: string | null) {
   }
 }
 
-function openingTurn(): MindTurn {
-  return { id: "opening", role: "mind", text: OPENING_TEXT, reply: { text: OPENING_TEXT, kind: "reply", quickReplies: OPENING_TOPICS, exercises: [], exerciseWhy: null, articles: [], distress: false, crisisKinds: [] } };
+/** The speech recognition language for the conversation's language. */
+function recognitionLang(lang: MindLang): string {
+  return lang === "ru" ? "ru-RU" : "en-US";
+}
+
+function openingTurn(lang: MindLang): MindTurn {
+  const tr = mindTranslator(lang);
+  const text = tr(OPENING_TEXT);
+  return { id: "opening", role: "mind", text, reply: { text, kind: "reply", quickReplies: OPENING_TOPICS.map((topic) => tr(topic)), exercises: [], exerciseWhy: null, articles: [], distress: false, crisisKinds: [] } };
 }
 
 function MicIcon() {
@@ -69,17 +77,22 @@ function Wave() {
 }
 
 function ReplyBody({ reply }: { reply: MindReply }) {
+  const t = useT();
   return (
     <>
       {reply.kind === "crisis" ? <SafetyActions /> : null}
       <ExerciseLinks ids={reply.exercises} why={reply.exerciseWhy} />
-      <ArticleLinks slugs={reply.articles} title="Related articles (they open without losing this conversation)" />
+      <ArticleLinks slugs={reply.articles} title={t("Related articles (they open without losing this conversation)")} />
     </>
   );
 }
 
 export function MindTalk() {
-  const [turns, setTurns] = useState<MindTurn[]>(() => [openingTurn()]);
+  const t = useT();
+  const { locale } = useLocale();
+  const lang = mindLangFor(locale);
+  const listenLang = recognitionLang(lang);
+  const [turns, setTurns] = useState<MindTurn[]>(() => [openingTurn(lang)]);
   const [state, setState] = useState<ConversationState>(() => initialConversation());
   const [draft, setDraft] = useState("");
   const [hydrated, setHydrated] = useState(false);
@@ -113,10 +126,10 @@ export function MindTalk() {
     const stored = readConversation();
     /* eslint-disable react-hooks/set-state-in-effect -- reading browser-only storage once after hydration */
     if (stored) {
-      const base = stored.turns.length > 0 ? stored.turns : [openingTurn()];
+      const base = stored.turns.length > 0 ? stored.turns : [openingTurn(lang)];
       setState(stored.state);
       if (stored.state.result && stored.state.resultStep === 0 && base[base.length - 1]?.id !== "result-opening") {
-        const opening = resultOpening(stored.state.result);
+        const opening = resultOpening(stored.state.result, lang);
         setTurns([...base.filter((turn) => turn.id !== "result-opening"), { id: "result-opening", role: "mind", text: opening.text, reply: opening }]);
       } else {
         setTurns(base);
@@ -128,14 +141,36 @@ export function MindTalk() {
     setCanListen(listeningSupported());
     setHydrated(true);
     /* eslint-enable react-hooks/set-state-in-effect */
-    void onDeviceRecognition(LANG).then((result) => setLocalAvailable(result === "available"));
     return () => {
       listenerRef.current?.abort();
       handsFreeRef.current = false;
       userStopped.current = true;
       player.stop(OWNER);
     };
+    // Storage is read once per visit. The language is handled by the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The language is known only after hydration. Until the person has written anything,
+  // show the opening (or a questionnaire result) in that language.
+  const resultRef = useRef(state.result);
+  useEffect(() => {
+    resultRef.current = state.result;
+  }, [state.result]);
+  useEffect(() => {
+    void onDeviceRecognition(listenLang).then((result) => setLocalAvailable(result === "available"));
+    setTurns((current) => {
+      if (current.some((turn) => turn.role === "person")) return current;
+      return current.map((turn) => {
+        if (turn.id === "opening") return openingTurn(lang);
+        if (turn.id === "result-opening" && resultRef.current) {
+          const opening = resultOpening(resultRef.current, lang);
+          return { ...turn, text: opening.text, reply: opening };
+        }
+        return turn;
+      });
+    });
+  }, [lang, listenLang]);
 
   useEffect(() => {
     if (hydrated) writeConversation({ turns, state });
@@ -160,7 +195,7 @@ export function MindTalk() {
       setVoiceError(null);
       setInterim("");
       const listener = listenOnce({
-        lang: LANG,
+        lang: listenLang,
         local: mode === "local",
         onStart: () => setListening(true),
         onInterim: (text) => setInterim(text),
@@ -171,9 +206,9 @@ export function MindTalk() {
         onError: (error) => {
           setInterim("");
           if (error === "no-speech" && handsFreeRef.current) {
-            setVoiceError("I didn't hear anything, so I've stopped listening. Tap the microphone when you're ready.");
+            setVoiceError(t("I didn't hear anything, so I've stopped listening. Tap the microphone when you're ready."));
           } else {
-            setVoiceError(listenErrorMessage(error));
+            setVoiceError(t(listenErrorMessage(error)));
           }
           if (error === "denied" || error === "site-blocked" || error === "service-blocked") setHandsFree(false);
         },
@@ -183,9 +218,9 @@ export function MindTalk() {
         },
       });
       listenerRef.current = listener;
-      if (!listener) setVoiceError(listenErrorMessage("other"));
+      if (!listener) setVoiceError(t(listenErrorMessage("other")));
     },
-    [],
+    [listenLang, t],
   );
 
   const speak = useCallback(
@@ -194,7 +229,7 @@ export function MindTalk() {
         if (handsFreeRef.current && consent !== "none") startListening(consent);
         return;
       }
-      player.play(OWNER, segmentsFromText(spokenReply(reply), "en"), {
+      player.play(OWNER, segmentsFromText(spokenReply(reply, lang), lang), {
         stepWait: 0,
         localOnly: true,
         onEnd: () => {
@@ -203,14 +238,14 @@ export function MindTalk() {
         },
       });
     },
-    [speakReplies, canSpeak, consent, startListening],
+    [speakReplies, canSpeak, consent, startListening, lang],
   );
 
   const send = useCallback(
     async (text: string, via: "voice" | "text") => {
       const message = text.trim();
       if (!message) return;
-      const turn = await provider.respond(state, message);
+      const turn = await provider.respond(state, message, lang);
       setState(turn.state);
       setTurns((current) => [
         ...current,
@@ -220,7 +255,7 @@ export function MindTalk() {
       if (turn.reply.kind === "crisis") setHandsFree(false);
       if (via === "voice" || speakReplies) speak(turn.reply);
     },
-    [provider, state, speak, speakReplies],
+    [provider, state, speak, speakReplies, lang],
   );
 
   useEffect(() => {
@@ -260,46 +295,47 @@ export function MindTalk() {
     userStopped.current = false;
     clearConversation();
     setState(initialConversation());
-    setTurns([openingTurn()]);
+    setTurns([openingTurn(lang)]);
     setHandsFree(false);
   }
 
   const last = turns[turns.length - 1];
   const quick = last?.role === "mind" ? (last.reply?.quickReplies ?? []) : [];
   const micState = listening ? "listening" : speaking ? "speaking" : "idle";
-  const micLabel = listening ? "Stop listening and send" : speaking ? "Interrupt and speak" : "Speak to LifeZoi Mind";
+  const micLabel = listening ? t("Stop listening and send") : speaking ? t("Interrupt and speak") : t("Speak to LifeZoi Mind");
 
   return (
     <section className="mind-talk" aria-labelledby="mind-talk-title">
       <div className="stack">
-        <h2 id="mind-talk-title">Talk with LifeZoi Mind</h2>
+        <h2 id="mind-talk-title">{t("Talk with LifeZoi Mind")}</h2>
         <p className="hint">
-          {provider.info.label}: {provider.info.notes} Your words stay in this browser tab and are cleared when you close it.{" "}
-          <Link href="/mind/privacy">How this works</Link>
+          {t(provider.info.label)}: {t(provider.info.notes)} {t("Your words stay in this browser tab and are cleared when you close it.")}{" "}
+          <Link href="/mind/privacy">{t("How this works")}</Link>
         </p>
+        {lang === "en" && locale !== "en" ? <p className="mind-note">{t("LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian to talk in Russian.")}</p> : null}
       </div>
 
-      <div className="mind-thread" ref={threadRef} role="log" aria-live="polite" aria-label="Conversation">
+      <div className="mind-thread" ref={threadRef} role="log" aria-live="polite" aria-label={t("Conversation")}>
         {turns.map((turn) => (
           <div
             key={turn.id}
             className={`mind-bubble ${turn.role === "person" ? "mind-bubble-person" : "mind-bubble-mind"}${turn.reply?.kind === "crisis" ? " mind-bubble-crisis" : ""}`}
           >
-            <span className="mind-bubble-who">{turn.role === "person" ? (turn.via === "voice" ? "You (spoken)" : "You") : "LifeZoi Mind"}</span>
+            <span className="mind-bubble-who">{turn.role === "person" ? (turn.via === "voice" ? t("You (spoken)") : t("You")) : "LifeZoi Mind"}</span>
             <p>{turn.text}</p>
             {turn.reply ? <ReplyBody reply={turn.reply} /> : null}
           </div>
         ))}
         {listening && interim ? (
           <div className="mind-bubble mind-bubble-person" aria-live="off">
-            <span className="mind-bubble-who">You (listening…)</span>
+            <span className="mind-bubble-who">{t("You (listening…)")}</span>
             <p className="mind-interim">{interim}</p>
           </div>
         ) : null}
       </div>
 
       {quick.length > 0 ? (
-        <div className="mind-chips" role="group" aria-label="Suggested replies">
+        <div className="mind-chips" role="group" aria-label={t("Suggested replies")}>
           {quick.map((option) => (
             <button key={option} type="button" className="mind-chip" onClick={() => void send(option, "text")}>
               {option}
@@ -324,26 +360,26 @@ export function MindTalk() {
           {listening ? (
             <>
               <span className="mind-status-label">
-                <Wave /> Listening…
+                <Wave /> {t("Listening…")}
               </span>
-              <span className="mind-status-detail">Speak naturally. Tap the button again when you have finished.</span>
+              <span className="mind-status-detail">{t("Speak naturally. Tap the button again when you have finished.")}</span>
             </>
           ) : speaking ? (
             <>
               <span className="mind-status-label">
-                <Wave /> LifeZoi Mind is speaking
+                <Wave /> {t("LifeZoi Mind is speaking")}
               </span>
-              <span className="mind-status-detail">Tap the microphone to interrupt and speak, or use the buttons to pause.</span>
+              <span className="mind-status-detail">{t("Tap the microphone to interrupt and speak, or use the buttons to pause.")}</span>
             </>
           ) : canListen === false ? (
             <>
-              <span className="mind-status-label">Voice input is not available in this browser</span>
-              <span className="mind-status-detail">You can type below. Chrome, Edge, and Safari support speaking to the page.</span>
+              <span className="mind-status-label">{t("Voice input is not available in this browser")}</span>
+              <span className="mind-status-detail">{t("You can type below. Chrome, Edge, and Safari support speaking to the page.")}</span>
             </>
           ) : (
             <>
-              <span className="mind-status-label">Tap the microphone to speak</span>
-              <span className="mind-status-detail">Or type your message below. You can switch at any time.</span>
+              <span className="mind-status-label">{t("Tap the microphone to speak")}</span>
+              <span className="mind-status-detail">{t("Or type your message below. You can switch at any time.")}</span>
             </>
           )}
         </div>
@@ -351,11 +387,11 @@ export function MindTalk() {
           <div className="actions">
             {voice.status === "paused" ? (
               <button type="button" className="btn btn-secondary btn-small" onClick={() => player.resume()}>
-                Resume
+                {t("Resume")}
               </button>
             ) : (
               <button type="button" className="btn btn-secondary btn-small" onClick={() => player.pause()}>
-                Pause
+                {t("Pause")}
               </button>
             )}
             <button
@@ -367,7 +403,7 @@ export function MindTalk() {
                 userStopped.current = false;
               }}
             >
-              Stop speaking
+              {t("Stop speaking")}
             </button>
           </div>
         ) : null}
@@ -380,34 +416,38 @@ export function MindTalk() {
       ) : null}
       {voice.owner === OWNER && voice.problem === "no-voice" ? (
         <p className="mind-note" role="alert">
-          This device has no English voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.
+          {lang === "ru"
+            ? t("This device has no Russian voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.")
+            : t("This device has no English voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.")}
         </p>
       ) : null}
 
       {asking ? (
         <div className="mind-dialog" role="dialog" aria-labelledby="mind-voice-consent-title">
-          <h3 id="mind-voice-consent-title">Before you use the microphone</h3>
+          <h3 id="mind-voice-consent-title">{t("Before you use the microphone")}</h3>
           <p>
-            LifeZoi Mind uses your browser&apos;s built-in speech recognition, which is free. LifeZoi does not record or store your voice. But depending on your browser, the sound of your voice may be sent to the browser maker&apos;s speech service to be turned into text (for example Google for Chrome, or Apple for Safari), under their privacy terms.
+            {t(
+              "LifeZoi Mind uses your browser's built-in speech recognition, which is free. LifeZoi does not record or store your voice. But depending on your browser, the sound of your voice may be sent to the browser maker's speech service to be turned into text (for example Google for Chrome, or Apple for Safari), under their privacy terms.",
+            )}
           </p>
           {localAvailable ? (
             <p>
-              <strong>Good news:</strong> this browser can turn speech into text on your device, so your voice does not have to leave it.
+              {t("Good news: this browser can turn speech into text on your device, so your voice does not have to leave it.")}
             </p>
           ) : (
-            <p>This browser did not report on-device speech recognition, so it may send your audio to its speech service.</p>
+            <p>{t("This browser did not report on-device speech recognition, so it may send your audio to its speech service.")}</p>
           )}
           <div className="actions">
             {localAvailable ? (
               <button type="button" className="btn btn-primary" onClick={() => chooseConsent("local")}>
-                Use on-device recognition only
+                {t("Use on-device recognition only")}
               </button>
             ) : null}
             <button type="button" className={localAvailable ? "btn btn-secondary" : "btn btn-primary"} onClick={() => chooseConsent("browser")}>
-              {localAvailable ? "Let the browser decide" : "I understand, use the microphone"}
+              {localAvailable ? t("Let the browser decide") : t("I understand, use the microphone")}
             </button>
             <button type="button" className="btn btn-ghost" onClick={() => setAsking(false)}>
-              No thanks, I&apos;ll type
+              {t("No thanks, I'll type")}
             </button>
           </div>
         </div>
@@ -415,12 +455,12 @@ export function MindTalk() {
 
       <form className="mind-compose" onSubmit={onSubmit}>
         <label htmlFor="mind-draft" className="mind-sr">
-          Your message
+          {t("Your message")}
         </label>
         <textarea
           id="mind-draft"
           value={draft}
-          placeholder="Type what's on your mind…"
+          placeholder={t("Type what's on your mind…")}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.shiftKey) {
@@ -434,17 +474,17 @@ export function MindTalk() {
         />
         <div className="mind-compose-row">
           <button type="submit" className="btn btn-primary" disabled={!draft.trim()}>
-            Send
+            {t("Send")}
           </button>
           <button type="button" className="btn btn-ghost" onClick={restart}>
-            Start a new conversation
+            {t("Start a new conversation")}
           </button>
         </div>
       </form>
 
       <details className="card stack">
         <summary>
-          <strong>Voice settings</strong>
+          <strong>{t("Voice settings")}</strong>
         </summary>
         <label className="mind-toggle">
           <input
@@ -461,37 +501,39 @@ export function MindTalk() {
               }
             }}
           />
-          Read replies aloud
+          {t("Read replies aloud")}
         </label>
         <label className="mind-toggle">
           <input type="checkbox" checked={handsFree} disabled={canListen === false} onChange={(event) => setHandsFree(event.target.checked)} />
-          Continuous voice conversation: listen again after each reply
+          {t("Continuous voice conversation: listen again after each reply")}
         </label>
-        {canSpeak === false ? <p className="hint">This browser cannot read aloud. Replies are shown as text.</p> : null}
+        {canSpeak === false ? <p className="hint">{t("This browser cannot read aloud. Replies are shown as text.")}</p> : null}
         <p className="hint">
-          Voices come from your device, so the choice depends on your phone or computer. Devices do not tell web pages whether a voice is male or female, so try a few and choose one that sounds warm and calm to you. Only voices that run on your device are used for your conversation.
+          {t(
+            "Voices come from your device, so the choice depends on your phone or computer. Devices do not tell web pages whether a voice is male or female, so try a few and choose one that sounds warm and calm to you. Only voices that run on your device are used for your conversation.",
+          )}
         </p>
         <button type="button" className="btn btn-secondary btn-small" onClick={() => setShowVoices((value) => !value)} aria-expanded={showVoices}>
-          {showVoices ? "Hide voice choice" : "Choose a voice and speed"}
+          {showVoices ? t("Hide voice choice") : t("Choose a voice and speed")}
         </button>
         {showVoices ? (
           <div className="stack">
-            <VoiceChoices lang="en" steps={false} rate={prefs.rate} stepWait={prefs.stepWait} />
+            <VoiceChoices lang={lang} steps={false} rate={prefs.rate} stepWait={prefs.stepWait} />
             <button
               type="button"
               className="btn btn-secondary btn-small"
               disabled={voices.length === 0}
-              onClick={() => player.play(OWNER, segmentsFromText("Hello. I'm here to listen. Take a slow breath, and tell me what's on your mind.", "en"), { stepWait: 0, localOnly: true })}
+              onClick={() => player.play(OWNER, segmentsFromText(t("Hello. I'm here to listen. Take a slow breath, and tell me what's on your mind."), lang), { stepWait: 0, localOnly: true })}
             >
-              Try this voice
+              {t("Try this voice")}
             </button>
           </div>
         ) : null}
         {consent !== "none" ? (
           <p className="hint">
-            Microphone choice: {consent === "local" ? "on-device recognition only" : "the browser decides where speech is recognized"}.{" "}
+            {t("Microphone choice: {choice}.", { choice: consent === "local" ? t("on-device recognition only") : t("the browser decides where speech is recognized") })}{" "}
             <button type="button" className="btn btn-ghost btn-small" onClick={() => chooseConsent("none")}>
-              Reset
+              {t("Reset")}
             </button>
           </p>
         ) : null}

@@ -113,33 +113,38 @@ export function MindShell({
 }
 
 export function ExerciseLinks({ ids, why }: { ids: readonly string[]; why?: string | null }) {
+  const t = useT();
   const list = ids.map((id) => exerciseById(id)).filter((entry) => entry !== null);
   if (list.length === 0) return null;
   return (
     <div className="mind-suggest">
-      <p className="mind-suggest-title">Exercises you could try (optional)</p>
+      <p className="mind-suggest-title">{t("Exercises you could try (optional)")}</p>
       <ul>
         {list.map((exercise) => (
           <li key={exercise.id}>
-            <Link href={`/mind/exercises/${exercise.id}`}>{exercise.title}</Link> — {exercise.summary}
+            <Link href={`/mind/exercises/${exercise.id}`}>{t(exercise.title)}</Link> — {t(exercise.summary)}
           </li>
         ))}
       </ul>
-      {why ? <p className="hint">Why these may help: {why}</p> : null}
+      {why ? <p className="hint">{t("Why these may help: {why}", { why: t(why) })}</p> : null}
     </div>
   );
 }
 
-export function ArticleLinks({ slugs, title = "From the LifeZoi Psychology Encyclopedia" }: { slugs: readonly string[]; title?: string }) {
+export function ArticleLinks({ slugs, title }: { slugs: readonly string[]; title?: string }) {
+  const t = useT();
   const list = slugs.map((slug) => articleBySlug(slug)).filter((entry) => entry !== null);
   if (list.length === 0) return null;
   return (
     <div className="mind-suggest">
-      <p className="mind-suggest-title">{title}</p>
+      <p className="mind-suggest-title">{title ?? t("From the LifeZoi Psychology Encyclopedia")}</p>
       <ul>
         {list.map((article) => (
           <li key={article.slug}>
-            <Link href={`/mind/library/${article.slug}`}>{article.title}</Link> <span className="hint">· {article.minutes} min read</span>
+            <Link href={`/mind/library/${article.slug}`} lang="en">
+              {article.title}
+            </Link>{" "}
+            <span className="hint">· {t("{minutes} min read", { minutes: article.minutes })}</span>
           </li>
         ))}
       </ul>

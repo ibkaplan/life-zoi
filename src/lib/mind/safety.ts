@@ -91,7 +91,7 @@ export const STANDING_SAFETY_LINE =
 export type CrisisMessage = { title: string; paragraphs: string[] };
 
 /** What LifeZoi Mind says instead of ordinary coaching when a crisis is detected. */
-export function crisisMessage(kinds: readonly CrisisKind[]): CrisisMessage {
+export function crisisMessage(kinds: readonly CrisisKind[], tr: (english: string) => string = (english) => english): CrisisMessage {
   const paragraphs: string[] = [];
   const emotional = kinds.includes("suicide") || kinds.includes("self-harm");
   const danger = kinds.includes("immediate-danger");
@@ -99,26 +99,26 @@ export function crisisMessage(kinds: readonly CrisisKind[]): CrisisMessage {
   const medical = kinds.includes("medical-emergency");
   if (emotional) {
     paragraphs.push(
-      "Thank you for telling me. What you just wrote matters, and you deserve real support from a person right now, not only from an app.",
-      "Please call or text 988 to reach the 988 Suicide & Crisis Lifeline. It is free, confidential, and open 24 hours a day. If you might act on these thoughts, or you have already hurt yourself, call 911 or go to the nearest emergency department now.",
-      "If you can, move away from anything you could use to hurt yourself, and let someone near you know how you are feeling.",
+      tr("Thank you for telling me. What you just wrote matters, and you deserve real support from a person right now, not only from an app."),
+      tr("Please call or text 988 to reach the 988 Suicide & Crisis Lifeline. It is free, confidential, and open 24 hours a day. If you might act on these thoughts, or you have already hurt yourself, call 911 or go to the nearest emergency department now."),
+      tr("If you can, move away from anything you could use to hurt yourself, and let someone near you know how you are feeling."),
     );
   }
   if (danger) {
-    paragraphs.push("If you are in danger right now, call 911. If it is safe, move to a place where other people are around.");
+    paragraphs.push(tr("If you are in danger right now, call 911. If it is safe, move to a place where other people are around."));
   }
   if (others) {
     paragraphs.push(
-      "It sounds like you may be thinking about hurting someone. Please step away from the situation now. If anyone is in immediate danger, call 911. You can also call or text 988 to talk with a trained counselor about what you are feeling.",
+      tr("It sounds like you may be thinking about hurting someone. Please step away from the situation now. If anyone is in immediate danger, call 911. You can also call or text 988 to talk with a trained counselor about what you are feeling."),
     );
   }
   if (medical) {
-    paragraphs.push("This may be a medical emergency. LifeZoi Mind cannot assess symptoms. Call 911 or go to the nearest emergency department.");
+    paragraphs.push(tr("This may be a medical emergency. LifeZoi Mind cannot assess symptoms. Call 911 or go to the nearest emergency department."));
   }
   paragraphs.push(
-    "I have paused the ordinary conversation. LifeZoi Mind is not a crisis counselor and cannot contact anyone for you. When you are safe, you are welcome to come back and keep talking.",
+    tr("I have paused the ordinary conversation. LifeZoi Mind is not a crisis counselor and cannot contact anyone for you. When you are safe, you are welcome to come back and keep talking."),
   );
-  return { title: "Your safety comes first", paragraphs };
+  return { title: tr("Your safety comes first"), paragraphs };
 }
 
 export const DISTRESS_NOTE =

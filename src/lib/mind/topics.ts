@@ -431,8 +431,9 @@ export function mentionedPerson(text: string): string | null {
   return match ? `your ${match[2].toLowerCase()}` : null;
 }
 
-export function fillPerson(text: string, person: string | null, topic: Topic): string {
-  return text.replace(/\{person\}/g, person ?? topic.personFallback ?? "them");
+/** `person` is already in the reply's language; `tr` translates the fallback. */
+export function fillPerson(text: string, person: string | null, topic: Topic, tr: (english: string) => string = (english) => english): string {
+  return text.replace(/\{person\}/g, person ?? tr(topic.personFallback ?? "them"));
 }
 
 export function detectTopic(text: string): Topic | null {

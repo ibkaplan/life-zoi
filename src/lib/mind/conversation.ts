@@ -1,6 +1,7 @@
 import type { CrisisKind } from "@/lib/emotional-wellness/types";
 import { articleBySlug, recommendArticles } from "@/lib/mind/articles";
 import { instrumentById, type InstrumentId } from "@/lib/mind/assessments";
+import { mindCues, mindTranslator, type MindLang, type MindTranslate } from "@/lib/mind/lang";
 import { checkSafety, crisisMessage, DISTRESS_NOTE } from "@/lib/mind/safety";
 import { detectTopic, fillPerson, mentionedPerson, topicById, TOPICS, type Topic, type TopicId } from "@/lib/mind/topics";
 
@@ -113,8 +114,8 @@ const EMOTION_REFLECTIONS: [RegExp, string][] = [
   [/\b(relieved|better|calmer|helps|helped)\b/i, "I'm glad that feels a little lighter."],
 ];
 
-function reflect(message: string): string | null {
-  for (const [pattern, text] of EMOTION_REFLECTIONS) if (pattern.test(message)) return text;
+function reflect(message: string, tr: MindTranslate): string | null {
+  for (const [pattern, text] of EMOTION_REFLECTIONS) if (pattern.test(message)) return tr(text);
   return null;
 }
 
@@ -161,30 +162,42 @@ const RESULT_QUESTIONS: Record<InstrumentId, string[]> = {
 };
 
 /** The first message after a questionnaire. It never treats the score as a diagnosis. */
-export function resultOpening(result: ResultContext): MindReply {
+export function resultOpening(result: ResultContext, lang: MindLang = "en"): MindReply {
+  const tr = mindTranslator(lang);
   const instrument = instrumentById(result.instrument);
-  const subject = result.instrument === "gad7" ? "anxiety symptoms" : "depression symptoms";
+  const anxiety = result.instrument === "gad7";
   const level =
-    result.band === "Minimal" ? `few ${subject}` : result.band === "Mild" ? `some ${subject}` : `elevated ${subject}`;
+    result.band === "Minimal"
+      ? anxiety
+        ? tr("few anxiety symptoms")
+        : tr("few depression symptoms")
+      : result.band === "Mild"
+        ? anxiety
+          ? tr("some anxiety symptoms")
+          : tr("some depression symptoms")
+        : anxiety
+          ? tr("elevated anxiety symptoms")
+          : tr("elevated depression symptoms");
   const paragraphs = [
-    `Your answers on the ${instrument?.shortName ?? "questionnaire"} indicate that you may be experiencing ${level} over the last two weeks. This questionnaire cannot diagnose a condition, and it cannot tell us what is causing how you feel, but it can help us understand what you have been experiencing.`,
+    tr(
+      "Your answers on the {name} indicate that you may be experiencing {level} over the last two weeks. This questionnaire cannot diagnose a condition, and it cannot tell us what is causing how you feel, but it can help us understand what you have been experiencing.",
+      { name: instrument?.shortName ?? tr("questionnaire"), level },
+    ),
   ];
   if (result.item9Positive) {
-    paragraphs.push(
-      "You also answered that you have had thoughts of being better off dead or of hurting yourself. Please keep the 988 Lifeline in mind: you can call or text 988 at any time, and call 911 if you might act on these thoughts. Please tell a doctor or someone you trust about this answer too.",
-    );
+    paragraphs.push(tr("You also answered that you have had thoughts of being better off dead or of hurting yourself. Please keep the 988 Lifeline in mind: you can call or text 988 at any time, and call 911 if you might act on these thoughts. Please tell a doctor or someone you trust about this answer too."));
   }
   if (result.suggestFollowUp) {
-    paragraphs.push("At this level, the questionnaire's developers suggest talking with a doctor or mental health professional, who can look at the whole picture with you.");
+    paragraphs.push(tr("At this level, the questionnaire's developers suggest talking with a doctor or mental health professional, who can look at the whole picture with you."));
   }
-  paragraphs.push("Would you like to explore what may be contributing to these feelings?");
+  paragraphs.push(tr("Would you like to explore what may be contributing to these feelings?"));
   return reply(paragraphs.join("\n\n"), "reply", {
-    quickReplies: ["Yes, let's explore", "Not right now"],
+    quickReplies: [tr("Yes, let's explore"), tr("Not right now")],
     distress: result.item9Positive,
   });
 }
 
-function resultTurn(state: ConversationState, message: string): { reply: MindReply; state: ConversationState } | null {
+function resultTurn(state: ConversationState, message: string, original: string, tr: MindTranslate): { reply: MindReply; state: ConversationState } | null {
   const result = state.result;
   if (!result) return null;
   const questions = RESULT_QUESTIONS[result.instrument];
@@ -194,43 +207,43 @@ function resultTurn(state: ConversationState, message: string): { reply: MindRep
       return {
         state: { ...state, result: null, resultStep: 0 },
         reply: reply(
-          "That's completely fine. You don't have to explore anything you're not ready for. If you'd like, you can try a short exercise, read about what the questionnaire measures, or simply tell me about your day.",
+          tr("That's completely fine. You don't have to explore anything you're not ready for. If you'd like, you can try a short exercise, read about what the questionnaire measures, or simply tell me about your day."),
           "reply",
-          { exercises: instrument?.exercises.slice(0, 2) ?? [], articles: instrument?.articles.slice(0, 2) ?? [], quickReplies: ["Tell me about an exercise", "I'd like to talk about my day"] },
+          { exercises: instrument?.exercises.slice(0, 2) ?? [], articles: instrument?.articles.slice(0, 2) ?? [], quickReplies: [tr("Tell me about an exercise"), tr("I'd like to talk about my day")] },
         ),
       };
     }
-    if (!ACCEPT.test(message) && message.split(/\s+/).length > 4) {
+    if (!ACCEPT.test(message) && original.split(/\s+/).length > 4) {
       // They started talking about it directly: treat it as the first answer.
-      return resultTurn({ ...state, resultStep: 1, asked: [...state.asked] }, message);
+      return resultTurn({ ...state, resultStep: 1, asked: [...state.asked] }, message, original, tr);
     }
-    return { state: { ...state, resultStep: 1 }, reply: reply(`Thank you. Let's take it one question at a time, and you can skip any of them. ${questions[0]}`) };
+    return { state: { ...state, resultStep: 1 }, reply: reply(`${tr("Thank you. Let's take it one question at a time, and you can skip any of them.")} ${tr(questions[0])}`) };
   }
   const answered = state.resultStep; // 1-based index of the question just answered
-  const reflection = UNSURE.test(message) ? "That's okay, it's not always easy to put into words." : (reflect(message) ?? "Thank you for sharing that.");
+  const reflection = UNSURE.test(message) ? tr("That's okay, it's not always easy to put into words.") : (reflect(message, tr) ?? tr("Thank you for sharing that."));
   if (answered < questions.length) {
-    return { state: { ...state, resultStep: answered + 1 }, reply: reply(`${reflection} ${questions[answered]}`) };
+    return { state: { ...state, resultStep: answered + 1 }, reply: reply(`${reflection} ${tr(questions[answered])}`) };
   }
   // All questions answered: educational guidance, exercises, articles, and professional help where it fits.
   const topic = detectTopic(message) ?? (result.instrument === "gad7" ? topicById("anxiety") : topicById("low-mood"));
   const paragraphs = [
-    `${reflection} Thank you for talking this through with me. From what you've shared, a few things may be worth trying, at your own pace and only if they feel right.`,
+    `${reflection} ${tr("Thank you for talking this through with me. From what you've shared, a few things may be worth trying, at your own pace and only if they feel right.")}`,
     result.instrument === "gad7"
-      ? "When worry is frequent, it often helps to calm the body first, then sort worries into ones you can act on and ones you can't. Regular sleep, movement, and limiting caffeine can also make a difference."
-      : "When mood is low, small, doable activities and staying in touch with people can gently help, even before you feel like it. Regular sleep, daylight, and movement support mood too.",
+      ? tr("When worry is frequent, it often helps to calm the body first, then sort worries into ones you can act on and ones you can't. Regular sleep, movement, and limiting caffeine can also make a difference.")
+      : tr("When mood is low, small, doable activities and staying in touch with people can gently help, even before you feel like it. Regular sleep, daylight, and movement support mood too."),
   ];
   if (result.suggestFollowUp || result.item9Positive) {
-    paragraphs.push("Please also consider talking with a doctor or mental health professional. They can assess what is going on, which a questionnaire and an app cannot do, and effective help is available.");
+    paragraphs.push(tr("Please also consider talking with a doctor or mental health professional. They can assess what is going on, which a questionnaire and an app cannot do, and effective help is available."));
   } else {
-    paragraphs.push("If these feelings continue or get stronger, talking with a doctor or mental health professional is always a good option.");
+    paragraphs.push(tr("If these feelings continue or get stronger, talking with a doctor or mental health professional is always a good option."));
   }
   return {
     state: { ...state, result: null, resultStep: 0, topic: topic.id, step: 4, suggestedProfessional: true },
     reply: reply(paragraphs.join("\n\n"), "reply", {
       exercises: instrument?.exercises.slice(0, 3) ?? [],
-      exerciseWhy: topic.why,
+      exerciseWhy: tr(topic.why),
       articles: instrument?.articles.slice(0, 2) ?? [],
-      quickReplies: ["I'd like to keep talking", "Show me the 7-day plan"],
+      quickReplies: [tr("I'd like to keep talking"), tr("Show me the 7-day plan")],
       distress: result.item9Positive,
     }),
   };
@@ -248,15 +261,18 @@ function encyclopediaAnswer(message: string): MindReply | null {
 /**
  * One turn of the conversation. Safety comes first, then boundaries, then the topic flow.
  */
-export function respond(state: ConversationState, rawMessage: string): { reply: MindReply; state: ConversationState } {
-  const message = rawMessage.replace(/\s+/g, " ").trim();
+export function respond(state: ConversationState, rawMessage: string, lang: MindLang = "en"): { reply: MindReply; state: ConversationState } {
+  const tr = mindTranslator(lang);
+  const original = rawMessage.replace(/\s+/g, " ").trim();
+  // Patterns read English keywords. For another language, recognizable wording becomes keywords first.
+  const message = mindCues(lang, original);
   const next: ConversationState = { ...state, turns: state.turns + 1 };
-  if (!message) return { state, reply: reply("Take your time. Write or say a few words when you're ready.") };
+  if (!original) return { state, reply: reply(tr("Take your time. Write or say a few words when you're ready.")) };
 
   // 1. Safety, before anything else.
-  const safety = checkSafety(message);
+  const safety = checkSafety(original);
   if (safety.level === "crisis") {
-    const crisis = crisisMessage(safety.kinds);
+    const crisis = crisisMessage(safety.kinds, tr);
     return {
       state: { ...next, crisis: true },
       reply: reply([crisis.title, ...crisis.paragraphs].join("\n\n"), "crisis", { crisisKinds: safety.kinds }),
@@ -268,9 +284,9 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     return {
       state: next,
       reply: reply(
-        "I can't advise on starting, stopping, or changing any medication, and it's important not to stop a prescribed medicine without talking with the person who prescribed it, because some need to be changed gradually. Your doctor or pharmacist can go through your questions with you. Would it help to talk about how you've been feeling, or to write down the questions you want to ask them?",
+        tr("I can't advise on starting, stopping, or changing any medication, and it's important not to stop a prescribed medicine without talking with the person who prescribed it, because some need to be changed gradually. Your doctor or pharmacist can go through your questions with you. Would it help to talk about how you've been feeling, or to write down the questions you want to ask them?"),
         "boundary",
-        { quickReplies: ["Talk about how I've been feeling", "Help me prepare questions"] },
+        { quickReplies: [tr("Talk about how I've been feeling"), tr("Help me prepare questions")] },
       ),
     };
   }
@@ -278,7 +294,7 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     return {
       state: next,
       reply: reply(
-        "That's an understandable question, and I'm not able to answer it. I can't diagnose any condition, and neither can a questionnaire on its own. A doctor or licensed mental health professional can assess what's going on. What I can do is help you understand what you've been experiencing, so you feel more prepared to talk with them. What have you been noticing most?",
+        tr("That's an understandable question, and I'm not able to answer it. I can't diagnose any condition, and neither can a questionnaire on its own. A doctor or licensed mental health professional can assess what's going on. What I can do is help you understand what you've been experiencing, so you feel more prepared to talk with them. What have you been noticing most?"),
         "boundary",
         { articles: recommendArticles(message, 2).map((article) => article.slug) },
       ),
@@ -288,7 +304,7 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     return {
       state: next,
       reply: reply(
-        "I'm LifeZoi Mind, an educational wellness tool. I'm not a person, a therapist, or a doctor, and right now my replies are written in advance and chosen by rules, not generated by an AI model. I can listen, ask questions, suggest exercises, and share articles. For diagnosis, treatment, or a crisis, please reach out to a professional or call or text 988 in the United States. What would you like to talk about?",
+        tr("I'm LifeZoi Mind, an educational wellness tool. I'm not a person, a therapist, or a doctor, and right now my replies are written in advance and chosen by rules, not generated by an AI model. I can listen, ask questions, suggest exercises, and share articles. For diagnosis, treatment, or a crisis, please reach out to a professional or call or text 988 in the United States. What would you like to talk about?"),
         "boundary",
       ),
     };
@@ -296,19 +312,19 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
 
   // 3. A conversation that started from a questionnaire result.
   if (next.result) {
-    const turn = resultTurn(next, message);
-    if (turn) return withDistress(turn, safety.level === "distress");
+    const turn = resultTurn(next, message, original, tr);
+    if (turn) return withDistress(turn, safety.level === "distress", tr);
   }
 
   // 4. Small talk and closings.
   if (GREETING.test(message)) {
-    return { state: next, reply: reply("Hello. I'm glad you're here. How are you feeling today, and is there something on your mind you'd like to talk about?", "reply", { quickReplies: OPENING_TOPICS.slice(0, 4) }) };
+    return { state: next, reply: reply(tr("Hello. I'm glad you're here. How are you feeling today, and is there something on your mind you'd like to talk about?"), "reply", { quickReplies: OPENING_TOPICS.slice(0, 4).map((text) => tr(text)) }) };
   }
   if (THANKS_BYE.test(message)) {
     return {
       state: { ...next, topic: null, step: 0, facet: null },
       reply: reply(
-        "Thank you for talking with me. I hope something here was useful. Be gentle with yourself today, and if you can, share how you're doing with someone you trust. You're welcome back any time.",
+        tr("Thank you for talking with me. I hope something here was useful. Be gentle with yourself today, and if you can, share how you're doing with someone you trust. You're welcome back any time."),
         "closing",
       ),
     };
@@ -319,15 +335,15 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     return {
       state: next,
       reply: reply(
-        "Of course. Here are a few exercises you could try. Each one can be read aloud step by step, and you can choose how long it lasts. There's no need to finish one if it doesn't feel right. If you tell me what's making it hard to relax, I can suggest the one that fits best.",
+        tr("Of course. Here are a few exercises you could try. Each one can be read aloud step by step, and you can choose how long it lasts. There's no need to finish one if it doesn't feel right. If you tell me what's making it hard to relax, I can suggest the one that fits best."),
         "reply",
-        { exercises: ["guided-relaxation", "paced-breathing", "progressive-muscle-relaxation", "grounding-54321"], exerciseWhy: "Relaxation and slow breathing help the body settle. Muscle relaxation releases tension. Grounding is useful when worry pulls you into the future." },
+        { exercises: ["guided-relaxation", "paced-breathing", "progressive-muscle-relaxation", "grounding-54321"], exerciseWhy: tr("Relaxation and slow breathing help the body settle. Muscle relaxation releases tension. Grounding is useful when worry pulls you into the future.") },
       ),
     };
   }
-  if (QUESTION.test(message) && !next.topic && !detectTopic(message)) {
+  if (lang === "en" && QUESTION.test(message) && !next.topic && !detectTopic(message)) {
     const answer = encyclopediaAnswer(message);
-    if (answer) return withDistress({ state: next, reply: answer }, safety.level === "distress");
+    if (answer) return withDistress({ state: next, reply: answer }, safety.level === "distress", tr);
   }
 
   // 6. Balanced responses that do not take sides against other people.
@@ -336,10 +352,11 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
       {
         state: { ...next, step: Math.max(next.step, 2) },
         reply: reply(
-          "It sounds like you're really hurt and angry, and those feelings make sense when someone has treated you badly. I'm not going to tell you how to feel. At the same time, holding on to resentment or acting to get even usually ends up costing us more than the other person. What would help you feel more at peace with this, or more in control of what happens next?",
+          tr("It sounds like you're really hurt and angry, and those feelings make sense when someone has treated you badly. I'm not going to tell you how to feel. At the same time, holding on to resentment or acting to get even usually ends up costing us more than the other person. What would help you feel more at peace with this, or more in control of what happens next?"),
         ),
       },
       safety.level === "distress",
+      tr,
     );
   }
   if (AGREEMENT.test(message)) {
@@ -347,10 +364,11 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
       {
         state: next,
         reply: reply(
-          "I can hear why it feels that way to you, and your feelings about it are real. I only know your side, though, so I can't fairly say who was right. What I can do is help you look at it from a few angles. If the other person described this moment, what do you think they would say?",
+          tr("I can hear why it feels that way to you, and your feelings about it are real. I only know your side, though, so I can't fairly say who was right. What I can do is help you look at it from a few angles. If the other person described this moment, what do you think they would say?"),
         ),
       },
       safety.level === "distress",
+      tr,
     );
   }
 
@@ -384,30 +402,31 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     next.topic = detected.id;
     next.step = 0;
     next.facet = null;
-  } else if (!switchedFromOffer && detected && current && detected.id !== current.id && detected.sideLabel) {
+  } else if (!switchedFromOffer && detected && current && detected.id !== current.id && detected.sideLabel && !(detected.id === "work-stress" && WORK_TOPICS.has(current.id))) {
     // Something new came up in the middle of a topic: say so, and remember it.
     if (!next.pending.includes(detected.id)) {
       next.pending = [...next.pending, detected.id];
-      sideNote = sideAcknowledgement(detected, current, mentionedPerson(message) ?? next.person, next.person);
+      sideNote = sideAcknowledgement(detected, current, mentionedPerson(message) ?? next.person, next.person, tr);
     }
   }
   const person = mentionedPerson(message);
   if (person && (!next.person || next.step === 0)) next.person = person;
 
   if (!current) {
-    const reflection = reflect(message);
+    const reflection = reflect(message, tr);
     const follow = UNSURE.test(message)
-      ? "That's okay. Sometimes it's hard to know where to start. Would it help to begin with how you're feeling right now, or with something that happened today?"
-      : `${reflection ?? "Thank you for telling me."} I want to make sure I understand. Could you tell me a little more about what happened, and how it's been affecting you?`;
+      ? tr("That's okay. Sometimes it's hard to know where to start. Would it help to begin with how you're feeling right now, or with something that happened today?")
+      : `${reflection ?? tr("Thank you for telling me.")} ${tr("I want to make sure I understand. Could you tell me a little more about what happened, and how it's been affecting you?")}`;
     return withDistress(
       {
         state: next,
         reply: reply(follow, "reply", {
-          quickReplies: UNSURE.test(message) ? ["How I'm feeling right now", "Something that happened today"] : [],
+          quickReplies: UNSURE.test(message) ? [tr("How I'm feeling right now"), tr("Something that happened today")] : [],
           articles: recommendArticles(message, 1).map((article) => article.slug),
         }),
       },
       safety.level === "distress",
+      tr,
     );
   }
 
@@ -415,8 +434,8 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
   if (professional) next.suggestedProfessional = true;
   const topic = current;
   const addProfessional = (text: string) => {
-    const filled = fillPerson([sideNote, text].filter(Boolean).join(" "), next.person, topic);
-    return professional ? `${filled}\n\n${PROFESSIONAL_NOTE}` : filled;
+    const filled = fillPerson([sideNote, text].filter(Boolean).join(" "), next.person ? tr(next.person) : null, topic, tr);
+    return professional ? `${filled}\n\n${tr(PROFESSIONAL_NOTE)}` : filled;
   };
 
   if (next.step === 0 && current.skipToFacet) {
@@ -425,10 +444,13 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
       // The first message already says what matters most, so don't ask it again.
       next.facet = facet.id;
       next.step = 2;
-      const opening = current.open.split(/(?<=[.!?])\s+/).filter((sentence) => !sentence.includes("?") && !sentence.startsWith("I can't"));
+      const opening = tr(current.open)
+        .split(/(?<=[.!?])\s+/)
+        .filter((sentence) => !sentence.includes("?") && !sentence.startsWith("I can't") && !sentence.startsWith("Я не могу"));
       return withDistress(
-        { state: next, reply: reply(addProfessional([opening[0], facet.reply, facet.question].join(" "))) },
+        { state: next, reply: reply(addProfessional([opening[0], tr(facet.reply), tr(facet.question)].join(" "))) },
         safety.level === "distress",
+        tr,
       );
     }
   }
@@ -436,47 +458,51 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
   if (next.step === 0) {
     next.step = 1;
     return withDistress(
-      { state: next, reply: reply(addProfessional(current.open), "reply", { quickReplies: current.facets.map((facet) => facet.label).concat(current.facets.length ? ["Something else"] : []) }) },
+      { state: next, reply: reply(addProfessional(tr(current.open)), "reply", { quickReplies: current.facets.map((facet) => tr(facet.label)).concat(current.facets.length ? [tr("Something else")] : []) }) },
       safety.level === "distress",
+      tr,
     );
   }
 
   if (next.step === 1) {
-    const facet = current.facets.find((entry) => entry.label === message || entry.match.test(message));
+    const facet = current.facets.find((entry) => entry.label === original || tr(entry.label) === original || entry.match.test(message));
     next.facet = facet?.id ?? "other";
     next.step = 2;
     const part = facet ?? current.otherFacet;
-    const lead = UNSURE.test(message) ? "That's okay, it can be hard to pin down." : facet ? "" : (reflect(message) ?? "");
+    const lead = UNSURE.test(message) ? tr("That's okay, it can be hard to pin down.") : facet ? "" : (reflect(message, tr) ?? "");
     return withDistress(
-      { state: next, reply: reply(addProfessional([lead, part.reply, part.question].filter(Boolean).join(" "))) },
+      { state: next, reply: reply(addProfessional([lead, tr(part.reply), tr(part.question)].filter(Boolean).join(" "))) },
       safety.level === "distress",
+      tr,
     );
   }
 
   if (next.step === 2) {
     next.step = 3;
-    const lead = reflect(message) ?? "Thank you, that helps me understand.";
+    const lead = reflect(message, tr) ?? tr("Thank you, that helps me understand.");
     const facet = current.facets.find((entry) => entry.id === next.facet);
     return withDistress(
-      { state: next, reply: reply(addProfessional(`${lead} ${facet?.perspective ?? current.perspective}`)) },
+      { state: next, reply: reply(addProfessional(`${lead} ${tr(facet?.perspective ?? current.perspective)}`)) },
       safety.level === "distress",
+      tr,
     );
   }
 
   if (next.step === 3) {
     next.step = 4;
-    const lead = UNSURE.test(message) ? "That's alright. You don't need to have it all worked out." : (reflect(message) ?? "That makes sense.");
+    const lead = UNSURE.test(message) ? tr("That's alright. You don't need to have it all worked out.") : (reflect(message, tr) ?? tr("That makes sense."));
     return withDistress(
       {
         state: next,
-        reply: reply(addProfessional(`${lead} ${current.nextSteps}`), "reply", {
+        reply: reply(addProfessional(`${lead} ${tr(current.nextSteps)}`), "reply", {
           exercises: [...current.exercises],
-          exerciseWhy: current.why,
+          exerciseWhy: tr(current.why),
           articles: [...current.articles],
-          quickReplies: ["I'd like to keep talking", "That helps, thank you"],
+          quickReplies: [tr("I'd like to keep talking"), tr("That helps, thank you")],
         }),
       },
       safety.level === "distress",
+      tr,
     );
   }
 
@@ -484,29 +510,34 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
   const waiting = next.pending.find((id) => id !== current.id);
   if (waiting && !sideNote) {
     next.offered = waiting;
-    const label = fillPerson(topicById(waiting).sideLabel ?? "", next.person, topicById(waiting));
-    const lead = UNSURE.test(message) ? "That's okay." : (reflect(message) ?? "Thank you for telling me.");
+    const label = fillPerson(tr(topicById(waiting).sideLabel ?? ""), next.person ? tr(next.person) : null, topicById(waiting), tr);
+    const lead = UNSURE.test(message) ? tr("That's okay.") : (reflect(message, tr) ?? tr("Thank you for telling me."));
     return withDistress(
       {
         state: next,
-        reply: reply(addProfessional(`${lead} Earlier you also mentioned ${label}. Would you like to talk about that now?`), "reply", {
-          quickReplies: ["Yes, let's talk about that", "Not now"],
+        reply: reply(addProfessional(`${lead} ${tr("Earlier you also mentioned {label}. Would you like to talk about that now?", { label })}`), "reply", {
+          quickReplies: [tr("Yes, let's talk about that"), tr("Not now")],
         }),
       },
       safety.level === "distress",
+      tr,
     );
   }
 
   // Then open, non-repeating follow-ups that encourage real-world support.
   const follow = pickFollowUp(next);
   next.asked = [...next.asked, follow.id];
-  const lead = UNSURE.test(message) ? "That's okay." : (reflect(message) ?? "I hear you.");
+  const lead = UNSURE.test(message) ? tr("That's okay.") : (reflect(message, tr) ?? tr("I hear you."));
   const articles = recommendArticles(message, 1, [...current.articles]).map((article) => article.slug);
   return withDistress(
-    { state: next, reply: reply(addProfessional(`${lead} ${follow.text}`), "reply", { articles }) },
+    { state: next, reply: reply(addProfessional(`${lead} ${tr(follow.text)}`), "reply", { articles }) },
     safety.level === "distress",
+    tr,
   );
 }
+
+/** Topics that are already about work, so another mention of work is not a separate concern. */
+const WORK_TOPICS: ReadonlySet<TopicId> = new Set(["work-criticism", "job-loss"]);
 
 const SIDE_LINES: Partial<Record<TopicId, string>> = {
   money: "You mentioned money as well. Money worries are one of the most common things that keep the mind busy, especially at night.",
@@ -519,21 +550,36 @@ const SIDE_LINES: Partial<Record<TopicId, string>> = {
   "job-loss": "You also mentioned your job. Losing work, or fearing it, adds a lot of pressure.",
 };
 
-function sideAcknowledgement(detected: Topic, current: Topic, newPerson: string | null, currentPerson: string | null): string {
-  const line = SIDE_LINES[detected.id] ?? `You also mentioned ${detected.sideLabel}.`;
-  const about = fillPerson(current.sideLabel ?? "what we were talking about", currentPerson, current);
-  return `${fillPerson(line, newPerson, detected)} I'll keep that in mind, and we can come back to it. For now, back to ${about}.`;
+function sideAcknowledgement(detected: Topic, current: Topic, newPerson: string | null, currentPerson: string | null, tr: MindTranslate): string {
+  const known = SIDE_LINES[detected.id];
+  const line = known ? tr(known) : tr("You also mentioned {label}.", { label: tr(detected.sideLabel ?? "") });
+  const about = fillPerson(tr(current.sideLabel ?? "what we were talking about"), currentPerson ? tr(currentPerson) : null, current, tr);
+  return `${fillPerson(line, newPerson ? tr(newPerson) : null, detected, tr)} ${tr("I'll keep that in mind, and we can come back to it. For now, back to {about}.", { about })}`;
 }
 
-function withDistress(turn: { reply: MindReply; state: ConversationState }, distress: boolean) {
+function withDistress(turn: { reply: MindReply; state: ConversationState }, distress: boolean, tr: MindTranslate) {
   if (!distress) return turn;
-  return { state: turn.state, reply: { ...turn.reply, distress: true, text: `${turn.reply.text}\n\n${DISTRESS_NOTE}` } };
+  return { state: turn.state, reply: { ...turn.reply, distress: true, text: `${turn.reply.text}\n\n${tr(DISTRESS_NOTE)}` } };
 }
 
 /** Plain text for reading a reply aloud. */
-export function spokenReply(value: MindReply): string {
+export function spokenReply(value: MindReply, lang: MindLang = "en"): string {
+  if (lang !== "en") return value.text;
   const titles = value.articles.map((slug) => articleBySlug(slug)?.title).filter(Boolean);
   return titles.length ? `${value.text} You might like to read: ${titles.join(", and ")}.` : value.text;
 }
 
 export const KNOWN_TOPICS = TOPICS.map((topic) => topic.id);
+
+/** Every English text kept in this file's constants, for the translation tests. */
+export function conversationText(): string[] {
+  return [
+    OPENING_TEXT,
+    ...OPENING_TOPICS,
+    PROFESSIONAL_NOTE,
+    ...OPEN_FOLLOW_UPS.map((entry) => entry.text),
+    ...EMOTION_REFLECTIONS.map(([, text]) => text),
+    ...Object.values(RESULT_QUESTIONS).flat(),
+    ...Object.values(SIDE_LINES),
+  ];
+}

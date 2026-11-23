@@ -51,6 +51,9 @@ export async function onDeviceRecognition(lang: string): Promise<"available" | "
 
 export type ListenError = "denied" | "site-blocked" | "service-blocked" | "no-speech" | "network" | "no-microphone" | "local-unavailable" | "other";
 
+/** Every message `listenErrorMessage` can return, for the translation catalogs. */
+export const LISTEN_ERRORS: readonly ListenError[] = ["denied", "site-blocked", "service-blocked", "no-speech", "network", "no-microphone", "local-unavailable", "other"];
+
 export function listenErrorMessage(error: ListenError): string {
   switch (error) {
     case "denied":
