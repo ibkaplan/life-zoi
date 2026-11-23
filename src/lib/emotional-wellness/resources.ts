@@ -108,7 +108,7 @@ export const ATTRIBUTIONS: readonly Attribution[] = [
     name: "American Psychological Association",
     title: "Health advisory on generative AI chatbots and wellness applications for mental health",
     url: "https://www.apa.org/topics/artificial-intelligence-machine-learning/health-advisory-chatbots-wellness-apps",
-    note: "APA advises that chatbots and wellness apps are not a substitute for a qualified mental health professional. This companion is rules-based and is not a generative model.",
+    note: "APA advises that chatbots and wellness apps are not a substitute for a qualified mental health professional. This companion uses prepared replies, not AI.",
   },
   {
     id: "nimh",

@@ -13,30 +13,30 @@ export const SUPPORTING_LINE =
   "You deserve to be heard, supported, and treated with kindness. Whatever you are facing, we can take one small step at a time.";
 
 export const CLINICAL_REVIEW_NOTICE =
-  "This page has not been reviewed by a licensed clinician. It must not be called clinically validated.";
+  "This page has not yet been reviewed by a licensed clinician, so please treat it as gentle support, not medical care.";
 
 export const COMPANION_IDENTITY =
-  "LifeZoi Emotional Companion is a rules-based support tool. It is not a person, a therapist, a doctor, or a crisis counselor. It does not love you or need you. It uses written replies, it is not a generative model, and the paid-model seam stays off.";
+  "LifeZoi Emotional Companion is a simple support tool with prepared, caring replies. It is not a person, a therapist, a doctor, or a crisis counselor, but it can help you slow down, put feelings into words, and find one small next step.";
 
 export const COMPANION_OPENING = `${COMPANION_IDENTITY} Would you like to be listened to, or to look at one small step?`;
 
 export const PAGE_DESCRIPTION =
-  "A rules-based emotional support page with a separate crisis check, short optional exercises, and private notes. Not clinical care.";
+  "Gentle emotional support with prepared replies, short optional exercises, and private notes. Crisis help is always on the page. Not medical care.";
 
 export const JOURNAL_PRIVACY =
-  "Your journal stays in this browser’s local storage. It is not shown to other people, it is not sent to an account by this page, and it is not a diagnosis. Signing out hides it until this same account signs in again.";
+  "Your journal is saved only in this browser on this device. No one else can see it, and it is not sent to your account. When you sign out, it is hidden until you sign in again.";
 
 export const JOY_NOTE =
-  "Small joys are optional. Skip this if naming one feels wrong today. These notes stay in this browser and are not a diagnosis.";
+  "Noting a small joy is optional. Skip it if today doesn't feel like that kind of day. These notes stay only in this browser.";
 
 export const CAREGIVER_NOTE =
-  "Caregiver notes are private to this browser. They are not a diagnosis of you or of the person you care for, and they are not shown to other people.";
+  "Caregiver notes stay only in this browser, and no one else can see them. They are just for you and say nothing about anyone's health.";
 
 export const EXERCISE_INTRO =
-  "These short exercises are optional. Stop at any step. Skipping one is a complete choice. The wording is original and is not a clinical protocol.";
+  "These short exercises are optional. You can stop at any step, and skipping one is completely fine.";
 
 export const CONTEXT_NOTE =
-  "Context chips are optional and changeable. Choosing one does not diagnose a condition, and this page will not infer a diagnosis from what you write.";
+  "Choosing a topic is optional, and you can change it at any time. It only helps the replies fit your situation. It never means a diagnosis.";
 
 export const CONTEXT_OPTIONS: { id: ContextId; label: string; phrase: string }[] = [
   { id: "cancer", label: "Cancer", phrase: msg("cancer") },

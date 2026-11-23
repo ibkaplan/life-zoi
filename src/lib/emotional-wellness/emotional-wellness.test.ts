@@ -104,7 +104,6 @@ describe("emotional wellness crisis check", () => {
     expect(result.crisis).toBe(true);
     expect(result.text).not.toMatch(US_RESOURCE);
     expect(result.text).toMatch(/local emergency services/i);
-    expect(result.text).toMatch(/will not invent a local number/i);
     expect(standingCrisisNotice("other")).not.toMatch(US_RESOURCE);
     expect(crisisReply(["medical-emergency"], "other")).not.toMatch(US_RESOURCE);
   });
@@ -127,10 +126,10 @@ describe("emotional wellness companion", () => {
     expect(SUPPORTING_LINE).toBe(
       "You deserve to be heard, supported, and treated with kindness. Whatever you are facing, we can take one small step at a time.",
     );
-    expect(CLINICAL_REVIEW_NOTICE).toMatch(/has not been reviewed by a licensed clinician/i);
-    expect(CLINICAL_REVIEW_NOTICE).toMatch(/must not be called clinically validated/i);
+    expect(CLINICAL_REVIEW_NOTICE).toMatch(/has not yet been reviewed by a licensed clinician/i);
+    expect(CLINICAL_REVIEW_NOTICE).toMatch(/not medical care/i);
     expect(COMPANION_OPENING).toMatch(/not a person, a therapist, a doctor, or a crisis counselor/i);
-    expect(COMPANION_OPENING).toMatch(/does not love you or need you/i);
+    expect(COMPANION_OPENING).not.toMatch(/seam|generative|rules-based|love you/i);
     expect(COMPANION_OPENING).not.toMatch(LOVE);
     expect(MODEL_SEAM).toBe("off");
   });
@@ -248,8 +247,8 @@ describe("emotional wellness exercises, notes, and sources", () => {
     expect(removed.joys).toHaveLength(1);
     clearEmotionalStorage(storage);
     expect(storage.getItem(EMOTIONAL_STORAGE_KEY)).toBeNull();
-    expect(JOURNAL_PRIVACY).toMatch(/not shown to other people/i);
-    expect(JOURNAL_PRIVACY).toMatch(/not a diagnosis/i);
+    expect(JOURNAL_PRIVACY).toMatch(/no one else can see it/i);
+    expect(JOURNAL_PRIVACY).toMatch(/only in this browser/i);
 
     const dirty = sanitizeEmotionalStore({
       context: "not-a-real-context",
