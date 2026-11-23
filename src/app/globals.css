@@ -993,7 +993,7 @@ button.assistant-send:focus-visible,
   height: 220px;
 }
 
-.home-credits { color: #172554; font-size: 1rem; }
+.home-credits { color: #172554; font-size: 1rem; font-weight: 700; }
 .home-credits summary { cursor: pointer; font-weight: 750; min-height: 44px; display: inline-flex; align-items: center; }
 .home-credits ul { margin: 0.4rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.45rem; }
 
@@ -1030,7 +1030,7 @@ button.assistant-send:focus-visible,
   font-weight: 700;
 }
 
-.home-outlook-note { color: #3E4E80; font-size: 1rem; }
+.home-outlook-note { color: #3E4E80; font-size: 1rem; font-weight: 700; }
 
 .home-works { padding-bottom: 2.5rem; }
 
@@ -2225,7 +2225,7 @@ button.assistant-send:focus-visible,
 
 .quiz-lg { font-size: clamp(2rem, 6vw, 3rem); }
 .quiz-md { font-size: clamp(1.4rem, 4vw, 2rem); }
-.quiz-sm { font-size: 1rem; }
+.quiz-sm { font-size: 1rem; font-weight: 700; }
 
 .quiz-flip {
   transform: rotate(180deg);
@@ -2669,7 +2669,7 @@ button.assistant-send:focus-visible,
 .brand-line { color: var(--gold-ink); }
 :root { --gold-ink: #8A5A0B; }
 .lede { font-size: 1.25rem; }
-.hint { font-size: 1rem; }
+.hint { font-size: 1rem; font-weight: 700; }
 .kicker { color: var(--dept-accent, var(--royal)); }
 .app-main { --dept-accent: var(--royal); --dept-ink: var(--royal); --dept-tint: #F3ECFB; --dept-soft: var(--lavender-brand); }
 .app-main[data-dept="nutrition"] { --dept-accent: #3F6B52; --dept-ink: #2F5A44; --dept-tint: #EEF3EF; --dept-soft: var(--sage-brand); }
@@ -2927,7 +2927,7 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .mb-topics { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 .mb-topic { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; display: grid; gap: 0.5rem; align-content: start; background: var(--surface); }
 .mb-topic .mb-art { max-width: 200px; }
-.mb-topic-letter { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--royal); color: #fff; font-size: 1rem; }
+.mb-topic-letter { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--royal); color: #fff; font-size: 1rem; font-weight: 700; }
 .mb-cite { font-size: 0.95rem; }
 .mb-rule { background: #FDF4E4; border: 2px solid var(--gold); }
 .mb-rule-title { font-weight: 800; font-size: clamp(1.4rem, 4vw, 2rem); color: var(--ink); text-transform: none; }
@@ -3034,7 +3034,7 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .cy-tag-section { background: #EDE3FA !important; }
 .cy-tag-section[data-section="standing"] { background: #DDEFEB !important; color: #1C5650 !important; }
 .cy-tag-section[data-section="gentle"] { background: #FCEBCB !important; color: #6B4407 !important; }
-.cy-care { background: #FFF7E8; border-left: 5px solid var(--gold); border-radius: 10px; padding: 0.6rem 0.8rem; display: grid; gap: 0.3rem; font-size: 1rem; }
+.cy-care { background: #FFF7E8; border-left: 5px solid var(--gold); border-radius: 10px; padding: 0.6rem 0.8rem; display: grid; gap: 0.3rem; font-size: 1rem; font-weight: 700; }
 .cy-care p { margin: 0; }
 .cy-done { color: #1F5A45; font-weight: 700; }
 .cy-search { min-height: 52px; font: inherit; padding: 0.5rem 0.9rem; border: 2px solid var(--line); border-radius: 12px; width: 100%; }
@@ -3246,7 +3246,7 @@ a.home-companion-card:hover { transform: translateY(-2px); }
 .music-round-main[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); }
 .music-progress { display: grid; gap: 0.2rem; }
 .music-progress input[type="range"], .music-volume input[type="range"] { width: 100%; min-height: 44px; accent-color: var(--royal); }
-.music-time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 1rem; }
+.music-time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 1rem; font-weight: 700; }
 .music-category select { min-height: 48px; font-size: 1.05rem; border-radius: 12px; }
 .music-onoff {
   display: inline-flex; align-items: center; gap: 0.6rem; min-height: 52px; padding: 0.4rem 1rem 0.4rem 0.5rem;
@@ -3425,6 +3425,11 @@ html:is([lang="uk"], [lang="ru"], [lang="el"]) main {
 .voice-help { border-top: 1px solid var(--line); padding-top: 0.75rem; }
 .voice-help summary { cursor: pointer; font-weight: 650; min-height: 44px; display: flex; align-items: center; }
 .voice-help ul { padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+.natural-voice { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem; background: var(--surface); }
+.natural-voice h4 { margin: 0; font-size: 1rem; font-weight: 700; }
+.natural-voice progress { width: 100%; height: 12px; }
+.natural-voice-toggle { display: flex; gap: 0.6rem; align-items: center; min-height: 44px; font-weight: 650; color: var(--ink); }
+.natural-voice-toggle input { width: 22px; height: 22px; flex: none; }
 @media (max-width: 560px) {
   .voice-buttons .btn { flex: 1 1 calc(50% - 0.5rem); justify-content: center; }
   .voice-page { justify-self: stretch; }

@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale, useT } from "@/components/locale-provider";
 import type { Translate } from "@/lib/i18n/translate";
+import { NaturalVoiceNote } from "@/components/voice/natural-voice";
 import { blocksFromElement, VOICE_SKIP_ATTR } from "@/lib/voice/dom";
 import {
   deviceVoices,
@@ -274,6 +275,7 @@ export function VoiceChoices({ lang, steps, rate, stepWait }: { lang: VoiceLang;
           ))}
         </select>
       </label>
+      <NaturalVoiceNote lang={lang} />
       {ranked.length > 0 ? (
         <label htmlFor={`${id}-voice`}>
           {t("{language} voice", { language: languageName(t, lang) })}

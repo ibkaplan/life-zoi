@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useT } from "@/components/locale-provider";
+import { NaturalVoiceRow } from "@/components/voice/natural-voice";
 import { languageName, useSpeechSupport, useVoicePrefs, useVoiceState, VoiceChoices } from "@/components/voice/read-aloud";
 import { LOCALE_META, LOCALES } from "@/lib/i18n/config";
 import { player, saveVoicePrefs } from "@/lib/voice/engine";
@@ -55,6 +56,7 @@ export function VoiceSettings() {
         return (
           <div key={lang} className="voice-settings-lang stack">
             <h3>{LOCALE_META[lang].nativeName}</h3>
+            <NaturalVoiceRow lang={lang} />
             <VoiceChoices lang={lang} steps={lang === locale} rate={prefs.rate} stepWait={prefs.stepWait} />
             <div className="voice-buttons">
               {trying ? (
@@ -103,6 +105,7 @@ function BetterVoicesHelp() {
           </li>
         </ul>
         <p className="hint">{t("Voices marked online send the words being read to your browser's provider. LifeZoi Mind never uses online voices, because your conversation stays on your device.")}</p>
+        <p className="hint">{t("The lifeZoi natural voices are free Piper voices. The voice file comes from huggingface.co and the speech program from cdn.jsdelivr.net, once. The voice then runs in this browser, and the words being read stay on this device.")}</p>
       </div>
     </details>
   );
