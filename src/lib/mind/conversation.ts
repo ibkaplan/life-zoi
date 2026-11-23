@@ -2,7 +2,7 @@ import type { CrisisKind } from "@/lib/emotional-wellness/types";
 import { articleBySlug, recommendArticles } from "@/lib/mind/articles";
 import { instrumentById, type InstrumentId } from "@/lib/mind/assessments";
 import { checkSafety, crisisMessage, DISTRESS_NOTE } from "@/lib/mind/safety";
-import { detectTopic, topicById, TOPICS, type TopicId } from "@/lib/mind/topics";
+import { detectTopic, fillPerson, mentionedPerson, topicById, TOPICS, type Topic, type TopicId } from "@/lib/mind/topics";
 
 /**
  * LifeZoi Mind's written companion: a rule-based conversation that runs entirely in
@@ -46,10 +46,29 @@ export type ConversationState = {
   resultStep: number;
   crisis: boolean;
   suggestedProfessional: boolean;
+  /** The person the visitor talked about, for example "your mom". */
+  person: string | null;
+  /** Other topics the visitor mentioned along the way, to come back to later. */
+  pending: TopicId[];
+  /** A pending topic Mind just offered to talk about. */
+  offered: TopicId | null;
 };
 
 export function initialConversation(result: ResultContext | null = null): ConversationState {
-  return { topic: null, step: 0, facet: null, asked: [], turns: 0, result, resultStep: 0, crisis: false, suggestedProfessional: false };
+  return {
+    topic: null,
+    step: 0,
+    facet: null,
+    asked: [],
+    turns: 0,
+    result,
+    resultStep: 0,
+    crisis: false,
+    suggestedProfessional: false,
+    person: null,
+    pending: [],
+    offered: null,
+  };
 }
 
 export const OPENING_TEXT =
@@ -112,6 +131,9 @@ const QUESTION = /^(what|why|how|is it|is there|can|does|do|are)\b.+\?$|\b(what 
 const RESENTMENT = /\b(i hate (him|her|them|my (boss|manager|partner|husband|wife|mother|father))|revenge|get back at|make (him|her|them) pay|teach (him|her|them) a lesson|they'?re all (idiots|stupid|against me)|everyone is against me|(he|she|they) (is|are) (evil|an idiot|stupid|a monster))\b/i;
 const AGREEMENT = /\b(am i right|don'?t you (think|agree)|wasn'?t (that|it) (unfair|wrong)|right\?$|you agree|tell me i'?m right|was i wrong)\b/i;
 const DURATION = /\b(for (weeks|months|years|a long time|ages)|every (single )?day|all the time|can'?t (work|function|get out of bed|eat)|stopped (eating|working|going out))\b/i;
+/** Only suggest a professional when it is the person's own feelings or functioning that have lasted. */
+const FEELING_OR_FUNCTION =
+  /\b(i('?ve| have)? (felt|been feeling|been)|i feel|feeling|sad|down|low|anxious|worried|depressed|hopeless|empty|numb|exhausted|can'?t (work|function|get out of bed|eat|sleep)|stopped (eating|working|going out))\b/i;
 
 function reply(text: string, kind: ReplyKind = "reply", extra: Partial<MindReply> = {}): MindReply {
   return { text, kind, quickReplies: [], exercises: [], exerciseWhy: null, articles: [], distress: false, crisisKinds: [], ...extra };
@@ -303,7 +325,7 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
       ),
     };
   }
-  if (QUESTION.test(message) && !next.topic) {
+  if (QUESTION.test(message) && !next.topic && !detectTopic(message)) {
     const answer = encyclopediaAnswer(message);
     if (answer) return withDistress({ state: next, reply: answer }, safety.level === "distress");
   }
@@ -335,12 +357,42 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
   // 7. Topic flow.
   const detected = detectTopic(message);
   let current = next.topic ? topicById(next.topic) : null;
-  if (detected && (!current || (detected.id !== current.id && next.step >= 3))) {
+
+  // The visitor accepted (or declined) coming back to something they mentioned earlier.
+  let switchedFromOffer = false;
+  if (next.offered) {
+    const offered = next.offered;
+    next.offered = null;
+    if (ACCEPT.test(message) || /\btalk about (it|that)\b/i.test(message)) {
+      next.pending = next.pending.filter((id) => id !== offered);
+      current = topicById(offered);
+      next.topic = offered;
+      next.step = 0;
+      next.facet = null;
+      switchedFromOffer = true;
+    } else if (DECLINE.test(message)) {
+      next.pending = next.pending.filter((id) => id !== offered);
+    }
+  }
+
+  let sideNote = "";
+  if (!switchedFromOffer && detected && (!current || (detected.id !== current.id && next.step >= 3 && detected.sideLabel))) {
+    if (current && current.id !== detected.id && !next.pending.includes(current.id) && current.sideLabel) {
+      next.pending = [...next.pending, current.id];
+    }
     current = detected;
     next.topic = detected.id;
     next.step = 0;
     next.facet = null;
+  } else if (!switchedFromOffer && detected && current && detected.id !== current.id && detected.sideLabel) {
+    // Something new came up in the middle of a topic: say so, and remember it.
+    if (!next.pending.includes(detected.id)) {
+      next.pending = [...next.pending, detected.id];
+      sideNote = sideAcknowledgement(detected, current, mentionedPerson(message) ?? next.person, next.person);
+    }
   }
+  const person = mentionedPerson(message);
+  if (person && (!next.person || next.step === 0)) next.person = person;
 
   if (!current) {
     const reflection = reflect(message);
@@ -359,9 +411,27 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     );
   }
 
-  const professional = !next.suggestedProfessional && DURATION.test(message);
+  const professional = !next.suggestedProfessional && DURATION.test(message) && FEELING_OR_FUNCTION.test(message);
   if (professional) next.suggestedProfessional = true;
-  const addProfessional = (text: string) => (professional ? `${text}\n\n${PROFESSIONAL_NOTE}` : text);
+  const topic = current;
+  const addProfessional = (text: string) => {
+    const filled = fillPerson([sideNote, text].filter(Boolean).join(" "), next.person, topic);
+    return professional ? `${filled}\n\n${PROFESSIONAL_NOTE}` : filled;
+  };
+
+  if (next.step === 0 && current.skipToFacet) {
+    const facet = current.facets.find((entry) => entry.match.test(message));
+    if (facet) {
+      // The first message already says what matters most, so don't ask it again.
+      next.facet = facet.id;
+      next.step = 2;
+      const opening = current.open.split(/(?<=[.!?])\s+/).filter((sentence) => !sentence.includes("?") && !sentence.startsWith("I can't"));
+      return withDistress(
+        { state: next, reply: reply(addProfessional([opening[0], facet.reply, facet.question].join(" "))) },
+        safety.level === "distress",
+      );
+    }
+  }
 
   if (next.step === 0) {
     next.step = 1;
@@ -386,7 +456,11 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
   if (next.step === 2) {
     next.step = 3;
     const lead = reflect(message) ?? "Thank you, that helps me understand.";
-    return withDistress({ state: next, reply: reply(addProfessional(`${lead} ${current.perspective}`)) }, safety.level === "distress");
+    const facet = current.facets.find((entry) => entry.id === next.facet);
+    return withDistress(
+      { state: next, reply: reply(addProfessional(`${lead} ${facet?.perspective ?? current.perspective}`)) },
+      safety.level === "distress",
+    );
   }
 
   if (next.step === 3) {
@@ -406,7 +480,24 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     );
   }
 
-  // Step 4 and later: open, non-repeating follow-ups that encourage real-world support.
+  // Step 4 and later: first come back to anything else the visitor mentioned.
+  const waiting = next.pending.find((id) => id !== current.id);
+  if (waiting && !sideNote) {
+    next.offered = waiting;
+    const label = fillPerson(topicById(waiting).sideLabel ?? "", next.person, topicById(waiting));
+    const lead = UNSURE.test(message) ? "That's okay." : (reflect(message) ?? "Thank you for telling me.");
+    return withDistress(
+      {
+        state: next,
+        reply: reply(addProfessional(`${lead} Earlier you also mentioned ${label}. Would you like to talk about that now?`), "reply", {
+          quickReplies: ["Yes, let's talk about that", "Not now"],
+        }),
+      },
+      safety.level === "distress",
+    );
+  }
+
+  // Then open, non-repeating follow-ups that encourage real-world support.
   const follow = pickFollowUp(next);
   next.asked = [...next.asked, follow.id];
   const lead = UNSURE.test(message) ? "That's okay." : (reflect(message) ?? "I hear you.");
@@ -415,6 +506,23 @@ export function respond(state: ConversationState, rawMessage: string): { reply: 
     { state: next, reply: reply(addProfessional(`${lead} ${follow.text}`), "reply", { articles }) },
     safety.level === "distress",
   );
+}
+
+const SIDE_LINES: Partial<Record<TopicId, string>> = {
+  money: "You mentioned money as well. Money worries are one of the most common things that keep the mind busy, especially at night.",
+  sleep: "You mentioned sleep too. Stress and sleep affect each other a lot, so that makes sense.",
+  "loved-one-illness": "You also mentioned {person} being unwell, which is a lot to carry on top of everything else.",
+  "health-worry": "You also mentioned your health. That kind of worry can sit underneath everything else.",
+  grief: "You also mentioned a loss. Grief can show up in many parts of life.",
+  loneliness: "You mentioned feeling lonely too, and that matters.",
+  "work-stress": "You mentioned work as well, which can add a lot of pressure.",
+  "job-loss": "You also mentioned your job. Losing work, or fearing it, adds a lot of pressure.",
+};
+
+function sideAcknowledgement(detected: Topic, current: Topic, newPerson: string | null, currentPerson: string | null): string {
+  const line = SIDE_LINES[detected.id] ?? `You also mentioned ${detected.sideLabel}.`;
+  const about = fillPerson(current.sideLabel ?? "what we were talking about", currentPerson, current);
+  return `${fillPerson(line, newPerson, detected)} I'll keep that in mind, and we can come back to it. For now, back to ${about}.`;
 }
 
 function withDistress(turn: { reply: MindReply; state: ConversationState }, distress: boolean) {

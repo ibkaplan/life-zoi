@@ -6,11 +6,18 @@
  * 2. Respond to that part, and ask a question that helps them understand it.
  * 3. Offer another perspective, gently, without taking sides against anyone.
  * 4. Suggest a few practical next steps and an exercise, and say why it may help.
+ *
+ * Text can contain {person}, which the conversation fills with the person the visitor
+ * mentioned (for example "your mom"), or with the topic's `personFallback`.
  */
 
 export type TopicId =
   | "work-criticism"
   | "grief"
+  | "loved-one-illness"
+  | "health-worry"
+  | "money"
+  | "job-loss"
   | "boundaries"
   | "loneliness"
   | "sleep"
@@ -23,7 +30,15 @@ export type TopicId =
   | "low-mood"
   | "good-day";
 
-export type Facet = { id: string; label: string; match: RegExp; reply: string; question: string };
+export type Facet = {
+  id: string;
+  label: string;
+  match: RegExp;
+  reply: string;
+  question: string;
+  /** Replaces the topic's perspective when this part is what the person chose. */
+  perspective?: string;
+};
 
 export type Topic = {
   id: TopicId;
@@ -36,7 +51,19 @@ export type Topic = {
   exercises: readonly string[];
   why: string;
   articles: readonly string[];
+  /** Used for {person} when the visitor has not named anyone. */
+  personFallback?: string;
+  /** How the conversation names this topic when it comes up on the side ("money"). */
+  sideLabel?: string;
+  /** When the first message already answers the opening question, go straight to that part. */
+  skipToFacet?: boolean;
 };
+
+const PEOPLE =
+  "mom|mum|mother|mama|dad|father|papa|parents?|husband|wife|partner|spouse|boyfriend|girlfriend|son|daughter|child|kids|children|baby|sister|brother|grandmother|grandma|granny|grandfather|grandpa|grandson|granddaughter|aunt|uncle|cousin|friend|best friend|neighbou?r|mother-in-law|father-in-law";
+
+const ILLNESS =
+  "sick|ill|unwell|illness|cancer|tumou?r|hospital\\w*|diagnos\\w*|dementia|alzheimer'?s?|stroke|heart attack|surgery|operation|dying|terminal|chemo\\w*|radiation|treatment|disease|not well|in (the )?icu|hospice|getting worse";
 
 export const TOPICS: readonly Topic[] = [
   {
@@ -82,7 +109,11 @@ export const TOPICS: readonly Topic[] = [
   },
   {
     id: "grief",
-    match: [/\b(died|passed away|passed on|lost my|loss of my|funeral|grief|grieving|bereave\w*|death of|miss (him|her|them) so)\b/i],
+    match: [
+      /\b(died|passed away|passed on|funeral|grief|grieving|bereave\w*|death of|miss (him|her|them) so)\b/i,
+      new RegExp(`\\b(lost|loss of) (my|our) (${PEOPLE}|dog|cat|pet)\\b`, "i"),
+    ],
+    sideLabel: "the loss you mentioned",
     open: "I'm so sorry for your loss. Grief can be overwhelming, and there is no right way or right timetable to feel it. I'm here to listen. What has been the hardest part for you lately: the missing, the practical changes, or feelings like guilt or anger that can come with grief?",
     facets: [
       {
@@ -115,6 +146,70 @@ export const TOPICS: readonly Topic[] = [
     articles: ["understanding-emotions", "loneliness"],
   },
   {
+    id: "loved-one-illness",
+    skipToFacet: true,
+    match: [
+      new RegExp(`\\b(my|our) (${PEOPLE})\\b.{0,60}\\b(${ILLNESS})\\b`, "i"),
+      new RegExp(`\\b(${ILLNESS})\\b.{0,40}\\b(my|our) (${PEOPLE})\\b`, "i"),
+      /\b(caring for|looking after|taking care of) (my|our) \w+|\b(caregiver|carer|caregiving)\b/i,
+    ],
+    personFallback: "the person you love",
+    sideLabel: "{person} being unwell",
+    open: "I'm so sorry that {person} is unwell. When someone we love is ill, it can bring worry, helplessness, and a lot of practical pressure all at once. What is weighing on you most right now: worry about how {person} is doing, not knowing how to help, or how much this is taking out of you?",
+    facets: [
+      {
+        id: "worry",
+        label: "Worry about how they're doing",
+        match: /\b(worr\w*|scared|afraid|fear\w*|what if|die|dying|worse|prognosis|results|survive|lose (him|her|them))/i,
+        reply: "Fear for someone you love can be one of the heaviest feelings there is, especially when so much is uncertain.",
+        question: "What is the thought about {person} that frightens you most? Is it something you know, or something you fear might happen?",
+      },
+      {
+        id: "help",
+        label: "Not knowing how to help",
+        match: /\b(help|what (can|should) i do|don'?t know (how|what)|helpless|useless|can'?t do anything|support (him|her|them)|fix)/i,
+        reply: "Feeling helpless when someone you love is ill is very common. Often what helps most isn't fixing things, but being there.",
+        question: "What does {person} seem to need most from you right now: practical help, company, or someone to listen?",
+        perspective: "You don't have to find the perfect words or solve the illness to help. Many people who are unwell say what matters most is company, being treated as themselves rather than as a patient, and someone who listens without rushing to reassure. Practical help, like a meal, a lift to an appointment, or sorting paperwork, can mean a lot too. It's also fine to ask {person} directly: what would help you most this week? What feels most possible for you to offer?",
+      },
+      {
+        id: "drained",
+        label: "It's taking a lot out of me",
+        match: /\b(tired|exhausted|drained|no time|alone in this|my own|burn\w*|too much|can'?t cope|caring|sleep|my life)/i,
+        reply: "Caring for someone who is ill takes a lot of energy, and it's easy to put your own needs last for a long time.",
+        question: "Who else could share some of this with you, even in a small way?",
+        perspective: "Looking after yourself while someone you love is ill can feel selfish, but it's what lets you keep going. Caregivers who get even small breaks, a walk, a night of proper sleep, a friend to talk to, usually cope better and have more to give. Accepting help is part of caring well, not a failure. What is one thing you could hand to someone else this week?",
+      },
+    ],
+    otherFacet: {
+      reply: "There's a lot to hold here.",
+      question: "What part of this feels hardest when you're on your own with it?",
+    },
+    perspective: "When someone we love is ill, it can help to separate what is in your hands from what isn't. The illness and how it goes aren't in your control. How you show up for {person}, and how you look after yourself so you can keep going, partly are. Being present and keeping small, familiar routines often matter more than finding the right thing to say. You don't have to carry this alone either. What kind of support would make the biggest difference for you right now?",
+    nextSteps: "A few things that may help, only if they fit. First, ask {person} what would help most today, rather than guessing. Second, write down your questions for the care team before appointments, so they feel less overwhelming. Third, keep one small thing each day that is just for you, like a short walk, a call with a friend, or a few quiet minutes. Many hospitals and charities also run free support groups for family and caregivers.",
+    exercises: ["paced-breathing", "self-compassion", "stress-plan"],
+    why: "Slow breathing helps when fear spikes. Self-compassion eases the guilt caregivers often feel. A stress plan helps you share the load and protect a little time for yourself.",
+    articles: ["anxiety-and-stress", "childhood-and-family"],
+  },
+  {
+    id: "health-worry",
+    skipToFacet: true,
+    match: [/\b(my (health|test results?|symptoms?|diagnosis|scan|biopsy|lump|blood work)|health anxiety|worried about my health|waiting for (my |the )?(test )?results|i'?m (so )?(sick|ill) (and|but)|i think i'?m (sick|ill))\b/i],
+    sideLabel: "your health",
+    open: "Worrying about your own health can be very unsettling, especially while you're waiting for answers. I can't assess symptoms, but I can help with the worry. What is the hardest part right now: waiting for results or an appointment, symptoms you've noticed, or thoughts about what it might mean?",
+    facets: [
+      { id: "waiting", label: "Waiting for answers", match: /\b(wait\w*|results|appointment|scan|test|call back|hear back)/i, reply: "Waiting is one of the hardest parts, because there is nothing to do with the worry except carry it.", question: "How long until you expect to know more, and how are you getting through the days until then?" },
+      { id: "symptoms", label: "Symptoms I've noticed", match: /\b(symptom\w*|pain|lump|feel (sick|ill)|hurts|bleeding|dizzy|tired)/i, reply: "Symptoms deserve proper attention from a doctor, and it's good that you're taking them seriously.", question: "Have you been able to talk with a doctor about them yet? If they get worse or feel urgent, please contact one right away, or call 911 in an emergency." },
+      { id: "meaning", label: "What it might mean", match: /\b(mean|worst|cancer|serious|die|dying|what if|google|online|read)/i, reply: "When health is uncertain, the mind often jumps straight to the worst possibility and treats it as if it were already true.", question: "What do you know for sure right now, and what is still a question?" },
+    ],
+    otherFacet: { reply: "That sounds like a lot to carry.", question: "When does the worry feel strongest during the day?" },
+    perspective: "Health worries tend to grow when they have nowhere to go. It can help to give them a place: write down what you know, what you don't know yet, and what you'll ask the doctor. Searching symptoms online usually raises worry rather than settling it, because it shows the rarest and most frightening possibilities. Who could you tell about what you're going through, so you're not carrying it alone?",
+    nextSteps: "Some things that may help. Write your questions down before your appointment. Choose a short daily worry time instead of letting the thoughts run all day. Use a calming exercise when the thoughts loop. And if anything gets worse or feels urgent, contact a doctor straight away, or call 911 in an emergency.",
+    exercises: ["worry-time", "paced-breathing", "grounding-54321"],
+    why: "Worry time contains health worries so they don't take over the day. Slow breathing settles the body. Grounding brings you back to the present when the mind races ahead.",
+    articles: ["anxiety-and-stress", "mindfulness"],
+  },
+  {
     id: "boundaries",
     match: [/\b(can'?t say no|cannot say no|people[- ]pleas\w*|taken advantage|walk all over me|always say yes|boundar(y|ies)|too much to ask|they expect me to)\b/i],
     open: "That sounds draining. When it's hard to say no, our own needs can quietly slip to the bottom of the list. What makes it hardest for you: worrying the other person will be upset, feeling guilty, or not being sure what you're allowed to ask for?",
@@ -132,6 +227,7 @@ export const TOPICS: readonly Topic[] = [
   },
   {
     id: "loneliness",
+    sideLabel: "feeling lonely",
     match: [/\b(lonely|loneliness|so alone|all alone|isolated|no friends|no one to talk to|nobody to talk to|nobody cares|no one cares)\b/i],
     open: "I'm really glad you said something. Loneliness can hurt a lot, and it's more common than many people realize. Can you tell me a bit more: is it that there are few people around you, or that you have people but don't feel truly close to them?",
     facets: [
@@ -147,7 +243,8 @@ export const TOPICS: readonly Topic[] = [
   },
   {
     id: "sleep",
-    match: [/\b(can'?t sleep|cannot sleep|insomnia|awake all night|wake up at night|waking up at night|trouble sleeping|not sleeping|sleepless|lying awake)\b/i],
+    sideLabel: "your sleep",
+    match: [/\b(can'?t sleep|cannot sleep|insomnia|awake all night|wake up at night|waking up at night|trouble sleeping|not sleeping|sleepless|lying awake|wak(e|ing) up at \d+ ?(am)?|(up|awake) at \d+ ?am|poor sleep|sleep (badly|poorly))\b/i],
     open: "Poor sleep can make everything else feel harder, so I'm sorry you're dealing with it. What happens most: trouble falling asleep, waking in the night, or waking up feeling unrested?",
     facets: [
       { id: "falling", label: "Trouble falling asleep", match: /\b(fall(ing)? asleep|can'?t switch off|mind racing|thoughts|lying awake|hours to)/i, reply: "When the mind keeps racing at bedtime, sleep can feel very far away.", question: "What tends to be on your mind when you're trying to fall asleep?" },
@@ -179,12 +276,13 @@ export const TOPICS: readonly Topic[] = [
   },
   {
     id: "family",
+    skipToFacet: true,
     match: [/\b(my (mother|mom|mum|father|dad|parents|son|daughter|kids|children|sister|brother|in-laws|mother-in-law|grandchild\w*)|family)\b/i],
     open: "Family relationships can bring some of our strongest feelings, both warm and painful. What's been happening, and what part of it is weighing on you most?",
     facets: [
       { id: "conflict", label: "We argued", match: /\b(argu\w*|fight|fought|conflict|yell\w*|shout\w*)/i, reply: "Arguments with family can be especially hard because the history between you is long and the stakes feel high.", question: "What do you wish they understood about your side?" },
-      { id: "worry", label: "I'm worried about them", match: /\b(worr\w*|scared|afraid|sick|ill|struggl\w*|concern\w*)/i, reply: "Worrying about someone you love can be exhausting, especially when you can't fix things for them.", question: "What part of this is in your hands, and what part isn't?" },
-      { id: "distance", label: "We've grown apart", match: /\b(distance|apart|don'?t talk|estranged|ignore|call me|visit)/i, reply: "Distance in a family can leave a lot of unspoken hurt on both sides.", question: "What would a small step closer look like for you, if you want one?" },
+      { id: "worry", label: "I'm worried about them", match: /\b(worr\w*|scared|afraid|sick|ill|struggl\w*|concern\w*)/i, reply: "Worrying about someone you love can be exhausting, especially when you can't fix things for them.", question: "What part of this is in your hands, and what part isn't?", perspective: "Caring about someone and being able to fix things for them are two different things, and the gap between them is painful. What is usually in your hands is how you show up: listening, staying in touch, and offering specific help rather than general advice. What isn't in your hands is their choices and what happens to them. Looking after yourself is part of being able to keep showing up. What would you like {person} to know about how you feel?" },
+      { id: "distance", label: "We've grown apart", match: /\b(distance|apart|(don|doesn|won|didn)'?t (talk|speak|call)|not (talking|speaking)|estranged|ignor\w*|call me|visit)/i, reply: "Distance in a family can leave a lot of unspoken hurt on both sides.", question: "What would a small step closer look like for you, if you want one?" },
     ],
     otherFacet: { reply: "Thank you for telling me.", question: "How are you feeling about it right now?" },
     perspective: "Family members often carry different memories of the same events, and each person's version can feel completely true to them. Understanding someone's view doesn't mean agreeing with it, or accepting being treated badly. It can help you decide how you want to respond. What would you want the relationship to look like a year from now?",
@@ -225,8 +323,28 @@ export const TOPICS: readonly Topic[] = [
     articles: ["emotional-intelligence", "understanding-emotions"],
   },
   {
+    id: "job-loss",
+    match: [/\b(lost my job|lose my job|laid off|got fired|been fired|fired me|let me go|made redundant|redundancy|unemployed|out of work|job loss|looking for (a )?(new )?job)\b/i],
+    sideLabel: "your job",
+    skipToFacet: true,
+    open: "I'm sorry. Losing a job, or fearing you might, can shake a lot at once: money, routine, and how you see yourself. What is hitting you hardest right now: the money side, the shock or unfairness of it, or worry about what comes next?",
+    facets: [
+      { id: "money", label: "The money side", match: /\b(money|bills?|rent|mortgage|pay|afford|savings|income|debt)/i, reply: "Worrying about how to pay for things is one of the hardest parts of losing work, and it's very understandable.", question: "Do you know roughly how long you can manage, and have you been able to check what support or benefits you might be able to get?" },
+      { id: "shock", label: "The shock or unfairness", match: /\b(shock\w*|unfair|not fair|why me|out of nowhere|sudden|angry|hurt|betray\w*|years)/i, reply: "Being let go can feel like a rejection, even when it's about the company and not about you.", question: "What is the thought about it that keeps coming back to you most?" },
+      { id: "next", label: "What comes next", match: /\b(next|future|find (a|another)|new job|age|too old|apply|interview|start again)/i, reply: "Not knowing what comes next can be frightening, especially if you've been in the same place for a long time.", question: "What kind of work, or what kind of day, would you like to be moving towards?" },
+    ],
+    otherFacet: { reply: "That's a lot to take in.", question: "How are you looking after yourself in the days since it happened?" },
+    perspective: "Losing a job often hurts in two ways: the practical problem, and a hit to how we see ourselves. They're worth separating. Your job was something you did, not who you are, and many people find their next step only after a period that felt very uncertain. Keeping some structure in your days, like a regular wake-up time, a walk, and a set time for job tasks, can help a lot. What is one small thing you could do this week that would make you feel a little more steady?",
+    nextSteps: "A few ideas, only if they fit. Make a simple list of what you need to sort out first, like income, benefits, and health insurance, and take one item at a time. Tell one or two people you trust, because isolation makes this harder. Keep a daily routine with time for rest, not only for searching. Free career and benefits advice is often available through local job centers or libraries.",
+    exercises: ["stress-plan", "self-compassion", "paced-breathing"],
+    why: "A stress plan breaks a big, vague problem into steps. Self-compassion helps with the blow to confidence. Slow breathing helps when worry about the future spikes.",
+    articles: ["anxiety-and-stress", "self-esteem-and-confidence"],
+  },
+  {
     id: "work-stress",
-    match: [/\b(work|job|deadline\w*|workload|overtime|burn(ed|t)? ?out|burnout|career|my shift|project|clients?)\b/i],
+    sideLabel: "work",
+    // "I can't work" is about how someone is coping, not about their job.
+    match: [/(?<!(can'?t|cannot|unable to|couldn'?t|not able to) )\b(work|job|deadline\w*|workload|overtime|burn(ed|t)? ?out|burnout|career|my shift|project|clients?)\b/i],
     open: "Work stress can really follow us home. I'd like to understand what's going on. What is weighing on you most: the amount of work, a person or relationship at work, or worry about how you're doing?",
     facets: [
       { id: "amount", label: "The amount of work", match: /\b(amount|too much|workload|deadline|hours|overtime|no time|behind)/i, reply: "When the work keeps piling up, it can feel like you're always behind, no matter how hard you try.", question: "Which part of the workload feels most urgent, and which part could wait or be shared?" },
@@ -239,6 +357,24 @@ export const TOPICS: readonly Topic[] = [
     exercises: ["stress-plan", "paced-breathing", "boundary-script"],
     why: "A stress plan separates what you can influence from what you can't. Slow breathing lowers the intensity of stress in the moment. A boundary script helps protect time for rest.",
     articles: ["anxiety-and-stress", "motivation-and-personal-growth"],
+  },
+  {
+    id: "money",
+    skipToFacet: true,
+    match: [/\b(money|debts?|bills?|rent|mortgage|can'?t afford|afford|broke|loans?|credit cards?|financ\w*|pay (the|my) bills|savings|paycheck|salary)\b/i],
+    sideLabel: "money",
+    open: "Money worries can follow you everywhere, into your sleep, your relationships, and how you feel about yourself. What is weighing on you most: a specific bill or debt, not knowing how you'll manage from month to month, or the strain it's putting on you and the people around you?",
+    facets: [
+      { id: "specific", label: "A bill or debt", match: /\b(bill|debt|loan|rent|mortgage|credit|owe|behind|late|collector)/i, reply: "A specific debt or bill can feel like a weight hanging over every day.", question: "Is there a date or deadline connected to it, and do you know what your options are yet?" },
+      { id: "monthly", label: "Managing month to month", match: /\b(month|manage|enough|paycheck|income|job|lost my job|hours|pension|prices|expensive)/i, reply: "Not knowing whether there will be enough can keep the mind on constant alert.", question: "Have you been able to look at the numbers on paper, or does that feel too stressful right now?" },
+      { id: "strain", label: "The strain it's causing", match: /\b(stress\w*|sleep|partner|husband|wife|family|ashamed|shame|embarrass\w*|fight|argu\w*|hide|hiding)/i, reply: "Money stress often spills into sleep and relationships, and many people feel ashamed of it, even though it's far more common than it seems.", question: "Does anyone know what you're going through with this?" },
+    ],
+    otherFacet: { reply: "That sounds stressful.", question: "What part of the money worry comes back to you most often?" },
+    perspective: "Money problems often feel bigger when they stay vague and hidden. Getting them onto paper, even roughly, usually makes them easier to face, because a known problem can be planned for, while a fog can't. Financial trouble also says nothing about your worth as a person. What would be one small, practical step you could take this week?",
+    nextSteps: "A few ideas, if they're useful. Write down what comes in, what goes out, and what's owed, without judging it. If you're behind on a payment, contacting the lender early often opens hardship options. Free, non-profit credit or debt counseling can help you see your choices. And give your mind a break: a set worry time can stop money thoughts from taking over the whole day.",
+    exercises: ["worry-time", "stress-plan", "paced-breathing"],
+    why: "Worry time keeps money thoughts to one part of the day. A stress plan turns a vague worry into small steps. Slow breathing helps when the stress feels physical.",
+    articles: ["anxiety-and-stress", "cognitive-behavioral-therapy"],
   },
   {
     id: "anxiety",
@@ -287,6 +423,16 @@ export const TOPICS: readonly Topic[] = [
 
 export function topicById(id: TopicId): Topic {
   return TOPICS.find((topic) => topic.id === id) as Topic;
+}
+
+/** The person someone mentioned, as "your mom", for {person} in replies. */
+export function mentionedPerson(text: string): string | null {
+  const match = new RegExp(`\\b(my|our) (${PEOPLE})\\b`, "i").exec(text);
+  return match ? `your ${match[2].toLowerCase()}` : null;
+}
+
+export function fillPerson(text: string, person: string | null, topic: Topic): string {
+  return text.replace(/\{person\}/g, person ?? topic.personFallback ?? "them");
 }
 
 export function detectTopic(text: string): Topic | null {

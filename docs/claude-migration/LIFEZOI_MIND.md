@@ -26,7 +26,7 @@ Code: `src/lib/mind/` (logic, tested in `mind.test.ts`) and `src/components/mind
 3. A questionnaire hand-off: explains the band without diagnosing, then asks the brief's follow-up questions one at a time.
 4. Greetings, closings, exercise requests, and questions answered from the encyclopedia.
 5. Resentment and "am I right?": validates feelings without taking sides.
-6. Topic flow (`topics.ts`, 13 topics): acknowledge and ask what bothered them most, respond to that part, offer a balanced perspective, then next steps with exercises (and why) and articles. Later turns use non-repeating open questions and point toward real-world support. Lasting or disabling problems add a suggestion to see a professional.
+6. Topic flow (`topics.ts`, 17 topics, including a loved one's illness or caregiving, the person's own health worries, money, and job loss): acknowledge and ask what bothered them most, respond to that part, offer a balanced perspective, then next steps with exercises (and why) and articles. Replies use the person the visitor named ("your mom") through `{person}`. When the first message already answers the opening question, Mind goes straight to that part. A new concern raised mid-topic (for example money while talking about sleep) is acknowledged, remembered, and offered again once the current topic is done. Later turns use non-repeating open questions and point toward real-world support. Lasting problems with the person's own mood or functioning add a suggestion to see a professional. `conversation-dialogues.test.ts` holds 32 realistic conversations that must stay on topic.
 
 It cannot understand arbitrary language. When nothing matches, it says thank you and asks for more, rather than pretending.
 
