@@ -4,6 +4,7 @@ import "@/components/encyclopedia/encyclopedia.css";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useT } from "@/components/locale-provider";
+import { DidYouKnow } from "@/components/encyclopedia/facts-view";
 import { Illustration } from "@/components/encyclopedia/illustrations";
 import { ArticleCard, Disclaimer, EnglishOnlyNote, EvidenceLegend } from "@/components/encyclopedia/parts";
 import { useArticles, useRecentArticles } from "@/components/encyclopedia/use-encyclopedia";
@@ -142,6 +143,8 @@ export function EncyclopediaLanding() {
         </Link>
       </section>
 
+      <DidYouKnow />
+
       <section className="ency-block">
         <div className="ency-block-head">
           <h2>{t("Featured articles")}</h2>
@@ -213,7 +216,7 @@ export function EncyclopediaLanding() {
         <p>{t("Every article separates what is well established from what is still being studied. Each label is assigned to one specific claim and names the kind of studies behind it.")}</p>
         <EvidenceLegend />
         <p className="hint">
-          <Link href="/encyclopedia/glossary">{t("Medical words explained")}</Link> · <Link href="/encyclopedia/library">{t("My Library")}</Link>
+          <Link href="/encyclopedia/glossary">{t("Medical words explained")}</Link> · <Link href="/encyclopedia/facts">{t("Did You Know?")}</Link> · <Link href="/encyclopedia/library">{t("My Library")}</Link>
         </p>
       </section>
 
