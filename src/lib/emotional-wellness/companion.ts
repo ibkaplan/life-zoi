@@ -107,7 +107,7 @@ export function respondToCompanion(input: {
 
   if (input.companionEnabled === false) {
     const text = t(
-      "The companion is off, so no coaching reply was written. If you are in danger, the crisis check on this page still runs on its own. The paid-model seam stays off.",
+      "Written replies are paused, so the companion did not answer. Press “Resume written replies” above to get answers again. If you are in danger, the crisis check on this page still runs.",
     );
     return finish(text, input.mode);
   }
