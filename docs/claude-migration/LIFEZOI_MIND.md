@@ -78,7 +78,7 @@ Any provider must run after the safety check, never handle a detected crisis, ke
 ## Not done yet
 
 - Clinical review of the safety phrases, crisis copy, and all Mind wording. The 988 wording is United States only.
-- Translations: Mind is English only; other locales see a note in their language. Official PHQ-9/GAD-7 translations would need to be added from the developers' site.
+- Translations: the frame (title, tabs, safety block, disclaimer) and the Exercises section (list, player, step voice) are in Ukrainian, Russian, and Greek (`catalog/<locale>/mind.json`, data listed in `src/lib/i18n/sources/mind.ts`). A page opts in with `<MindShell translated>`; other sections stay marked `lang="en"` with a note in the person's language until they are translated. The conversation engine still understands and answers in English, apart from the crisis check, which also reads Ukrainian, Russian, and Greek. Official PHQ-9/GAD-7 translations would need to be added from the developers' site.
 - PSS and ISI need permission or a licence before they can be added.
 - Reference links were checked on 2026-11-22. Several PubMed records could not be opened by the automated check (captcha or rate limit); they should get a human check before launch.
 - Screenshots and in-browser voice testing need a signed-in session (a preview deployment or a test account). Unit tests cover the logic.

@@ -15,7 +15,7 @@ export default async function ExercisePage({ params }: { params: Promise<{ id: s
   const exercise = exerciseById(id);
   if (!exercise) notFound();
   return (
-    <MindShell title={exercise.title}>
+    <MindShell title={exercise.title} translated>
       <MindExercisePlayer exercise={exercise} />
     </MindShell>
   );

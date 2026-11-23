@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useLocale, useT } from "@/components/locale-provider";
 import { useSpeechSupport } from "@/components/voice/read-aloud";
 import { formatDate, useMindStore } from "@/components/mind/shared";
 import { EVIDENCE_LABELS } from "@/lib/mind/evidence";
@@ -25,30 +26,31 @@ const CATEGORY_LABEL: Record<string, string> = {
 };
 
 export function MindExerciseList() {
+  const t = useT();
   const categories = [...new Set(MIND_EXERCISES.map((exercise) => exercise.category))];
   const [filter, setFilter] = useState<string | null>(null);
   const shown = filter ? MIND_EXERCISES.filter((exercise) => exercise.category === filter) : MIND_EXERCISES;
   return (
     <div className="stack-lg">
-      <p className="mind-note">All exercises are optional. Choose one that suits you, pick a length, and stop whenever you like. Each one can be read aloud step by step.</p>
-      <div className="mind-chips" role="group" aria-label="Filter exercises">
+      <p className="mind-note">{t("All exercises are optional. Choose one that suits you, pick a length, and stop whenever you like. Each one can be read aloud step by step.")}</p>
+      <div className="mind-chips" role="group" aria-label={t("Filter exercises")}>
         <button type="button" className="mind-chip" aria-pressed={filter === null} onClick={() => setFilter(null)}>
-          All
+          {t("All")}
         </button>
         {categories.map((category) => (
           <button key={category} type="button" className="mind-chip" aria-pressed={filter === category} onClick={() => setFilter(category)}>
-            {CATEGORY_LABEL[category] ?? category}
+            {t(CATEGORY_LABEL[category] ?? category)}
           </button>
         ))}
       </div>
       <div className="mind-grid">
         {shown.map((exercise) => (
           <Link key={exercise.id} href={`/mind/exercises/${exercise.id}`} className="mind-card">
-            <span className="mind-tag">{CATEGORY_LABEL[exercise.category] ?? exercise.category}</span>
-            <h3>{exercise.title}</h3>
-            <p>{exercise.summary}</p>
+            <span className="mind-tag">{t(CATEGORY_LABEL[exercise.category] ?? exercise.category)}</span>
+            <h3>{t(exercise.title)}</h3>
+            <p>{t(exercise.summary)}</p>
             <p className="mind-card-meta">
-              {exercise.lengths.join(", ")} minutes · {EVIDENCE_LABELS[exercise.evidence].label}
+              {t("{minutes} minutes", { minutes: exercise.lengths.join(", ") })} · {t(EVIDENCE_LABELS[exercise.evidence].label)}
             </p>
           </Link>
         ))}
@@ -61,6 +63,8 @@ type Phase = "ready" | "running" | "paused" | "finished";
 
 export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
   const store = useMindStore();
+  const t = useT();
+  const { locale } = useLocale();
   const canSpeak = useSpeechSupport();
   const [minutes, setMinutes] = useState(exercise.lengths[Math.min(1, exercise.lengths.length - 1)]);
   const [voiceOn, setVoiceOn] = useState(true);
@@ -110,7 +114,7 @@ export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
       }, 1000);
     };
     if (voiceOn && canSpeak) {
-      player.play(OWNER, segmentsFromText(list[at].text, "en"), {
+      player.play(OWNER, segmentsFromText(t(list[at].text), locale), {
         stepWait: 0,
         rateFactor: 0.9,
         // Stopping the voice (Pause, Stop, leaving the page) also ends it: only continue if this step is still current.
@@ -171,23 +175,23 @@ export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
   const evidence = EVIDENCE_LABELS[exercise.evidence];
 
   return (
-    <div className="stack-lg">
+    <div className="stack-lg" lang={locale}>
       <section className="card stack">
-        <p>{exercise.summary}</p>
+        <p>{t(exercise.summary)}</p>
         <p>
-          <strong>Why it may help:</strong> {exercise.why}
+          <strong>{t("Why it may help:")}</strong> {t(exercise.why)}
         </p>
         <p>
           <span className="mind-evidence" data-level={exercise.evidence}>
-            {evidence.label}
+            {t(evidence.label)}
           </span>{" "}
-          <span className="hint">{evidence.meaning}</span>
+          <span className="hint">{t(evidence.meaning)}</span>
         </p>
-        {exercise.caution ? <p className="mind-note">{exercise.caution}</p> : null}
+        {exercise.caution ? <p className="mind-note">{t(exercise.caution)}</p> : null}
         {exercise.sourceUrl ? (
           <p className="hint">
-            Source:{" "}
-            <a href={exercise.sourceUrl} target="_blank" rel="noreferrer">
+            {t("Source:")}{" "}
+            <a lang="en" href={exercise.sourceUrl} target="_blank" rel="noreferrer">
               {exercise.sourceLabel}
             </a>
           </p>
@@ -195,51 +199,51 @@ export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
       </section>
 
       <section className="mind-player" aria-labelledby="player-title">
-        <h2 id="player-title">{phase === "finished" ? "Well done for taking this time" : exercise.title}</h2>
+        <h2 id="player-title">{phase === "finished" ? t("Well done for taking this time") : t(exercise.title)}</h2>
         {phase === "ready" ? (
           <>
-            <p>Choose how long you would like.</p>
-            <div className="mind-lengths" role="group" aria-label="Length">
+            <p>{t("Choose how long you would like.")}</p>
+            <div className="mind-lengths" role="group" aria-label={t("Length")}>
               {exercise.lengths.map((length) => (
                 <button key={length} type="button" className="mind-chip" aria-pressed={minutes === length} onClick={() => setMinutes(length)}>
-                  {length} minutes
+                  {t("{minutes} minutes", { minutes: length })}
                 </button>
               ))}
             </div>
             <label className="mind-toggle">
               <input type="checkbox" checked={voiceOn && canSpeak !== false} disabled={canSpeak === false} onChange={(event) => setVoiceOn(event.target.checked)} />
-              Read the steps aloud
+              {t("Read the steps aloud")}
             </label>
-            {canSpeak === false ? <p className="hint">This browser cannot read aloud. The steps will appear on screen.</p> : null}
-            <p className="hint">About {Math.round(plannedSeconds(planExercise(exercise, minutes)) / 60)} minutes with quiet pauses between steps.</p>
+            {canSpeak === false ? <p className="hint">{t("This browser cannot read aloud. The steps will appear on screen.")}</p> : null}
+            <p className="hint">{t("About {minutes} minutes with quiet pauses between steps.", { minutes: Math.round(plannedSeconds(planExercise(exercise, minutes)) / 60) })}</p>
             <button type="button" className="btn btn-primary" onClick={start}>
-              Start
+              {t("Start")}
             </button>
           </>
         ) : phase === "finished" ? (
           <>
-            <p>Notice how you feel now. There is no right way to feel after an exercise.</p>
+            <p>{t("Notice how you feel now. There is no right way to feel after an exercise.")}</p>
             <div className="actions">
               <button type="button" className="btn btn-secondary" onClick={start}>
-                Repeat
+                {t("Repeat")}
               </button>
               {store.consent ? (
                 saved ? (
                   <span className="mind-tag validated" role="status">
-                    Saved to My progress
+                    {t("Saved to My progress")}
                   </span>
                 ) : (
                   <button type="button" className="btn btn-primary" onClick={save}>
-                    Save to My progress
+                    {t("Save to My progress")}
                   </button>
                 )
               ) : (
                 <Link className="btn btn-ghost" href="/mind/progress">
-                  Turn on saving to keep a record
+                  {t("Turn on saving to keep a record")}
                 </Link>
               )}
               <Link className="btn btn-ghost" href="/mind/exercises">
-                Other exercises
+                {t("Other exercises")}
               </Link>
             </div>
           </>
@@ -247,29 +251,29 @@ export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
           <>
             <div className="mind-orb" data-paused={phase === "paused"} aria-hidden="true" />
             <p className="mind-count">
-              Step {index + 1} of {steps.length}
+              {t("Step {current} of {total}", { current: index + 1, total: steps.length })}
             </p>
             <p className="mind-step-text" aria-live="polite">
-              {steps[index]?.text}
+              {steps[index] ? t(steps[index].text) : null}
             </p>
             <p className="mind-count" aria-live="off">
-              {phase === "paused" ? "Paused" : left > 0 ? `${left} seconds of quiet` : "…"}
+              {phase === "paused" ? t("Paused") : left > 0 ? t("{seconds} seconds of quiet", { seconds: left }) : "…"}
             </p>
             <div className="actions">
               {phase === "paused" ? (
                 <button type="button" className="btn btn-primary" onClick={resume}>
-                  Resume
+                  {t("Resume")}
                 </button>
               ) : (
                 <button type="button" className="btn btn-secondary" onClick={pause}>
-                  Pause
+                  {t("Pause")}
                 </button>
               )}
               <button type="button" className="btn btn-secondary" onClick={() => runStep(steps, index + 1)}>
-                Next step
+                {t("Next step")}
               </button>
               <button type="button" className="btn btn-ghost" onClick={stop}>
-                Stop
+                {t("Stop")}
               </button>
             </div>
           </>
@@ -278,12 +282,12 @@ export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
 
       {exercise.writing ? (
         <section className="card stack">
-          <h2>Write it down (optional)</h2>
-          <p className="hint">What you write here is not saved or sent anywhere. It disappears when you leave the page, so copy it to paper if you want to keep it.</p>
+          <h2>{t("Write it down (optional)")}</h2>
+          <p className="hint">{t("What you write here is not saved or sent anywhere. It disappears when you leave the page, so copy it to paper if you want to keep it.")}</p>
           <div className="mind-writing">
             {exercise.writing.map((prompt) => (
               <label key={prompt}>
-                {prompt}
+                {t(prompt)}
                 <textarea />
               </label>
             ))}
@@ -292,14 +296,18 @@ export function MindExercisePlayer({ exercise }: { exercise: MindExercise }) {
       ) : null}
 
       <section className="card stack">
-        <h2>All the steps</h2>
+        <h2>{t("All the steps")}</h2>
         <ol className="mind-list">
           {exercise.steps.map((step) => (
-            <li key={step.text}>{step.text}</li>
+            <li key={step.text}>{t(step.text)}</li>
           ))}
         </ol>
         {history.length ? (
-          <p className="hint">You saved this exercise on: {history.map((entry) => `${formatDate(entry.date)} (${entry.minutes} min)`).join(", ")}.</p>
+          <p className="hint">
+            {t("You saved this exercise on: {dates}.", {
+              dates: history.map((entry) => t("{date} ({minutes} min)", { date: formatDate(entry.date, locale), minutes: entry.minutes })).join(", "),
+            })}
+          </p>
         ) : null}
       </section>
     </div>
