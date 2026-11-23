@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function UnderstandPage() {
   return (
-    <MindShell title="Understand yourself" intro="Psychological self-assessment, at your own pace. Choose a questionnaire, answer privately, and see what the result can and cannot tell you.">
+    <MindShell translated title="Understand yourself" intro="Psychological self-assessment, at your own pace. Choose a questionnaire, answer privately, and see what the result can and cannot tell you.">
       <MindUnderstand />
     </MindShell>
   );

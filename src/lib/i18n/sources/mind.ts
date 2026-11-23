@@ -1,10 +1,10 @@
 import { MIND_AREAS } from "@/lib/mind/areas";
-import { compareResults, INSTRUMENTS, PHQ9 } from "@/lib/mind/assessments";
+import { compareResults, INSTRUMENTS, ITEM9_MESSAGE, NOT_INCLUDED, PHQ9 } from "@/lib/mind/assessments";
 import { EVIDENCE_LABELS } from "@/lib/mind/evidence";
 import { MIND_EXERCISES } from "@/lib/mind/exercises";
 import { PLAN_DAYS, PLAN_GOALS, PLAN_NOTICE } from "@/lib/mind/plan";
 import { EVALUATED_PROVIDERS, NOT_SUITABLE_NOTE, RULES_PROVIDER } from "@/lib/mind/provider";
-import { REFLECTIONS } from "@/lib/mind/reflections";
+import { REFLECTION_LABEL, REFLECTION_SCALE, REFLECTIONS } from "@/lib/mind/reflections";
 import { LISTEN_ERRORS, listenErrorMessage } from "@/lib/mind/speech";
 
 /**
@@ -21,9 +21,16 @@ const sources: unknown[] = [
   PLAN_GOALS.map((goal) => goal.label),
   PLAN_DAYS.map((day) => [day.theme, day.intro, day.reflection]),
   PLAN_NOTICE,
-  // Score band names and reflection titles appear on My progress. The questionnaires themselves are not listed.
-  INSTRUMENTS.map((instrument) => instrument.bands.map((band) => band.label)),
-  REFLECTIONS.map((reflection) => reflection.title),
+  // LifeZoi's own text about the questionnaires. The validated wording (stem, items, answer
+  // choices, difficulty question) is not listed: it is shown only in its original language
+  // until an official translation is added.
+  INSTRUMENTS.map((instrument) => [instrument.topic, instrument.purpose, instrument.timeFrame, instrument.canTell, instrument.cannotTell, instrument.bands.map((band) => [band.label, band.meaning])]),
+  [ITEM9_MESSAGE.title, ITEM9_MESSAGE.paragraphs],
+  NOT_INCLUDED.map((entry) => entry.reason),
+  // LifeZoi's own self-reflections are not validated tests, so they are translated in full.
+  REFLECTIONS.map((reflection) => [reflection.title, reflection.intro, reflection.statements]),
+  REFLECTION_LABEL,
+  REFLECTION_SCALE,
   comparisonText(),
   LISTEN_ERRORS.map((error) => listenErrorMessage(error)),
   MIND_AREAS,

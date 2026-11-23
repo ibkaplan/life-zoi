@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useLocale, useT } from "@/components/locale-provider";
 import { ArticleLinks, ExerciseLinks, formatDate, SafetyActions, useMindStore } from "@/components/mind/shared";
 import { compareResults, instrumentById, ITEM9_MESSAGE, PHQ9_SAFETY_ITEM, scoreInstrument, type Instrument, type ScoreResult } from "@/lib/mind/assessments";
 import { initialConversation } from "@/lib/mind/conversation";
@@ -12,18 +13,25 @@ import { reflectionById, REFLECTION_LABEL, REFLECTION_SCALE, summarizeReflection
 import { updateMindProgress } from "@/lib/mind/store";
 
 function Item9Panel() {
+  const t = useT();
   return (
     <section className="mind-safety" role="alert" aria-labelledby="item9-title">
-      <h2 id="item9-title">{ITEM9_MESSAGE.title}</h2>
+      <h2 id="item9-title">{t(ITEM9_MESSAGE.title)}</h2>
       {ITEM9_MESSAGE.paragraphs.map((text) => (
-        <p key={text}>{text}</p>
+        <p key={text}>{t(text)}</p>
       ))}
       <SafetyActions />
     </section>
   );
 }
 
+/** Shown when the site is not in English: the validated wording stays in its original language. */
+const ORIGINAL_WORDING =
+  "The questions and answer choices are shown in English, in their original validated wording. LifeZoi Mind will show them in another language only in the developers' official translation.";
+
 function InstrumentRunner({ instrument }: { instrument: Instrument }) {
+  const t = useT();
+  const { locale } = useLocale();
   const router = useRouter();
   const store = useMindStore();
   const [started, setStarted] = useState(false);
@@ -69,44 +77,47 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
     return (
       <div className="stack-lg">
         <section className="card stack">
-          <span className="mind-tag validated">Validated questionnaire</span>
-          <h2>About the {instrument.shortName}</h2>
-          <p>{instrument.purpose}</p>
+          <span className="mind-tag validated">{t("Validated questionnaire")}</span>
+          <h2>{t("About the {name}", { name: instrument.shortName })}</h2>
+          <p>{t(instrument.purpose)}</p>
           <p>
-            It has {instrument.items.length} questions about <strong>{instrument.timeFrame}</strong>, and takes about {instrument.minutes} minutes. Answer privately and honestly. There are no right or wrong answers, and you can stop at any time.
+            {t("It has {count} questions about {timeFrame}, and takes about {minutes} minutes. Answer privately and honestly. There are no right or wrong answers, and you can stop at any time.", { count: instrument.items.length, timeFrame: t(instrument.timeFrame), minutes: instrument.minutes })}
           </p>
+          {locale !== "en" ? <p className="mind-note">{t(ORIGINAL_WORDING)}</p> : null}
           <div className="mind-grid">
             <div className="stack">
-              <h3>What it can tell you</h3>
+              <h3>{t("What it can tell you")}</h3>
               <ul className="mind-list">
                 {instrument.canTell.map((text) => (
-                  <li key={text}>{text}</li>
+                  <li key={text}>{t(text)}</li>
                 ))}
               </ul>
             </div>
             <div className="stack">
-              <h3>What it cannot tell you</h3>
+              <h3>{t("What it cannot tell you")}</h3>
               <ul className="mind-list">
                 {instrument.cannotTell.map((text) => (
-                  <li key={text}>{text}</li>
+                  <li key={text}>{t(text)}</li>
                 ))}
               </ul>
             </div>
           </div>
           {repeatIn > 0 ? (
             <p className="mind-note">
-              You saved a result {formatDate(previous[0].date)}. Because this questionnaire asks about two weeks, it is most useful to repeat it in about {repeatIn} day{repeatIn === 1 ? "" : "s"}. You can still take it now.
+              {locale === "en"
+                ? `You saved a result ${formatDate(previous[0].date)}. Because this questionnaire asks about two weeks, it is most useful to repeat it in about ${repeatIn} day${repeatIn === 1 ? "" : "s"}. You can still take it now.`
+                : t("You saved a result {date}. Because this questionnaire asks about two weeks, it is most useful to repeat it in about {days} days. You can still take it now.", { date: formatDate(previous[0].date, locale), days: repeatIn })}
             </p>
           ) : null}
           <div className="actions">
             <button type="button" className="btn btn-primary" onClick={() => setStarted(true)}>
-              Begin
+              {t("Begin")}
             </button>
             <Link className="btn btn-ghost" href="/mind/understand">
-              Back to all questionnaires
+              {t("Back to all questionnaires")}
             </Link>
           </div>
-          <p className="hint">
+          <p className="hint" lang="en">
             {instrument.credit} {instrument.permission}
           </p>
         </section>
@@ -120,13 +131,13 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
     return (
       <section className="card stack" aria-labelledby="question-title">
         <p className="hint">
-          Question {Math.min(index + 1, total)} of {total}
+          {t("Question {number} of {total}", { number: Math.min(index + 1, total), total })}
         </p>
         <div className="mind-progressbar" aria-hidden="true">
           <span style={{ width: `${(index / total) * 100}%` }} />
         </div>
-        <p>{onDifficulty ? "One last question." : instrument.stem}</p>
-        <p id="question-title" className="mind-question">
+        {onDifficulty ? <p>{t("One last question.")}</p> : <p lang="en">{instrument.stem}</p>}
+        <p id="question-title" className="mind-question" lang="en">
           {onDifficulty ? instrument.difficulty.question : instrument.items[index]}
         </p>
         {showItem9 ? (
@@ -141,12 +152,12 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
                   setIndex(index + 1);
                 }}
               >
-                I have read this. Continue the questionnaire
+                {t("I have read this. Continue the questionnaire")}
               </button>
             </div>
           </>
         ) : (
-          <div className="mind-options" role="group" aria-labelledby="question-title">
+          <div className="mind-options" role="group" aria-labelledby="question-title" lang="en">
             {(onDifficulty ? instrument.difficulty.options.map((label, value) => ({ label, value })) : instrument.options).map((option) => (
               <button
                 key={option.label}
@@ -169,12 +180,12 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
         <div className="actions">
           {index > 0 ? (
             <button type="button" className="btn btn-secondary" onClick={() => setIndex(index - 1)}>
-              Back
+              {t("Back")}
             </button>
           ) : null}
           {onDifficulty ? (
             <button type="button" className="btn btn-ghost" onClick={() => setFinished(true)}>
-              Skip this question
+              {t("Skip this question")}
             </button>
           ) : null}
         </div>
@@ -185,7 +196,7 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
   if (!result) {
     return (
       <section className="card stack">
-        <p>Some questions were not answered, so no score can be worked out. The scoring only works when every question is answered.</p>
+        <p>{t("Some questions were not answered, so no score can be worked out. The scoring only works when every question is answered.")}</p>
         <button
           type="button"
           className="btn btn-primary"
@@ -194,7 +205,7 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
             setIndex(answers.findIndex((value) => value === null));
           }}
         >
-          Go to the unanswered question
+          {t("Go to the unanswered question")}
         </button>
       </section>
     );
@@ -204,67 +215,72 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
     <div className="stack-lg">
       {result.item9Positive ? <Item9Panel /> : null}
       <section className="card stack" aria-labelledby="result-title">
-        <h2 id="result-title">Your {instrument.shortName} result</h2>
+        <h2 id="result-title">{t("Your {name} result", { name: instrument.shortName })}</h2>
         <div className="mind-score">
           <span className="mind-score-number">
-            {result.total} <span className="hint">out of {result.maxScore}</span>
+            {result.total} <span className="hint">{t("out of {max}", { max: result.maxScore })}</span>
           </span>
-          <span className="mind-tag">{result.band.label} range</span>
+          <span className="mind-tag">{t("Range: {band}", { band: t(result.band.label) })}</span>
         </div>
-        <p>{result.band.meaning}</p>
-        <div className="mind-scale" aria-label="Score ranges">
+        <p>{t(result.band.meaning)}</p>
+        <div className="mind-scale" aria-label={t("Score ranges")}>
           {instrument.bands.map((band) => (
             <div key={band.label} className="mind-scale-row" data-current={band.label === result.band.label}>
               <span>
                 {band.min}–{band.max}
               </span>
               <span>
-                {band.label}
-                {band.label === result.band.label ? " (your result)" : ""}
+                {t(band.label)}
+                {band.label === result.band.label ? ` (${t("your result")})` : ""}
               </span>
             </div>
           ))}
         </div>
-        {result.difficulty ? <p>You said these problems made daily life: {result.difficulty.toLowerCase()}.</p> : null}
+        {result.difficulty ? (
+          <p>
+            {t("You said how difficult these problems made daily life:")} <span lang="en">{result.difficulty}</span>
+          </p>
+        ) : null}
         <p className="mind-note">
-          <strong>This is not a diagnosis.</strong> A score shows how often you were bothered by these symptoms over the last two weeks. It cannot tell you whether you have a condition or what is causing how you feel. {result.suggestFollowUp ? "At this level, the questionnaire's developers suggest talking with a doctor or mental health professional." : "If you are worried about how you feel, a doctor or mental health professional can help, whatever the score."}
+          <strong>{t("This is not a diagnosis.")}</strong> {t("A score shows how often you were bothered by these symptoms over the last two weeks. It cannot tell you whether you have a condition or what is causing how you feel.")}{" "}
+          {result.suggestFollowUp ? t("At this level, the questionnaire's developers suggest talking with a doctor or mental health professional.") : t("If you are worried about how you feel, a doctor or mental health professional can help, whatever the score.")}
         </p>
-        <h3>What this result cannot tell you</h3>
+        <h3>{t("What this result cannot tell you")}</h3>
         <ul className="mind-list">
           {instrument.cannotTell.map((text) => (
-            <li key={text}>{text}</li>
+            <li key={text}>{t(text)}</li>
           ))}
         </ul>
         {previous[0] ? (
           <p>
-            <strong>Compared with {formatDate(previous[0].date)} ({previous[0].total}):</strong> {compareResults(instrument, previous[0].total, result.total)}
+            <strong>{t("Compared with {date} ({total}):", { date: formatDate(previous[0].date, locale), total: previous[0].total })}</strong> {compareResults(instrument, previous[0].total, result.total, t)}
           </p>
         ) : null}
         <div className="actions">
           <button type="button" className="btn btn-primary" onClick={talkAboutIt}>
-            Talk about this result with LifeZoi Mind
+            {t("Talk about this result with LifeZoi Mind")}
           </button>
           {savedId ? (
             <span className="mind-tag validated" role="status">
-              Saved to My progress
+              {t("Saved to My progress")}
             </span>
           ) : store.consent ? (
             <button type="button" className="btn btn-secondary" onClick={save}>
-              Save this result
+              {t("Save this result")}
             </button>
           ) : (
             <Link className="btn btn-secondary" href="/mind/progress">
-              Turn on saving to keep results
+              {t("Turn on saving to keep results")}
             </Link>
           )}
         </div>
-        <p className="hint">Your individual answers are never saved. If you save, only the total, the range, the date, and whether the safety question was answered are kept, in this browser.</p>
+        <p className="hint">{t("Your individual answers are never saved. If you save, only the total, the range, the date, and whether the safety question was answered are kept, in this browser.")}</p>
       </section>
       <section className="card stack">
-        <ExerciseLinks ids={instrument.exercises} why="These exercises are commonly used to manage the symptoms this questionnaire asks about. They are optional and are not a treatment." />
+        <ExerciseLinks ids={instrument.exercises} why={t("These exercises are commonly used to manage the symptoms this questionnaire asks about. They are optional and are not a treatment.")} />
         <ArticleLinks slugs={instrument.articles} />
-        <p className="hint">Sources:</p>
-        <ul className="mind-refs">
+        <p className="hint">{t("Sources:")}</p>
+        <ul className="mind-refs" lang="en">
           {instrument.sources.map((source) => (
             <li key={source.url}>
               <a href={source.url} target="_blank" rel="noreferrer">
@@ -273,7 +289,7 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
             </li>
           ))}
         </ul>
-        <p className="hint">
+        <p className="hint" lang="en">
           {instrument.credit} {instrument.permission}
         </p>
       </section>
@@ -282,6 +298,7 @@ function InstrumentRunner({ instrument }: { instrument: Instrument }) {
 }
 
 function ReflectionRunner({ reflection }: { reflection: Reflection }) {
+  const t = useT();
   const store = useMindStore();
   const [answers, setAnswers] = useState<(number | null)[]>(() => reflection.statements.map(() => null));
   const [done, setDone] = useState(false);
@@ -291,14 +308,14 @@ function ReflectionRunner({ reflection }: { reflection: Reflection }) {
   return (
     <div className="stack-lg">
       <section className="card stack" aria-labelledby="reflection-title">
-        <span className="mind-tag reflection">{REFLECTION_LABEL}</span>
-        <h2 id="reflection-title">{reflection.title}</h2>
-        <p>{reflection.intro}</p>
-        <p>For each statement, choose how often it feels true for you lately.</p>
+        <span className="mind-tag reflection">{t(REFLECTION_LABEL)}</span>
+        <h2 id="reflection-title">{t(reflection.title)}</h2>
+        <p>{t(reflection.intro)}</p>
+        <p>{t("For each statement, choose how often it feels true for you lately.")}</p>
         {reflection.statements.map((statement, index) => (
           <fieldset key={statement} className="stack">
             <legend className="mind-question" style={{ fontSize: "1.2rem" }}>
-              {index + 1}. {statement}
+              {index + 1}. {t(statement)}
             </legend>
             <div className="mind-chips">
               {REFLECTION_SCALE.map((label, value) => (
@@ -314,7 +331,7 @@ function ReflectionRunner({ reflection }: { reflection: Reflection }) {
                     setAnswers(next);
                   }}
                 >
-                  {label}
+                  {t(label)}
                 </button>
               ))}
             </div>
@@ -322,32 +339,32 @@ function ReflectionRunner({ reflection }: { reflection: Reflection }) {
         ))}
         <div className="actions">
           <button type="button" className="btn btn-primary" disabled={!summary.complete} onClick={() => setDone(true)}>
-            See my reflection
+            {t("See my reflection")}
           </button>
         </div>
       </section>
       {done ? (
         <section className="card stack" aria-live="polite">
-          <h2>Your reflection</h2>
-          <p className="mind-note">This is not a score or a test result. It only gathers what stood out in your own answers, so you can decide what to explore.</p>
+          <h2>{t("Your reflection")}</h2>
+          <p className="mind-note">{t("This is not a score or a test result. It only gathers what stood out in your own answers, so you can decide what to explore.")}</p>
           {summary.worthAttention.length ? (
             <>
-              <h3>Worth paying attention to</h3>
+              <h3>{t("Worth paying attention to")}</h3>
               <ul className="mind-list">
                 {summary.worthAttention.map((text) => (
-                  <li key={text}>{text}</li>
+                  <li key={text}>{t(text)}</li>
                 ))}
               </ul>
             </>
           ) : (
-            <p>None of the statements stood out as a concern for you right now.</p>
+            <p>{t("None of the statements stood out as a concern for you right now.")}</p>
           )}
           {summary.strengths.length ? (
             <>
-              <h3>Strengths you mentioned</h3>
+              <h3>{t("Strengths you mentioned")}</h3>
               <ul className="mind-list">
                 {summary.strengths.map((text) => (
-                  <li key={text}>{text}</li>
+                  <li key={text}>{t(text)}</li>
                 ))}
               </ul>
             </>
@@ -356,12 +373,12 @@ function ReflectionRunner({ reflection }: { reflection: Reflection }) {
           <ArticleLinks slugs={reflection.articles} />
           <div className="actions">
             <Link className="btn btn-secondary" href="/mind">
-              Talk it through with LifeZoi Mind
+              {t("Talk it through with LifeZoi Mind")}
             </Link>
             {store.consent ? (
               saved ? (
                 <span className="mind-tag validated" role="status">
-                  Saved
+                  {t("Saved")}
                 </span>
               ) : (
                 <button
@@ -375,7 +392,7 @@ function ReflectionRunner({ reflection }: { reflection: Reflection }) {
                     setSaved(true);
                   }}
                 >
-                  Note that I did this reflection
+                  {t("Note that I did this reflection")}
                 </button>
               )
             ) : null}
@@ -391,5 +408,9 @@ export function MindAssessment({ id }: { id: string }) {
   if (instrument) return <InstrumentRunner instrument={instrument} />;
   const reflection = reflectionById(id);
   if (reflection) return <ReflectionRunner reflection={reflection} />;
-  return <p>This questionnaire was not found.</p>;
+  return <NotFound />;
+}
+
+function NotFound() {
+  return <p>{useT()("This questionnaire was not found.")}</p>;
 }

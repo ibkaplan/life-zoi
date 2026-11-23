@@ -383,3 +383,15 @@ describe("crisis wording in other languages", () => {
     expect(checkSafety("У меня был тяжёлый день на работе").level).toBe("none");
   });
 });
+
+describe("LifeZoi Mind questionnaire wording", () => {
+  it("does not translate the validated PHQ-9 and GAD-7 wording without an official translation", async () => {
+    const { MIND_TEXT } = await import("@/lib/mind/lang");
+    const catalogs = await Promise.all(["uk", "ru", "el"].map((locale) => import(`@/lib/i18n/catalog/${locale}/mind.json`)));
+    for (const instrument of INSTRUMENTS) {
+      const wording = [instrument.stem, ...instrument.items, ...instrument.options.map((option) => option.label), instrument.difficulty.question];
+      for (const catalog of catalogs) for (const text of wording) expect(catalog.default[text], text).toBeUndefined();
+      for (const table of Object.values(MIND_TEXT)) for (const text of instrument.items) expect(table[text], text).toBeUndefined();
+    }
+  });
+});
