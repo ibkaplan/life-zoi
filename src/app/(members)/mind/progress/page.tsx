@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ProgressPage() {
   return (
-    <MindShell title="My progress" intro="Optional and private. Look back on what you have tried, if you choose to keep a record.">
+    <MindShell translated title="My progress" intro="Optional and private. Look back on what you have tried, if you choose to keep a record.">
       <MindProgressView />
     </MindShell>
   );
