@@ -252,17 +252,26 @@ function bandOf(instrument: Instrument, total: number): Band {
  * Plain-language comparison of two results of the same questionnaire. A change inside
  * the same score band is described as small and is not treated as improvement or worsening.
  */
-export function compareResults(instrument: Instrument, earlier: number, later: number): string {
+export function compareResults(
+  instrument: Instrument,
+  earlier: number,
+  later: number,
+  tr: (english: string, values?: Record<string, string | number>) => string = fillEnglish,
+): string {
   const change = later - earlier;
   const before = bandOf(instrument, earlier);
   const after = bandOf(instrument, later);
-  const points = `${Math.abs(change)} point${Math.abs(change) === 1 ? "" : "s"}`;
-  if (change === 0) return "Your total is the same as last time.";
+  const values = { change: Math.abs(change), before: tr(before.label), after: tr(after.label) };
+  if (change === 0) return tr("Your total is the same as last time.");
   if (before.label === after.label) {
-    return `Your total changed by ${points} and stayed in the same band (${after.label}). A small change like this can happen from one ordinary week to the next, so it does not show that things are better or worse.`;
+    return tr("Your total changed by {change} and stayed in the same band ({after}). A small change like this can happen from one ordinary week to the next, so it does not show that things are better or worse.", values);
   }
   if (change < 0) {
-    return `Your total is ${points} lower, moving from ${before.label} to ${after.label}. You reported these symptoms less often this time. That can be worth noticing, but it is not proof of recovery.`;
+    return tr("Your total is {change} lower, moving from {before} to {after}. You reported these symptoms less often this time. That can be worth noticing, but it is not proof of recovery.", values);
   }
-  return `Your total is ${points} higher, moving from ${before.label} to ${after.label}. You reported these symptoms more often this time. The questionnaire cannot tell you why. It may be a good moment to look after yourself and to talk with someone you trust or a professional.`;
+  return tr("Your total is {change} higher, moving from {before} to {after}. You reported these symptoms more often this time. The questionnaire cannot tell you why. It may be a good moment to look after yourself and to talk with someone you trust or a professional.", values);
+}
+
+function fillEnglish(english: string, values?: Record<string, string | number>): string {
+  return values ? english.replace(/\{(\w+)\}/g, (whole, key: string) => (key in values ? String(values[key]) : whole)) : english;
 }

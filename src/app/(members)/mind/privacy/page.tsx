@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <MindShell title="Privacy & safety" intro="Plain answers about where your information goes and the limits of LifeZoi Mind.">
+    <MindShell translated title="Privacy & safety" intro="Plain answers about where your information goes and the limits of LifeZoi Mind.">
       <MindPrivacy />
     </MindShell>
   );

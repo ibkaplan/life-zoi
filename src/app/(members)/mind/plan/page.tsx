@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PlanPage() {
   return (
-    <MindShell title="Your 7-day wellness plan" intro="Small daily practices you choose. Skip, repeat, or change anything.">
+    <MindShell translated title="Your 7-day wellness plan" intro="Small daily practices you choose. Skip, repeat, or change anything.">
       <MindPlan />
     </MindShell>
   );
