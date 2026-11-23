@@ -179,8 +179,9 @@ describe("emotional wellness companion", () => {
   it("writes no coaching when replies are paused and the message is not a crisis", () => {
     const paused = talk("I feel sad and I want a plan", { companionEnabled: false });
     expect(paused.crisis).toBe(false);
-    expect(paused.text).toMatch(/companion is off/i);
-    expect(paused.text).toMatch(/paid-model seam stays off/i);
+    expect(paused.text).toMatch(/written replies are paused/i);
+    expect(paused.text).toMatch(/resume written replies/i);
+    expect(paused.text).not.toMatch(/seam/i);
     expect(paused.questionCount).toBe(0);
     expect(paused.text).not.toMatch(/small step|you should/i);
   });
