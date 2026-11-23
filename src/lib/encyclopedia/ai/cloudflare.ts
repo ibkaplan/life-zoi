@@ -125,11 +125,52 @@ export function createCloudflareProvider(options: {
   const now = options.now ?? (() => new Date());
   const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/ai/run/${CLOUDFLARE_MODEL}`;
 
+  /** English search words for a question in another language, or "" when that fails. */
+  async function searchWords(question: string): Promise<string> {
+    try {
+      const response = await fetchImpl(url, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${apiToken}` },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: "Translate the health question into 3 to 8 plain English search words. Reply with the words only, separated by spaces." },
+            { role: "user", content: question.slice(0, 600) },
+          ],
+          max_tokens: 40,
+          temperature: 0,
+        }),
+        signal: AbortSignal.timeout(MODEL_LIMITS.timeoutMs),
+      });
+      if (!response.ok) return "";
+      const payload = (await response.json()) as CloudflarePayload;
+      if (payload.success === false) return "";
+      return readText(payload)
+        .toLowerCase()
+        .replace(/[^a-z\s-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 120);
+    } catch {
+      return "";
+    }
+  }
+
   return {
     id: "cloudflare",
     label: "Cloudflare Workers AI, grounded in LifeZoi Health Encyclopedia articles",
     async answer(request: AnswerRequest): Promise<Answer> {
-      const library = libraryAnswer(request);
+      let library = libraryAnswer(request);
+      const latest = [...request.turns].reverse().find((turn) => turn.role === "user")?.text ?? "";
+      // The articles are in English. A question in another language is first turned into
+      // English search words, so it can find its article.
+      if (library.noArticle && /[^\u0000-\u007F]/.test(latest) && takeModelCall(now())) {
+        const words = await searchWords(latest);
+        if (words) {
+          const last = request.turns.length - 1;
+          const turns = request.turns.map((turn, index) => (index === last ? { ...turn, text: `${turn.text} ${words}` } : turn));
+          library = { ...libraryAnswer({ ...request, turns }), topic: library.topic };
+        }
+      }
       // No matching article: say so honestly rather than let a model answer from nothing.
       if (library.noArticle) return library;
       const matched = library.articles

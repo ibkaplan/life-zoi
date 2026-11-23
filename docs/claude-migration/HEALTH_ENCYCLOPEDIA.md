@@ -63,7 +63,7 @@ Under the project's rule, the Database migrations workflow applies it to product
 
 **Cloudflare mode** (owner decision by Tetyana, 2026-11-22, Health Encyclopedia only, not LifeZoi Mind). It is on only when the server has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_WORKERS_AI_TOKEN` (`src/lib/encyclopedia/ai/cloudflare.ts`):
 
-- The server first finds the matching articles, exactly as in library mode. If none match, no model is called and the honest "no dedicated article yet" answer is returned.
+- The server first finds the matching articles, exactly as in library mode. The articles are in English, so a question with non-English letters that finds nothing is first turned into English search words by one short model call (counted in the daily cap). If still nothing matches, no answer is written by the model and the honest "no dedicated article yet" answer is returned.
 - It sends the free model `@cf/google/gemma-4-26b-a4b-it` the question, up to six earlier turns of the conversation (earlier answers are reduced to their topic), and up to 6,000 characters of the matching articles. No account, profile, assessment, or lab data is sent.
 - The model is told to use only that text, write in the member's interface language, and not diagnose, mention medicine changes or doses, or add figures. A reply that names a dose or a percentage the articles do not contain is thrown away.
 - Article cards and evidence labels still come from the articles. The answer says it was written by an AI model and can make mistakes.
