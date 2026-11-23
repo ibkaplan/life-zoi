@@ -1066,5 +1066,11 @@
  "{name} website": "Вебсайт {name} (англійською)",
  "{part} may be the tight spot for {habit}. One small action is: {action}. On a hard day: {easier}. This note is educational. It is not a diagnosis, and it is not clinically validated.": "Найвужчим місцем для звички «{habit}» може бути: {part}. Одна невелика дія: {action}. У важкий день: {easier}. Ця нотатка має освітній характер. Це не діагноз, і це не перевірено клінічно.",
  "{value} {unit} on {date}": "{value} {unit}, {date}",
- "{when} Eastern": "{when} (східний час США)"
+ "{when} Eastern": "{when} (східний час США)",
+ "Talk it through in LifeZoi Mind": "Поговоріть про це в LifeZoi Mind",
+ "Open LifeZoi Mind": "Відкрити LifeZoi Mind",
+ "This page offers short calming exercises, a private journal, and links to real people who can help. It is not a therapist, a doctor, or a crisis counselor. To talk something through and get concrete small steps, use LifeZoi Mind.": "На цій сторінці є короткі заспокійливі вправи, особистий щоденник і посилання на справжніх людей, які можуть допомогти. Це не психотерапевт, не лікар і не кризовий консультант. Щоб обговорити те, що вас турбує, і отримати конкретні маленькі кроки, скористайтеся LifeZoi Mind.",
+ "In LifeZoi Mind you can write or speak about stress, sleep, sadness, loneliness, or worries and get concrete small steps, guided exercises, and short articles with sources. Crisis help is there too.": "У LifeZoi Mind можна написати або розповісти голосом про стрес, сон, смуток, самотність чи тривоги й отримати конкретні маленькі кроки, вправи з голосовим супроводом і короткі статті з джерелами. Кризова допомога там теж є.",
+ "LifeZoi Mind is in English for now.": "Поки що LifeZoi Mind доступний лише англійською.",
+ "Gentle emotional support with short optional exercises, a private journal, and a link to LifeZoi Mind. Crisis help is always on the page. Not medical care.": "М'яка емоційна підтримка: короткі необов'язкові вправи, особистий щоденник і посилання на LifeZoi Mind. Кризова допомога завжди є на сторінці. Не медична допомога."
 }

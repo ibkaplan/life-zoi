@@ -39,6 +39,9 @@ import {
   HEADLINE,
   JOURNAL_PRIVACY,
   JOY_NOTE,
+  MIND_CARD_BODY,
+  MIND_CARD_LANGUAGE,
+  PAGE_INTRO,
   SUPPORTING_LINE,
 } from "@/lib/emotional-wellness/copy";
 import { EXERCISES } from "@/lib/emotional-wellness/exercises";
@@ -96,6 +99,9 @@ const sources: unknown[] = [
     CAREGIVER_NOTE,
     EXERCISE_INTRO,
     CONTEXT_NOTE,
+    PAGE_INTRO,
+    MIND_CARD_BODY,
+    MIND_CARD_LANGUAGE,
   ],
   CONTEXT_OPTIONS.map(({ label }) => label),
   EXERCISES.map(({ title, summary, steps }) => ({ title, summary, steps })),
