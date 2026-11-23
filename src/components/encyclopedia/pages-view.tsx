@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useT } from "@/components/locale-provider";
 import { ArticleBody } from "@/components/encyclopedia/article-body";
+import { SavedFacts } from "@/components/encyclopedia/facts-view";
 import { Illustration } from "@/components/encyclopedia/illustrations";
 import { ArticleCard, Disclaimer, EnglishOnlyNote, favoriteId, FavoriteToggle } from "@/components/encyclopedia/parts";
 import { useArticles, useRecentArticles } from "@/components/encyclopedia/use-encyclopedia";
@@ -318,6 +319,7 @@ export function LibraryView() {
         </div>
         <p className="hint">{t("Saved articles are kept with your other LifeZoi favorites.")}</p>
       </section>
+      <SavedFacts />
       <section className="ency-block">
         <div className="ency-block-head">
           <h2>{t("Recently viewed")}</h2>

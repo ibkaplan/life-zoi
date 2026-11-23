@@ -23,7 +23,16 @@ They are linked. Every article has an optional "Ask LifeZoi AI about this articl
 | My Library: saved articles use the existing companion favorites (`ency:<slug>`); recently viewed is kept in this browser per account | `pages-view.tsx` |
 | Editor: create, edit, preview, save draft, send to review, publish, archive, references, image, review and dates | `/admin/encyclopedia`, `src/app/api/admin/encyclopedia/route.ts` |
 | LifeZoi AI page, rules, and limits | `/lifezoi-ai`, `src/lib/encyclopedia/ai/`, `src/app/api/lifezoi-ai/route.ts` |
-| Tests | `src/lib/encyclopedia/encyclopedia.test.ts` |
+| Tests | `src/lib/encyclopedia/encyclopedia.test.ts`, `src/lib/encyclopedia/facts.test.ts` |
+| Did You Know? health facts (45 facts in 15 categories, Fact of the Day, archive) | `src/lib/encyclopedia/facts.ts`, `src/components/encyclopedia/facts-view.tsx`, `/encyclopedia/facts` |
+
+## Did You Know? — Amazing Health Facts
+
+Added 2026-11-23. The encyclopedia homepage shows a Fact of the Day card with a "Discover More" button, a link to the related article when there is one, and "See All Facts". `/encyclopedia/facts` has search, a filter for the 15 categories, all facts as illustrated cards, and the Facts of the Day from the last 30 days. `/encyclopedia/facts/<id>` shows why it is interesting, how it works, what science says, history, related discoveries, sources, related articles and facts, Save to My Library (companion favorite `fact:<id>`), Share (the device's share sheet, or the link is copied), and "Ask LifeZoi AI to explain". Saved facts appear in My Library.
+
+- Each fact is labelled Established science, Preliminary research, or Traditional practice, and links to the source it was checked against (Nobel Prize summary pages, NIH institutes, CDC, WHO, FDA, Cochrane, PubMed, HHS). Numbers appear only where the source states them. The wording was drafted with AI assistance and has not been reviewed by a health professional, and the pages say so.
+- The Fact of the Day is computed, not stored: a fixed shuffle starting 2026-11-23, in the member's own time zone, so every fact is shown once before any repeats. Add new facts at the end of `FACTS` so earlier days do not change.
+- Facts are in code, like the timeline, so there is no migration and the admin editor does not edit them. Fact text is English only; the menus, labels, and categories are translated.
 
 ### Content rules
 
@@ -130,6 +139,6 @@ No paid services. The Cloudflare token is the only new secret, and it is optiona
 - Add licensed photographs with diverse people, and a way to upload images (the editor accepts a URL today).
 - Write more articles, especially for categories with only one or two, and for the AI topics that have no dedicated article yet (women's health, men's health, hormonal health, the immune system).
 - Translate article bodies, the timeline, and the glossary.
-- Categories and the timeline are edited in code, not in the editor.
+- Categories, the timeline, and the Did You Know? facts are edited in code, not in the editor. A medical reviewer should read the 45 facts.
 - Use a shared store such as the database for rate limits if strict limits across server instances are needed.
 - Check real answers in Cloudflare mode in each language once the key is set. Model answers were tested only with a stubbed Cloudflare response.

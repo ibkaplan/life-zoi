@@ -223,7 +223,68 @@
 .ency-admin-error { color: var(--danger); font-weight: 600; }
 .ency-admin-preview { border: 2px dashed var(--lavender-brand); border-radius: var(--radius); padding: 1rem; }
 
+/* Did You Know? — health facts. Each category has its own soft colour. */
+.fact-cat-body { --fact-tint: #fdeef0; --fact-accent: #a33a52; }
+.fact-cat-brain { --fact-tint: #efeafc; --fact-accent: #5a33a0; }
+.fact-cat-heart { --fact-tint: #fdecec; --fact-accent: #a3322f; }
+.fact-cat-sleep { --fact-tint: #e9eefb; --fact-accent: #34508f; }
+.fact-cat-nutrition { --fact-tint: #fdf3e3; --fact-accent: #8a5410; }
+.fact-cat-immune { --fact-tint: #e5f4f1; --fact-accent: #1d5e57; }
+.fact-cat-hormones { --fact-tint: #fbeefa; --fact-accent: #8a2f7f; }
+.fact-cat-aging { --fact-tint: #eef4e6; --fact-accent: #476b22; }
+.fact-cat-eastern { --fact-tint: #fff0e8; --fact-accent: #9a4317; }
+.fact-cat-western { --fact-tint: #e8f2fb; --fact-accent: #245d8f; }
+.fact-cat-history { --fact-tint: #f4efe6; --fact-accent: #6b5226; }
+.fact-cat-herbs { --fact-tint: #e9f5e8; --fact-accent: #2f6b2c; }
+.fact-cat-discoveries { --fact-tint: #e6f3f8; --fact-accent: #1f6378; }
+.fact-cat-mind { --fact-tint: #f1ecfa; --fact-accent: #5d3d93; }
+.fact-cat-exercise { --fact-tint: #fff4df; --fact-accent: #855a00; }
+
+.fact-badge-established { background: #e3f2ee; color: #1d5e57; }
+.fact-badge-preliminary { background: #ede6fa; color: #52288a; }
+.fact-badge-traditional { background: #fbf0dc; color: #7a4f0b; }
+
+.fact-today {
+  display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: 1.5rem; align-items: center; padding: 1.5rem;
+  border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow);
+  background: linear-gradient(135deg, var(--fact-tint, var(--ency-soft)) 0%, #ffffff 70%);
+}
+.fact-today-loading { min-height: 14rem; }
+.fact-today h2 { margin: 0.2rem 0 0.5rem; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.2; }
+.fact-today-text > p { margin: 0 0 0.75rem; font-size: 1.08rem; line-height: 1.55; }
+.fact-today-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.fact-today-art { border-radius: var(--radius); background: #ffffffb3; padding: 0.75rem; border: 1px solid var(--fact-tint, var(--line)); }
+.fact-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.fact-see-all { font-weight: 700; color: var(--fact-accent, var(--royal)); }
+
+.fact-card {
+  display: flex; flex-direction: column; border-radius: var(--radius); border: 1px solid var(--line); background: #fff; overflow: hidden;
+  box-shadow: var(--shadow); border-top: 5px solid var(--fact-accent, var(--royal));
+}
+.fact-card-art { background: var(--fact-tint, var(--ency-soft)); padding: 0.6rem 1.5rem 0.2rem; }
+.fact-card-art .ency-art { max-height: 6.5rem; }
+.fact-card-body { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem 1.1rem 1.15rem; flex: 1; }
+.fact-card-body h3 { margin: 0; font-size: 1.1rem; line-height: 1.3; color: var(--deep); }
+.fact-card-body p { margin: 0; line-height: 1.5; }
+.fact-card-meta { font-size: 0.85rem; font-weight: 700; color: var(--fact-accent, var(--teal)); }
+.fact-card-foot { margin-top: auto; padding-top: 0.4rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+.fact-detail { display: grid; gap: 1.1rem; }
+.fact-detail-head {
+  display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); gap: 1.5rem; align-items: center; padding: 1.5rem;
+  border-radius: var(--radius); background: linear-gradient(135deg, var(--fact-tint, var(--ency-soft)) 0%, #ffffff 75%); border: 1px solid var(--line);
+}
+.fact-detail-head h1 { margin: 0.2rem 0 0.6rem; font-family: var(--font-display); color: var(--deep); font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.15; }
+.fact-detail-lead { font-size: 1.15rem; line-height: 1.55; margin: 0 0 0.6rem; }
+.fact-section { padding: 1rem 1.25rem; border-radius: var(--radius); border: 1px solid var(--line); background: #fff; border-left: 5px solid var(--fact-accent, var(--royal)); }
+.fact-section h2 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--fact-accent, var(--deep)); }
+.fact-section p { margin: 0; line-height: 1.6; }
+.fact-sources { margin: 0 0 0.5rem; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
+.fact-sources a { overflow-wrap: anywhere; }
+
 @media (max-width: 760px) {
+  .fact-today, .fact-detail-head { grid-template-columns: minmax(0, 1fr); padding: 1.1rem; }
+  .fact-today-art { max-width: 11rem; justify-self: center; }
   .ency-hero, .ency-ai-hero, .ency-feature-east { grid-template-columns: minmax(0, 1fr); }
   .ency-hero-illustration { justify-self: center; max-width: 11rem; order: -1; }
   .ency-ai-hero .ency-hero-illustration { justify-self: center; }
