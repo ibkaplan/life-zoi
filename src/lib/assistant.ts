@@ -30,7 +30,7 @@ export const SAFETY_NOTICE =
   msg("This may need urgent medical care. If you are in immediate danger, contact local emergency services now. If you are in the United States and in emotional distress, call or text 988.");
 
 const URGENT_PATTERN =
-  /\b(suicid|kill myself|want to die|end my life|overdose|chest pain|cannot breathe|can't breathe|trouble breathing|shortness of breath|stroke|face droop|slurred speech|severe bleeding|unconscious|not breathing)\b/i;
+  /\b(suicid|kill myself|want to die|end my life|overdose|chest pains?|pain in (?:my|the|his|her) chest|chest (?:pressure|tightness)|tight(?:ness)? in (?:my|the) chest|crushing chest|cannot breathe|can't breathe|trouble breathing|shortness of breath|stroke|face droop|slurred speech|severe bleeding|unconscious|not breathing)\b/i;
 
 /**
  * Text folded for the Ukrainian, Russian, and Greek checks below: lower case, without
@@ -47,7 +47,7 @@ export function foldForSafety(text: string): string {
 
 /** The same urgent topics in Ukrainian, Russian, and Greek. Stems, matched on folded text. */
 const URGENT_LOCAL =
-  /суіцид|суицид|самогубств|самоуби|вбити себе|убить себя|покінчити з собою|покончить с собой|хочу померти|хочу умереть|не хочу жити|не хочу жить|передозуванн|передозировк|біль у грудях|біль в грудях|болить у грудях|боль в груди|болит в груди|не можу дихати|не могу дышать|важко дихати|трудно дышать|тяжело дышать|задишк|одышк|інсульт|инсульт|перекосило обличчя|перекосило лицо|оніміло обличчя|невиразна мова|невнятная речь|заплітається язик|заплетается язык|сильна кровотеча|сильное кровотечение|без свідомості|без сознания|знепритомні|не дихає|не дышит|αυτοκτον|σκοτωσω τον εαυτο μου|να σκοτωθω|θελω να πεθανω|δεν θελω να ζω|υπερβολικη δοση|πονο στο στηθοσ|πονοσ στο στηθοσ|δεν μπορω να αναπνευσω|δυσκολια στην αναπνοη|δυσκολευομαι να αναπνευσω|δυσπνοια|εγκεφαλικο|σοβαρη αιμορραγια|αναισθητ|λιποθυμ|δεν αναπνεει/;
+  /суіцид|суицид|самогубств|самоуби|вбити себе|убить себя|покінчити з собою|покончить с собой|хочу померти|хочу умереть|не хочу жити|не хочу жить|передозуванн|передозировк|біль у грудях|біль в грудях|болить у грудях|болить в грудях|болять груди|боль в груди|боль за грудиной|болит в груди|болит груд|давит в груди|сдавливает грудь|біль за грудиною|тисне в грудях|не можу дихати|не могу дышать|важко дихати|трудно дышать|тяжело дышать|задишк|одышк|інсульт|инсульт|перекосило обличчя|перекосило лицо|оніміло обличчя|невиразна мова|невнятная речь|заплітається язик|заплетается язык|сильна кровотеча|сильное кровотечение|без свідомості|без сознания|знепритомні|не дихає|не дышит|αυτοκτον|σκοτωσω τον εαυτο μου|να σκοτωθω|θελω να πεθανω|δεν θελω να ζω|υπερβολικη δοση|πονο στο στηθοσ|πονοσ στο στηθοσ|πονοι στο στηθοσ|πονα το στηθοσ|ποναει το στηθοσ|δεν μπορω να αναπνευσω|δυσκολια στην αναπνοη|δυσκολευομαι να αναπνευσω|δυσπνοια|εγκεφαλικο|σοβαρη αιμορραγια|αναισθητ|λιποθυμ|δεν αναπνεει/;
 
 /** Replies in Ukrainian, Russian, or Greek that leave lifeZoi's educational limits. Matched on folded text. */
 const UNSAFE_LOCAL_REPLY =

@@ -118,3 +118,42 @@ describe("Cloudflare answers", () => {
     expect((medicine.body.answer as { blocks: { text?: string }[] }).blocks[0]?.text).toBe(MEDICATION_TEXT);
   });
 });
+
+describe("questions in other languages and emergencies", () => {
+  it("treats common ways of saying chest pain as urgent, in every language", async () => {
+    const { isUrgentMessage } = await import("@/lib/assistant");
+    for (const text of ["chest pain", "I have chest pains", "pain in my chest", "tightness in my chest", "у меня болит грудь", "боль в груди", "болить у грудях", "πόνος στο στήθος", "πονάει το στήθος"]) {
+      expect(isUrgentMessage(text), text).toBe(true);
+    }
+    expect(isUrgentMessage("How can I protect my heart?")).toBe(false);
+  });
+
+  it("finds the English article for a question in another language", async () => {
+    const replies = [
+      { success: true, result: { response: "heart health protect blood pressure" } },
+      { success: true, result: { response: "Двигайтесь каждый день." } },
+    ];
+    const calls: string[] = [];
+    const impl = (async (_url: string | URL | Request, init?: RequestInit) => {
+      calls.push(String(init?.body));
+      return new Response(JSON.stringify(replies[calls.length - 1]), { status: 200 });
+    }) as typeof fetch;
+    const answer = await createCloudflareProvider({ accountId: ACCOUNT, apiToken: TOKEN, fetchImpl: impl }).answer({
+      turns: [{ role: "user", text: "Как защитить сердце?" }],
+      length: "short",
+      articles: BUILT_IN_ARTICLES,
+      language: "ru",
+    });
+    expect(calls).toHaveLength(2);
+    expect(answer.noArticle).toBe(false);
+    expect(answer.articles[0]?.slug).toBe("heart-health-blood-pressure-cholesterol");
+    expect(answer.source).toBe("model");
+  });
+
+  it("still says there is no article when the search words find nothing", async () => {
+    const { impl, calls } = fakeFetch({ success: true, result: { response: "zzqxw" } });
+    const answer = await createCloudflareProvider({ accountId: ACCOUNT, apiToken: TOKEN, fetchImpl: impl }).answer({ turns: [{ role: "user", text: "Что такое ззкв?" }], length: "short", articles: BUILT_IN_ARTICLES, language: "ru" });
+    expect(calls).toHaveLength(1);
+    expect(answer.noArticle).toBe(true);
+  });
+});
