@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useSyncExternalStore, type FormEvent } from "react";
-import { respondToCompanion } from "@/lib/emotional-wellness/companion";
+import Link from "next/link";
+import { useState, useSyncExternalStore } from "react";
 import {
   CAREGIVER_NOTE,
   CLINICAL_REVIEW_NOTICE,
-  COMPANION_OPENING,
-  CONTEXT_NOTE,
-  CONTEXT_OPTIONS,
   EXERCISE_INTRO,
-  FEATURE_NAME,
   HEADLINE,
   JOURNAL_PRIVACY,
   JOY_NOTE,
+  MIND_CARD_BODY,
+  MIND_CARD_LANGUAGE,
+  PAGE_INTRO,
+  PAGE_TITLE,
   SUPPORTING_LINE,
 } from "@/lib/emotional-wellness/copy";
-import { standingCrisisNotice } from "@/lib/emotional-wellness/crisis";
+import { crisisReply, detectCrisis, standingCrisisNotice } from "@/lib/emotional-wellness/crisis";
 import {
   EXERCISES,
   nextExerciseStep,
@@ -32,31 +32,13 @@ import {
   subscribeEmotionalStore,
   updateEmotionalStore,
 } from "@/lib/emotional-wellness/store";
-import type { CompanionMode, ContextId, CountryChoice, NoteBucket, PrivateNote } from "@/lib/emotional-wellness/types";
+import type { CountryChoice, NoteBucket, PrivateNote } from "@/lib/emotional-wellness/types";
 import { useSession } from "@/components/session-provider";
 import { useLocale, useT } from "@/components/locale-provider";
 import { LOCALE_META } from "@/lib/i18n/config";
 import { msg } from "@/lib/i18n/translate";
 
 const READ_ONLY = msg("Sample data is read-only. Turn off the sample to record your own notes.");
-
-type CompanionRequest = Omit<Parameters<typeof respondToCompanion>[0], "t">;
-
-type Turn = {
-  id: string;
-  role: "visitor" | "companion";
-  text: string;
-  crisis: boolean;
-  /** What the reply was written from, so it can be shown again in the chosen language. */
-  request?: CompanionRequest;
-};
-
-const OPENING_TURN: Turn = {
-  id: "opening",
-  role: "companion",
-  text: COMPANION_OPENING,
-  crisis: false,
-};
 
 function phoneHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -100,10 +82,7 @@ export function EmotionalWellnessView() {
   const { sample } = useSession();
   const t = useT();
   const stored = useSyncExternalStore(subscribeEmotionalStore, getEmotionalStoreSnapshot, getEmotionalServerSnapshot);
-  const [turns, setTurns] = useState<Turn[]>([OPENING_TURN]);
-  const [mode, setMode] = useState<CompanionMode>("open");
-  const [message, setMessage] = useState("");
-  const [repliesOn, setRepliesOn] = useState(true);
+  const [crisis, setCrisis] = useState<{ bucket: NoteBucket; text: string } | null>(null);
   const [exercise, setExercise] = useState<ExerciseSession | null>(null);
   const [journalDraft, setJournalDraft] = useState("");
   const [joyDraft, setJoyDraft] = useState("");
@@ -125,77 +104,47 @@ export function EmotionalWellnessView() {
     save((current) => ({ ...current, country }));
   }
 
-  function setContext(context: ContextId) {
-    save((current) => ({ ...current, context }));
-  }
-
   function addNote(bucket: NoteBucket, text: string, clear: () => void) {
+    // The crisis check still reads anything a person writes on this page.
+    setCrisis(detectCrisis(text).length > 0 ? { bucket, text } : null);
     const id = createNoteId();
     const now = new Date().toISOString();
     save((current) => addPrivateNote(current, bucket, text, now, id));
     if (!sample) clear();
   }
 
-  function onTalk(event: FormEvent) {
-    event.preventDefault();
-    const text = message.trim();
-    if (!text) return;
-    const request: CompanionRequest = {
-      message: text,
-      context: stored.context,
-      country: stored.country,
-      mode,
-      companionEnabled: repliesOn,
-    };
-    const result = respondToCompanion(request);
-    setMode(result.mode);
-    setMessage("");
-    setTurns((current) =>
-      [
-        ...current,
-        { id: `${createNoteId()}v`, role: "visitor" as const, text, crisis: false },
-        { id: `${createNoteId()}c`, role: "companion" as const, text: result.text, crisis: result.crisis, request },
-      ].slice(-40),
+  const usNumbers = showEmergencyNumbers(stored.country);
+
+  function crisisAlert(bucket: NoteBucket) {
+    if (crisis?.bucket !== bucket) return null;
+    return (
+      <p className="ew-bubble ew-bubble-crisis" role="alert">
+        {crisisReply(detectCrisis(crisis.text), stored.country, t)}
+      </p>
     );
   }
-
-  const usNumbers = showEmergencyNumbers(stored.country);
 
   return (
     <div className="stack-lg">
       <header className="stack">
-        <p className="kicker">{t(FEATURE_NAME)}</p>
+        <p className="kicker">{t(PAGE_TITLE)}</p>
         <h1>{t(HEADLINE)}</h1>
         <p className="lede">{t(SUPPORTING_LINE)}</p>
       </header>
 
       <section className="card stack" aria-labelledby="ew-limits">
         <h2 id="ew-limits">{t("What this page is")}</h2>
-        <p>{t(COMPANION_OPENING)}</p>
+        <p>{t(PAGE_INTRO)}</p>
         <p className="alert alert-error">{t(CLINICAL_REVIEW_NOTICE)}</p>
         <p className="banner" role="note">
           {standingCrisisNotice(stored.country, t)}
         </p>
       </section>
 
-      <section className="card stack" aria-labelledby="ew-context">
-        <h2 id="ew-context">{t("Optional context")}</h2>
-        <p className="hint">{t(CONTEXT_NOTE)}</p>
-        <div className="ew-chips" role="group" aria-label={t("Optional context")}>
-          {CONTEXT_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              className="btn btn-secondary ew-chip"
-              type="button"
-              aria-pressed={stored.context === option.id}
-              onClick={() => setContext(option.id)}
-            >
-              {t(option.label)}
-            </button>
-          ))}
-        </div>
+      <section className="card stack" aria-labelledby="ew-country">
+        <h2 id="ew-country">{t("Country for crisis numbers")}</h2>
         <fieldset className="stack">
-          <legend>{t("Country for crisis numbers")}</legend>
+          <legend className="sr-only">{t("Country for crisis numbers")}</legend>
           <p className="hint">
             {t(
               "If you are in the United States, or haven't chosen a country, this page shows United States crisis numbers. In another country, please contact your local emergency services.",
@@ -231,56 +180,15 @@ export function EmotionalWellnessView() {
         ) : null}
       </section>
 
-      <section className="card stack" id="companion" aria-labelledby="ew-companion">
-        <h2 id="ew-companion">{t("Companion")}</h2>
-        <p className="hint">
-          {t(
-            "The companion asks one question at a time. You can pause its written replies whenever you like. Crisis help stays on this page either way.",
-          )}
-        </p>
+      <section className="card stack" id="mind" aria-labelledby="ew-mind">
+        <h2 id="ew-mind">{t("Talk it through in LifeZoi Mind")}</h2>
+        <p>{t(MIND_CARD_BODY)}</p>
+        <p className="hint">{t(MIND_CARD_LANGUAGE)}</p>
         <div className="actions">
-          <button
-            className="btn btn-secondary"
-            type="button"
-            aria-pressed={!repliesOn}
-            onClick={() => setRepliesOn((on) => !on)}
-          >
-            {repliesOn ? t("Pause written replies") : t("Resume written replies")}
-          </button>
+          <Link className="btn btn-primary" href="/mind">
+            {t("Open LifeZoi Mind")}
+          </Link>
         </div>
-        <div className="ew-log" aria-live="polite">
-          {turns.map((turn) => (
-            <p
-              key={turn.id}
-              className={turn.crisis ? "ew-bubble ew-bubble-crisis" : turn.role === "companion" ? "ew-bubble ew-bubble-companion" : "ew-bubble"}
-              role={turn.crisis ? "alert" : undefined}
-            >
-              <strong>{turn.role === "visitor" ? t("You") : t("Companion")}: </strong>
-              {turn.role === "visitor"
-                ? turn.text
-                : turn.request
-                  ? respondToCompanion({ ...turn.request, t }).text
-                  : t(turn.text)}
-            </p>
-          ))}
-        </div>
-        <form className="stack" onSubmit={onTalk}>
-          <label className="field" htmlFor="ew-message">
-            <span>{t("Message")}</span>
-            <textarea
-              id="ew-message"
-              value={message}
-              maxLength={1500}
-              rows={4}
-              onChange={(event) => setMessage(event.target.value)}
-            />
-          </label>
-          <div className="actions">
-            <button className="btn btn-primary" type="submit">
-              {t("Send")}
-            </button>
-          </div>
-        </form>
       </section>
 
       <section className="stack" id="exercises" aria-labelledby="ew-exercises">
@@ -350,6 +258,7 @@ export function EmotionalWellnessView() {
             </button>
           </div>
         </form>
+        {crisisAlert("journal")}
         <NoteList
           notes={stored.journal}
           empty={msg("No journal entries yet.")}
@@ -380,6 +289,7 @@ export function EmotionalWellnessView() {
             </button>
           </div>
         </form>
+        {crisisAlert("joys")}
         <NoteList
           notes={stored.joys}
           empty={msg("No small joys saved. Skipping this is fine.")}
@@ -419,6 +329,7 @@ export function EmotionalWellnessView() {
             </button>
           </div>
         </form>
+        {crisisAlert("caregiverNotes")}
         <NoteList
           notes={stored.caregiverNotes}
           empty={msg("No caregiver notes yet.")}

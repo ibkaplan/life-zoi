@@ -21,7 +21,15 @@ export const COMPANION_IDENTITY =
 export const COMPANION_OPENING = `${COMPANION_IDENTITY} Would you like to be listened to, or to look at one small step?`;
 
 export const PAGE_DESCRIPTION =
-  "Gentle emotional support with prepared replies, short optional exercises, and private notes. Crisis help is always on the page. Not medical care.";
+  "Gentle emotional support with short optional exercises, a private journal, and a link to LifeZoi Mind. Crisis help is always on the page. Not medical care.";
+
+export const PAGE_INTRO =
+  "This page offers short calming exercises, a private journal, and links to real people who can help. It is not a therapist, a doctor, or a crisis counselor. To talk something through and get concrete small steps, use LifeZoi Mind.";
+
+export const MIND_CARD_BODY =
+  "In LifeZoi Mind you can write or speak about stress, sleep, sadness, loneliness, or worries and get concrete small steps, guided exercises, and short articles with sources. Crisis help is there too.";
+
+export const MIND_CARD_LANGUAGE = "LifeZoi Mind is in English for now.";
 
 export const JOURNAL_PRIVACY =
   "Your journal is saved only in this browser on this device. No one else can see it, and it is not sent to your account. When you sign out, it is hidden until you sign in again.";

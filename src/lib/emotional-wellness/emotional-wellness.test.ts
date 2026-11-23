@@ -325,3 +325,14 @@ describe("emotional wellness exercises, notes, and sources", () => {
     expect(titles).toContain("https://988lifeline.org/");
   });
 });
+
+describe("emotional wellness page without the companion chat", () => {
+  it("links to LifeZoi Mind instead of a chat and still checks written notes for a crisis", async () => {
+    const { readFileSync } = await import("node:fs");
+    const view = readFileSync(`${process.cwd()}/src/components/emotional-wellness/emotional-wellness-view.tsx`, "utf8");
+    expect(view).not.toMatch(/respondToCompanion/);
+    expect(view).toMatch(/href="\/mind"/);
+    expect(view).toMatch(/detectCrisis\(text\)/);
+    expect(view).toMatch(/standingCrisisNotice/);
+  });
+});
