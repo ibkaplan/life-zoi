@@ -373,8 +373,10 @@ export function respond(state: ConversationState, rawMessage: string, lang: Mind
   }
 
   // 7. Topic flow.
-  const detected = detectTopic(message);
   let current = next.topic ? topicById(next.topic) : null;
+  // A tapped answer button belongs to the current topic, even if its words name another one.
+  const tappedLabel = !!current?.facets.some((facet) => facet.label === original || tr(facet.label) === original);
+  const detected = tappedLabel ? null : detectTopic(message);
 
   // The visitor accepted (or declined) coming back to something they mentioned earlier.
   let switchedFromOffer = false;
@@ -446,7 +448,7 @@ export function respond(state: ConversationState, rawMessage: string, lang: Mind
       next.step = 2;
       const opening = tr(current.open)
         .split(/(?<=[.!?])\s+/)
-        .filter((sentence) => !sentence.includes("?") && !sentence.startsWith("I can't") && !sentence.startsWith("Я не могу"));
+        .filter((sentence) => !sentence.includes("?") && !sentence.startsWith("I can't") && !sentence.startsWith("Я не могу") && !sentence.startsWith("Я не можу"));
       return withDistress(
         { state: next, reply: reply(addProfessional([opening[0], tr(facet.reply), tr(facet.question)].join(" "))) },
         safety.level === "distress",

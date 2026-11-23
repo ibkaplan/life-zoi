@@ -259,7 +259,6 @@
  "Talk with LifeZoi Mind": "Поговорите с LifeZoi Mind",
  "Your words stay in this browser tab and are cleared when you close it.": "Ваши слова остаются в этой вкладке браузера и стираются, когда вы её закрываете.",
  "How this works": "Как это работает",
- "LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian to talk in Russian.": "На этом языке ответы LifeZoi Mind пока на английском. Можно писать по-английски или переключить сайт на русский, чтобы разговаривать по-русски.",
  "You (spoken)": "Вы (голосом)",
  "You (listening…)": "Вы (слушаю…)",
  "Suggested replies": "Предложенные ответы",
@@ -312,5 +311,7 @@
  "An optional, flexible week of small practices that you choose.": "Необязательная гибкая неделя небольших практик, которые вы выбираете сами.",
  "Plain-language articles with sources and evidence labels.": "Статьи простым языком с источниками и отметками доказательности.",
  "Optional, private, and deletable. Off unless you turn it on.": "Необязательно, приватно, можно удалить. Выключено, пока вы не включите.",
- "What happens to your words, and what LifeZoi Mind can and cannot do.": "Что происходит с вашими словами и что LifeZoi Mind может и чего не может."
+ "What happens to your words, and what LifeZoi Mind can and cannot do.": "Что происходит с вашими словами и что LifeZoi Mind может и чего не может.",
+ "This device has no Ukrainian voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.": "На этом устройстве нет украинского голоса, работающего на самом устройстве, поэтому ответы показаны только текстом. LifeZoi Mind использует для чтения вашего разговора только голоса на устройстве.",
+ "LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian or Ukrainian to talk in that language.": "На этом языке ответы LifeZoi Mind пока на английском. Можно писать по-английски или переключить сайт на русский или украинский, чтобы разговаривать на этом языке."
 }

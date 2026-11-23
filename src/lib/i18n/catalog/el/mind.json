@@ -259,7 +259,6 @@
  "Talk with LifeZoi Mind": "Μιλήστε με το LifeZoi Mind",
  "Your words stay in this browser tab and are cleared when you close it.": "Τα λόγια σας μένουν σε αυτή την καρτέλα του προγράμματος περιήγησης και διαγράφονται όταν την κλείσετε.",
  "How this works": "Πώς λειτουργεί",
- "LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian to talk in Russian.": "Σε αυτή τη γλώσσα οι απαντήσεις του LifeZoi Mind είναι ακόμη στα αγγλικά. Μπορείτε να γράφετε στα αγγλικά ή να αλλάξετε τον ιστότοπο στα ρωσικά για να μιλήσετε στα ρωσικά.",
  "You (spoken)": "Εσείς (φωνητικά)",
  "You (listening…)": "Εσείς (ακούω…)",
  "Suggested replies": "Προτεινόμενες απαντήσεις",
@@ -312,5 +311,7 @@
  "An optional, flexible week of small practices that you choose.": "Μια προαιρετική, ευέλικτη εβδομάδα με μικρές πρακτικές που επιλέγετε εσείς.",
  "Plain-language articles with sources and evidence labels.": "Άρθρα σε απλή γλώσσα με πηγές και ενδείξεις τεκμηρίωσης.",
  "Optional, private, and deletable. Off unless you turn it on.": "Προαιρετικό, ιδιωτικό και διαγράψιμο. Απενεργοποιημένο, εκτός αν το ενεργοποιήσετε.",
- "What happens to your words, and what LifeZoi Mind can and cannot do.": "Τι γίνεται με τα λόγια σας και τι μπορεί και τι δεν μπορεί να κάνει το LifeZoi Mind."
+ "What happens to your words, and what LifeZoi Mind can and cannot do.": "Τι γίνεται με τα λόγια σας και τι μπορεί και τι δεν μπορεί να κάνει το LifeZoi Mind.",
+ "This device has no Ukrainian voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.": "Αυτή η συσκευή δεν έχει ουκρανική φωνή που λειτουργεί στην ίδια τη συσκευή, οπότε οι απαντήσεις εμφανίζονται μόνο ως κείμενο. Το LifeZoi Mind χρησιμοποιεί μόνο φωνές της συσκευής για να διαβάζει τη συζήτησή σας.",
+ "LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian or Ukrainian to talk in that language.": "Σε αυτή τη γλώσσα οι απαντήσεις του LifeZoi Mind είναι ακόμη στα αγγλικά. Μπορείτε να γράφετε στα αγγλικά ή να αλλάξετε τον ιστότοπο στα ρωσικά ή στα ουκρανικά για να μιλήσετε σε αυτή τη γλώσσα."
 }
