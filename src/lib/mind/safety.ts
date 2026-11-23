@@ -1,3 +1,4 @@
+import { foldForSafety, isUrgentMessage } from "@/lib/assistant";
 import { detectCrisis } from "@/lib/emotional-wellness/crisis";
 import type { CrisisKind } from "@/lib/emotional-wellness/types";
 
@@ -30,12 +31,33 @@ const SEVERE_DISTRESS = [
   /\bpanic attack\b/i,
 ];
 
+/**
+ * Suicide and self-harm wording in Ukrainian, Russian, and Greek, matched on folded text.
+ * Mind's replies are in English for now, but people may still type or speak in their own
+ * language, and a crisis must never be missed because of that. Other urgent wording from
+ * the assistant's shared check (for example chest pain) is treated as a medical emergency.
+ */
+const SUICIDE_LOCAL =
+  /суицид|суіцид|самогубств|самоуби|вбити себе|убить себя|покінчити з собою|покончить с собой|хочу померти|хочу умереть|не хочу жити|не хочу жить|жить не хочу|жити не хочу|не хочу больше жить|не хочу більше жити|передозуванн|передозировк|αυτοκτον|σκοτωσω τον εαυτο μου|να σκοτωθω|θελω να πεθανω|δεν θελω να ζω/;
+const SELF_HARM_LOCAL = /порезать себя|порезаться|порізати себе|порізатися|навредить себе|нашкодити собі|причинить себе вред|завдати собі шкоди|режу себя|ріжу себе|αυτοτραυματ|να κοψω τον εαυτο μου/;
+
+/** Crisis kinds found in Ukrainian, Russian, or Greek text. */
+export function detectLocalCrisis(text: string): CrisisKind[] {
+  const folded = foldForSafety(text);
+  const kinds: CrisisKind[] = [];
+  if (SUICIDE_LOCAL.test(folded)) kinds.push("suicide");
+  if (SELF_HARM_LOCAL.test(folded)) kinds.push("self-harm");
+  if (kinds.length === 0 && isUrgentMessage(text) && /[\u0400-\u04ff\u0370-\u03ff]/.test(text)) kinds.push("medical-emergency");
+  return kinds;
+}
+
 const NEGATION = /\b(not|no|never|don't|dont|do not|isn't|wasn't)\s+\w*\s*$/i;
 
 export function checkSafety(text: string): SafetyCheck {
   const value = text.replace(/\s+/g, " ").trim();
   if (!value) return { level: "none", kinds: [] };
   const kinds = detectCrisis(value);
+  for (const kind of detectLocalCrisis(value)) if (!kinds.includes(kind)) kinds.push(kind);
   // "Everyone would be better off without me" is treated as possible suicidal thinking.
   if (/\b(everyone|everybody|they|my family) would be better off without me\b/i.test(value) && !kinds.includes("suicide")) {
     kinds.unshift("suicide");

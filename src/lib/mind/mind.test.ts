@@ -364,3 +364,22 @@ describe("microphone access", () => {
     }
   });
 });
+
+describe("crisis wording in other languages", () => {
+  it("catches suicide, self-harm, and medical emergencies typed in Russian, Ukrainian, or Greek", () => {
+    for (const text of ["Я не хочу жить", "хочу умереть", "Я хочу покінчити з собою", "Δεν θέλω να ζω", "думаю о самоубийстве"]) {
+      const result = checkSafety(text);
+      expect(result.level, text).toBe("crisis");
+      expect(result.kinds, text).toContain("suicide");
+    }
+    expect(checkSafety("Хочу порезать себя").kinds).toContain("self-harm");
+    expect(checkSafety("У меня сильная боль в груди и трудно дышать").kinds).toContain("medical-emergency");
+    const reply = respond(initialConversation(), "Я не хочу жить").reply;
+    expect(reply.kind).toBe("crisis");
+    expect(reply.text).toMatch(/988/);
+  });
+
+  it("leaves ordinary Russian messages alone", () => {
+    expect(checkSafety("У меня был тяжёлый день на работе").level).toBe("none");
+  });
+});
