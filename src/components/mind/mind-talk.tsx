@@ -39,7 +39,7 @@ function writeLocal(key: string, value: string | null) {
 
 /** The speech recognition language for the conversation's language. */
 function recognitionLang(lang: MindLang): string {
-  return lang === "ru" ? "ru-RU" : lang === "uk" ? "uk-UA" : "en-US";
+  return lang === "ru" ? "ru-RU" : lang === "uk" ? "uk-UA" : lang === "el" ? "el-GR" : "en-US";
 }
 
 function openingTurn(lang: MindLang): MindTurn {
@@ -312,7 +312,6 @@ export function MindTalk() {
           {t(provider.info.label)}: {t(provider.info.notes)} {t("Your words stay in this browser tab and are cleared when you close it.")}{" "}
           <Link href="/mind/privacy">{t("How this works")}</Link>
         </p>
-        {lang === "en" && locale !== "en" ? <p className="mind-note">{t("LifeZoi Mind's replies are still in English in this language. You can write in English, or switch the site to Russian or Ukrainian to talk in that language.")}</p> : null}
       </div>
 
       <div className="mind-thread" ref={threadRef} role="log" aria-live="polite" aria-label={t("Conversation")}>
@@ -416,7 +415,9 @@ export function MindTalk() {
       ) : null}
       {voice.owner === OWNER && voice.problem === "no-voice" ? (
         <p className="mind-note" role="alert">
-          {lang === "uk"
+          {lang === "el"
+            ? t("This device has no Greek voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.")
+            : lang === "uk"
             ? t("This device has no Ukrainian voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.")
             : lang === "ru"
             ? t("This device has no Russian voice that runs on the device itself, so replies are shown as text only. LifeZoi Mind only uses on-device voices to read your conversation aloud.")

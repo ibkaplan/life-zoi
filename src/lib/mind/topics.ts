@@ -260,7 +260,7 @@ export const TOPICS: readonly Topic[] = [
   },
   {
     id: "relationship",
-    match: [/\b(my (partner|husband|wife|boyfriend|girlfriend|spouse|fiance|fiancee)|we (had a fight|argued|keep arguing|broke up)|break ?up|divorce|cheat(ed|ing)?)\b/i],
+    match: [/\b(my (partner|husband|wife|boyfriend|girlfriend|spouse|fiance|fiancee)|we (had a fight|argued|keep arguing|broke up)|break ?up|divorce|cheat(ed|ing)?|(problems?|trouble|issues?|difficult(y|ies)) (in|with) (a |my |our )?relationship|my relationship|relationship (problems?|issues?|trouble))\b/i],
     open: "That sounds painful. Difficulties with someone close can affect everything else in the day. What feels most important right now: what was said, a pattern that keeps repeating, or how unsure you feel about the relationship?",
     facets: [
       { id: "said", label: "What was said", match: /\b(said|words|told me|called me|hurtful|insult)/i, reply: "Words from someone close can hurt deeply, precisely because they matter to us.", question: "What did you hear in what they said? Sometimes the meaning we take from words hurts as much as the words themselves." },

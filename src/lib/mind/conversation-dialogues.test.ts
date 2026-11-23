@@ -27,6 +27,7 @@ const CASES: Case[] = [
   { name: "a grandson in hospital", messages: ["My grandson is in the hospital"], topic: "loved-one-illness", expect: [/your grandson/] },
   { name: "caregiving burnout", messages: ["I'm a caregiver for my mother and I have no time for myself"], topic: "loved-one-illness", expect: [/your own needs last|share some of this/] },
   { name: "sleep with money worries", messages: ["I can't sleep", "I keep thinking about money", "for a few weeks", "ok", "I don't know", "yes"], topic: "money", expect: [/You mentioned money/, /Earlier you also mentioned money/, /Money worries can follow you/] },
+  { name: "the relationship button", messages: ["I'm having problems in a relationship"], topic: "relationship", expect: [/what was said, a pattern that keeps repeating/] },
   { name: "money worries", messages: ["I'm worried about money", "rent is due next week"], topic: "money", expect: [/bill or debt/i] },
   { name: "debt", messages: ["I have so much debt on my credit cards"], topic: "money", expect: [/debt or bill/] },
   { name: "can't afford", messages: ["I can't afford my bills this month"], topic: "money" },
