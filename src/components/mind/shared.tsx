@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
 import { useLocale, useT } from "@/components/locale-provider";
 import { useAccount } from "@/lib/account-store";
-import { standingCrisisNotice } from "@/lib/emotional-wellness/crisis";
 import { articleBySlug, type ArticleMotif } from "@/lib/mind/articles";
+import { LOCALE_META, type Locale } from "@/lib/i18n/config";
 import { exerciseById } from "@/lib/mind/exercises";
 import { OUTSIDE_US_LINE, STANDING_SAFETY_LINE, US_CRISIS_ACTIONS } from "@/lib/mind/safety";
 import { bindMindOwner, getMindServerSnapshot, getMindSnapshot, subscribeMind } from "@/lib/mind/store";
@@ -22,12 +22,6 @@ const TABS = [
   { href: "/mind/privacy", label: "Privacy & safety" },
 ];
 
-/** LifeZoi Mind is written in English for now. Each note is written in its own language. */
-const ENGLISH_ONLY: Record<string, string> = {
-  uk: "LifeZoi Mind поки що доступний лише англійською. Перекладені версії PHQ-9 та GAD-7 можна показувати лише в офіційних перекладах, і їх ще не додано.",
-  ru: "LifeZoi Mind пока доступен только на английском. Переводы PHQ-9 и GAD-7 можно показывать только в официальных версиях, и они ещё не добавлены.",
-  el: "Το LifeZoi Mind είναι προς το παρόν διαθέσιμο μόνο στα αγγλικά. Τα PHQ-9 και GAD-7 μπορούν να εμφανιστούν μόνο σε επίσημες μεταφράσεις, οι οποίες δεν έχουν προστεθεί ακόμη.",
-};
 
 export function useMindStore() {
   const account = useAccount();
@@ -39,11 +33,12 @@ export function useMindStore() {
 }
 
 export function SafetyActions({ compact = false }: { compact?: boolean }) {
+  const t = useT();
   return (
     <div className="mind-safety-actions">
       {US_CRISIS_ACTIONS.filter((action) => !compact || action.href.startsWith("tel:") || action.href.startsWith("sms:")).map((action, index) => (
-        <a key={action.href} href={action.href} className={index === 0 || action.href === "tel:911" ? "" : "secondary"} aria-label={`${action.label}: ${action.detail}`}>
-          {action.label}
+        <a key={action.href} href={action.href} className={index === 0 || action.href === "tel:911" ? "" : "secondary"} aria-label={`${t(action.label)}: ${t(action.detail)}`}>
+          {t(action.label)}
         </a>
       ))}
     </div>
@@ -52,46 +47,66 @@ export function SafetyActions({ compact = false }: { compact?: boolean }) {
 
 export function StandingSafety() {
   const t = useT();
-  const { locale } = useLocale();
   return (
-    <aside className="mind-safety" aria-label="Crisis support">
+    <aside className="mind-safety" aria-label={t("Crisis support")}>
       <p>
-        <strong>{STANDING_SAFETY_LINE}</strong>
+        <strong>{t(STANDING_SAFETY_LINE)}</strong>
       </p>
-      {locale !== "en" ? <p lang={locale}>{standingCrisisNotice("us", t)}</p> : null}
       <SafetyActions compact />
-      <p>{OUTSIDE_US_LINE}</p>
+      <p>{t(OUTSIDE_US_LINE)}</p>
     </aside>
   );
 }
 
-export function MindShell({ title, intro, children, hero = false }: { title: string; intro?: string; children: React.ReactNode; hero?: boolean }) {
+/**
+ * The LifeZoi Mind frame: title, tabs, and the standing safety block, in the person's language.
+ * Sections that are not translated yet pass `translated={false}` (the default): their content is
+ * marked as English and a note in the person's language says so.
+ */
+export function MindShell({
+  title,
+  intro,
+  children,
+  hero = false,
+  translated = false,
+}: {
+  title: string;
+  intro?: string;
+  children: React.ReactNode;
+  hero?: boolean;
+  translated?: boolean;
+}) {
   const pathname = usePathname() ?? "/mind";
   const { locale } = useLocale();
+  const t = useT();
+  const english = locale !== "en" && !translated;
   const current = TABS.filter((tab) => pathname === tab.href || (tab.href !== "/mind" && pathname.startsWith(`${tab.href}/`))).pop()?.href ?? (pathname === "/mind" ? "/mind" : null);
   return (
-    <div className="mind" lang="en">
+    <div className="mind" lang={locale}>
       <header className={hero ? "mind-hero" : "stack"}>
         <p className="kicker">LifeZoi Mind</p>
-        <h1>{title}</h1>
-        {intro ? <p className={hero ? "mind-hero-sub" : "lede"}>{intro}</p> : null}
+        <h1>{t(title)}</h1>
+        {intro ? <p className={hero ? "mind-hero-sub" : "lede"}>{t(intro)}</p> : null}
       </header>
-      <nav className="mind-tabs" aria-label="LifeZoi Mind sections">
+      <nav className="mind-tabs" aria-label={t("LifeZoi Mind sections")}>
         {TABS.map((tab) => (
           <Link key={tab.href} href={tab.href} aria-current={current === tab.href ? "page" : undefined}>
-            {tab.label}
+            {t(tab.label)}
           </Link>
         ))}
       </nav>
-      {ENGLISH_ONLY[locale] ? (
-        <p className="mind-note" lang={locale}>
-          {ENGLISH_ONLY[locale]}
+      {english ? (
+        <p className="mind-note">
+          {t("This section of LifeZoi Mind is still in English. The translation is in progress.")}
+          {pathname.startsWith("/mind/understand") ? ` ${t("The PHQ-9 and GAD-7 can be shown only in official translations, and those have not been added yet.")}` : null}
         </p>
       ) : null}
-      {children}
+      {english ? <div lang="en">{children}</div> : children}
       <StandingSafety />
       <p className="hint">
-        LifeZoi Mind is an educational emotional wellness tool. It is not a licensed psychologist, psychiatrist, or medical provider, it does not diagnose or treat any condition, and it is not a substitute for therapy. It has not been reviewed by a licensed clinician.
+        {t(
+          "LifeZoi Mind is an educational emotional wellness tool. It is not a licensed psychologist, psychiatrist, or medical provider, it does not diagnose or treat any condition, and it is not a substitute for therapy. It has not been reviewed by a licensed clinician.",
+        )}
       </p>
     </div>
   );
@@ -199,7 +214,7 @@ export function MotifArt({ motif, className }: { motif: ArticleMotif; className?
   );
 }
 
-export function formatDate(iso: string): string {
+export function formatDate(iso: string, locale: Locale = "en"): string {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso.slice(0, 10) : date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  return Number.isNaN(date.getTime()) ? iso.slice(0, 10) : date.toLocaleDateString(LOCALE_META[locale].htmlLang, { year: "numeric", month: "long", day: "numeric" });
 }

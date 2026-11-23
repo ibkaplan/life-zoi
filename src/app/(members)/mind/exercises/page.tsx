@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ExercisesPage() {
   return (
-    <MindShell title="Guided exercises" intro="Practical, evidence-informed exercises you can do in a few minutes. Choose the type and length, and listen step by step.">
+    <MindShell translated title="Guided exercises" intro="Practical, evidence-informed exercises you can do in a few minutes. Choose the type and length, and listen step by step.">
       <MindExerciseList />
     </MindShell>
   );
