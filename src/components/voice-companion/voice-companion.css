@@ -1,0 +1,144 @@
+/* LifeZoi voice companion: the corner button and its cards. Uses the site's colour tokens. */
+
+.vc-root {
+  --vc-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  --vc-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+@media (max-width: 999px) {
+  /* Above the phone tab bar. */
+  .vc-root { --vc-bottom: calc(84px + 0.75rem + env(safe-area-inset-bottom, 0px)); }
+}
+
+.vc-orb {
+  position: fixed;
+  z-index: 58;
+  right: var(--vc-right);
+  bottom: var(--vc-bottom);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  background: radial-gradient(circle at 30% 30%, #8b5fc7, var(--royal));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(82, 40, 138, 0.35);
+  animation: vc-breathe 5s ease-in-out infinite;
+}
+.vc-orb svg { width: 28px; height: 28px; }
+.vc-orb:focus-visible { outline: 4px solid var(--gold); outline-offset: 3px; }
+.vc-orb[data-status="listening"] { background: radial-gradient(circle at 30% 30%, #d8645a, #b9433a); animation: vc-pulse 1.4s ease-in-out infinite; }
+.vc-orb[data-status="speaking"] { background: radial-gradient(circle at 30% 30%, #3a9a91, var(--teal)); animation: none; }
+.vc-orb[data-status="thinking"] { animation: vc-think 1s linear infinite; }
+.vc-orb[data-status="paused"],
+.vc-orb[data-status="off"] { background: #7a7f99; animation: none; }
+
+.vc-orb-label {
+  position: fixed;
+  z-index: 58;
+  right: calc(var(--vc-right) + 68px);
+  bottom: calc(var(--vc-bottom) + 16px);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+.vc-root[data-status="listening"] .vc-orb-label { color: #8f2f27; border-color: #f0c4bf; }
+
+.vc-bars { display: inline-flex; gap: 3px; align-items: center; height: 26px; }
+.vc-bars span { width: 4px; border-radius: 2px; background: currentColor; animation: vc-bar 0.9s ease-in-out infinite; }
+.vc-bars span:nth-child(1) { height: 10px; }
+.vc-bars span:nth-child(2) { height: 20px; animation-delay: 0.15s; }
+.vc-bars span:nth-child(3) { height: 14px; animation-delay: 0.3s; }
+.vc-bars span:nth-child(4) { height: 22px; animation-delay: 0.45s; }
+
+.vc-sheet {
+  position: fixed;
+  z-index: 58;
+  right: var(--vc-right);
+  bottom: calc(var(--vc-bottom) + 72px);
+  width: min(380px, calc(100vw - 32px));
+  max-height: min(70vh, calc(100dvh - var(--vc-bottom) - 120px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: 0 16px 40px rgba(23, 37, 84, 0.2);
+}
+@media (max-width: 560px) {
+  .vc-sheet { left: 16px; right: 16px; width: auto; }
+}
+.vc-sheet h2 { font-size: 1.25rem; margin: 0; }
+.vc-sheet h3 { font-size: 1.05rem; margin: 0; }
+.vc-sheet p { margin: 0; }
+.vc-sheet .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.vc-setup { background: linear-gradient(160deg, #f3ecfb, #eef7f5 70%); }
+.vc-kicker { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--royal); }
+.vc-who { display: block; font-size: 0.82rem; font-weight: 700; color: var(--royal); }
+.vc-panel-head { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: space-between; }
+.vc-heard { padding: 0.5rem 0.75rem; border-radius: 14px; background: var(--sky); }
+.vc-reply { padding: 0.5rem 0.75rem; border-radius: 14px; background: #eef7f5; }
+.vc-crisis { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
+.vc-consent { padding: 0.75rem; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); }
+
+.vc-pill { display: inline-flex; gap: 0.4rem; align-items: center; padding: 0.2rem 0.65rem; border-radius: 999px; background: var(--lavender); font-weight: 700; font-size: 0.9rem; }
+.vc-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--royal); }
+.vc-pill[data-status="listening"] .vc-dot { background: #b9433a; animation: vc-blink 1s ease-in-out infinite; }
+.vc-pill[data-status="speaking"] .vc-dot { background: var(--teal); }
+.vc-pill[data-status="thinking"] .vc-dot { background: var(--gold); }
+.vc-pill[data-status="paused"] .vc-dot,
+.vc-pill[data-status="off"] .vc-dot { background: #7a7f99; }
+
+.vc-switch { display: flex; gap: 0.6rem; align-items: flex-start; font-weight: 600; }
+.vc-switch input { width: 1.25rem; height: 1.25rem; margin-top: 0.15rem; flex: 0 0 auto; accent-color: var(--royal); }
+
+@keyframes vc-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes vc-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(185, 67, 58, 0.5); }
+  50% { box-shadow: 0 0 0 16px rgba(185, 67, 58, 0); }
+}
+@keyframes vc-think {
+  0% { box-shadow: 0 0 0 3px rgba(242, 182, 93, 0.9); }
+  50% { box-shadow: 0 0 0 7px rgba(242, 182, 93, 0.35); }
+  100% { box-shadow: 0 0 0 3px rgba(242, 182, 93, 0.9); }
+}
+@keyframes vc-bar {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+@keyframes vc-blink {
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vc-orb, .vc-orb[data-status] { animation: none; }
+  .vc-orb[data-status="listening"] { outline: 4px solid #f4c7c1; }
+  .vc-bars span, .vc-pill .vc-dot { animation: none !important; }
+}
+
+/* Voice Companion settings card */
+.vc-settings .vc-switch { padding: 0.35rem 0; }
+.vc-settings fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 0.2rem; }
+.vc-settings label.vc-range { display: grid; gap: 0.25rem; font-weight: 600; max-width: 26rem; }
+.vc-settings table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.vc-settings th, .vc-settings td { text-align: left; padding: 0.4rem 0.5rem; border-top: 1px solid var(--line); vertical-align: top; }
+
+/* LifeZoi AI microphone */
+.ency-ai-mic { display: inline-flex; gap: 0.45rem; align-items: center; }
+.ency-ai-mic svg { width: 20px; height: 20px; }
+.ency-ai-mic[data-state="listening"] { background: #b9433a; border-color: #b9433a; color: #fff; animation: vc-pulse 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ency-ai-mic[data-state="listening"] { animation: none; } }

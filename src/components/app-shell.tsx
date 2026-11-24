@@ -6,6 +6,7 @@ import { SittingReminder } from "@/components/movement-breaks/tracker";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
 import { PageListen } from "@/components/voice/page-listen";
+import { VoiceCompanion } from "@/components/voice-companion/voice-companion";
 import { useAccount } from "@/lib/account-store";
 import { useCompanion } from "@/lib/companion/store";
 import { departmentFor } from "@/lib/departments";
@@ -66,6 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         </footer>
       </main>
+      <VoiceCompanion />
     </>
   );
 }
