@@ -5,7 +5,7 @@ import { msg, type Translate } from "@/lib/i18n/translate";
 import type { LibraryCategory as MusicCategory } from "@/lib/music-library/catalog";
 import { crisisMessage } from "@/lib/mind/safety";
 import { mapError, speechRecognitionCtor, type ListenError, type Recognition } from "@/lib/mind/speech";
-import { player, speechSupported } from "@/lib/voice/engine";
+import { deviceVoices, player, primeSpeech, speechSupported, voiceFor } from "@/lib/voice/engine";
 import { segmentsFromText, SPEECH_TAG, type VoiceLang } from "@/lib/voice/voices";
 
 /**
@@ -156,6 +156,29 @@ function createRuntime() {
   let pending: Intent | null = null;
   /** The person paused hands-free; only they can start it again. */
   let userPaused = false;
+  /** The welcome without the person's name, for devices with no on-device voice. */
+  let plainGreeting = "";
+
+  /** Voices load a moment after the page; wait up to 1.5 s so the right voice is chosen. */
+  function whenVoicesReady(then: () => void) {
+    const started = Date.now();
+    const check = () => {
+      if (deviceVoices().length > 0 || Date.now() - started > 1500) then();
+      else setTimeout(check, 250);
+    };
+    check();
+  }
+
+  /**
+   * The person's name is read only by a voice that runs on the device. Without one for
+   * this language, the welcome without the name is read by any voice, so it is never silent.
+   */
+  function chooseGreetingVoice(greeting: NonNullable<CompanionState["greeting"]>, plain: string): NonNullable<CompanionState["greeting"]> {
+    if (plain) plainGreeting = plain;
+    if (!greeting.personal) return greeting;
+    if (voiceFor(lang(), true) || deviceVoices().length === 0) return greeting;
+    return { ...greeting, text: plainGreeting || greeting.text, personal: false };
+  }
 
   function set(change: Partial<CompanionState>) {
     state = { ...state, ...change };
@@ -285,7 +308,8 @@ function createRuntime() {
         if (state.prefs.handsFree) savePrefs({ handsFree: false });
         return;
       }
-      if (failed && failed !== "no-speech") set({ error: failed });
+      // Hands-free listens again quietly after silence; a single tap says it heard nothing.
+      if (failed && (failed !== "no-speech" || !state.prefs.handsFree)) set({ error: failed });
       silentRounds += 1;
       if (state.prefs.handsFree && !userPaused) {
         if (silentRounds >= MAX_SILENT_ROUNDS) set({ paused: true });
@@ -495,40 +519,59 @@ function createRuntime() {
     },
     savePrefs,
     /** The welcome for this visit. Returns false when the browser blocked the sound. */
-    greet(text: string, needsProfile: boolean, personal: boolean) {
+    /**
+     * The welcome for this visit. A welcome with the person's name is read only by a voice
+     * that runs on the device; when there is none for this language, the version without
+     * the name (`plain`) is read by any voice, so the welcome is never silent.
+     */
+    greet(named: string, needsProfile: boolean, personalText: boolean, plain: string = named) {
       if (needsProfile) {
         pending = { kind: "page", page: "profile" };
         set({ suggestion: { kind: "profile" } });
       }
-      set({ greeting: { text, needsProfile, blocked: false, personal }, reply: text });
+      set({ greeting: { text: named, needsProfile, blocked: false, personal: personalText }, reply: named });
       if (!state.prefs.voiceOutput || !speechSupported()) return;
       // Browsers only let a page speak after the person has tapped or typed on it.
       const activation = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
       if (activation && !activation.hasBeenActive) {
-        set({ greeting: { text, needsProfile, blocked: true, personal } });
+        set({ greeting: { text: named, needsProfile, blocked: true, personal: personalText } });
         return;
       }
       speechTicket += 1;
       const mine = speechTicket;
-      player.play(COMPANION_OWNER, segmentsFromText(text, lang()), { stepWait: 0, localOnly: personal });
-      setTimeout(() => {
-        const greeting = state.greeting;
-        if (mine !== speechTicket || !greeting) return;
-        const voice = player.state();
-        // The engine pauses when the browser refuses to speak without a tap.
-        if (voice.owner === COMPANION_OWNER && voice.status === "paused") {
-          player.stop(COMPANION_OWNER);
-          set({ greeting: { ...greeting, blocked: true } });
-        }
-      }, 1800);
+      whenVoicesReady(() => {
+        if (mine !== speechTicket || !state.greeting) return;
+        const greeting = chooseGreetingVoice(state.greeting, plain);
+        set({ greeting, reply: greeting.text });
+        player.play(COMPANION_OWNER, segmentsFromText(greeting.text, lang()), { stepWait: 0, localOnly: greeting.personal });
+        setTimeout(() => {
+          const current = state.greeting;
+          if (mine !== speechTicket || !current) return;
+          const voice = player.state();
+          // The engine pauses when the browser refuses to speak without a tap.
+          if (voice.owner === COMPANION_OWNER && voice.status === "paused") {
+            player.stop(COMPANION_OWNER);
+            set({ greeting: { ...current, blocked: true } });
+          }
+        }, 1800);
+      });
     },
     /** Plays the welcome again from a tap, which browsers allow. */
     replayGreeting() {
       const greeting = state.greeting;
       if (!greeting) return;
-      set({ greeting: { ...greeting, blocked: false } });
+      primeSpeech();
+      if (!state.micHeldBy) player.stop();
+      const next = { ...chooseGreetingVoice(greeting, plainGreeting), blocked: false };
+      set({ greeting: next, reply: next.text });
       speechTicket += 1;
-      player.play(COMPANION_OWNER, segmentsFromText(greeting.text, lang()), { stepWait: 0, localOnly: greeting.personal });
+      player.play(COMPANION_OWNER, segmentsFromText(next.text, lang()), { stepWait: 0, localOnly: next.personal });
+    },
+    /** Speaks a reply from a tap, for example the hello when the panel opens. */
+    sayNow(text: string) {
+      primeSpeech();
+      if (!state.micHeldBy) player.stop();
+      say(text);
     },
     dismissGreeting() {
       if (state.greeting) set({ greeting: null });
@@ -538,10 +581,15 @@ function createRuntime() {
       userPaused = false;
       silentRounds = 0;
       speechTicket += 1;
-      player.stop(COMPANION_OWNER);
+      primeSpeech();
+      // The person wants to talk: quiet any LifeZoi reading (a paused Listen button would
+      // otherwise keep the microphone closed). A guided session holds the microphone instead.
+      if (!state.micHeldBy) player.stop();
       set({ paused: false, error: null });
-      // Give the browser a moment to stop speaking before the microphone opens.
-      setTimeout(() => startRecognition(), 120);
+      // Started inside the tap: Safari only opens the microphone from one.
+      if (!startRecognition() && !recognition) {
+        set({ error: state.micHeldBy ? null : !state.recognitionSupported ? "service-blocked" : "other" });
+      }
     },
     /** Stops speaking and listening at once (the button while busy, or Esc). */
     interrupt() {
@@ -560,7 +608,8 @@ function createRuntime() {
       silentRounds = 0;
       if (on) {
         set({ paused: false, error: null });
-        setTimeout(() => startRecognition(), 120);
+        if (!state.micHeldBy) player.stop();
+        startRecognition();
       } else stopRecognition();
     },
     /** Records the microphone choice made in the consent panel. "none" turns the microphone off. */

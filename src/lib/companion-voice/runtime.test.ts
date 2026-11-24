@@ -265,4 +265,26 @@ describe("voice companion runtime", () => {
     await vi.advanceTimersByTimeAsync(1200);
     expect(spoken.join(" ")).toContain("Good evening, Tatyana!");
   });
+
+  it("opens the microphone straight from the tap, even when another Listen button was left paused", async () => {
+    const { companion } = await setup({ mic: "browser", handsFree: false });
+    const { player } = await import("@/lib/voice/engine");
+    const { segmentsFromText } = await import("@/lib/voice/voices");
+    player.play("page-listen", segmentsFromText("A long article read aloud.", "en"), { stepWait: 0 });
+    await vi.advanceTimersByTimeAsync(1000);
+    player.pause();
+    expect(player.state().status).toBe("paused");
+    companion.talk();
+    // No timer needed: the recognizer starts inside the tap.
+    expect(latest()?.started).toBe(true);
+    expect(player.state().status).toBe("idle");
+  });
+
+  it("says it heard nothing after a single tap with silence, instead of doing nothing", async () => {
+    const { companion } = await setup({ mic: "browser", handsFree: false });
+    companion.talk();
+    await vi.advanceTimersByTimeAsync(10);
+    latest().silence();
+    expect(companion.state().error).toBe("no-speech");
+  });
 });

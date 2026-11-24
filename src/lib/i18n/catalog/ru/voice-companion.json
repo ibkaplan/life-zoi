@@ -129,5 +129,9 @@
   "Here's some music for you.": "Вот музыка для вас.",
   "I've paused the music.": "Музыка на паузе.",
   "Going back.": "Возвращаемся.",
-  "A guided session is open, so the companion is not listening. It listens again when the session ends.": "Открыто занятие с голосом, поэтому помощник не слушает. Он снова начнёт слушать, когда занятие закончится."
+  "A guided session is open, so the companion is not listening. It listens again when the session ends.": "Открыто занятие с голосом, поэтому помощник не слушает. Он снова начнёт слушать, когда занятие закончится.",
+  "Hello! I'm here. Tap Talk to LifeZoi and tell me what you'd like, for example: open My Day.": "Здравствуйте! Я здесь. Нажмите «Поговорить с LifeZoi» и скажите, что вам нужно, например: открой мой день.",
+  "This device has no voice for this language, so LifeZoi's replies are shown as text. You can add a voice in your computer's language and speech settings.": "На этом устройстве нет голоса для этого языка, поэтому ответы LifeZoi показываются текстом. Голос можно добавить в настройках языка и речи компьютера.",
+  "This browser cannot read aloud, so LifeZoi's replies are shown as text.": "Этот браузер не умеет читать вслух, поэтому ответы LifeZoi показываются текстом.",
+  "The voice could not start. Tap the LifeZoi button to try again.": "Голос не смог включиться. Нажмите кнопку LifeZoi, чтобы попробовать снова."
 }

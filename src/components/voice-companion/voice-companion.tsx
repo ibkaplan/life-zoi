@@ -16,7 +16,9 @@ import { companion, companionStatus, GUIDED_OWNER, serverCompanionState, type Co
 import type { MicChoice } from "@/lib/companion-voice/prefs";
 import { listenErrorMessage } from "@/lib/mind/speech";
 import { US_CRISIS_ACTIONS } from "@/lib/mind/safety";
-import type { Translate } from "@/lib/i18n/translate";
+import { msg, type Translate } from "@/lib/i18n/translate";
+
+const PANEL_HELLO = msg("Hello! I'm here. Tap Talk to LifeZoi and tell me what you'd like, for example: open My Day.");
 
 /** Set once per tab, so LifeZoi welcomes the person when they open it, not on every page. */
 const GREETED_KEY = "lifezoi.voice-companion.greeted";
@@ -86,8 +88,10 @@ function useWelcome() {
     ready: profile.ready,
     make(variant: number) {
       const name = spokenName(saved?.displayName);
-      const greeting = greetingFor({ hasProfile: saved !== null, name, hour: new Date().getHours(), variant, t });
-      return { ...greeting, personal: name !== null };
+      const hour = new Date().getHours();
+      const greeting = greetingFor({ hasProfile: saved !== null, name, hour, variant, t });
+      const plain = greetingFor({ hasProfile: saved !== null, name: null, hour, variant, t }).text;
+      return { ...greeting, plain, personal: name !== null };
     },
   };
 }
@@ -112,6 +116,7 @@ export function VoiceCompanion() {
   const orbRef = useRef<HTMLButtonElement>(null);
   const speaking = voice.owner === "voice-companion" && (voice.status === "playing" || voice.status === "waiting");
   const status = companionStatus(state, speaking);
+  const voiceProblem = voice.owner === "voice-companion" ? voice.problem : null;
   const guided = useGuided();
   const guidedOpen = guided.running !== null || (voice.owner === GUIDED_OWNER && voice.status !== "idle");
 
@@ -152,8 +157,14 @@ export function VoiceCompanion() {
     const variant = nextVariant(state.prefs.lastVariant);
     const greeting = welcome.make(variant);
     if (!greeting.needsProfile) companion.savePrefs({ lastVariant: variant });
-    companion.greet(greeting.text, greeting.needsProfile, greeting.personal);
+    companion.greet(greeting.text, greeting.needsProfile, greeting.personal, greeting.plain);
   }, [state.loaded, state.prefs.setup, state.prefs.autoWelcome, state.prefs.lastVariant, welcome, signedIn, guidedOpen]);
+
+  // A microphone or voice problem opens the panel, so the message is seen instead of nothing happening.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- shows a problem the runtime reported
+    if (state.error || voiceProblem) setOpen(true);
+  }, [state.error, voiceProblem]);
 
   // A new page closes the welcome card; the panel stays as the person left it.
   const lastPath = useRef(pathname);
@@ -182,7 +193,7 @@ export function VoiceCompanion() {
     const variant = nextVariant(state.prefs.lastVariant);
     const greeting = welcome.make(variant);
     companion.savePrefs({ lastVariant: greeting.needsProfile ? state.prefs.lastVariant : variant });
-    companion.greet(greeting.text, greeting.needsProfile, greeting.personal);
+    companion.greet(greeting.text, greeting.needsProfile, greeting.personal, greeting.plain);
   }
 
   function enableVoice() {
@@ -204,7 +215,15 @@ export function VoiceCompanion() {
       companion.interrupt();
       return;
     }
-    setOpen((value) => !value);
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    // One tap does something you can hear: the welcome, listening, or a short hello.
+    setOpen(true);
+    if (state.greeting?.blocked) companion.replayGreeting();
+    else if (state.prefs.mic !== "none" && state.recognitionSupported) companion.talk();
+    else if (state.prefs.voiceOutput) companion.sayNow(t(PANEL_HELLO));
   }
 
   function onTalk() {
@@ -337,6 +356,15 @@ export function VoiceCompanion() {
                 </li>
               ))}
             </ul>
+          ) : null}
+          {voiceProblem ? (
+            <p className="alert alert-error" role="alert">
+              {voiceProblem === "no-voice"
+                ? t("This device has no voice for this language, so LifeZoi's replies are shown as text. You can add a voice in your computer's language and speech settings.")
+                : voiceProblem === "unsupported"
+                  ? t("This browser cannot read aloud, so LifeZoi's replies are shown as text.")
+                  : t("The voice could not start. Tap the LifeZoi button to try again.")}
+            </p>
           ) : null}
           {state.error ? (
             <p className="alert alert-error" role="alert">
