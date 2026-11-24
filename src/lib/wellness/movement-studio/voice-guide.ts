@@ -1,11 +1,11 @@
 /**
- * Read-aloud for Find My Movement cards, with the browser's own speech voices.
- * Nothing is sent to a server. This is the hook the planned LifeZoi natural
- * voice assistant can replace: give `speakGuide` a different speaker.
+ * Read-aloud for Find My Movement cards. It now speaks through the shared
+ * LifeZoi voice (src/lib/voice/engine.ts), like every other Listen button.
+ * Nothing is sent to a server.
  */
 
-import { readVoicePrefs } from "@/lib/voice/engine";
-import { chooseVoice, DEFAULT_VOICE_TONE, voiceLanguage, type VoiceTone } from "@/lib/voice/voices";
+import { player } from "@/lib/voice/engine";
+import { chooseVoice, DEFAULT_VOICE_TONE, segmentsFromText, voiceLanguage, type VoiceTone } from "@/lib/voice/voices";
 
 export type GuideVoice = { name: string; lang: string };
 
@@ -24,34 +24,26 @@ export function pickGuideVoice<V extends GuideVoice>(
   return chooseVoice(voices, base, saved?.voice, saved?.tone ?? DEFAULT_VOICE_TONE);
 }
 
-function savedChoice(lang: string): { voice?: string; tone: VoiceTone } {
-  const base = voiceLanguage({ lang });
-  const prefs = readVoicePrefs();
-  return { voice: base ? prefs.voices[base] : undefined, tone: prefs.tone };
-}
 
 export function guideSpeechSupported(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window && typeof window.speechSynthesis?.speak === "function";
 }
 
-/** Speaks `text` in `lang`. Returns false when the browser cannot speak, so the page can say so. */
+const GUIDE_OWNER = "find-my-movement";
+
+/**
+ * Speaks `text` in `lang` with the LifeZoi voice: the shared read-aloud player,
+ * so it uses the saved voice, speed, volume, and natural voice, and never
+ * talks over another Listen button or a guided session.
+ * Returns false when the browser cannot speak, so the page can say so.
+ */
 export function speakGuide(text: string, lang: string, onEnd?: () => void): boolean {
   if (!guideSpeechSupported()) return false;
-  const synth = window.speechSynthesis;
-  synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  utterance.rate = 0.9;
-  const voice = pickGuideVoice(synth.getVoices(), lang, savedChoice(lang));
-  if (voice) utterance.voice = voice;
-  if (onEnd) {
-    utterance.onend = onEnd;
-    utterance.onerror = onEnd;
-  }
-  synth.speak(utterance);
+  const base = voiceLanguage({ lang }) ?? "en";
+  player.play(GUIDE_OWNER, segmentsFromText(text, base), { stepWait: 0, rateFactor: 0.95, onEnd: () => onEnd?.() });
   return true;
 }
 
 export function stopGuide() {
-  if (guideSpeechSupported()) window.speechSynthesis.cancel();
+  player.stop(GUIDE_OWNER);
 }

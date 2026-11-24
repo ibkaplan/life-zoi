@@ -11,6 +11,7 @@ import { clearConversation, readConversation, writeConversation, type MindTurn }
 import { newId } from "@/lib/mind/progress";
 import { activeProvider } from "@/lib/mind/provider";
 import { listenErrorMessage, listeningSupported, listenOnce, onDeviceRecognition, type Listener } from "@/lib/mind/speech";
+import { companion } from "@/lib/companion-voice/runtime";
 import { player } from "@/lib/voice/engine";
 import { segmentsFromText } from "@/lib/voice/voices";
 
@@ -143,6 +144,7 @@ export function MindTalk() {
     /* eslint-enable react-hooks/set-state-in-effect */
     return () => {
       listenerRef.current?.abort();
+      companion.releaseMic(OWNER);
       handsFreeRef.current = false;
       userStopped.current = true;
       player.stop(OWNER);
@@ -194,6 +196,8 @@ export function MindTalk() {
       listenerRef.current?.abort();
       setVoiceError(null);
       setInterim("");
+      // The voice companion steps aside while LifeZoi Mind uses the microphone.
+      companion.holdMic(OWNER);
       const listener = listenOnce({
         lang: listenLang,
         local: mode === "local",
@@ -215,6 +219,7 @@ export function MindTalk() {
         onEnd: () => {
           setListening(false);
           listenerRef.current = null;
+          companion.releaseMic(OWNER);
         },
       });
       listenerRef.current = listener;

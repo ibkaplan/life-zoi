@@ -4,6 +4,7 @@ import "@/components/health-day/health-day.css";
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { FeelingMatches } from "@/components/health-day/feeling-matches";
+import { GuidedDayPicks } from "@/components/guided/guided-launch";
 import { useT } from "@/components/locale-provider";
 import { getCalorieServerSnapshot, getCalorieSnapshot, subscribeCalories } from "@/lib/calories/store";
 import { useCompanion } from "@/lib/companion/store";
@@ -99,6 +100,23 @@ export function MyHealthDay() {
           </span>
         </Link>
       </div>
+
+      <article className="lzd-card hd-guided" aria-labelledby="hd-guided-title">
+        <p className="hd-match-kind">
+          <span aria-hidden="true">🎧 </span>
+          {t("Voice-guided")}
+        </p>
+        <h3 id="hd-guided-title">{t("Guided sessions for now")}</h3>
+        <p className="hd-hint">
+          {summary.guided.sessions > 0
+            ? t("Guided sessions today: {count}, about {minutes} min", { count: summary.guided.sessions, minutes: Math.max(1, summary.guided.minutes) })
+            : t("Tap Start and the LifeZoi voice guides you step by step.")}
+        </p>
+        <GuidedDayPicks only={part} headingLevel="h4" />
+        <Link className="hd-match-go" href="/guided">
+          {t("All guided sessions")}
+        </Link>
+      </article>
 
       <div className="hd-lower">
         <article className="lzd-card hd-feel" aria-labelledby="hd-feel-title">

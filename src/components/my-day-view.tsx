@@ -7,6 +7,7 @@ import { useSession } from "@/components/session-provider";
 import { msg } from "@/lib/i18n/translate";
 import { sayJoined } from "@/lib/my-day/say";
 import { LoadingState } from "@/components/sources";
+import { GuidedDaySection } from "@/components/guided/guided-launch";
 import { useAccount } from "@/lib/account-store";
 import { isEmptyBrain } from "@/lib/brain-quiz/progress";
 import { useBrainProgress } from "@/components/brain-quiz/use-brain-progress";
@@ -133,6 +134,8 @@ export function MyDayView() {
           <p className="hint">{t("No completed assessment is saved, so the day stays general. Sample answers are not used.")}</p>
         )}
       </section>
+
+      <GuidedDaySection />
 
       <ol className="stack-lg">
         {items.map((item) => (

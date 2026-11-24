@@ -45,7 +45,9 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [LIFEZOI_DAILY.md](LIFEZOI_DAILY.md) | LifeZoi Daily: one idea a day from the assessment, optional feeling tap, three separate progress indicators, weekly report |
 | [MINI_COURSES.md](MINI_COURSES.md) | 7-day mini-courses on the dashboard: three courses, one short practice a day, gentle progress with no streaks |
 | [TRAINING_ACADEMY.md](TRAINING_ACADEMY.md) | Training Academy: five personal-growth courses, 50 lessons, practice feedback, achievements, My Growth Journey, academy_state storage, voice |
+| [GUIDED_SESSIONS.md](GUIDED_SESSIONS.md) | Voice-guided Pilates, yoga, stretching, breathing, relaxation, and meditation: one player, the LifeZoi voice, music ducking, My Day launch, saved history, and voice upgrade options |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
+| [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [LIFEZOI_MIND.md](LIFEZOI_MIND.md) | LifeZoi Mind: rule-based voice and text companion, PHQ-9 and GAD-7, safety handling, exercises, 7-day plan, Psychology Encyclopedia, consented progress, provider research |

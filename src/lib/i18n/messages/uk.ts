@@ -236,6 +236,7 @@ export const uk: Messages = {
     "/academy/meals": "Харчування",
     "/academy/move": "Рух",
     "/breathe": "Дихайте для життя",
+    "/guided": "Сесії з голосом",
     "/academy/move/breaks": "Перерви на рух",
     "/academy/move/studio/daily-movement": "Щоденний рух",
     "/academy/move/studio/chair-yoga": "Студія йоги на стільці",

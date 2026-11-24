@@ -101,6 +101,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     label: "Wellness Library",
     pages: [
       { href: "/academy/move/library", label: "Wellness Library" },
+      { href: "/guided", label: "Guided sessions" },
       { href: "/breathe", label: "Breathe for Life" },
       { href: "/library/music", label: "My Music" },
       { href: "/library", label: "Health Library" },
@@ -225,6 +226,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/nature", label: "Nature" },
   { href: "/habit-transformation", label: "Habit Transformation" },
   { href: "/academy/move/library", label: "Wellness Library" },
+  { href: "/guided", label: "Guided sessions" },
   { href: "/breathe", label: "Breathe for Life" },
   { href: "/academy/move/breaks", label: "Movement breaks" },
   { href: "/academy/move/studio/daily-movement", label: "Daily Movement" },
