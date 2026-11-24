@@ -91,10 +91,12 @@ describe("sentences and pauses", () => {
 
 describe("saved voice choice", () => {
   it("survives a round trip and ignores bad values", () => {
-    const prefs = parseVoicePrefs(serializeVoicePrefs({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null, tone: "soft" }));
-    expect(prefs).toEqual({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null, tone: "soft" });
+    const prefs = parseVoicePrefs(serializeVoicePrefs({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null, tone: "soft", volume: 0.6 }));
+    expect(prefs).toEqual({ rate: 1.1, voices: { en: "Ava (Premium)" }, stepWait: null, tone: "soft", volume: 0.6 });
     expect(parseVoicePrefs("{not json").rate).toBe(0.95);
-    expect(parseVoicePrefs(JSON.stringify({ rate: 9, voices: { xx: "a", en: 5 }, stepWait: 7 }))).toEqual({ rate: 1.5, voices: {}, stepWait: 0, tone: "soft" });
+    expect(parseVoicePrefs(JSON.stringify({ rate: 9, voices: { xx: "a", en: 5 }, stepWait: 7 }))).toEqual({ rate: 1.5, voices: {}, stepWait: 0, tone: "soft", volume: 1 });
+    // Older saved settings have no volume: full volume. Silence is never stored by accident.
+    expect(parseVoicePrefs(JSON.stringify({ volume: 0 })).volume).toBe(0.2);
   });
 });
 

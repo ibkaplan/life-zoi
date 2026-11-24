@@ -18,7 +18,8 @@ import encyclopedia from "./encyclopedia.json";
 import courses from "./courses.json";
 import health_day from "./health-day.json";
 import fact_quiz from "./fact-quiz.json";
+import guided from "./guided.json";
 import voice_companion from "./voice-companion.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...voice_companion };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion };
 export default catalog;

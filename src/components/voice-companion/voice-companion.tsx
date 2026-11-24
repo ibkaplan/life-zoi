@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useBackgroundMusic } from "@/components/background-music/provider";
+import { useGuided } from "@/components/guided/guided-provider";
 import { useProfile } from "@/components/companion/use-profile";
 import { useLocale, useT } from "@/components/locale-provider";
 import { MicConsent } from "@/components/voice-companion/mic-consent";
@@ -111,7 +112,15 @@ export function VoiceCompanion() {
   const orbRef = useRef<HTMLButtonElement>(null);
   const speaking = voice.owner === "voice-companion" && (voice.status === "playing" || voice.status === "waiting");
   const status = companionStatus(state, speaking);
-  const guidedOpen = voice.owner === GUIDED_OWNER && voice.status !== "idle";
+  const guided = useGuided();
+  const guidedOpen = guided.running !== null || (voice.owner === GUIDED_OWNER && voice.status !== "idle");
+
+  // A guided session speaks and pauses on its own; the companion does not listen over it.
+  useEffect(() => {
+    if (!guidedOpen) return;
+    companion.holdMic(GUIDED_OWNER);
+    return () => companion.releaseMic(GUIDED_OWNER);
+  }, [guidedOpen]);
 
   const actions = useMemo(
     () => ({
@@ -334,7 +343,11 @@ export function VoiceCompanion() {
               {t(listenErrorMessage(state.error))}
             </p>
           ) : null}
-          {state.micHeldBy ? <p className="hint">{t("Another LifeZoi microphone on this page is in use, so the companion is paused.")}</p> : null}
+          {state.micHeldBy === GUIDED_OWNER ? (
+            <p className="hint">{t("A guided session is open, so the companion is not listening. It listens again when the session ends.")}</p>
+          ) : state.micHeldBy ? (
+            <p className="hint">{t("Another LifeZoi microphone on this page is in use, so the companion is paused.")}</p>
+          ) : null}
           {status === "paused" && !state.micHeldBy ? <p className="hint">{t("Hands-free is paused. Tap Talk to LifeZoi to start listening again.")}</p> : null}
 
           {consent === "panel" ? (

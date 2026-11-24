@@ -8,7 +8,7 @@ import { statusLabel, useCompanionVoice } from "@/components/voice-companion/voi
 import { useVoicePrefs, useVoiceState } from "@/components/voice/read-aloud";
 import { companion, companionStatus } from "@/lib/companion-voice/runtime";
 import { player, saveVoicePrefs } from "@/lib/voice/engine";
-import { segmentsFromText, type VoicePrefs } from "@/lib/voice/voices";
+import { segmentsFromText } from "@/lib/voice/voices";
 
 type MicPermission = "granted" | "denied" | "prompt" | "unknown";
 
@@ -58,8 +58,7 @@ export function CompanionSettingsSection() {
   const speaking = voice.owner === "voice-companion" && (voice.status === "playing" || voice.status === "waiting");
   const status = companionStatus(state, speaking);
   const micOn = state.prefs.mic !== "none";
-  // The site-wide voice volume arrives with the guided-session player; show it once it exists.
-  const volume = (prefs as VoicePrefs & { volume?: number }).volume;
+  const volume = prefs.volume;
 
   return (
     <section className="card stack vc-settings" id="voice-companion" aria-labelledby="vc-settings-title">
@@ -154,7 +153,7 @@ export function CompanionSettingsSection() {
       {typeof volume === "number" ? (
         <label className="vc-range">
           {t("Voice volume")}: {Math.round(volume * 100)}%
-          <input type="range" min={0.2} max={1} step={0.05} value={volume} onChange={(event) => saveVoicePrefs({ volume: Number(event.target.value) } as Partial<VoicePrefs>)} />
+          <input type="range" min={0.2} max={1} step={0.05} value={volume} onChange={(event) => saveVoicePrefs({ volume: Number(event.target.value) })} />
         </label>
       ) : (
         <p className="hint">{t("Voice volume follows your device's volume buttons.")}</p>

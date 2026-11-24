@@ -1,0 +1,328 @@
+/*
+ * Guided-session player and launch cards. Phone first: the player is a sheet
+ * from the bottom of the screen with big buttons; on wider screens it is a
+ * centered panel. Uses the site's surface, line, and radius tokens so every
+ * page background works.
+ */
+
+.gs-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  background: rgba(23, 37, 84, 0.42);
+}
+
+.gs-panel {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  width: 100%;
+  max-height: 100dvh;
+  overflow-y: auto;
+  padding: 1.1rem 1rem calc(1.1rem + env(safe-area-inset-bottom));
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.gs-panel:focus {
+  outline: none;
+}
+
+@media (min-width: 720px) {
+  .gs-backdrop {
+    align-items: center;
+    padding: 1.5rem;
+  }
+
+  .gs-panel {
+    max-width: 44rem;
+    max-height: calc(100dvh - 3rem);
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius);
+  }
+}
+
+.gs-head {
+  display: grid;
+  gap: 0.15rem;
+  padding-right: 3rem;
+}
+
+.gs-head h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.gs-kind {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.gs-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gs-close:focus-visible,
+.gs-main:focus-visible,
+.gs-go:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.gs-now {
+  display: grid;
+  gap: 0.4rem;
+  min-height: 7.5rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--lavender);
+}
+
+.gs-step {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gs-cue {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.45;
+}
+
+.gs-done {
+  font-weight: 600;
+}
+
+.gs-care,
+.gs-saved {
+  margin: 0;
+}
+
+.gs-progress {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.gs-bar {
+  height: 0.6rem;
+  border-radius: 999px;
+  background: var(--sky);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.gs-bar span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.25s linear;
+}
+
+.gs-times {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.gs-status,
+.gs-note,
+.gs-medical {
+  margin: 0;
+}
+
+.gs-note {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  background: var(--danger-bg);
+}
+
+.gs-medical {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.gs-controls {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.gs-main {
+  min-height: 3.5rem;
+  font-size: 1.25rem;
+  width: 100%;
+}
+
+.gs-secondary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.gs-secondary .btn {
+  min-height: 2.9rem;
+}
+
+@media (min-width: 720px) {
+  .gs-secondary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.gs-settings summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.gs-settings-grid {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+@media (min-width: 720px) {
+  .gs-settings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.gs-settings h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.gs-settings select,
+.gs-settings input[type="range"] {
+  width: 100%;
+}
+
+/* ---------- launch cards (My Day, My Health Day, the library) ---------- */
+
+.gs-picks {
+  display: grid;
+  gap: 1rem;
+}
+
+.gs-part {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gs-part h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.gs-part-now h3::after {
+  content: " •";
+  color: var(--primary);
+}
+
+.gs-cards {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gs-card {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.gs-card h4,
+.gs-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.gs-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.gs-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  justify-self: start;
+  min-height: 2.9rem;
+  margin-top: 0.35rem;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  border: 0;
+  background: var(--primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gs-go:hover {
+  background: var(--deep);
+}
+
+.gs-lengths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.gs-lengths .gs-go {
+  margin: 0;
+  min-width: 4.25rem;
+}
+
+.gs-history {
+  display: grid;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gs-history li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}

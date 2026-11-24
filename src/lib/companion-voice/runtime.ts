@@ -319,7 +319,15 @@ function createRuntime() {
       if (!then) scheduleListen(200);
       return;
     }
-    player.play(COMPANION_OWNER, segmentsFromText(text, lang()), { stepWait: 0, localOnly: personal, onEnd: finish });
+    player.play(COMPANION_OWNER, segmentsFromText(text, lang()), {
+      stepWait: 0,
+      localOnly: personal,
+      onEnd: (reason) => {
+        // Stopped by the person, or replaced by another voice: do not open the page after all.
+        if (reason === "done") finish();
+        else done = true;
+      },
+    });
     // If the browser could not speak (no voice, or it wants a tap first), carry on without sound.
     setTimeout(() => {
       if (done || mine !== speechTicket) return;

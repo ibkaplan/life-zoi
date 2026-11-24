@@ -247,7 +247,7 @@ export function unlockNeuralAudio() {
 }
 
 /** Plays one sentence. Resolves when it ends or is stopped. */
-export async function playClip(clip: Clip): Promise<void> {
+export async function playClip(clip: Clip, volume = 1): Promise<void> {
   stopClip();
   const ctx = audioContext();
   if (ctx.state === "suspended") await ctx.resume().catch(() => undefined);
@@ -255,7 +255,12 @@ export async function playClip(clip: Clip): Promise<void> {
   buffer.getChannelData(0).set(clip.pcm);
   const source = ctx.createBufferSource();
   source.buffer = buffer;
-  source.connect(ctx.destination);
+  if (volume < 1) {
+    const gain = ctx.createGain();
+    gain.gain.value = Math.max(0, volume);
+    source.connect(gain);
+    gain.connect(ctx.destination);
+  } else source.connect(ctx.destination);
   playing = source;
   // Background music lowers itself while a voice speaks.
   audioFocus.claim("natural-voice", "voice");

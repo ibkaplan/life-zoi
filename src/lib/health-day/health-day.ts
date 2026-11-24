@@ -2,6 +2,7 @@ import type { CalorieLog } from "@/lib/calories/types";
 import { totals } from "@/lib/calories/math";
 import type { CompanionState, DailyFeeling } from "@/lib/companion/state";
 import { factOfTheDay, type HealthFact } from "@/lib/encyclopedia/facts";
+import { guidedOn } from "@/lib/guided/history";
 import { msg } from "@/lib/i18n/translate";
 import type { LibraryCategory } from "@/lib/music-library/catalog";
 import { isTracked, TRACK_ITEMS } from "@/lib/movement-breaks/personal";
@@ -25,6 +26,8 @@ export type HealthDaySummary = {
   habits: { done: number; total: number };
   movement: { minutes: number; breaks: number };
   breathing: { sessions: number; minutes: number };
+  /** Voice-guided sessions (Pilates, yoga, meditation, and others) finished today. */
+  guided: { sessions: number; minutes: number };
   /** `null` when nothing is in the calorie counter for today. */
   food: { items: number; meals: number; kcal: number } | null;
   fact: HealthFact;
@@ -44,6 +47,7 @@ export function healthDaySummary(companion: CompanionState, calories: CalorieLog
       breaks: Math.max(0, day?.movementBreaks ?? 0),
     },
     breathing: { sessions: sessions.length, minutes: Math.round(seconds / 60) },
+    guided: guidedOn(companion.guided, today),
     food,
     fact: factOfTheDay(today),
   };
