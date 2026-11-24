@@ -91,7 +91,7 @@ export function GuidedPlayer({
       : state.status === "paused"
         ? state.interruption === "blocked"
           ? t("The browser needs a tap before the voice can speak. Press Resume.")
-          : state.interruption
+          : state.interruption === "replaced"
             ? t("Paused, because another sound started. Press Resume to continue from this step.")
             : t("Paused. Resume continues from this step.")
         : state.status === "finished"
