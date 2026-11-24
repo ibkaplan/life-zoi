@@ -41,6 +41,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [CHAIR_YOGA_LIBRARY.md](CHAIR_YOGA_LIBRARY.md) | Chair Yoga Studio videos, what was verified, and how to add more |
 | [DAILY_MOVEMENT_LIBRARY.md](DAILY_MOVEMENT_LIBRARY.md) | Daily Movement videos, the morning and evening plan rules, and what was verified |
 | [WELLNESS_VIDEO_LIBRARY.md](WELLNESS_VIDEO_LIBRARY.md) | Wellness Library video collection (14 activities × 6 lengths), what was verified, missing lengths, and how to add videos |
+| [BRAIN_QUIZ_DAILY.md](BRAIN_QUIZ_DAILY.md) | Brain & Habit Quiz daily training: fresh five a day in local time, rotation, built Logic/Numbers puzzles, My Brain Journey history and milestones, saved in companion_state |
 | [LIFEZOI_DAILY.md](LIFEZOI_DAILY.md) | LifeZoi Daily: one idea a day from the assessment, optional feeling tap, three separate progress indicators, weekly report |
 | [MINI_COURSES.md](MINI_COURSES.md) | 7-day mini-courses on the dashboard: three courses, one short practice a day, gentle progress with no streaks |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |

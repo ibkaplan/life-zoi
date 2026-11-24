@@ -32,6 +32,7 @@ export function ChoicePlay({
   const t = useT();
   const [selected, setSelected] = useState<number[]>(picked);
   const multi = activity.kind === "multi";
+  const values = activity.kind === "choice" ? activity.values : undefined;
   const show = revealed;
 
   function toggle(index: number) {
@@ -51,7 +52,7 @@ export function ChoicePlay({
   return (
     <div className="stack">
       {activity.kind === "rebus" ? <RebusArt layout={activity.rebus} /> : null}
-      <p>{t(activity.prompt)}</p>
+      <p>{t(activity.prompt, values?.prompt)}</p>
       {multi ? <p className="hint">{t("Select every correct choice. The full set is required.")}</p> : null}
       <div className="choices" role="group" aria-label={t("Choices")}>
         {activity.choices.map((choice, index) => {
@@ -77,7 +78,7 @@ export function ChoicePlay({
           {activity.choices.map((choice, index) => (
             <p key={choice}>
               <strong>{t(choice)}. </strong>
-              {t(activity.explanations[index] ?? "")}
+              {t(activity.explanations[index] ?? "", values?.explanations?.[index])}
             </p>
           ))}
           {activity.kind !== "rebus" && activity.sources?.length ? (

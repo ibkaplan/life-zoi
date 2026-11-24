@@ -36,12 +36,17 @@ type Base = {
   prompt: string;
 };
 
+/** Values for `{placeholders}` in a built puzzle's prompt and explanations. */
+export type TextValues = Record<string, string | number>;
+
 export type ChoiceActivity = Base & {
   kind: "choice";
   choices: Four;
   correctIndex: 0 | 1 | 2 | 3;
   explanations: Four;
   sources?: SourceLink[];
+  /** Only on puzzles built from a seed (see generated.ts). */
+  values?: { prompt?: TextValues; explanations?: readonly TextValues[] };
 };
 
 export type MultiActivity = Base & {

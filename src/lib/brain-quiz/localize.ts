@@ -1,4 +1,5 @@
 import type { Activity } from "@/lib/brain-quiz/activities";
+import { baseActivityId } from "@/lib/brain-quiz/progress";
 import { NATIVE_EL } from "@/lib/brain-quiz/native-el";
 import { NATIVE_RU } from "@/lib/brain-quiz/native-ru";
 import type { NativeSet } from "@/lib/brain-quiz/native-types";
@@ -22,7 +23,8 @@ export function nativeIds(): Set<string> {
  */
 export function localizeActivity<A extends Activity>(activity: A, locale: Locale): A {
   if (locale === "en") return activity;
-  const variant = NATIVE[locale].variants[activity.id];
+  // A daily copy such as `L03_d327` uses the native puzzle of its original.
+  const variant = NATIVE[locale].variants[baseActivityId(activity.id)];
   return variant ? ({ ...activity, ...variant } as A) : activity;
 }
 
@@ -106,4 +108,9 @@ export function noteText(note: string, t: Translate): string {
     if (match?.[1]) return t(template.text, { items: listText(match[1].split(", "), t) });
   }
   return t(note);
+}
+
+/** The prompt in this language, with the values of a built puzzle filled in. */
+export function promptText(activity: Activity, t: Translate): string {
+  return t(activity.prompt, activity.kind === "choice" ? activity.values?.prompt : undefined);
 }

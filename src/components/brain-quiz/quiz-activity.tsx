@@ -4,7 +4,8 @@ import { useState } from "react";
 import type { Activity } from "@/lib/brain-quiz/activities";
 import { isLockedKind } from "@/lib/brain-quiz/activities";
 import { localISODate } from "@/lib/dates";
-import { recordOutcome, saveDailyPick, type DailyPick } from "@/lib/brain-quiz/progress";
+import { baseActivityId, markSeen, recordOutcome, saveDailyPick, type DailyPick } from "@/lib/brain-quiz/progress";
+import { dayNumber } from "@/lib/brain-quiz/daily";
 import { AttentionPlay } from "@/components/brain-quiz/attention-play";
 import { ChoicePlay } from "@/components/brain-quiz/choice-play";
 import { MemoryPlay } from "@/components/brain-quiz/memory-play";
@@ -44,6 +45,8 @@ export function QuizActivity({
       onSaved?.(pick);
       return;
     }
+    const base = baseActivityId(activity.id);
+    const builtGame = activity.kind === "memory" || activity.kind === "attention";
     const outcome = recordOutcome(progress, {
       today,
       activityId: activity.id,
@@ -51,9 +54,10 @@ export function QuizActivity({
       difficulty: activity.difficulty,
       correct,
       lock: isLockedKind(activity),
+      baseId: !builtGame && base !== activity.id ? base : undefined,
     });
     const pick: DailyPick = { id: activity.id, correct, note, gained: outcome.gained, picked };
-    let next = outcome.progress;
+    let next = markSeen(outcome.progress, [activity.id], dayNumber(today));
     if (dailyDate) next = saveDailyPick(next, dailyDate, pick);
     save(next);
     setLocal(pick);
