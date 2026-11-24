@@ -9,7 +9,7 @@ import { ArticleCard, Disclaimer, EnglishOnlyNote } from "@/components/encyclope
 import { useArticles } from "@/components/encyclopedia/use-encyclopedia";
 import { findArticle } from "@/lib/encyclopedia/catalog";
 import { FACT_EVIDENCE } from "@/lib/encyclopedia/facts";
-import { findStory, STORIES, STORY_APPROACHES, STORY_CONDITIONS, STORY_KINDS, STORY_THEMES, storiesFor, type HealthStory, type StoryKind } from "@/lib/encyclopedia/stories";
+import { findStory, STORIES, STORY_APPROACHES, STORY_CONDITIONS, STORY_KINDS, STORY_THEMES, storiesFor, videoEmbedUrl, type HealthStory, type StoryKind, type StoryVideo } from "@/lib/encyclopedia/stories";
 import type { Article } from "@/lib/encyclopedia/types";
 
 const TITLE = "Real People. Real Stories. Real Medical Knowledge.";
@@ -85,6 +85,39 @@ function ChipFilter({
         </button>
       ))}
     </div>
+  );
+}
+
+function VideoItem({ video }: { video: StoryVideo }) {
+  const t = useT();
+  const [playing, setPlaying] = useState(false);
+  const embed = videoEmbedUrl(video);
+  return (
+    <li className="story-video">
+      <p>
+        <strong lang="en">{video.title}</strong> <span className="hint">{video.publisher}</span>
+      </p>
+      {embed && playing ? (
+        <div className="video-frame story-video-frame">
+          <iframe
+            src={`${embed}?autoplay=1&rel=0`}
+            title={video.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        </div>
+      ) : embed ? (
+        <button type="button" className="btn btn-secondary" onClick={() => setPlaying(true)}>
+          ▶ {t("Play video")}
+        </button>
+      ) : (
+        <a className="btn btn-secondary" href={video.url} target="_blank" rel="noopener noreferrer">
+          {t("Watch on the publisher's website")}
+        </a>
+      )}
+      {embed ? <p className="hint">{t("The video plays from YouTube only after you press Play.")}</p> : null}
+    </li>
   );
 }
 
@@ -252,6 +285,16 @@ export function StoryPage({ id }: { id: string }) {
           <h2>{t("What this story does not show")}</h2>
           <p lang="en">{story.limits}</p>
         </section>
+        {story.videos && story.videos.length > 0 ? (
+          <section className="fact-section">
+            <h2>{t("Watch")}</h2>
+            <ul className="story-videos">
+              {story.videos.map((video) => (
+                <VideoItem key={video.url} video={video} />
+              ))}
+            </ul>
+          </section>
+        ) : null}
         <section className="fact-section">
           <h2>{t("Sources")}</h2>
           <ul className="fact-sources">

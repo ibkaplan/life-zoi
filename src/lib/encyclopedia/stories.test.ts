@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BUILT_IN_ARTICLES } from "@/lib/encyclopedia/articles";
-import { STORIES, STORY_KINDS, STORY_THEMES, storiesFor } from "@/lib/encyclopedia/stories";
+import { STORIES, STORY_KINDS, STORY_THEMES, storiesFor, videoEmbedUrl } from "@/lib/encyclopedia/stories";
 
 const SLUGS = new Set(BUILT_IN_ARTICLES.map((article) => article.slug));
 
@@ -15,6 +15,10 @@ describe("Real People. Real Stories.", () => {
       expect(story.limits.length, story.id).toBeGreaterThan(20);
       expect(story.sources.length, story.id).toBeGreaterThan(0);
       for (const source of story.sources) expect(source.url, story.id).toMatch(/^https:\/\//);
+      for (const video of story.videos ?? []) {
+        expect(video.url, story.id).toMatch(/^https:\/\//);
+        if (video.youtubeId) expect(videoEmbedUrl(video)).toBe(`https://www.youtube-nocookie.com/embed/${video.youtubeId}`);
+      }
       for (const slug of story.articles ?? []) expect(SLUGS.has(slug), `${story.id} → ${slug}`).toBe(true);
       for (const theme of story.themes) expect(STORY_THEMES.some((item) => item.slug === theme)).toBe(true);
       expect(story.story.join(" "), story.id).not.toMatch(/\bcured?\b|miracle/i);

@@ -144,7 +144,28 @@ export function EncyclopediaLanding() {
         </Link>
       </section>
 
+      <nav className="ency-quick" aria-label={t("Sections")}>
+        <Link href="/encyclopedia/stories">
+          <Illustration name="heart" />
+          <span>{t("Real People. Real Stories.")}</span>
+        </Link>
+        <Link href="/encyclopedia/facts">
+          <Illustration name="magnifier" />
+          <span>{t("Did You Know?")}</span>
+        </Link>
+        <Link href="/encyclopedia/timeline">
+          <Illustration name="timeline" />
+          <span>{t("Medical discoveries timeline")}</span>
+        </Link>
+        <Link href="/encyclopedia/eastern-western">
+          <Illustration name="balance" />
+          <span>{t("Eastern & Western Medicine")}</span>
+        </Link>
+      </nav>
+
       <DidYouKnow />
+
+      <StoriesTeaser />
 
       <section className="ency-block">
         <div className="ency-block-head">
@@ -156,8 +177,6 @@ export function EncyclopediaLanding() {
           ))}
         </div>
       </section>
-
-      <StoriesTeaser />
 
       <RecentlyViewed articles={articles} />
 

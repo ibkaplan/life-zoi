@@ -55,6 +55,13 @@ export type StoryApproach = (typeof STORY_APPROACHES)[number]["slug"];
 
 export type ScienceLevel = "established" | "preliminary" | "traditional";
 
+/**
+ * A video about the story from an official or reputable publisher. With a YouTube id
+ * it plays in a privacy-friendly embed (youtube-nocookie) only after a click. Without
+ * one, it opens on the publisher's own page. Nothing is downloaded or re-hosted.
+ */
+export type StoryVideo = { title: string; publisher: string; url: string; youtubeId?: string };
+
 export type HealthStory = {
   id: string;
   kind: StoryKind;
@@ -73,8 +80,13 @@ export type HealthStory = {
   /** What the story does not show, so nobody reads it as a promise. */
   limits: string;
   sources: Reference[];
+  videos?: StoryVideo[];
   articles?: string[];
 };
+
+export function videoEmbedUrl(video: StoryVideo): string | null {
+  return video.youtubeId && /^[A-Za-z0-9_-]{11}$/.test(video.youtubeId) ? `https://www.youtube-nocookie.com/embed/${video.youtubeId}` : null;
+}
 
 const CDC = "Centers for Disease Control and Prevention";
 const tipsHeart: Reference = {
@@ -169,6 +181,7 @@ export const STORIES: readonly HealthStory[] = [
       heartRecovery,
       tipsHeart,
     ],
+    videos: [{ title: "Roosevelt's videos: Tips From Former Smokers", publisher: "CDC", url: "https://www.cdc.gov/tobacco/campaign/tips/resources/videos/index.html#roosevelt" }],
     articles: ["heart-health-blood-pressure-cholesterol"],
   },
   {
@@ -192,6 +205,7 @@ export const STORIES: readonly HealthStory[] = [
     ],
     limits: "This story is about one person. Quitting at any age has benefits, and it is never too late to ask for help.",
     sources: [{ title: "Brian H.'s Story", publisher: "CDC Tips From Former Smokers", url: "https://www.cdc.gov/tobacco/campaign/tips/stories/brian-heart.html" }, cdcSmoking, tipsHeart],
+    videos: [{ title: "Brian H.'s videos: Tips From Former Smokers", publisher: "CDC", url: "https://www.cdc.gov/tobacco/campaign/tips/resources/videos/index.html#brianh" }],
     articles: ["heart-health-blood-pressure-cholesterol"],
   },
   {
@@ -218,6 +232,7 @@ export const STORIES: readonly HealthStory[] = [
       { title: "Upholding the Highest Bioethical Standards", publisher: "Johns Hopkins Medicine", url: "https://www.hopkinsmedicine.org/henrietta-lacks/upholding-the-highest-bioethical-standards" },
       { title: "HeLa Cells: A New Chapter in An Enduring Story", publisher: "NIH Director's Blog", url: "https://directorsblog.nih.gov/2013/08/07/hela-cells-a-new-chapter-in-an-enduring-story/" },
     ],
+    videos: [{ title: "The immortal cells of Henrietta Lacks", publisher: "TED-Ed", url: "https://www.youtube.com/watch?v=22lGbAVWhro", youtubeId: "22lGbAVWhro" }],
     articles: ["how-cancer-develops", "evidence-based-medicine"],
   },
   {

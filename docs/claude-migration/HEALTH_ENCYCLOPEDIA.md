@@ -40,7 +40,10 @@ Added 2026-11-24 (owner approved the list of stories). `/encyclopedia/stories` l
 
 - **Real person** stories (Shigeaki Hinohara, B. K. S. Iyengar, Roosevelt and Brian from the CDC Tips From Former Smokers campaign, Henrietta Lacks) use only what the linked sources say. They were checked against those pages on 2026-11-24.
 - **Composite** stories (stroke rehabilitation, prediabetes, back pain with acupuncture) say in the first sentence that the person is not real. Every step follows the linked NHS, CDC, or NCCIH page.
-- Stories are in code (`src/lib/encyclopedia/stories.ts`), English only, with illustrations. No photographs or videos yet: add only licensed images and verified official embeddable videos (youtube-nocookie, like the movement library).
+- Stories are in code (`src/lib/encyclopedia/stories.ts`), English only, with illustrations.
+- Videos (2026-11-24): Roosevelt and Brian link to their videos on the CDC Tips video page. Henrietta Lacks has the TED-Ed lesson "The immortal cells of Henrietta Lacks" (YouTube id `22lGbAVWhro`, confirmed from a page that lists it, not from YouTube itself), played in a youtube-nocookie embed only after a click. Nothing is re-hosted.
+- Photographs: none yet. Wikimedia Commons could not be read from the build container, so no photo's license could be checked. Add a photo only with a confirmed licence and credit.
+- The encyclopedia homepage has quick links to Real Stories, Did You Know?, the timeline, and Eastern & Western Medicine near the top.
 
 ### Content rules
 
