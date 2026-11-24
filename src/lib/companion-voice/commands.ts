@@ -114,14 +114,19 @@ export function normalize(text: string): string {
     .trim();
 }
 
+/** Word starts, so "медитац" matches "медитацию". An item ending in "$" must be the whole word ("hi", not "hiking"). */
 function stems(list: readonly string[]): RegExp {
-  const parts = list.map((item) => normalize(item).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const parts = list.map((item) => {
+    const whole = item.endsWith("$");
+    const body = normalize(whole ? item.slice(0, -1) : item).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return whole ? `${body}(?= |$)` : body;
+  });
   return new RegExp(`(?:^| )(?:${parts.join("|")})`);
 }
 
 const W = {
-  stopListening: stems(["stop listening", "stop", "be quiet", "quiet please", "pause listening", "microphone off", "mic off", "go to sleep lifezoi", "стоп", "хватит", "замолчи", "перестань", "не слушай", "выключи микрофон", "досить", "зупинись", "замовкни", "припини", "вимкни мікрофон", "σταματα", "στοπ", "σωπα", "κλεισε το μικροφωνο"]),
-  back: stems(["go back", "back", "previous page", "назад", "вернись", "повернись", "πισω"]),
+  stopListening: stems(["stop listening", "stop$", "be quiet", "quiet please", "pause listening", "microphone off", "mic off", "go to sleep lifezoi", "стоп", "хватит", "замолчи", "перестань", "не слушай", "выключи микрофон", "досить", "зупинись", "замовкни", "припини", "вимкни мікрофон", "σταματα", "στοπ", "σωπα", "κλεισε το μικροφωνο"]),
+  back: stems(["go back", "back$", "previous page", "назад", "вернись", "повернись", "πισω"]),
   musicStop: stems(["stop the music", "stop music", "pause the music", "pause music", "music off", "turn off the music", "выключи музыку", "останови музыку", "вимкни музику", "зупини музику", "σταματα τη μουσικη", "κλεισε τη μουσικη"]),
   music: stems(["music", "song", "songs", "tune", "музык", "песн", "музик", "пісн", "μουσικ", "τραγουδ"]),
   musicSleep: stems(["sleep", "bedtime", "сон", "сна", "спать", "сну", "спати", "υπν"]),
@@ -154,13 +159,13 @@ const W = {
   settings: stems(["settings", "voice settings", "настройк", "налаштуван", "ρυθμισ"]),
   home: stems(["home", "homepage", "home page", "main page", "start page", "главн", "домой", "домашн", "головн", "додому", "αρχικ"]),
   askAi: /^(?:ask lifezoi ai|ask lifezoi|ask ai|спроси лайфзой|спроси|спитай лайфзой|спитай|запитай|ρωτα το lifezoi|ρωτα)\s+(.+)$/,
-  yes: stems(["yes", "yeah", "yep", "sure", "ok", "okay", "please do", "go ahead", "let's do it", "да", "конечно", "давай", "хорошо", "ладно", "так", "звісно", "звичайно", "добре", "ναι", "βεβαια", "εντα", "οκ"]),
-  no: stems(["no", "nope", "not now", "no thanks", "нет", "не надо", "не сейчас", "ні", "не треба", "не зараз", "οχι", "οχι τωρα"]),
-  greeting: stems(["good morning", "good afternoon", "good evening", "hello", "hi", "hey", "доброе утро", "добрый день", "добрый вечер", "привет", "здравствуй", "доброго ранку", "добрий день", "добрий вечір", "добрий вечер", "привіт", "вітаю", "καλημερα", "καλησπερα", "γεια"]),
+  yes: stems(["yes$", "yeah$", "yep$", "sure$", "ok$", "okay$", "please do", "go ahead", "let's do it", "да$", "конечно", "давай", "хорошо$", "ладно", "так$", "звісно", "звичайно", "добре$", "ναι$", "βεβαια", "εντα", "οκ$"]),
+  no: stems(["no$", "nope$", "not now", "no thanks", "нет$", "не надо", "не сейчас", "ні$", "не треба", "не зараз", "οχι$", "οχι τωρα"]),
+  greeting: stems(["good morning", "good afternoon", "good evening", "hello", "hi$", "hey$", "доброе утро", "добрый день", "добрый вечер", "привет", "здравствуй", "доброго ранку", "добрий день", "добрий вечір", "добрий вечер", "привіт", "вітаю", "καλημερα", "καλησπερα", "γεια"]),
   thanks: stems(["thank", "thanks", "спасибо", "благодар", "дякую", "ευχαριστ"]),
-  help: stems(["help", "what can you do", "what can i say", "помоги", "помощь", "что ты умеешь", "что умеешь", "допоможи", "допомога", "що ти вмієш", "що вмієш", "βοηθει", "βοηθεια", "τι μπορεις"]),
-  feelLow: stems(["tired", "exhausted", "stressed", "anxious", "worried", "sad", "not great", "not good", "bad", "lonely", "устал", "устала", "стресс", "тревож", "волну", "грустн", "плохо", "одинок", "втомил", "стрес", "тривож", "хвилю", "сумн", "погано", "самотн", "κουρασ", "αγχ", "στρες", "λυπ", "ασχημα", "μονος", "μονη"]),
-  feelGood: stems(["good", "great", "fine", "well", "happy", "wonderful", "хорошо", "отлично", "нормально", "прекрасно", "замечательно", "добре", "чудово", "відмінно", "καλα", "τελεια", "υπεροχα"]),
+  help: stems(["help$", "help me", "what can you do", "what can i say", "помоги", "помощь", "что ты умеешь", "что умеешь", "допоможи", "допомога", "що ти вмієш", "що вмієш", "βοηθει", "βοηθεια", "τι μπορεις"]),
+  feelLow: stems(["tired", "exhausted", "stressed", "anxious", "worried", "sad$", "not great", "not good", "bad$", "lonely", "устал", "устала", "стресс", "тревож", "волну", "грустн", "плохо", "одинок", "втомил", "стрес", "тривож", "хвилю", "сумн", "погано", "самотн", "κουρασ", "αγχ", "στρες", "λυπ", "ασχημα", "μονος", "μονη"]),
+  feelGood: stems(["good$", "great$", "fine$", "well$", "happy$", "wonderful$", "хорошо", "отлично", "нормально", "прекрасно", "замечательно", "добре", "чудово", "відмінно", "καλα", "τελεια", "υπεροχα"]),
   question: stems(["what", "how", "why", "when", "which", "should", "can you", "could you", "tell me", "is it", "are there", "do i", "что", "как", "почему", "зачем", "когда", "какой", "какие", "можно", "стоит ли", "расскажи", "що", "як", "чому", "коли", "який", "які", "чи", "розкажи", "τι", "πως", "γιατι", "ποτε", "ποιο", "ποια", "μπορεις", "πες μου"]),
 };
 

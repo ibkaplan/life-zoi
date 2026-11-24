@@ -125,6 +125,12 @@ function companionSpeaking(): boolean {
   return voice.owner === COMPANION_OWNER && (voice.status === "playing" || voice.status === "waiting");
 }
 
+/** Speaking, or about to: the player waits a moment for the device's voices before the first sentence. */
+function companionBusy(): boolean {
+  const voice = player.state();
+  return companionSpeaking() || (voice.owner === COMPANION_OWNER && voice.status === "idle" && voice.total > 0 && !voice.problem);
+}
+
 export function companionStatus(state: CompanionState, speaking: boolean): CompanionStatus {
   if (speaking) return "speaking";
   if (state.thinking) return "thinking";
@@ -203,7 +209,7 @@ function createRuntime() {
       state.recognitionSupported &&
       !state.micHeldBy &&
       !otherVoiceBusy() &&
-      !companionSpeaking() &&
+      !companionBusy() &&
       !state.thinking &&
       typeof document !== "undefined" &&
       document.visibilityState === "visible"
