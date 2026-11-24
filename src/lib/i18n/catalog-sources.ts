@@ -11,6 +11,7 @@ import habits from "./sources/habits";
 import focus from "./sources/focus";
 import assistant from "./sources/assistant";
 import mind from "./sources/mind";
+import encyclopedia from "./sources/encyclopedia";
 
 /**
  * English text that the app stores in data and shows through `t(value)`, by area.
@@ -18,7 +19,7 @@ import mind from "./sources/mind";
  * option or lesson cannot ship in English only. Add a data module to the area's
  * file in `./sources/` when a page starts showing it with `t`.
  */
-export const AREA_SOURCES: Record<string, unknown[]> = { "core": core, "pages": pages, "nutrition": nutrition, "wellness-challenges": wellness_challenges, "wellness-academy": wellness_academy, "wellness-urges": wellness_urges, "brain": brain, "library": library, "companion": companion, "habits": habits, "focus": focus, "assistant": assistant, "mind": mind };
+export const AREA_SOURCES: Record<string, unknown[]> = { "core": core, "pages": pages, "nutrition": nutrition, "wellness-challenges": wellness_challenges, "wellness-academy": wellness_academy, "wellness-urges": wellness_urges, "brain": brain, "library": library, "companion": companion, "habits": habits, "focus": focus, "assistant": assistant, "mind": mind, "encyclopedia": encyclopedia };
 
 /** Keys, ids, links, and other strings that are never shown as words. */
 function isText(value: string): boolean {
