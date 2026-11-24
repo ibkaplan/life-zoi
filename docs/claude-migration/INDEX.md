@@ -42,6 +42,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [DAILY_MOVEMENT_LIBRARY.md](DAILY_MOVEMENT_LIBRARY.md) | Daily Movement videos, the morning and evening plan rules, and what was verified |
 | [WELLNESS_VIDEO_LIBRARY.md](WELLNESS_VIDEO_LIBRARY.md) | Wellness Library video collection (14 activities × 6 lengths), what was verified, missing lengths, and how to add videos |
 | [LIFEZOI_DAILY.md](LIFEZOI_DAILY.md) | LifeZoi Daily: one idea a day from the assessment, optional feeling tap, three separate progress indicators, weekly report |
+| [MINI_COURSES.md](MINI_COURSES.md) | 7-day mini-courses on the dashboard: three courses, one short practice a day, gentle progress with no streaks |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |

@@ -19,6 +19,7 @@ import { assessmentHasAnswers } from "@/lib/labels";
 import { LoadingState } from "@/components/sources";
 import { DIGNITY_NOTE, purposeReflection } from "@/lib/purpose";
 import { ReviewInvitation } from "@/components/feedback/review-invitation";
+import { MiniCourses } from "@/components/courses/mini-courses";
 
 export function DashboardView() {
   const { ready, session, sample } = useSession();
@@ -89,6 +90,7 @@ export function DashboardView() {
           </Link>
         </article>
       </section>
+      <MiniCourses variant="dashboard" />
       <TopicGallery />
       <NewsSections />
       <article className="card stack dash-card dash-matters">

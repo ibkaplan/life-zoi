@@ -1,5 +1,6 @@
 import { addIsoDays, daysBetween, isRealISODate } from "@/lib/dates";
 import { msg } from "@/lib/i18n/translate";
+import { courseDaysIn } from "@/lib/courses/courses";
 import { sources } from "@/lib/sources";
 import type { CompanionState, DailyFeeling, DailyTopic } from "@/lib/companion/state";
 import { DAILY_TOPICS } from "@/lib/companion/state";
@@ -378,6 +379,7 @@ export function activitiesIn(session: UserSession, companion: CompanionState, wi
   const focus = companion.focus.days.filter((item) => inRange(item.date, start, end)).reduce((sum, item) => sum + item.sessions, 0);
   const games = companion.games.filter((item) => item.completed && inRange(item.date, start, end)).length;
   const habits = session.checkIns.filter((item) => item.done && inRange(item.date, start, end)).length;
+  const courses = courseDaysIn(companion.courses, start, end).length;
   const all: ActivityCount[] = [
     { id: "plan", label: msg("Activities marked done"), count: planned },
     { id: "breathing", label: msg("Breathing sessions"), count: breathing },
@@ -385,6 +387,7 @@ export function activitiesIn(session: UserSession, companion: CompanionState, wi
     { id: "games", label: msg("Brain games finished"), count: games },
     { id: "habits", label: msg("Habit days you marked"), count: habits },
     { id: "breaks", label: msg("Movement breaks"), count: breaks },
+    { id: "courses", label: msg("Mini-course practices"), count: courses },
   ];
   return all.filter((item) => item.count > 0);
 }
@@ -403,6 +406,7 @@ export function activeDates(session: UserSession, companion: CompanionState, win
   for (const item of companion.focus.days) if (item.sessions > 0 && inRange(item.date, start, end)) dates.add(item.date);
   for (const item of companion.games) if (inRange(item.date, start, end)) dates.add(item.date);
   for (const item of session.checkIns) if (inRange(item.date, start, end)) dates.add(item.date);
+  for (const item of courseDaysIn(companion.courses, start, end)) dates.add(item.date);
   return [...dates].sort();
 }
 

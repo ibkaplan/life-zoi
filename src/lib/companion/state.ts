@@ -1,6 +1,7 @@
 import { isRealISODate, mondayOf } from "@/lib/dates";
 import { emptyBreathe, isEmptyBreathe, sanitizeBreathe, type BreatheState } from "@/lib/breathe/state";
 import { emptyFocus, isEmptyFocus, sanitizeFocus, type FocusState } from "@/lib/focus/progress";
+import { emptyCourses, isEmptyCourses, sanitizeCourses, type CoursesState } from "@/lib/courses/courses";
 
 /**
  * Companion state: the guidance mode, preferences, daily logs, weekly
@@ -258,6 +259,8 @@ export type CompanionState = {
   focus: FocusState;
   womensCare: WomensCarePrefs;
   daily: DailyState;
+  /** 7-day mini-courses: the course in progress and the days marked done. */
+  courses: CoursesState;
 };
 
 /** One break every 30 minutes across a whole day is 48. More than that is not a real count. */
@@ -323,6 +326,7 @@ export function emptyCompanion(): CompanionState {
     focus: emptyFocus(),
     womensCare: emptyWomensCare(),
     daily: emptyDaily(),
+    courses: emptyCourses(),
   };
 }
 
@@ -364,7 +368,8 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     !state.womensCare.relevant &&
     Object.keys(state.daily.feelings).length === 0 &&
     state.daily.skipped.length === 0 &&
-    state.daily.explored.length === 0
+    state.daily.explored.length === 0 &&
+    isEmptyCourses(state.courses)
   );
 }
 
@@ -677,6 +682,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
     focus: sanitizeFocus(record.focus),
     womensCare: sanitizeWomensCare(record.womensCare),
     daily: sanitizeDaily(record.daily),
+    courses: sanitizeCourses(record.courses),
   };
 }
 
