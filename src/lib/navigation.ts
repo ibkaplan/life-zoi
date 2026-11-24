@@ -117,6 +117,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     pages: [
       { href: "/brain-quiz", label: "Brain & Habit Quiz" },
       { href: "/brain-quiz/games", label: "Brain games" },
+      { href: "/brain-quiz/health-facts", label: "Health Facts Quiz" },
       { href: "/focus", label: "Focus & Brain Training" },
       { href: "/mind", label: "LifeZoi Mind" },
       { href: "/emotional-wellness", label: "Emotional Wellness" },
@@ -227,6 +228,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/library/music", label: "My Music" },
   { href: "/library/books", label: "Books and listening" },
   { href: "/brain-quiz/games", label: "Brain games" },
+  { href: "/brain-quiz/health-facts", label: "Health Facts Quiz" },
   { href: "/progress/weekly", label: "Weekly check-in" },
   { href: "/food-plan/today", label: "Today's meals" },
   { href: "/profile", label: "Profile" },

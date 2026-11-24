@@ -1,0 +1,44 @@
+/* Health Facts Quiz (/brain-quiz/health-facts). Uses the encyclopedia and fact tokens. */
+
+.fq-card { border-top: 6px solid var(--fact-accent, var(--royal)); }
+.fq-top { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-weight: 700; color: var(--deep); }
+.fq-progress { height: 0.5rem; border-radius: 999px; background: var(--fact-tint, var(--lavender)); overflow: hidden; }
+.fq-progress span { display: block; height: 100%; background: var(--fact-accent, var(--royal)); transition: width 0.3s ease; }
+.fq-question { font-size: clamp(1.3rem, 3.2vw, 1.8rem); margin: 0; color: var(--deep); }
+
+.fq-choices { display: grid; gap: 0.6rem; }
+.fq-choice {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  min-height: 3.4rem; padding: 0.8rem 1rem; border-radius: 14px; border: 2px solid var(--line);
+  background: #fff; color: var(--ink); font: inherit; font-size: 1.05rem; text-align: left; cursor: pointer;
+}
+.fq-choice:hover:not(:disabled) { border-color: var(--fact-accent, var(--royal)); background: var(--fact-tint, var(--lavender)); }
+.fq-choice:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.fq-choice:disabled { cursor: default; }
+.fq-choice[data-state="right"] { border-color: #2f7d4f; background: #e7f5ec; }
+.fq-choice[data-state="wrong"] { border-color: #a3322f; background: #fdecec; }
+.fq-choice[data-state="other"] { opacity: 0.7; }
+.fq-tag { font-size: 0.85rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 999px; background: #fff; border: 1px solid currentColor; }
+.fq-choice[data-state="right"] .fq-tag { color: #1f5e3a; }
+.fq-choice[data-state="wrong"] .fq-tag { color: #8a2a27; }
+
+.fq-explain { display: grid; gap: 0.6rem; padding: 1rem 1.15rem; border-radius: var(--radius); background: var(--fact-tint, var(--lavender)); }
+.fq-explain p { margin: 0; line-height: 1.55; }
+.fq-verdict { font-weight: 800; font-size: 1.15rem; }
+.fq-explain-right .fq-verdict { color: #1f5e3a; }
+.fq-explain-wrong .fq-verdict { color: #8a2a27; }
+.fq-next { justify-self: start; }
+
+.fq-result h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); margin: 0; color: var(--deep); }
+.fq-review { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.fq-review li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 0.6rem; padding: 0.8rem 1rem; border-radius: var(--radius); border: 1px solid var(--line); background: #fff; }
+.fq-review-text { display: grid; gap: 0.3rem; }
+.fq-mark { font-size: 1.3rem; font-weight: 800; }
+.fq-right .fq-mark { color: #2f7d4f; }
+.fq-wrong .fq-mark { color: #a3322f; }
+.fq-quit { justify-self: start; background: none; border: 0; padding: 0.4rem 0; font: inherit; color: var(--royal); text-decoration: underline; cursor: pointer; }
+
+@media (max-width: 640px) {
+  .fq-choice { font-size: 1rem; }
+  .fq-next { justify-self: stretch; }
+}
