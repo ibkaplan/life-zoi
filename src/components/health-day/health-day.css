@@ -1,0 +1,178 @@
+/*
+ * My Health Day. Phone first, large type and targets like LifeZoi Daily,
+ * using the same surface, line, and radius tokens so every page background works.
+ */
+
+.hd {
+  display: grid;
+  gap: 1rem;
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.hd-head {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.hd-head h2 {
+  margin: 0;
+}
+
+.hd-lede,
+.hd-hint,
+.hd-note {
+  margin: 0;
+  color: var(--muted, inherit);
+}
+
+.hd-note {
+  font-size: 1rem;
+}
+
+.hd-reminder {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 82%, #a8bfae);
+}
+
+.hd-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.hd-tile {
+  display: grid;
+  gap: 0.2rem;
+  align-content: start;
+  min-height: 9rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: inherit;
+  text-decoration: none;
+}
+
+.hd-tile:hover,
+.hd-tile:focus-visible {
+  border-color: var(--deep);
+}
+
+.hd-tile-icon {
+  font-size: 1.6rem;
+}
+
+.hd-tile-title {
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.hd-tile-value {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.hd-tile-sub {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.hd-lower {
+  display: grid;
+  gap: 1rem;
+}
+
+.hd-matches {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hd-match {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 90%, #b98ee5);
+}
+
+.hd-match h3,
+.hd-match h4,
+.hd-match p {
+  margin: 0;
+}
+
+.hd-match h3,
+.hd-match h4 {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.hd-match-kind {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  color: var(--deep);
+}
+
+.hd-match-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.hd-match-go,
+.hd a.hd-match-go,
+.lzd a.hd-match-go {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--deep);
+  background: var(--surface);
+  color: var(--deep);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hd-fact h3 {
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  .hd-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .hd-matches {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1000px) {
+  .hd-lower {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 360px) {
+  .hd-grid {
+    grid-template-columns: 1fr;
+  }
+}

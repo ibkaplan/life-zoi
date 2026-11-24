@@ -4,6 +4,7 @@ import "@/components/daily/daily.css";
 import Link from "next/link";
 import { useState } from "react";
 import { Art } from "@/components/companion/art";
+import { FeelingMatches } from "@/components/health-day/feeling-matches";
 import "@/components/imagery/imagery.css";
 import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useLocale, useT } from "@/components/locale-provider";
@@ -23,6 +24,7 @@ import {
   type WeeklyReport,
 } from "@/lib/daily/daily";
 import { localISODate } from "@/lib/dates";
+import { partOfDay } from "@/lib/health-day/health-day";
 import { LOCALE_META } from "@/lib/i18n/config";
 import type { Translate } from "@/lib/i18n/translate";
 import { firstNameOf } from "@/lib/news/greeting";
@@ -201,6 +203,12 @@ export function LifeZoiDaily({ variant }: { variant: "home" | "page" }) {
             <p className="lzd-reply" role="status">
               {t("Skipped for today. That is completely fine.")}
             </p>
+          ) : null}
+          {feeling ? (
+            <>
+              <p className="lzd-label">{t("Matched to how you feel")}</p>
+              <FeelingMatches feeling={feeling} part={partOfDay(new Date().getHours())} />
+            </>
           ) : null}
           <div className="lzd-row">
             {!feeling && !skipped ? (
