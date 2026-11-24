@@ -34,6 +34,15 @@ Added 2026-11-23. The encyclopedia homepage shows a Fact of the Day card with a 
 - The Fact of the Day is computed, not stored: a fixed shuffle starting 2026-11-23, in the member's own time zone, so every fact is shown once before any repeats. Add new facts at the end of `FACTS` so earlier days do not change.
 - Facts are in code, like the timeline, so there is no migration and the admin editor does not edit them. Fact text is English only; the menus, labels, and categories are translated.
 
+## Health Facts Quiz
+
+Added 2026-11-24 at `/brain-quiz/health-facts` (Brain & Mind menu, the Brain & Habit Quiz page, the encyclopedia quick links, the Did You Know? page, and "Test yourself on this fact" on each fact that has a question).
+
+- 30 questions in `src/lib/encyclopedia/fact-quiz.ts`, two for each of the 15 fact categories. Each is built on one existing fact and its explanation only restates that fact. No new facts, numbers, or sources were added.
+- A round is 10 questions (all topics or one category). After each answer: right or wrong, the explanation, the evidence label, the fact's first source, "Read the full fact", and the related article when there is one. The end shows the score and every answer with a link to its fact.
+- Questions, choices, and explanations are translated into Ukrainian, Russian, and Greek (`src/lib/i18n/catalog/*/fact-quiz.json`). The fact pages they link to stay English, and the quiz says so.
+- No AI, no network call, and nothing is saved. Not a medical test.
+
 ## Real People. Real Stories.
 
 Added 2026-11-24 (owner approved the list of stories). `/encyclopedia/stories` lists health stories with filters for condition, approach to care (Western, Eastern, integrative, lifestyle), theme, and kind of story. The homepage shows the first three. Each story page has the story, "What science says" with an evidence label on each point, "What this story does not show", sources, related articles, and a link to ask LifeZoi AI.

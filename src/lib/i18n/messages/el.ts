@@ -255,6 +255,7 @@ export const el: Messages = {
     "/library/music": "Η μουσική μου",
     "/library/books": "Βιβλία και ακρόαση",
     "/brain-quiz/games": "Παιχνίδια μυαλού",
+    "/brain-quiz/health-facts": "Κουίζ γεγονότων υγείας",
     "/progress/weekly": "Εβδομαδιαίος απολογισμός",
     "/food-plan/today": "Τα σημερινά γεύματα",
     "/profile": "Προφίλ",
