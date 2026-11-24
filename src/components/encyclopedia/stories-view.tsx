@@ -3,9 +3,9 @@
 import "@/components/encyclopedia/encyclopedia.css";
 import Link from "next/link";
 import { useState } from "react";
-import { useT } from "@/components/locale-provider";
+import { useLocale, useT } from "@/components/locale-provider";
 import { Illustration } from "@/components/encyclopedia/illustrations";
-import { ArticleCard, Disclaimer, EnglishOnlyNote } from "@/components/encyclopedia/parts";
+import { ArticleCard, Disclaimer } from "@/components/encyclopedia/parts";
 import { useArticles } from "@/components/encyclopedia/use-encyclopedia";
 import { findArticle } from "@/lib/encyclopedia/catalog";
 import { FACT_EVIDENCE } from "@/lib/encyclopedia/facts";
@@ -43,11 +43,9 @@ function StoryCard({ story }: { story: HealthStory }) {
         <Illustration name={art(story)} />
       </div>
       <div className="fact-card-body">
-        <p className="fact-card-meta" lang="en">
-          {story.place}
-        </p>
-        <h3 lang="en">{story.title}</h3>
-        <p lang="en">{story.teaser}</p>
+        <p className="fact-card-meta">{t(story.place)}</p>
+        <h3>{t(story.title)}</h3>
+        <p>{t(story.teaser)}</p>
         <div className="fact-card-foot">
           <KindBadge kind={story.kind} />
           <Link className="btn btn-secondary" href={`/encyclopedia/stories/${story.id}`}>
@@ -121,6 +119,17 @@ function VideoItem({ video }: { video: StoryVideo }) {
   );
 }
 
+/** Stories are translated; source titles and video titles keep their original language. */
+function StoriesLanguageNote() {
+  const { locale, t } = useLocale();
+  if (locale === "en") return null;
+  return (
+    <p className="ency-lang-note" role="note">
+      {t("Stories are translated. Source titles and videos stay in their original language.")}
+    </p>
+  );
+}
+
 function EmptyStories() {
   const t = useT();
   return <p className="ency-empty">{t("Stories are being prepared. Each one is checked against its sources before it is published.")}</p>;
@@ -188,7 +197,7 @@ export function StoriesView() {
         </div>
         <Illustration name="heart" className="ency-hero-illustration" />
       </header>
-      <EnglishOnlyNote />
+      <StoriesLanguageNote />
       <ChipFilter label={t("Health condition")} all={t("All conditions")} items={STORY_CONDITIONS} value={condition} onChange={setCondition} />
       <ChipFilter label={t("Approach to care")} all={t("All approaches")} items={STORY_APPROACHES} value={approach} onChange={setApproach} />
       <ChipFilter label={t("Theme")} all={t("All themes")} items={STORY_THEMES} value={theme} onChange={setTheme} />
@@ -244,10 +253,8 @@ export function StoryPage({ id }: { id: string }) {
             <Illustration name={art(story)} />
           </div>
           <div>
-            <p className="ency-kicker" lang="en">
-              {story.place}
-            </p>
-            <h1 lang="en">{story.title}</h1>
+            <p className="ency-kicker">{t(story.place)}</p>
+            <h1>{t(story.title)}</h1>
             <p>
               <KindBadge kind={story.kind} /> <span className="hint">{t(STORY_KINDS[story.kind].note)}</span>
             </p>
@@ -262,13 +269,11 @@ export function StoryPage({ id }: { id: string }) {
             </p>
           </div>
         </header>
-        <EnglishOnlyNote />
+        <StoriesLanguageNote />
         <section className="fact-section">
           <h2>{t("The story")}</h2>
           {story.story.map((paragraph) => (
-            <p key={paragraph.slice(0, 40)} lang="en">
-              {paragraph}
-            </p>
+            <p key={paragraph.slice(0, 40)}>{t(paragraph)}</p>
           ))}
         </section>
         <section className="fact-section">
@@ -276,14 +281,14 @@ export function StoryPage({ id }: { id: string }) {
           <ul className="story-science">
             {story.science.map((item) => (
               <li key={item.point}>
-                <span className={`ency-badge fact-badge-${item.level}`}>{t(FACT_EVIDENCE[item.level].label)}</span> <span lang="en">{item.point}</span>
+                <span className={`ency-badge fact-badge-${item.level}`}>{t(FACT_EVIDENCE[item.level].label)}</span> <span>{t(item.point)}</span>
               </li>
             ))}
           </ul>
         </section>
         <section className="fact-section">
           <h2>{t("What this story does not show")}</h2>
-          <p lang="en">{story.limits}</p>
+          <p>{t(story.limits)}</p>
         </section>
         {story.videos && story.videos.length > 0 ? (
           <section className="fact-section">
