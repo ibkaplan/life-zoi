@@ -6,7 +6,7 @@
 with expected_tables(name) as (
   values
     ('profiles'), ('assessments'), ('scenarios'), ('habit_goals'), ('check_ins'),
-    ('care_invitations'), ('companion_state'), ('registration_invites'),
+    ('care_invitations'), ('companion_state'), ('academy_state'), ('registration_invites'),
     ('community_profiles'), ('community_messages'), ('community_reports'),
     ('community_blocks'), ('community_mutes'),
     ('feedback_reviews'), ('feedback_suggestions'), ('feedback_announcements')
@@ -20,7 +20,8 @@ expected_policies(tbl, name) as (
     ('check_ins', 'check_ins_own_rows'),
     ('care_invitations', 'care_invitations_select_own'),
     ('care_invitations', 'care_invitations_insert_own'),
-    ('companion_state', 'companion_state_own_rows')
+    ('companion_state', 'companion_state_own_rows'),
+    ('academy_state', 'academy_state_own_rows')
 ),
 expected_functions(name) as (
   values

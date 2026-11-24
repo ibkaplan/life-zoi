@@ -12,6 +12,7 @@ import {
 } from "@/lib/browser-store";
 import { clearAssistantThread } from "@/lib/assistant";
 import { bindCompanionOwner, clearCompanionAccount, clearCompanionLocal } from "@/lib/companion/store";
+import { bindAcademyOwner, clearAcademyAccount, clearAcademyLocal } from "@/lib/growth-academy/store";
 import { clearLiveSession } from "@/lib/wellness-assistant/live-session";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
@@ -141,6 +142,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     bindCalorieOwner(userId);
     bindWellnessOwner(userId);
     bindCompanionOwner(userId, { sample: snapshot.sample });
+    bindAcademyOwner(userId, { sample: snapshot.sample });
     if (!userId) {
       adoptedFor.current = null;
       reloadGuestMyDay();
@@ -365,8 +367,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (signedIn) {
           void clearAccountRecords();
           void clearCompanionAccount();
+          void clearAcademyAccount();
         } else {
           clearCompanionLocal();
+          clearAcademyLocal();
         }
         writeBrowserStore(emptySession(), false);
       },

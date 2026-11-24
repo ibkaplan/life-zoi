@@ -272,6 +272,8 @@ export const en = {
     "/ai-assistant": "Wellness Assistant",
     "/community": "Community",
     "/emotional-wellness": "Emotional Wellness",
+    "/training-academy": "Training Academy",
+    "/training-academy/journey": "My Growth Journey",
     "/mind": "LifeZoi Mind",
     "/share-the-care": "Share the Care",
     "/change-lab": "Change Lab",
