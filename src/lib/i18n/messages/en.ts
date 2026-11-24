@@ -258,6 +258,7 @@ export const en = {
     "/library/music": "My Music",
     "/library/books": "Books and listening",
     "/brain-quiz/games": "Brain games",
+    "/brain-quiz/health-facts": "Health Facts Quiz",
     "/progress/weekly": "Weekly check-in",
     "/food-plan/today": "Today's meals",
     "/profile": "Profile",

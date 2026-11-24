@@ -256,6 +256,7 @@ export const uk: Messages = {
     "/library/music": "Моя музика",
     "/library/books": "Книги та аудіо",
     "/brain-quiz/games": "Ігри для розуму",
+    "/brain-quiz/health-facts": "Вікторина фактів про здоров’я",
     "/progress/weekly": "Тижневий підсумок",
     "/food-plan/today": "Страви на сьогодні",
     "/profile": "Профіль",

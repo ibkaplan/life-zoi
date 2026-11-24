@@ -256,6 +256,7 @@ export const ru: Messages = {
     "/library/music": "Моя музыка",
     "/library/books": "Книги и аудио",
     "/brain-quiz/games": "Игры для ума",
+    "/brain-quiz/health-facts": "Викторина фактов о здоровье",
     "/progress/weekly": "Итоги недели",
     "/food-plan/today": "Блюда на сегодня",
     "/profile": "Профиль",
