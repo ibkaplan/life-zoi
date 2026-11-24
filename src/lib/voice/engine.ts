@@ -4,6 +4,7 @@ import { neuralActive, playClip, stopClip, synthesize, unlockNeuralAudio } from 
 import {
   chooseVoice,
   clampRate,
+  clampVoiceVolume,
   DEFAULT_VOICE_PREFS,
   estimatedSeconds,
   parseVoicePrefs,
@@ -65,8 +66,17 @@ export type PlayOptions = {
   stepWait?: number | null;
   /** The text may include the person's own information: use only voices that run on the device. */
   localOnly?: boolean;
-  onEnd?: () => void;
+  /** Loudness of the voice, 0 to 1. Defaults to the saved voice volume. Some browsers (iPhone and iPad Safari) ignore it for device voices. */
+  volume?: number;
+  /**
+   * Called once when this reading ends: `done` after the last sentence, `stopped`
+   * when Stop (or leaving the page) ended it, `replaced` when another Listen
+   * button started. Callers that only care that it ended can ignore the reason.
+   */
+  onEnd?: (reason: EndReason) => void;
 };
+
+export type EndReason = "done" | "stopped" | "replaced";
 
 type Listener = () => void;
 
@@ -157,6 +167,7 @@ export function saveVoicePrefs(change: Partial<VoicePrefs>) {
     voices: change.tone && change.tone !== current.tone && !change.voices ? {} : { ...current.voices, ...(change.voices ?? {}) },
     stepWait: change.stepWait !== undefined ? change.stepWait : current.stepWait,
     tone: change.tone ?? current.tone,
+    volume: clampVoiceVolume(change.volume ?? current.volume),
   };
   prefsCache = next;
   try {
@@ -238,13 +249,19 @@ function createPlayer() {
     }
   }
 
-  function finish() {
+  function finish(reason: EndReason = "done") {
     const done = options.onEnd;
+    options = {};
     clearTimers();
     ticket += 1;
     segments = [];
     set({ ...IDLE });
-    done?.();
+    done?.(reason);
+  }
+
+  function voiceVolume(): number {
+    const value = options.volume;
+    return typeof value === "number" && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : readVoicePrefs().volume;
   }
 
   function stepWait(): number | null {
@@ -326,7 +343,7 @@ function createPlayer() {
         // Make the next sentence while this one plays, so there is no gap.
         const next = segments[at + 1];
         if (next && naturalFor(next.lang)) void synthesize(next.lang, next.text, rate).catch(() => undefined);
-        return playClip(clip).then(() => {
+        return playClip(clip, voiceVolume()).then(() => {
           if (mine === ticket) afterSentence(at);
         });
       })
@@ -365,7 +382,7 @@ function createPlayer() {
     utterance.lang = voice?.lang || SPEECH_TAG[segment.lang];
     utterance.rate = rate;
     utterance.pitch = 1;
-    utterance.volume = 1;
+    utterance.volume = voiceVolume();
     let ended = false;
     const done = () => {
       if (ended || mine !== ticket) return;
@@ -433,7 +450,7 @@ function createPlayer() {
       clearTimers();
       ticket += 1;
       cancelSpeech();
-      if (previousOwner && previousOwner !== owner) previous?.();
+      if (previousOwner && previousOwner !== owner) previous?.("replaced");
       if (!speechSupported() && !next.some((segment) => naturalFor(segment.lang))) {
         set({ ...IDLE, owner, problem: "unsupported" });
         return;
@@ -490,7 +507,7 @@ function createPlayer() {
       if (owner && state.owner !== owner) return;
       if (state.status === "idle" && !state.problem) return;
       cancelSpeech();
-      finish();
+      finish("stopped");
     },
     /** Reads again from the first sentence. */
     replay() {
@@ -544,6 +561,28 @@ export const player = createPlayer();
 
 export function serverVoiceState(): VoiceState {
   return IDLE;
+}
+
+let speechPrimed = false;
+
+/**
+ * Call straight from a tap, before `player.play`. iPhone and iPad Safari only
+ * allow speech that starts inside a tap; speaking an empty sentence there
+ * once lets later sentences (after a timer, between exercise steps) be heard.
+ */
+export function primeSpeech() {
+  unlockNeuralAudio();
+  if (speechPrimed) return;
+  const engine = synth();
+  if (!engine || typeof window.SpeechSynthesisUtterance !== "function") return;
+  try {
+    const silent = new SpeechSynthesisUtterance(" ");
+    silent.volume = 0;
+    engine.speak(silent);
+    speechPrimed = true;
+  } catch {
+    // Speech is optional; the written steps are always shown.
+  }
 }
 
 /** Stops all speech, for example when the person moves to another page. */

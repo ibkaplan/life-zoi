@@ -3,6 +3,7 @@ import { emptyBreathe, isEmptyBreathe, sanitizeBreathe, type BreatheState } from
 import { emptyBrainProgress, isEmptyBrain, sanitizeBrain, type BrainProgress } from "@/lib/brain-quiz/progress";
 import { emptyFocus, isEmptyFocus, sanitizeFocus, type FocusState } from "@/lib/focus/progress";
 import { emptyCourses, isEmptyCourses, sanitizeCourses, type CoursesState } from "@/lib/courses/courses";
+import { addGuidedRecord, emptyGuided, EXERCISE_KINDS, isEmptyGuided, recordMinutes, sanitizeGuided, type GuidedRecord, type GuidedState } from "@/lib/guided/history";
 
 /**
  * Companion state: the guidance mode, preferences, daily logs, weekly
@@ -268,6 +269,8 @@ export type CompanionState = {
   daily: DailyState;
   /** 7-day mini-courses: the course in progress and the days marked done. */
   courses: CoursesState;
+  /** Voice-guided sessions (Pilates, yoga, meditation, and others) the person finished. */
+  guided: GuidedState;
 };
 
 /** One break every 30 minutes across a whole day is 48. More than that is not a real count. */
@@ -335,6 +338,7 @@ export function emptyCompanion(): CompanionState {
     womensCare: emptyWomensCare(),
     daily: emptyDaily(),
     courses: emptyCourses(),
+    guided: emptyGuided(),
   };
 }
 
@@ -378,7 +382,8 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     Object.keys(state.daily.feelings).length === 0 &&
     state.daily.skipped.length === 0 &&
     state.daily.explored.length === 0 &&
-    isEmptyCourses(state.courses)
+    isEmptyCourses(state.courses) &&
+    isEmptyGuided(state.guided)
   );
 }
 
@@ -693,6 +698,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
     womensCare: sanitizeWomensCare(record.womensCare),
     daily: sanitizeDaily(record.daily),
     courses: sanitizeCourses(record.courses),
+    guided: sanitizeGuided(record.guided),
   };
 }
 
@@ -787,4 +793,11 @@ export function addExplored(state: CompanionState, date: string, topic: DailyTop
   if (state.daily.explored.some((item) => item.date === date && item.topic === topic)) return state;
   const explored = [{ date, topic }, ...state.daily.explored].slice(0, LIMITS.explored);
   return { ...state, daily: { ...state.daily, explored } };
+}
+
+/** Save a finished guided session. Movement sessions also add to the day's exercise minutes. */
+export function addGuidedSession(state: CompanionState, record: GuidedRecord): CompanionState {
+  const next = { ...state, guided: addGuidedRecord(state.guided, record) };
+  if (!EXERCISE_KINDS.includes(record.kind)) return next;
+  return withDay(next, record.date, (day) => ({ ...day, exerciseMinutes: day.exerciseMinutes + recordMinutes(record.seconds) }));
 }

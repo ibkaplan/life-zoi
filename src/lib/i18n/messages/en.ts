@@ -238,6 +238,7 @@ export const en = {
     "/academy/meals": "Nutrition",
     "/academy/move": "Movement",
     "/breathe": "Breathe for Life",
+    "/guided": "Guided sessions",
     "/academy/move/breaks": "Movement breaks",
     "/academy/move/studio/daily-movement": "Daily Movement",
     "/academy/move/studio/chair-yoga": "Chair Yoga Studio",
