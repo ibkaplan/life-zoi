@@ -9,7 +9,16 @@ import { ArticleBody } from "@/components/encyclopedia/article-body";
 import { Illustration } from "@/components/encyclopedia/illustrations";
 import { ArticleCard, EvidenceBadge, FavoriteToggle } from "@/components/encyclopedia/parts";
 import { useArticles, useRecentArticles } from "@/components/encyclopedia/use-encyclopedia";
-import { ReadAloud } from "@/components/voice/read-aloud";
+import { ReadAloud, useVoiceState } from "@/components/voice/read-aloud";
+import { MicConsent } from "@/components/voice-companion/mic-consent";
+import { useCompanionVoice } from "@/components/voice-companion/voice-companion";
+import "@/components/voice-companion/voice-companion.css";
+import { companion } from "@/lib/companion-voice/runtime";
+import type { MicChoice } from "@/lib/companion-voice/prefs";
+import { listenErrorMessage, listeningSupported, listenOnce, type ListenError, type Listener } from "@/lib/mind/speech";
+import { player } from "@/lib/voice/engine";
+import { segmentsFromText, SPEECH_TAG } from "@/lib/voice/voices";
+import type { Translate } from "@/lib/i18n/translate";
 import { useAccount } from "@/lib/account-store";
 import type { Answer, AnswerLength } from "@/lib/encyclopedia/ai/answer";
 import { findArticle } from "@/lib/encyclopedia/catalog";
@@ -103,11 +112,28 @@ function useConversation(): [Conversation, (next: Conversation | null) => void] 
 
 const newId = () => Math.random().toString(36).slice(2, 10);
 
+/** The read-aloud owner for answers to spoken questions. */
+const SPOKEN_OWNER = "lifezoi-ai-spoken";
+
+/** The words of an answer, in the order the page shows them, for reading aloud. */
+export function answerSpeech(answer: Answer, t: Translate): string[] {
+  return answer.blocks.map((block) => (block.kind === "paragraph" ? t(block.text) : block.kind === "points" ? block.items.join(". ") : `${t(block.label)}: ${block.claim}`));
+}
+
+function MicIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function AnswerView({ answer, onOpen }: { answer: Answer; onOpen: (slug: string) => void }) {
   const t = useT();
   const articles = useArticles();
   const cards = answer.articles.map((card) => findArticle(card.slug, articles)).filter((item): item is Article => Boolean(item));
-  const speech = answer.blocks.map((block) => (block.kind === "paragraph" ? t(block.text) : block.kind === "points" ? block.items.join(". ") : `${t(block.label)}: ${block.claim}`));
+  const speech = answerSpeech(answer, t);
   return (
     <div className={`ency-ai-answer${answer.safety === "urgent" ? " ency-ai-urgent" : ""}`}>
       {answer.blocks.map((block, index) => {
@@ -233,8 +259,72 @@ function AiInner() {
   const endRef = useRef<HTMLDivElement>(null);
   const inputId = useId();
   const focusArticle = focus ? findArticle(focus, articles) : undefined;
+  const voiceCompanion = useCompanionVoice();
+  const voiceState = useVoiceState();
+  const [listening, setListening] = useState(false);
+  const [micError, setMicError] = useState<ListenError | null>(null);
+  const [askingMic, setAskingMic] = useState(false);
+  const [canListen, setCanListen] = useState<boolean | null>(null);
+  const listenerRef = useRef<Listener | null>(null);
+  const askRef = useRef<(question: string, spoken?: boolean) => Promise<void>>(async () => undefined);
+  const readingSpoken = voiceState.owner === SPOKEN_OWNER && voiceState.status !== "idle";
 
-  async function ask(question: string) {
+  // A question handed over by the voice companion (or a link) fills the box; the person still taps Ask.
+  const handedQuestion = params.get("q");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the address can change while this page stays open
+    if (handedQuestion) setDraft(handedQuestion.slice(0, 600));
+  }, [handedQuestion]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- known only in the browser
+    setCanListen(listeningSupported());
+    return () => {
+      listenerRef.current?.abort();
+      companion.releaseMic("lifezoi-ai");
+      player.stop(SPOKEN_OWNER);
+    };
+  }, []);
+
+  function startListening(choice: MicChoice) {
+    if (choice === "none") return;
+    player.stop(SPOKEN_OWNER);
+    listenerRef.current?.abort();
+    companion.holdMic("lifezoi-ai");
+    setMicError(null);
+    const listener = listenOnce({
+      lang: SPEECH_TAG[locale],
+      local: choice === "local",
+      onStart: () => setListening(true),
+      onInterim: (text) => setDraft(text.slice(0, 600)),
+      onFinal: (text) => void askRef.current(text, true),
+      onError: (error) => setMicError(error),
+      onEnd: () => {
+        setListening(false);
+        listenerRef.current = null;
+        companion.releaseMic("lifezoi-ai");
+      },
+    });
+    listenerRef.current = listener;
+    if (!listener) {
+      setMicError("other");
+      companion.releaseMic("lifezoi-ai");
+    }
+  }
+
+  function onMic() {
+    if (listening) {
+      listenerRef.current?.stop();
+      return;
+    }
+    if (voiceCompanion.prefs.mic === "none") {
+      setAskingMic(true);
+      return;
+    }
+    startListening(voiceCompanion.prefs.mic);
+  }
+
+  async function ask(question: string, spoken = false) {
     const text = question.trim().slice(0, 600);
     if (!text || busy) return;
     const userTurn: Turn = { id: newId(), role: "user", text };
@@ -258,6 +348,8 @@ function AiInner() {
         ? { id: newId(), role: "assistant", answer: body.answer }
         : { id: newId(), role: "notice", text: body.error ?? msg("Something went wrong. Please try again.") };
       save({ ...convo, turns: [...turns, next] });
+      // A spoken question gets a spoken answer, in the same LifeZoi voice as every Listen button.
+      if (spoken && body.answer) player.play(SPOKEN_OWNER, segmentsFromText(answerSpeech(body.answer, t), locale), { stepWait: 0 });
     } catch {
       save({ ...convo, turns: [...turns, { id: newId(), role: "notice", text: msg("LifeZoi AI could not be reached. Check your connection and try again.") }] });
     } finally {
@@ -265,6 +357,10 @@ function AiInner() {
       requestAnimationFrame(() => endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" }));
     }
   }
+
+  useEffect(() => {
+    askRef.current = ask;
+  });
 
   function open(slug: string) {
     scrollBack.current = window.scrollY;
@@ -366,10 +462,63 @@ function AiInner() {
               {t("Detailed answer")}
             </button>
           </div>
-          <button className="btn btn-primary ency-ai-ask" type="submit" disabled={busy || !draft.trim()}>
-            {t("Ask LifeZoi")}
-          </button>
+          <div className="actions">
+            {canListen ? (
+              <button
+                type="button"
+                className="btn btn-secondary ency-ai-mic"
+                data-state={listening ? "listening" : "idle"}
+                onClick={onMic}
+                disabled={busy}
+                aria-pressed={listening}
+                aria-label={listening ? t("Stop listening and ask") : t("Ask LifeZoi AI with your voice")}
+              >
+                <MicIcon /> {listening ? t("Listening… tap to finish") : t("Speak")}
+              </button>
+            ) : null}
+            <button className="btn btn-primary ency-ai-ask" type="submit" disabled={busy || !draft.trim()}>
+              {t("Ask LifeZoi")}
+            </button>
+          </div>
         </div>
+        {askingMic ? (
+          <MicConsent
+            lang={locale}
+            onChoose={(choice) => {
+              setAskingMic(false);
+              if (choice === "none") return;
+              companion.setMic(choice);
+              startListening(choice);
+            }}
+          />
+        ) : null}
+        {listening ? (
+          <p className="hint" role="status">
+            {t("Listening. Ask your question, then pause. The answer will be read aloud.")}
+          </p>
+        ) : null}
+        {readingSpoken ? (
+          <p className="actions">
+            {voiceState.status === "paused" ? (
+              <button type="button" className="btn btn-secondary btn-small" onClick={() => player.resume()}>
+                {t("Resume")}
+              </button>
+            ) : (
+              <button type="button" className="btn btn-secondary btn-small" onClick={() => player.pause()}>
+                {t("Pause")}
+              </button>
+            )}
+            <button type="button" className="btn btn-secondary btn-small" onClick={() => player.stop(SPOKEN_OWNER)}>
+              {t("Stop speaking")}
+            </button>
+          </p>
+        ) : null}
+        {micError ? (
+          <p className="alert alert-error" role="alert">
+            {t(listenErrorMessage(micError))}
+          </p>
+        ) : null}
+        {canListen === false ? <p className="hint">{t("Voice questions are not available in this browser. Chrome, Edge, and Safari support speaking to the page.")}</p> : null}
         {locale !== "en" && mode !== "cloudflare" ? <p className="hint">{t("Questions work best in English for now, because the articles are in English.")}</p> : null}
       </form>
 
@@ -411,6 +560,7 @@ function AiInner() {
               <li>{t("It is not sent to any outside AI company.")}</li>
             ) : null}
             <li>{t("LifeZoi does not store your questions in a database or use them to train AI.")}</li>
+            <li>{t("When you ask with your voice, your browser's speech recognition turns it into text. Some browsers send the audio to their maker's speech service to do this (Google for Chrome, Apple for Safari). LifeZoi never records or keeps the audio, and only the text of the question is sent, as when you type.")}</li>
             <li>{t("Our hosting provider may keep short technical request logs, as most websites do.")}</li>
             <li>{t("The conversation is kept only in this browser tab, for your account. It disappears when you close the tab, or right away when you choose Delete this conversation.")}</li>
             <li>{t("Do not type names, addresses, or other details that identify you. They are not needed for an answer.")}</li>

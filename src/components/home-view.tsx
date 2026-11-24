@@ -9,6 +9,7 @@ import { Art, type ArtName } from "@/components/companion/art";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
 import { StorageNote } from "@/components/storage-note";
+import { VoiceCompanion } from "@/components/voice-companion/voice-companion";
 import { useMessages, useT } from "@/components/locale-provider";
 import { sources } from "@/lib/sources";
 
@@ -243,6 +244,7 @@ export function HomeView() {
           </details>
         </footer>
       </main>
+      <VoiceCompanion />
     </div>
   );
 }

@@ -8,7 +8,7 @@
 
 type RecognitionResultList = ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }>;
 
-type Recognition = {
+export type Recognition = {
   lang: string;
   interimResults: boolean;
   continuous: boolean;
@@ -31,6 +31,11 @@ function ctor(): RecognitionCtor | null {
   if (typeof window === "undefined") return null;
   const w = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor };
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+}
+
+/** The browser's speech recognition constructor, or null. Shared with the voice companion and LifeZoi AI. */
+export function speechRecognitionCtor(): (new () => Recognition) | null {
+  return ctor();
 }
 
 export function listeningSupported(): boolean {
