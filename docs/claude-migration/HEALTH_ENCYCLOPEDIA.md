@@ -34,6 +34,14 @@ Added 2026-11-23. The encyclopedia homepage shows a Fact of the Day card with a 
 - The Fact of the Day is computed, not stored: a fixed shuffle starting 2026-11-23, in the member's own time zone, so every fact is shown once before any repeats. Add new facts at the end of `FACTS` so earlier days do not change.
 - Facts are in code, like the timeline, so there is no migration and the admin editor does not edit them. Fact text is English only; the menus, labels, and categories are translated.
 
+## Real People. Real Stories.
+
+Added 2026-11-24 (owner approved the list of stories). `/encyclopedia/stories` lists health stories with filters for condition, approach to care (Western, Eastern, integrative, lifestyle), theme, and kind of story. The homepage shows the first three. Each story page has the story, "What science says" with an evidence label on each point, "What this story does not show", sources, related articles, and a link to ask LifeZoi AI.
+
+- **Real person** stories (Shigeaki Hinohara, B. K. S. Iyengar, Roosevelt and Brian from the CDC Tips From Former Smokers campaign, Henrietta Lacks) use only what the linked sources say. They were checked against those pages on 2026-11-24.
+- **Composite** stories (stroke rehabilitation, prediabetes, back pain with acupuncture) say in the first sentence that the person is not real. Every step follows the linked NHS, CDC, or NCCIH page.
+- Stories are in code (`src/lib/encyclopedia/stories.ts`), English only, with illustrations. No photographs or videos yet: add only licensed images and verified official embeddable videos (youtube-nocookie, like the movement library).
+
 ### Content rules
 
 - Every seeded article was drafted with AI assistance from the sources it cites, and was checked against those sources (PubMed IDs, NIH, NCI, NCCIH, CDC, WHO, FDA, Cochrane, and Nobel Prize pages). Each one says "Not yet reviewed by a qualified health professional" until an editor publishes a version with a named reviewer and a review date.

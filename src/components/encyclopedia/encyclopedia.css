@@ -282,6 +282,13 @@
 .fact-sources { margin: 0 0 0.5rem; padding-left: 1.2rem; display: grid; gap: 0.35rem; }
 .fact-sources a { overflow-wrap: anywhere; }
 
+/* Real People. Real Stories. */
+.story-card { border-top-color: #b4532a; }
+.story-kind-real { background: #e3f2ee; color: #1d5e57; }
+.story-kind-composite { background: #fbf0dc; color: #7a4f0b; }
+.story-science { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+.story-science li { line-height: 1.55; }
+
 @media (max-width: 760px) {
   .fact-today, .fact-detail-head { grid-template-columns: minmax(0, 1fr); padding: 1.1rem; }
   .fact-today-art { max-width: 11rem; justify-self: center; }
