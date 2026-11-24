@@ -15,7 +15,8 @@ import daily from "./daily.json";
 import mind from "./mind.json";
 import reviews from "./reviews.json";
 import encyclopedia from "./encyclopedia.json";
+import health_day from "./health-day.json";
 import fact_quiz from "./fact-quiz.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...fact_quiz };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz };
 export default catalog;

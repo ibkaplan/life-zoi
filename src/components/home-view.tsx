@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomeGauge } from "@/components/home-gauge";
 import { LifeZoiDaily } from "@/components/daily/lifezoi-daily";
+import { MyHealthDay } from "@/components/health-day/my-health-day";
 import { Art, type ArtName } from "@/components/companion/art";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
@@ -85,6 +86,11 @@ export function HomeView() {
         {/* LifeZoi Daily comes first after logging in. The rest of the homepage is unchanged below it. */}
         <div className="page home-daily">
           <LifeZoiDaily variant="home" />
+        </div>
+
+        {/* My Health Day: today's habits, movement, breathing, food, and the Fact of the Day. */}
+        <div className="page home-health-day">
+          <MyHealthDay />
         </div>
 
         <section className="page home-hero">
