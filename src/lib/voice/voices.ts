@@ -302,9 +302,17 @@ export type VoicePrefs = {
   stepWait: StepWait;
   /** The kind of voice picked when the person has not chosen one by name. */
   tone: VoiceTone;
+  /** Loudness of the LifeZoi voice everywhere, 0.2 to 1. Some browsers (iPhone and iPad Safari) ignore it for device voices. */
+  volume: number;
 };
 
-export const DEFAULT_VOICE_PREFS: VoicePrefs = { rate: DEFAULT_RATE, voices: {}, stepWait: 0, tone: DEFAULT_VOICE_TONE };
+export const DEFAULT_VOICE_PREFS: VoicePrefs = { rate: DEFAULT_RATE, voices: {}, stepWait: 0, tone: DEFAULT_VOICE_TONE, volume: 1 };
+
+/** Voice loudness, kept audible: the quietest setting is 20%. */
+export function clampVoiceVolume(volume: unknown): number {
+  const value = typeof volume === "number" && Number.isFinite(volume) ? volume : 1;
+  return Math.min(1, Math.max(0.2, Math.round(value * 100) / 100));
+}
 
 export function clampRate(rate: unknown): number {
   const value = typeof rate === "number" && Number.isFinite(rate) ? rate : DEFAULT_RATE;
@@ -324,12 +332,12 @@ export function parseVoicePrefs(raw: string | null | undefined): VoicePrefs {
     }
     const stepWait = (STEP_WAIT_CHOICES as readonly unknown[]).includes(value.stepWait) ? (value.stepWait as StepWait) : 0;
     const tone = (VOICE_TONES as readonly unknown[]).includes(value.tone) ? (value.tone as VoiceTone) : DEFAULT_VOICE_TONE;
-    return { rate: clampRate(value.rate), voices, stepWait, tone };
+    return { rate: clampRate(value.rate), voices, stepWait, tone, volume: clampVoiceVolume(value.volume) };
   } catch {
     return { ...DEFAULT_VOICE_PREFS, voices: {} };
   }
 }
 
 export function serializeVoicePrefs(prefs: VoicePrefs): string {
-  return JSON.stringify({ rate: clampRate(prefs.rate), voices: prefs.voices, stepWait: prefs.stepWait, tone: prefs.tone });
+  return JSON.stringify({ rate: clampRate(prefs.rate), voices: prefs.voices, stepWait: prefs.stepWait, tone: prefs.tone, volume: clampVoiceVolume(prefs.volume) });
 }
