@@ -1,0 +1,179 @@
+/*
+ * 7-day mini-courses. Phone first, large type and targets, strong contrast.
+ * Progress is shown as seven calm dots: filled for days done, outlined for days
+ * still ahead. Nothing is shown in red, and nothing counts down.
+ */
+
+.mc {
+  font-size: 1.1rem;
+  line-height: 1.55;
+}
+
+.mc-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  min-width: 0;
+}
+
+.mc-card h2,
+.mc-card h3,
+.mc-card h4,
+.mc-card p {
+  margin: 0;
+}
+
+.mc-kicker {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--deep);
+  font-size: 0.95rem;
+}
+
+.mc-head {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.mc-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .mc-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mc-choice {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(185, 142, 229, 0.22), transparent 60%),
+    var(--surface);
+}
+
+.mc-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.mc-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mc-dot {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--primary);
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--deep);
+  background: var(--surface);
+}
+
+.mc-dot[data-done="true"] {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.mc-today {
+  border-radius: 14px;
+  background: var(--lavender);
+  padding: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mc-minutes {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.mc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.mc-actions .btn {
+  min-height: 48px;
+}
+
+.mc-care,
+.mc-note {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.mc-kind {
+  color: var(--deep);
+  font-weight: 650;
+}
+
+.mc-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.mc-day {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.mc-day[data-done="true"] {
+  background: var(--sky);
+}
+
+.mc-day-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+  align-items: baseline;
+}
+
+.mc-day-title h3 {
+  font-size: 1.15rem;
+}
+
+.mc-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.mc-check input {
+  width: 1.4rem;
+  height: 1.4rem;
+  accent-color: var(--primary);
+}
+
+.mc-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
