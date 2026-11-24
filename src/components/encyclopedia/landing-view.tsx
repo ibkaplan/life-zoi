@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useT } from "@/components/locale-provider";
 import { DidYouKnow } from "@/components/encyclopedia/facts-view";
+import { StoriesTeaser } from "@/components/encyclopedia/stories-view";
 import { Illustration } from "@/components/encyclopedia/illustrations";
 import { ArticleCard, Disclaimer, EnglishOnlyNote, EvidenceLegend } from "@/components/encyclopedia/parts";
 import { useArticles, useRecentArticles } from "@/components/encyclopedia/use-encyclopedia";
@@ -155,6 +156,8 @@ export function EncyclopediaLanding() {
           ))}
         </div>
       </section>
+
+      <StoriesTeaser />
 
       <RecentlyViewed articles={articles} />
 
