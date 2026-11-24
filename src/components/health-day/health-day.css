@@ -108,6 +108,14 @@
   margin: 0;
 }
 
+.hd-match h3,
+.hd-match h4 {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
 .hd-match-kind {
   margin: 0;
   font-weight: 800;
@@ -124,7 +132,9 @@
   align-items: center;
 }
 
-.hd-match-go {
+.hd-match-go,
+.hd a.hd-match-go,
+.lzd a.hd-match-go {
   justify-self: start;
   display: inline-flex;
   align-items: center;
