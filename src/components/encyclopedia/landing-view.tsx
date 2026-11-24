@@ -153,6 +153,10 @@ export function EncyclopediaLanding() {
           <Illustration name="magnifier" />
           <span>{t("Did You Know?")}</span>
         </Link>
+        <Link href="/brain-quiz/health-facts">
+          <Illustration name="brain" />
+          <span>{t("Health Facts Quiz")}</span>
+        </Link>
         <Link href="/encyclopedia/timeline">
           <Illustration name="timeline" />
           <span>{t("Medical discoveries timeline")}</span>

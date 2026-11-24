@@ -11,6 +11,7 @@ import { commitCompanion, useCompanion } from "@/lib/companion/store";
 import { toggleFavorite } from "@/lib/companion/state";
 import { localISODate } from "@/lib/dates";
 import { findArticle } from "@/lib/encyclopedia/catalog";
+import { questionFor } from "@/lib/encyclopedia/fact-quiz";
 import {
   FACT_CATEGORIES,
   FACT_EVIDENCE,
@@ -179,6 +180,11 @@ export function FactsView() {
         <div className="ency-hero-text">
           <h1>{t("Did You Know? — Amazing Health Facts")}</h1>
           <p>{t("Surprising facts about the body, medicine, and health, each checked against a trusted source. Open any fact to learn how it works and what science says.")}</p>
+          <p>
+            <Link className="btn btn-primary" href="/brain-quiz/health-facts">
+              {t("Take the Health Facts Quiz")}
+            </Link>
+          </p>
         </div>
         <Illustration name="magnifier" className="ency-hero-illustration" />
       </header>
@@ -341,6 +347,11 @@ export function FactPage({ id }: { id: string }) {
           <Link className="btn btn-secondary" href={ask}>
             {t("Ask LifeZoi AI to explain")}
           </Link>
+          {questionFor(fact.id) ? (
+            <Link className="btn btn-secondary" href={`/brain-quiz/health-facts?fact=${fact.id}`}>
+              {t("Test yourself on this fact")}
+            </Link>
+          ) : null}
         </div>
         {sections
           .filter((entry): entry is [string, string] => Boolean(entry[1]))
