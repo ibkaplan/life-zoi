@@ -10,7 +10,8 @@ import { logicQuestions } from "@/lib/brain-quiz/questions-logic";
 import { numberQuestions } from "@/lib/brain-quiz/questions-numbers";
 import { riddleQuestions } from "@/lib/brain-quiz/questions-riddles";
 import { wordQuestions } from "@/lib/brain-quiz/questions-words";
-import { CATEGORY_IDS, type CategoryId, type Difficulty } from "@/lib/brain-quiz/progress";
+import { buildGenerated, isGeneratedId } from "@/lib/brain-quiz/generated";
+import { baseActivityId, CATEGORY_IDS, type CategoryId, type Difficulty } from "@/lib/brain-quiz/progress";
 
 export const CATEGORIES: readonly { id: CategoryId; title: string; blurb: string }[] = [
   { id: "logic", title: "Logic", blurb: "Sequences, patterns, and short reasoning puzzles." },
@@ -91,8 +92,20 @@ export function categoryMeta(id: CategoryId) {
   return found;
 }
 
+/**
+ * An activity by id. Besides the written bank this finds built number puzzles
+ * (`GL-e-0042`) and daily copies (`L04_d327`, `M-sequence-e_d327`). A daily copy is the
+ * same activity under a new id, so it can be played and scored on that day; memory and
+ * attention games build a new layout from the new id.
+ */
 export function activityById(id: string): Activity | undefined {
-  return byId.get(id);
+  const direct = byId.get(id);
+  if (direct) return direct;
+  if (isGeneratedId(id)) return buildGenerated(id);
+  const base = baseActivityId(id);
+  if (base === id) return undefined;
+  const original = byId.get(base) ?? (isGeneratedId(base) ? buildGenerated(base) : undefined);
+  return original ? ({ ...original, id } as Activity) : undefined;
 }
 
 export function activitiesFor(category: CategoryId, difficulty?: Difficulty): Activity[] {

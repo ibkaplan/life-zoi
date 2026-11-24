@@ -9,6 +9,7 @@ import { sayJoined } from "@/lib/my-day/say";
 import { LoadingState } from "@/components/sources";
 import { useAccount } from "@/lib/account-store";
 import { isEmptyBrain } from "@/lib/brain-quiz/progress";
+import { useBrainProgress } from "@/components/brain-quiz/use-brain-progress";
 import { isEmptyEmotional } from "@/lib/emotional-wellness/storage";
 import { getEmotionalServerSnapshot, getEmotionalStoreSnapshot, subscribeEmotionalStore } from "@/lib/emotional-wellness/store";
 import { isEmptyFoodPlan } from "@/lib/food-plan/types";
@@ -49,6 +50,7 @@ const OVERVIEW = [
 
 export function MyDayView() {
   const session = useSession();
+  const brain = useBrainProgress();
   const { t, longDate, locale } = usePageFormat();
   const account = useAccount();
   const say = (text: string) => sayJoined(t, text, locale === "en");
@@ -68,7 +70,7 @@ export function MyDayView() {
   const items = presentDay(day, file.savedTimes, answers, journey, {
     date: snap.today,
     foodPlan: session.sample || isEmptyFoodPlan(session.session.foodPlan) ? null : session.session.foodPlan,
-    brain: session.sample || isEmptyBrain(session.session.brainQuiz) ? null : session.session.brainQuiz,
+    brain: session.sample || brain.sample || isEmptyBrain(brain.progress) ? null : brain.progress,
     emotionalNotes: !session.sample && signedIn && !isEmptyEmotional(emotional),
   });
   const progress = dayProgress(items);

@@ -2372,6 +2372,40 @@ button.assistant-send:focus-visible,
 .quiz-barLabel { font-size: 12px; fill: var(--ink); }
 .quiz-bar { fill: var(--primary); }
 .quiz-barAlt { fill: var(--blue); }
+.quiz-axis { stroke: var(--line); stroke-width: 1; }
+.quiz-calendar { max-width: 340px; }
+.quiz-weeks { max-width: 560px; }
+.quiz-day { fill: var(--lavender); stroke: var(--line); stroke-width: 1; }
+.quiz-day1 { fill: color-mix(in srgb, var(--primary) 30%, white); }
+.quiz-day2 { fill: color-mix(in srgb, var(--primary) 52%, white); }
+.quiz-day3 { fill: color-mix(in srgb, var(--primary) 76%, white); }
+.quiz-day4 { fill: var(--primary); }
+.quiz-dayDaily { stroke: var(--ink); stroke-width: 2; }
+
+.quiz-welcome { border-left: 6px solid var(--primary); }
+.quiz-todayFacts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.quiz-todayFacts li {
+  display: grid;
+  gap: 0.15rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.6rem 0.75rem;
+  background: var(--lavender);
+}
+.quiz-todayFacts strong { font-size: 1.35rem; }
+.quiz-todayFacts span { font-size: 0.9rem; }
+@media (min-width: 800px) {
+  .quiz-todayFacts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.quiz-milestones { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
+.quiz-done { border-radius: 14px; background: var(--lavender); padding: 0.9rem 1rem; display: grid; gap: 0.4rem; }
 
 .quiz-found { color: var(--deep); font-weight: 700; }
 

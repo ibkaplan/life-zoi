@@ -1,5 +1,6 @@
 import { isRealISODate, mondayOf } from "@/lib/dates";
 import { emptyBreathe, isEmptyBreathe, sanitizeBreathe, type BreatheState } from "@/lib/breathe/state";
+import { emptyBrainProgress, isEmptyBrain, sanitizeBrain, type BrainProgress } from "@/lib/brain-quiz/progress";
 import { emptyFocus, isEmptyFocus, sanitizeFocus, type FocusState } from "@/lib/focus/progress";
 import { emptyCourses, isEmptyCourses, sanitizeCourses, type CoursesState } from "@/lib/courses/courses";
 
@@ -257,6 +258,12 @@ export type CompanionState = {
   breathe: BreatheState;
   /** Focus & Brain Training: finished focus sessions and breaks by day, and timer settings. */
   focus: FocusState;
+  /**
+   * Brain & Habit Quiz: points, answers, daily challenges, history, and which questions
+   * were shown. It moved here from the profile row, which has too little room for a
+   * long history; older profile copies are adopted once (see use-brain-progress.ts).
+   */
+  brainQuiz: BrainProgress;
   womensCare: WomensCarePrefs;
   daily: DailyState;
   /** 7-day mini-courses: the course in progress and the days marked done. */
@@ -324,6 +331,7 @@ export function emptyCompanion(): CompanionState {
     games: [],
     breathe: emptyBreathe(),
     focus: emptyFocus(),
+    brainQuiz: emptyBrainProgress(),
     womensCare: emptyWomensCare(),
     daily: emptyDaily(),
     courses: emptyCourses(),
@@ -364,6 +372,7 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     state.food.disliked.length === 0 &&
     isEmptyBreathe(state.breathe) &&
     isEmptyFocus(state.focus) &&
+    isEmptyBrain(state.brainQuiz) &&
     !state.womensCare.identifiesAsWoman &&
     !state.womensCare.relevant &&
     Object.keys(state.daily.feelings).length === 0 &&
@@ -680,6 +689,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
       .slice(0, LIMITS.games),
     breathe: sanitizeBreathe(record.breathe),
     focus: sanitizeFocus(record.focus),
+    brainQuiz: sanitizeBrain(record.brainQuiz),
     womensCare: sanitizeWomensCare(record.womensCare),
     daily: sanitizeDaily(record.daily),
     courses: sanitizeCourses(record.courses),

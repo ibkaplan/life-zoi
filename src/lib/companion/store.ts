@@ -130,6 +130,17 @@ export function fitForAccount(state: CompanionState, budget = ACCOUNT_BUDGET): C
       next = { ...next, games: next.games.slice(0, next.games.length - 25) };
     } else if (next.reviews.length > 12) {
       next = { ...next, reviews: next.reviews.slice(0, -1) };
+    } else if (Object.keys(next.brainQuiz.seen).length > 300 || next.brainQuiz.days.length > 120) {
+      // Quiz rotation and history shrink last. Points and scored ids are never trimmed here.
+      const seen = Object.entries(next.brainQuiz.seen).sort((a, b) => b[1] - a[1]);
+      next = {
+        ...next,
+        brainQuiz: {
+          ...next.brainQuiz,
+          seen: Object.fromEntries(seen.slice(0, Math.max(300, Math.floor(seen.length / 2)))),
+          days: next.brainQuiz.days.slice(0, Math.max(120, next.brainQuiz.days.length - 30)),
+        },
+      };
     } else {
       break;
     }

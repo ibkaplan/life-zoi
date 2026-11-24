@@ -6,9 +6,9 @@ import { LzPhoto } from "@/components/imagery/lz-photo";
 import { useState } from "react";
 import { activitiesFor, CATEGORIES } from "@/lib/brain-quiz/catalog";
 import { featuredRebus } from "@/lib/brain-quiz/daily";
-import { localISODate } from "@/lib/dates";
 import {
   badgesFor,
+  liveStreak,
   JOURNEY_NOTE,
   QUIZ_NOTICE,
   QUIZ_TAGLINE,
@@ -16,6 +16,8 @@ import {
   type Difficulty,
 } from "@/lib/brain-quiz/progress";
 import { RebusArt } from "@/components/brain-quiz/rebus-art";
+import { TodayPanel } from "@/components/brain-quiz/today-panel";
+import { useLocalToday } from "@/components/brain-quiz/use-local-today";
 import { msg } from "@/lib/i18n/translate";
 import { StatLine } from "@/components/brain-quiz/stat-line";
 import { useBrainProgress } from "@/components/brain-quiz/use-brain-progress";
@@ -29,7 +31,8 @@ export function BrainQuizHub() {
   const { locale, t } = useLocale();
   const { progress, storageNote, ready } = useBrainProgress();
   const [level, setLevel] = useState<Difficulty>("easy");
-  const today = ready ? localISODate() : "2026-11-06";
+  const localToday = useLocalToday();
+  const today = ready && localToday ? localToday : "2026-11-06";
   const featured = localizeActivity(featuredRebus(today), locale);
   const badges = badgesFor(progress);
 
@@ -51,6 +54,7 @@ export function BrainQuizHub() {
           <Link className="btn btn-secondary" href="/focus">{t("Focus & Brain Training")}</Link>
         </div>
       </section>
+      {ready && localToday ? <TodayPanel today={localToday} level={level} /> : null}
       <p className={"quiz-notice"}>{t(QUIZ_NOTICE)}</p>
       <p className="hint">{t(storageNote)} {t(JOURNEY_NOTE)}</p>
       <section className="card stack">
@@ -67,7 +71,7 @@ export function BrainQuizHub() {
         <StatLine value={progress.points} label={msg("{count} total points")} />
         <StatLine value={progress.correct} label={msg("{count} correct")} />
         <StatLine value={progress.games} label={msg("{count} games")} />
-        <StatLine value={progress.streak} label={msg("{count} day streak")} />
+        <StatLine value={liveStreak(progress, today)} label={msg("{count} day streak")} />
         <StatLine value={progress.bestDay} label={msg("{count} personal best day")} />
         <StatLine value={badges.length} label={msg("{count} badges")} />
       </section>

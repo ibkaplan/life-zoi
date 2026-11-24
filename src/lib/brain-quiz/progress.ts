@@ -1,4 +1,4 @@
-import { addIsoDays, isRealISODate } from "@/lib/dates";
+import { addIsoDays, isRealISODate, mondayOf } from "@/lib/dates";
 import { msg } from "@/lib/i18n/translate";
 
 export const CATEGORY_IDS = ["logic", "riddles", "memory", "attention", "numbers", "words", "habits"] as const;
@@ -22,9 +22,12 @@ export function pointsFor(difficulty: Difficulty): number {
 
 export type CategoryStats = { played: number; correct: number; points: number };
 export type DifficultyStats = { played: number; correct: number };
-export type DayMark = { date: string; points: number; plays: number };
+/** One calendar day (the person's own local date). `right` and `wrong` count answers given that day. */
+export type DayMark = { date: string; points: number; plays: number; right: number; wrong: number };
 export type DailyScore = { date: string; score: number; correct: number };
 export type DailyPick = { id: string; correct: boolean; note: string; gained: number; picked: number[] };
+/** The five activities chosen for one local calendar day. Saved once, so a refresh or another device shows the same five. */
+export type DailyRoundMark = { date: string; ids: string[] };
 
 export type BrainProgress = {
   awarded: string[];
@@ -43,14 +46,60 @@ export type BrainProgress = {
   dailyPerfect: string[];
   dailyScores: DailyScore[];
   lastDaily: { date: string; picks: DailyPick[] } | null;
+  /** Today's chosen five, kept so the set never changes during the day. */
+  round: DailyRoundMark | null;
+  /** Activity id (without a daily suffix) to the day number it was last shown. Drives rotation. */
+  seen: Record<string, number>;
+  /** Every answer given, right or wrong. `correct` above counts only answers that scored. */
+  right: number;
+  wrong: number;
   byCategory: Record<CategoryId, CategoryStats>;
   byDifficulty: Record<Difficulty, DifficultyStats>;
 };
 
-const AWARDED_LIMIT = 240;
-const TOUCH_LIMIT = 160;
-const DAY_LIMIT = 42;
-const DAILY_LIMIT = 30;
+/**
+ * Limits keep the saved record small enough for the account row while leaving room
+ * for a large question bank and more than a year of history.
+ */
+export const BRAIN_LIMITS = { awarded: 3000, touches: 400, days: 400, daily: 400, seen: 1500 } as const;
+const AWARDED_LIMIT = BRAIN_LIMITS.awarded;
+const TOUCH_LIMIT = BRAIN_LIMITS.touches;
+const DAY_LIMIT = BRAIN_LIMITS.days;
+const DAILY_LIMIT = BRAIN_LIMITS.daily;
+const SEEN_LIMIT = BRAIN_LIMITS.seen;
+
+/** Daily copies of an activity carry a suffix such as `_d327` (the day number). */
+const DAILY_SUFFIX = /_d\d{1,5}$/;
+
+export function baseActivityId(id: string): string {
+  return id.replace(DAILY_SUFFIX, "");
+}
+
+export function isDailyCopy(id: string): boolean {
+  return DAILY_SUFFIX.test(id);
+}
+
+/**
+ * Newest first, without repeats, at most `limit`. When the list is full, dated daily
+ * copies are dropped before plain ids, because a dated copy can never be shown again
+ * while a plain id could be scored twice if it were forgotten.
+ */
+function capIds(ids: string[], limit: number): string[] {
+  if (ids.length <= limit) return ids;
+  const extra = ids.length - limit;
+  let dropped = 0;
+  const out: string[] = [];
+  for (let index = ids.length - 1; index >= 0; index -= 1) {
+    const id = ids[index] as string;
+    if (dropped < extra && isDailyCopy(id)) {
+      dropped += 1;
+      continue;
+    }
+    out.push(id);
+  }
+  out.reverse();
+  return out.slice(0, limit);
+}
 
 function emptyCategory(): CategoryStats {
   return { played: 0, correct: 0, points: 0 };
@@ -74,6 +123,10 @@ export function emptyBrainProgress(): BrainProgress {
     dailyPerfect: [],
     dailyScores: [],
     lastDaily: null,
+    round: null,
+    seen: {},
+    right: 0,
+    wrong: 0,
     byCategory: {
       logic: emptyCategory(),
       riddles: emptyCategory(),
@@ -107,18 +160,31 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
+const ID_PATTERN = /^[A-Za-z0-9:_-]{2,48}$/;
+
 function cleanIdList(value: unknown, limit: number): string[] {
   if (!Array.isArray(value)) return [];
   const out: string[] = [];
+  const known = new Set<string>();
   for (const item of value) {
     if (typeof item !== "string") continue;
     const trimmed = item.trim();
-    if (!/^[A-Za-z0-9:_-]{2,48}$/.test(trimmed)) continue;
-    if (out.includes(trimmed)) continue;
+    if (!ID_PATTERN.test(trimmed)) continue;
+    if (known.has(trimmed)) continue;
+    known.add(trimmed);
     out.push(trimmed);
-    if (out.length >= limit) break;
   }
-  return out;
+  return capIds(out, limit);
+}
+
+function cleanSeen(value: unknown): Record<string, number> {
+  const row = asRecord(value);
+  if (!row) return {};
+  const entries = Object.entries(row)
+    .filter(([id, day]) => ID_PATTERN.test(id) && typeof day === "number" && Number.isInteger(day) && day >= -3650 && day <= 36500)
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
+    .slice(0, SEEN_LIMIT);
+  return Object.fromEntries(entries) as Record<string, number>;
 }
 
 function cleanCount(value: unknown, max = 100000): number {
@@ -163,10 +229,17 @@ export function sanitizeBrain(input: unknown): BrainProgress {
           const day = asRecord(item);
           const date = cleanDate(day?.date);
           if (!day || !date) return null;
-          return { date, points: cleanCount(day.points), plays: cleanCount(day.plays, 200) };
+          return {
+            date,
+            points: cleanCount(day.points),
+            plays: cleanCount(day.plays, 500),
+            right: cleanCount(day.right, 500),
+            wrong: cleanCount(day.wrong, 500),
+          };
         })
         .filter((item): item is DayMark => item !== null)
-        .filter((item, index, all) => all.findIndex((other) => other.date === item.date) === index)
+        .filter(uniqueDate())
+        .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, DAY_LIMIT)
     : [];
   const dailyScores = Array.isArray(row.dailyScores)
@@ -178,7 +251,8 @@ export function sanitizeBrain(input: unknown): BrainProgress {
           return { date, score: cleanCount(day.score), correct: cleanCount(day.correct, 5) };
         })
         .filter((item): item is DailyScore => item !== null)
-        .filter((item, index, all) => all.findIndex((other) => other.date === item.date) === index)
+        .filter(uniqueDate())
+        .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, DAILY_LIMIT)
     : [];
   let lastDaily: BrainProgress["lastDaily"] = null;
@@ -189,7 +263,7 @@ export function sanitizeBrain(input: unknown): BrainProgress {
       ? last.picks
           .map((item): DailyPick | null => {
             const pick = asRecord(item);
-            if (!pick || typeof pick.id !== "string" || !/^[A-Za-z0-9:_-]{2,40}$/.test(pick.id)) return null;
+            if (!pick || typeof pick.id !== "string" || !ID_PATTERN.test(pick.id)) return null;
             if (typeof pick.correct !== "boolean") return null;
             const picked = Array.isArray(pick.picked)
               ? pick.picked.filter((n): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n < 8).slice(0, 4)
@@ -200,6 +274,13 @@ export function sanitizeBrain(input: unknown): BrainProgress {
           .slice(0, 5)
       : [];
     lastDaily = { date: lastDate, picks };
+  }
+  let round: DailyRoundMark | null = null;
+  const roundRow = asRecord(row.round);
+  const roundDate = cleanDate(roundRow?.date);
+  if (roundRow && roundDate) {
+    const ids = cleanIdList(roundRow.ids, 5);
+    if (ids.length > 0) round = { date: roundDate, ids };
   }
   return {
     awarded: cleanIdList(row.awarded, AWARDED_LIMIT),
@@ -218,8 +299,22 @@ export function sanitizeBrain(input: unknown): BrainProgress {
     dailyPerfect: cleanIdList(row.dailyPerfect, DAILY_LIMIT).filter((item) => isRealISODate(item)),
     dailyScores,
     lastDaily,
+    round,
+    seen: cleanSeen(row.seen),
+    // Records saved before answers were counted start from what they already show.
+    right: row.right === undefined ? cleanCount(row.correct, 10000) : cleanCount(row.right),
+    wrong: row.wrong === undefined ? Math.max(0, cleanCount(row.games, 10000) - cleanCount(row.correct, 10000)) : cleanCount(row.wrong),
     byCategory,
     byDifficulty,
+  };
+}
+
+function uniqueDate() {
+  const known = new Set<string>();
+  return (item: { date: string }) => {
+    if (known.has(item.date)) return false;
+    known.add(item.date);
+    return true;
   };
 }
 
@@ -230,6 +325,12 @@ export type OutcomeInput = {
   difficulty: Difficulty;
   correct: boolean;
   lock: boolean;
+  /**
+   * For a daily copy of a written question (such as `L04_d327`), the original id. The
+   * original is then marked as answered too, so the same question does not score again
+   * in practice. Generated games (memory, attention) leave this out.
+   */
+  baseId?: string;
 };
 
 export type OutcomeResult = { progress: BrainProgress; gained: number; already: boolean };
@@ -243,11 +344,15 @@ function bumpStreak(progress: BrainProgress, today: string) {
   return { streak, bestStreak: Math.max(progress.bestStreak, streak), lastActive: today };
 }
 
-function bumpDay(days: DayMark[], today: string, points: number, play: boolean): DayMark[] {
-  const existing = days.find((day) => day.date === today);
-  const next: DayMark = existing
-    ? { date: today, points: existing.points + points, plays: existing.plays + (play ? 1 : 0) }
-    : { date: today, points, plays: play ? 1 : 0 };
+function bumpDay(days: DayMark[], today: string, points: number, play: boolean, answer: "right" | "wrong" | null = null): DayMark[] {
+  const existing = days.find((day) => day.date === today) ?? { date: today, points: 0, plays: 0, right: 0, wrong: 0 };
+  const next: DayMark = {
+    date: today,
+    points: existing.points + points,
+    plays: existing.plays + (play ? 1 : 0),
+    right: existing.right + (answer === "right" ? 1 : 0),
+    wrong: existing.wrong + (answer === "wrong" ? 1 : 0),
+  };
   return [next, ...days.filter((day) => day.date !== today)].sort((a, b) => b.date.localeCompare(a.date)).slice(0, DAY_LIMIT);
 }
 
@@ -273,13 +378,18 @@ export function recordOutcome(progress: BrainProgress, input: OutcomeInput): Out
   if (input.correct && !alreadyAwarded) {
     gained = pointsFor(input.difficulty);
     correct += 1;
-    awarded = [input.activityId, ...awarded].slice(0, AWARDED_LIMIT);
+    awarded = [input.activityId, ...awarded];
     byCategory[input.category].correct += 1;
     byCategory[input.category].points += gained;
     byDifficulty[input.difficulty].correct += 1;
   }
-  const attempted = input.lock && !alreadyAttempted ? [input.activityId, ...progress.attempted].slice(0, AWARDED_LIMIT) : progress.attempted;
-  const days = bumpDay(progress.days, input.today, gained, firstTouch);
+  let attempted = input.lock && !alreadyAttempted ? [input.activityId, ...progress.attempted] : progress.attempted;
+  const base = input.baseId && input.baseId !== input.activityId ? input.baseId : "";
+  if (base && input.lock && !attempted.includes(base)) attempted = [base, ...attempted];
+  if (base && input.correct && !awarded.includes(base)) awarded = [base, ...awarded];
+  awarded = capIds(awarded, AWARDED_LIMIT);
+  attempted = capIds(attempted, AWARDED_LIMIT);
+  const days = bumpDay(progress.days, input.today, gained, firstTouch, input.correct ? "right" : "wrong");
   const todayPoints = days.find((day) => day.date === input.today)?.points ?? 0;
   return {
     gained,
@@ -292,6 +402,8 @@ export function recordOutcome(progress: BrainProgress, input: OutcomeInput): Out
       touches: firstTouch ? [touch, ...progress.touches].slice(0, TOUCH_LIMIT) : progress.touches,
       points: progress.points + gained,
       correct,
+      right: progress.right + (input.correct ? 1 : 0),
+      wrong: progress.wrong + (input.correct ? 0 : 1),
       games: progress.games + (firstTouch ? 1 : 0),
       bestDay: Math.max(progress.bestDay, todayPoints),
       days,
@@ -329,7 +441,7 @@ export function completeDaily(
     progress: {
       ...progress,
       ...bumpStreak(progress, today),
-      awarded: [key, ...progress.awarded].slice(0, AWARDED_LIMIT),
+      awarded: capIds([key, ...progress.awarded], AWARDED_LIMIT),
       points: progress.points + gained,
       bestDay: Math.max(progress.bestDay, days.find((day) => day.date === today)?.points ?? 0),
       bestDaily: Math.max(progress.bestDaily, score),
@@ -358,7 +470,135 @@ export function badgesFor(progress: BrainProgress): Badge[] {
   if (progress.byCategory.habits.correct >= 10) {
     badges.push({ id: "habit-10", title: msg("Habit learner"), detail: msg("Ten habit questions were answered correctly.") });
   }
+  if (progress.points >= 500) badges.push({ id: "points-500", title: msg("500 points"), detail: msg("Your saved total reached 500 game points.") });
+  if (progress.points >= 1000) badges.push({ id: "points-1000", title: msg("1,000 points"), detail: msg("Your saved total reached 1,000 game points.") });
+  if (progress.points >= 2500) badges.push({ id: "points-2500", title: msg("2,500 points"), detail: msg("Your saved total reached 2,500 game points.") });
+  if (progress.bestStreak >= 14) badges.push({ id: "streak-14", title: msg("14-day streak"), detail: msg("You came back on fourteen days in a row.") });
+  if (progress.bestStreak >= 30) badges.push({ id: "streak-30", title: msg("30-day streak"), detail: msg("You came back on thirty days in a row.") });
+  if (progress.dailyDone.length >= 5) badges.push({ id: "daily-5", title: msg("Five daily challenges"), detail: msg("You finished five daily challenges.") });
+  if (progress.dailyDone.length >= 10) badges.push({ id: "daily-10", title: msg("Ten daily challenges"), detail: msg("You finished ten daily challenges.") });
+  if (progress.dailyDone.length >= 30) badges.push({ id: "daily-30", title: msg("Thirty daily challenges"), detail: msg("You finished thirty daily challenges.") });
+  if (progress.dailyPerfect.length >= 3) badges.push({ id: "perfect-3", title: msg("Three perfect dailies"), detail: msg("Three daily challenges had every part correct.") });
+  if (progress.right + progress.wrong >= 100) badges.push({ id: "answers-100", title: msg("100 answers"), detail: msg("You gave 100 answers across the games.") });
+  if (progress.byDifficulty.hard.correct >= 10) badges.push({ id: "hard-10", title: msg("Hard level explorer"), detail: msg("Ten hard activities were finished correctly.") });
+  if (bestWeekDays(progress) >= 5) badges.push({ id: "week-5", title: msg("Five-day week"), detail: msg("You played on five days of one week.") });
   return badges;
+}
+
+/** The most days played in any one Monday-to-Sunday week. */
+export function bestWeekDays(progress: BrainProgress): number {
+  const weeks = new Map<string, number>();
+  for (const day of progress.days) {
+    if (day.plays === 0 && day.points === 0) continue;
+    const week = mondayOf(day.date);
+    weeks.set(week, (weeks.get(week) ?? 0) + 1);
+  }
+  return Math.max(0, ...weeks.values());
+}
+
+export type Milestone = { id: string; label: string; value: number; target: number };
+
+const MILESTONE_STEPS = {
+  points: [100, 300, 500, 1000, 2500, 5000, 10000],
+  daily: [1, 5, 10, 30, 100, 365],
+  streak: [3, 7, 14, 30, 60, 100, 365],
+  answers: [10, 50, 100, 250, 500, 1000, 2500],
+} as const;
+
+function nextStep(steps: readonly number[], value: number): number {
+  return steps.find((step) => step > value) ?? (steps[steps.length - 1] as number);
+}
+
+/** The next goal in each area, for the progress bars on My Brain Journey. */
+export function nextMilestones(progress: BrainProgress): Milestone[] {
+  const answers = progress.right + progress.wrong;
+  return [
+    { id: "points", label: msg("Points: {value} of {target}"), value: progress.points, target: nextStep(MILESTONE_STEPS.points, progress.points) },
+    { id: "daily", label: msg("Daily challenges: {value} of {target}"), value: progress.dailyDone.length, target: nextStep(MILESTONE_STEPS.daily, progress.dailyDone.length) },
+    { id: "streak", label: msg("Best streak: {value} of {target} days"), value: progress.bestStreak, target: nextStep(MILESTONE_STEPS.streak, progress.bestStreak) },
+    { id: "answers", label: msg("Answers: {value} of {target}"), value: answers, target: nextStep(MILESTONE_STEPS.answers, answers) },
+  ];
+}
+
+/** The day still counts as a streak day when the last play was today or yesterday. */
+export function liveStreak(progress: BrainProgress, today: string): number {
+  if (!progress.lastActive) return 0;
+  if (progress.lastActive === today || progress.lastActive === addIsoDays(today, -1)) return progress.streak;
+  return 0;
+}
+
+export type WeekSummary = { start: string; points: number; activeDays: number; right: number; wrong: number; dailies: number };
+
+/** Monday-to-Sunday weeks, oldest first, ending with the week that holds `today`. */
+export function weeklyHistory(progress: BrainProgress, today: string, weeks = 12): WeekSummary[] {
+  const current = mondayOf(today);
+  if (!current) return [];
+  const out: WeekSummary[] = [];
+  for (let back = weeks - 1; back >= 0; back -= 1) {
+    const start = addIsoDays(current, -7 * back);
+    const end = addIsoDays(start, 6);
+    const inWeek = (date: string) => date >= start && date <= end;
+    const days = progress.days.filter((day) => inWeek(day.date));
+    out.push({
+      start,
+      points: days.reduce((sum, day) => sum + day.points, 0),
+      activeDays: days.filter((day) => day.plays > 0 || day.points > 0).length,
+      right: days.reduce((sum, day) => sum + day.right, 0),
+      wrong: days.reduce((sum, day) => sum + day.wrong, 0),
+      dailies: progress.dailyDone.filter(inWeek).length,
+    });
+  }
+  return out;
+}
+
+export type CalendarDay = { date: string; plays: number; points: number; daily: boolean };
+
+/** The last `days` calendar days, oldest first, starting on a Monday so it lines up as weeks. */
+export function activityCalendar(progress: BrainProgress, today: string, weeks = 12): CalendarDay[] {
+  const start = addIsoDays(mondayOf(today), -7 * (weeks - 1));
+  if (!start) return [];
+  const byDate = new Map(progress.days.map((day) => [day.date, day]));
+  const done = new Set(progress.dailyDone);
+  const out: CalendarDay[] = [];
+  for (let offset = 0; offset < weeks * 7; offset += 1) {
+    const date = addIsoDays(start, offset);
+    if (date > today) break;
+    const day = byDate.get(date);
+    out.push({ date, plays: day?.plays ?? 0, points: day?.points ?? 0, daily: done.has(date) });
+  }
+  return out;
+}
+
+/** Remember that these activities were shown on this day, so the next days pick others. */
+export function markSeen(progress: BrainProgress, ids: readonly string[], day: number): BrainProgress {
+  const seen = { ...progress.seen };
+  for (const id of ids) seen[baseActivityId(id)] = day;
+  return { ...progress, seen: cleanSeen(seen) };
+}
+
+export type Welcome = { title: string; detail: string; values?: Record<string, string | number> };
+
+/** A short, friendly line for the top of the quiz. It never mentions a score as a measure. */
+export function welcomeFor(progress: BrainProgress, today: string, dayIndex: number): Welcome {
+  const picks = progress.lastDaily?.date === today ? progress.lastDaily.picks.length : 0;
+  if (progress.dailyDone.includes(today)) {
+    return { title: msg("Today’s challenge is done. Well played!"), detail: msg("Five new questions arrive tomorrow, at midnight your time.") };
+  }
+  if (picks > 0) {
+    return { title: msg("Welcome back! You are part way through today’s challenge."), detail: msg("{count} of 5 parts done. Your answers are saved."), values: { count: picks } };
+  }
+  if (isEmptyBrain(progress)) {
+    return { title: msg("Welcome! Your first brain challenge is ready."), detail: msg("Five short parts, about 5 to 10 minutes. There is no rush.") };
+  }
+  if (progress.lastActive === addIsoDays(today, -1) && progress.streak > 0) {
+    return { title: msg("Welcome back! Your new brain challenge is ready."), detail: msg("Play today to make it {count} days in a row."), values: { count: progress.streak + 1 } };
+  }
+  const lines = [
+    msg("Welcome back! Your new brain challenge is ready."),
+    msg("Another day, another opportunity to challenge your mind!"),
+    msg("Good to see you. Five fresh questions are waiting."),
+  ];
+  return { title: lines[((dayIndex % lines.length) + lines.length) % lines.length] as string, detail: msg("Five new parts today, chosen from questions you have not seen lately.") };
 }
 
 export function favoriteCategory(progress: BrainProgress): CategoryId | null {
@@ -376,7 +616,7 @@ export function weekActivity(progress: BrainProgress, today: string): DayMark[] 
   for (let back = 6; back >= 0; back -= 1) {
     const date = addIsoDays(today, -back);
     const found = progress.days.find((day) => day.date === date);
-    marks.push({ date, plays: found?.plays ?? 0, points: found?.points ?? 0 });
+    marks.push({ date, plays: found?.plays ?? 0, points: found?.points ?? 0, right: found?.right ?? 0, wrong: found?.wrong ?? 0 });
   }
   return marks;
 }
