@@ -20,6 +20,12 @@ import health_day from "./health-day.json";
 import fact_quiz from "./fact-quiz.json";
 import guided from "./guided.json";
 import voice_companion from "./voice-companion.json";
+import growth_confidence from "./growth-confidence.json";
+import growth_mindfulness from "./growth-mindfulness.json";
+import growth_communication from "./growth-communication.json";
+import growth_emotional_intelligence from "./growth-emotional-intelligence.json";
+import growth_resilience from "./growth-resilience.json";
+import growth_academy from "./growth-academy.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion, ...growth_confidence, ...growth_mindfulness, ...growth_communication, ...growth_emotional_intelligence, ...growth_resilience, ...growth_academy };
 export default catalog;

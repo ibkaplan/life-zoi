@@ -26,6 +26,7 @@ const PERSONAL_PREFIXES = [
   "/community",
   "/welcome",
   "/ai-assistant",
+  "/training-academy/journey",
 ];
 
 export function isPersonalPage(pathname: string): boolean {

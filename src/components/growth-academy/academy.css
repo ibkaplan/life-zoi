@@ -1,0 +1,659 @@
+/*
+ * LifeZoi Training Academy. Phone first, comfortable reading width, large
+ * targets, and the site's colour tokens so every page background still works.
+ * Course colours come from the course data as --ga-c1 (strong) and --ga-c2 (soft).
+ */
+
+.ga {
+  font-size: 1.08rem;
+  line-height: 1.6;
+  --ga-c1: var(--primary);
+  --ga-c2: var(--lavender);
+}
+
+.ga h1,
+.ga h2,
+.ga h3,
+.ga h4,
+.ga p {
+  margin: 0;
+}
+
+.ga-kicker {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--deep);
+  font-size: 0.9rem;
+}
+
+.ga-hero {
+  display: grid;
+  gap: 1rem;
+  border-radius: calc(var(--radius) + 6px);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(242, 182, 93, 0.32), transparent 42%),
+    radial-gradient(circle at 6% 96%, rgba(47, 143, 131, 0.2), transparent 46%),
+    linear-gradient(135deg, var(--lavender), var(--surface));
+  border: 1px solid var(--line);
+}
+
+.ga-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  line-height: 1.12;
+  color: var(--ink);
+}
+
+.ga-tagline {
+  font-size: clamp(1.1rem, 2.6vw, 1.35rem);
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.ga-welcome {
+  max-width: 44rem;
+  color: var(--ink);
+}
+
+.ga-note {
+  font-size: 0.98rem;
+  color: var(--muted);
+}
+
+.ga-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+  min-width: 0;
+}
+
+.ga-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.ga-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+/* My Learning Journey numbers */
+.ga-stats {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+@media (min-width: 720px) {
+  .ga-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ga-stat {
+  border-radius: 14px;
+  background: var(--sky);
+  padding: 0.7rem 0.85rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.ga-stat dt {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.ga-stat dd {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* Course cards */
+.ga-courses {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 680px) {
+  .ga-courses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .ga-courses {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ga-course-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+}
+
+.ga-course-body {
+  padding: 1rem 1.15rem 1.2rem;
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+}
+
+.ga-course-body h3 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.ga-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 7;
+  background: var(--ga-c2);
+}
+
+.ga-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.ga-meta li {
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+  background: var(--ga-c2);
+  color: var(--ink);
+}
+
+/* Progress bar */
+.ga-progress {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.ga-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ga-bar {
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--ga-c2);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.ga-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ga-c1), color-mix(in srgb, var(--ga-c1) 70%, #fff));
+  transition: width 0.4s ease;
+}
+
+/* Status badges */
+.ga-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.86rem;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ga-badge[data-status="in-progress"] {
+  background: #fff4dc;
+  color: #6b4500;
+  border-color: #f0d7a0;
+}
+
+.ga-badge[data-status="completed"] {
+  background: #e3f2ec;
+  color: #1c5a46;
+  border-color: #b9dccd;
+}
+
+/* Lesson list on the course page */
+.ga-lessons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ga-lesson-item {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 0.85rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.ga-lesson-item[data-current="true"] {
+  border-color: var(--ga-c1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ga-c1) 30%, transparent);
+}
+
+.ga-num {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: var(--ga-c2);
+  color: var(--ink);
+}
+
+.ga-lesson-item[data-status="completed"] .ga-num {
+  background: var(--ga-c1);
+  color: #fff;
+}
+
+.ga-lesson-text {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.ga-lesson-text h3 {
+  font-size: 1.08rem;
+}
+
+/* Lesson page */
+.ga-reading {
+  max-width: 46rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.ga-steps {
+  display: flex;
+  gap: 0.35rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 0.2rem;
+}
+
+.ga-steps button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  min-height: 2.5rem;
+}
+
+.ga-steps button[aria-current="step"] {
+  background: var(--ga-c1);
+  border-color: var(--ga-c1);
+  color: #fff;
+}
+
+.ga-steps button[data-seen="true"]:not([aria-current="step"]) {
+  background: var(--ga-c2);
+}
+
+.ga-part {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.ga-part h2 {
+  font-size: clamp(1.35rem, 3.4vw, 1.7rem);
+  line-height: 1.2;
+}
+
+.ga-part h3 {
+  font-size: 1.15rem;
+  margin-top: 0.4rem;
+}
+
+.ga-part ul,
+.ga-part ol {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ga-story {
+  border-left: 4px solid var(--ga-c1);
+  background: var(--ga-c2);
+  border-radius: 0 14px 14px 0;
+  padding: 0.9rem 1.1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ga-care {
+  border: 1px solid #f0d7a0;
+  background: #fff8e8;
+  color: #4d3600;
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+}
+
+.ga-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.ga-field label {
+  font-weight: 700;
+}
+
+.ga-field input,
+.ga-field textarea {
+  font: inherit;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  background: var(--surface);
+  color: var(--ink);
+  min-height: 2.9rem;
+}
+
+.ga-field textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+.ga-examples {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ga-example {
+  text-align: left;
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 0.65rem 0.85rem;
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.ga-example:hover,
+.ga-example:focus-visible {
+  border-color: var(--ga-c1);
+}
+
+.ga-example small {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.ga-feedback {
+  border: 1px solid #b9dccd;
+  background: #eef8f3;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+  color: #173f33;
+}
+
+.ga-takeaways li::marker {
+  color: var(--ga-c1);
+}
+
+.ga-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.ga-complete {
+  border: 2px dashed var(--ga-c1);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  display: grid;
+  gap: 0.6rem;
+  background: var(--surface);
+}
+
+.ga-celebrate {
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(242, 182, 93, 0.35), transparent 50%),
+    var(--ga-c2);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ga-timer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.ga-timer output {
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  min-width: 4.5rem;
+}
+
+.ga-check {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  font-weight: 600;
+}
+
+.ga-check input {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.15rem;
+  accent-color: var(--ga-c1);
+}
+
+/* Achievements */
+.ga-awards {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ga-award {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.7rem;
+  align-items: start;
+}
+
+.ga-award[data-earned="false"] {
+  opacity: 0.78;
+  background: var(--sky);
+}
+
+.ga-award-icon {
+  grid-row: span 3;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.ga-award h3 {
+  font-size: 1rem;
+}
+
+.ga-award p {
+  font-size: 0.93rem;
+  color: var(--muted);
+}
+
+.ga-toast {
+  position: fixed;
+  inset: auto 1rem 1rem 1rem;
+  margin-inline: auto;
+  max-width: 30rem;
+  z-index: 60;
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ga-toast button {
+  color: inherit;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* History and saved text */
+.ga-history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ga-history li {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, auto) 1fr;
+  gap: 0.6rem;
+  font-size: 0.98rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.ga-history time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ga-saved {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--sky);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+}
+
+.ga-challenge {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(47, 143, 131, 0.18), transparent 55%),
+    var(--surface);
+}
+
+.ga-challenge-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Completion summary: prints cleanly on one page where possible. */
+.ga-certificate {
+  border: 3px double var(--ga-c1);
+  border-radius: 18px;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background: var(--surface);
+  display: grid;
+  gap: 0.9rem;
+  text-align: center;
+}
+
+.ga-certificate h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+}
+
+.ga-certificate .ga-lessons-done {
+  text-align: left;
+  columns: 2 16rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+@media print {
+  .ga-no-print,
+  header,
+  footer,
+  nav,
+  .voice-page {
+    display: none !important;
+  }
+
+  .ga-certificate {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

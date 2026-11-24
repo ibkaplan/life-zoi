@@ -271,6 +271,8 @@ export const ru: Messages = {
     "/ai-assistant": "Помощник по благополучию",
     "/community": "Сообщество",
     "/emotional-wellness": "Эмоциональное благополучие",
+    "/training-academy": "Академия развития",
+    "/training-academy/journey": "Мой путь роста",
     "/mind": "LifeZoi Mind: эмоциональное здоровье",
     "/share-the-care": "Поделитесь заботой",
     "/change-lab": "Лаборатория перемен",
