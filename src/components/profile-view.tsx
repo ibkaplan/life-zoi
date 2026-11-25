@@ -29,6 +29,7 @@ import {
   vegetableLabels,
 } from "@/lib/labels";
 import { LoadingState } from "@/components/sources";
+import { FriendsTeaser } from "@/components/friends/friends-teaser";
 import type { Assessment } from "@/lib/types";
 
 function Row({ term, value }: { term: string; value: string }) {
@@ -198,6 +199,7 @@ export function ProfileView() {
           ) : null}
         </section>
       ) : null}
+      <FriendsTeaser />
     </div>
   );
 }
