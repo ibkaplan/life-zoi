@@ -206,6 +206,7 @@ export const uk: Messages = {
     menu: "Меню",
     closeMenu: "Закрити меню",
     sectionPages: "Сторінки цього розділу",
+    morePages: "Ще",
     allSections: "Усі розділи",
     finishSignIn: "Завершити вхід",
     allPages: "Усі сторінки",

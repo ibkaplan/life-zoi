@@ -206,6 +206,7 @@ export const ru: Messages = {
     menu: "Меню",
     closeMenu: "Закрыть меню",
     sectionPages: "Страницы этого раздела",
+    morePages: "Ещё",
     allSections: "Все разделы",
     finishSignIn: "Завершить вход",
     allPages: "Все страницы",

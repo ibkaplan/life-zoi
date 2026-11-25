@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { HeaderMusicButton } from "@/components/background-music/header-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useMessages } from "@/components/locale-provider";
@@ -53,6 +53,140 @@ function SectionMark({ section }: { section: NavSection }) {
     <svg className="nav-star" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
       <path d="M12 2.8l2.75 5.6 6.15.9-4.45 4.33 1.05 6.12L12 16.87l-5.5 2.88 1.05-6.12L3.1 9.3l6.15-.9z" />
     </svg>
+  );
+}
+
+/**
+ * The pages of the current section on wide screens, always on one line.
+ * Every page is measured in a hidden copy of the row; the pages that fit are shown, and the rest
+ * go into a "More" list at the end, so a long section never wraps onto a second line.
+ * The current page always stays visible.
+ */
+function WideSubnav({
+  label,
+  ariaLabel,
+  moreLabel,
+  pages,
+  currentPage,
+  pathname,
+}: {
+  label: string;
+  ariaLabel: string;
+  moreLabel: string;
+  pages: { href: string; label: string }[];
+  currentPage: string | null;
+  pathname: string;
+}) {
+  const row = useRef<HTMLElement>(null);
+  const measure = useRef<HTMLDivElement>(null);
+  const more = useRef<HTMLDetailsElement>(null);
+  const [fit, setFit] = useState(pages.length);
+
+  // Close the More list after moving to another page, on Escape, or on a click outside it.
+  useEffect(() => {
+    if (more.current) more.current.open = false;
+  }, [pathname]);
+
+  useEffect(() => {
+    const close = (event: Event) => {
+      const list = more.current;
+      if (!list?.open) return;
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        list.open = false;
+        list.querySelector("summary")?.focus();
+        return;
+      }
+      if (!list.contains(event.target as Node)) list.open = false;
+    };
+    document.addEventListener("click", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("click", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, []);
+
+  const pagesKey = pages.map((page) => `${page.href}=${page.label}`).join("|");
+
+  useLayoutEffect(() => {
+    const nav = row.current;
+    const box = measure.current;
+    if (!nav || !box) return;
+    const compute = () => {
+      const items = Array.from(box.querySelectorAll<HTMLElement>("[data-measure]"));
+      const labelWidth = (box.querySelector<HTMLElement>("[data-measure-label]")?.offsetWidth ?? 0) + 8;
+      const moreWidth = (box.querySelector<HTMLElement>("[data-measure-more]")?.offsetWidth ?? 0) + 8;
+      const style = getComputedStyle(nav);
+      const available = nav.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const widths = items.map((item) => item.offsetWidth + 3.2);
+      const total = labelWidth + widths.reduce((sum, width) => sum + width, 0);
+      if (total <= available) {
+        setFit(pages.length);
+        return;
+      }
+      let used = labelWidth + moreWidth;
+      let count = 0;
+      for (const width of widths) {
+        if (used + width > available) break;
+        used += width;
+        count += 1;
+      }
+      setFit(Math.max(1, count));
+    };
+    compute();
+    const observer = new ResizeObserver(compute);
+    observer.observe(nav);
+    void document.fonts?.ready.then(compute);
+    return () => observer.disconnect();
+  }, [pagesKey, pages.length]);
+
+  // Keep the current page visible: if it would fall into More, it takes the last visible place.
+  const order = pages.map((_, index) => index);
+  const currentIndex = pages.findIndex((page) => page.href === currentPage);
+  if (fit < pages.length && currentIndex >= fit) {
+    order.splice(currentIndex, 1);
+    order.splice(fit - 1, 0, currentIndex);
+  }
+  const shown = order.slice(0, fit).map((index) => pages[index]);
+  const hidden = order.slice(fit).map((index) => pages[index]);
+
+  return (
+    <nav ref={row} className="site-subnav site-subnav-wide" aria-label={ariaLabel}>
+      <span className="site-subnav-label">{label}</span>
+      {shown.map((page) => (
+        <Link key={page.href} href={page.href} aria-current={currentPage === page.href ? "page" : undefined}>
+          {page.label}
+        </Link>
+      ))}
+      {hidden.length > 0 ? (
+        <details ref={more} className="site-subnav-more-list">
+          <summary>{moreLabel}</summary>
+          <ul>
+            {hidden.map((page) => (
+              <li key={page.href}>
+                <Link href={page.href} aria-current={currentPage === page.href ? "page" : undefined}>
+                  {page.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+      <div ref={measure} className="site-subnav-measure" aria-hidden="true">
+        <span className="site-subnav-label" data-measure-label>
+          {label}
+        </span>
+        {pages.map((page) => (
+          <span key={page.href} className="site-subnav-measure-item" data-measure>
+            {page.label}
+          </span>
+        ))}
+        <span className="site-subnav-measure-item site-subnav-measure-more" data-measure-more>
+          {moreLabel} ▾
+        </span>
+      </div>
+    </nav>
   );
 }
 
@@ -212,14 +346,15 @@ export function SiteNav() {
 
       {current && current.pages.length > 1 ? (
         <>
-          <nav className="site-subnav site-subnav-wide" aria-label={`${sectionLabel(current)}: ${m.shell.sectionPages}`}>
-            <span className="site-subnav-label">{sectionLabel(current)}</span>
-            {current.pages.map((page) => (
-              <Link key={page.href} href={page.href} aria-current={currentPage === page.href ? "page" : undefined}>
-                {navLabel(m, page)}
-              </Link>
-            ))}
-          </nav>
+          <WideSubnav
+            key={current.key}
+            label={sectionLabel(current)}
+            ariaLabel={`${sectionLabel(current)}: ${m.shell.sectionPages}`}
+            moreLabel={m.shell.morePages}
+            pages={current.pages.map((page) => ({ href: page.href, label: navLabel(m, page) }))}
+            currentPage={currentPage}
+            pathname={pathname}
+          />
           <details key={current.key} className="site-subnav site-subnav-phone">
             <summary>
               <span className="site-subnav-label">{sectionLabel(current)}</span>
