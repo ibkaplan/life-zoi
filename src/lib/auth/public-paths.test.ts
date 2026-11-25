@@ -9,6 +9,15 @@ describe("members-only gate", () => {
     expect(decideGate({ pathname: "/sign-in/", status: "signed-out" })).toEqual({ kind: "next" });
   });
 
+  it("lets a visitor open every free tool under /free, and nothing that only starts with the same letters", () => {
+    for (const path of ["/free", "/free/", "/free/calorie-calculator", "/free/blood-pressure"]) {
+      expect(isPublicPath(path)).toBe(true);
+      expect(decideGate({ pathname: path, status: "signed-out" })).toEqual({ kind: "next" });
+    }
+    expect(isPublicPath("/freedom")).toBe(false);
+    expect(decideGate({ pathname: "/freebies", status: "signed-out" }).kind).toBe("redirect");
+  });
+
   it("sends a visitor who types a members' address to sign-in, keeping where they were going", () => {
     for (const path of ["/dashboard", "/assessment", "/what-if", "/ai-assistant", "/library/music", "/brain-quiz/games", "/academy/move/library", "/settings", "/admin/invitations"]) {
       const decision = decideGate({ pathname: path, status: "signed-out" });

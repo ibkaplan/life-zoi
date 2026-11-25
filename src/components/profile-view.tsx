@@ -29,6 +29,7 @@ import {
   vegetableLabels,
 } from "@/lib/labels";
 import { LoadingState } from "@/components/sources";
+import { FriendsTeaser } from "@/components/friends/friends-teaser";
 import type { Assessment } from "@/lib/types";
 
 function Row({ term, value }: { term: string; value: string }) {
@@ -134,6 +135,9 @@ export function ProfileView() {
         <Link className="btn btn-secondary" href="/my-health">
           {m.sections.myHealth}
         </Link>
+        <Link className="btn btn-secondary" href="/progress/achievements">
+          {t("My Streaks & Achievements")}
+        </Link>
       </p>
       {latest ? (
         <section className="card stack">
@@ -195,6 +199,7 @@ export function ProfileView() {
           ) : null}
         </section>
       ) : null}
+      <FriendsTeaser />
     </div>
   );
 }
