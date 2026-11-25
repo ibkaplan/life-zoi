@@ -33,7 +33,7 @@ function subscribeNoop() {
   return () => {};
 }
 
-type Loaded = { state: FriendChallenge; mode: ChallengeSaveMode; summary: CircleSummary | null; link: string; linkChecked: boolean };
+export type FriendsData = { state: FriendChallenge; mode: ChallengeSaveMode; summary: CircleSummary | null; link: string; linkChecked: boolean };
 
 /** Invite a Friend: personal link, the 7-day Together challenge, and badges for both friends. */
 export function FriendsView({ productionSite }: { productionSite: boolean }) {
@@ -41,7 +41,7 @@ export function FriendsView({ productionSite }: { productionSite: boolean }) {
   const account = useAccount();
   const userId = account.phase === "ready" ? account.userId : null;
   const today = useSyncExternalStore(subscribeNoop, () => localISODate(), () => "");
-  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [loaded, setFriendsData] = useState<FriendsData | null>(null);
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -58,7 +58,7 @@ export function FriendsView({ productionSite }: { productionSite: boolean }) {
       if (cancelled) return;
       const origin = productionSite ? PRODUCTION_SITE_ORIGIN : resolveShareOrigin(false, window.location.origin);
       const token = invitation && invitation.ok ? (invitation.value.active?.token ?? "") : "";
-      setLoaded({
+      setFriendsData({
         state: challenge.state,
         mode: challenge.mode,
         summary,
@@ -90,19 +90,15 @@ export function FriendsView({ productionSite }: { productionSite: boolean }) {
   }
 
   const data = loaded ?? { state: emptyChallenge(), mode: "device" as const, summary: null, link: "", linkChecked: false };
-  const { state, summary } = data;
-  const earned = earnedBadges(summary, state);
-  const day = Math.min(challengeDay(state, today), CHALLENGE_LENGTH);
-  const upNext = nextStep(state, today);
 
   async function update(next: FriendChallenge) {
     if (!userId) return;
-    setLoaded((current) => (current ? { ...current, state: next } : current));
+    setFriendsData((current) => (current ? { ...current, state: next } : current));
     setSaving(true);
     const mode = await saveChallenge(userId, next);
     const fresh = await loadCircleSummary();
     setSaving(false);
-    setLoaded((current) => (current ? { ...current, mode, summary: fresh ?? current.summary } : current));
+    setFriendsData((current) => (current ? { ...current, mode, summary: fresh ?? current.summary } : current));
   }
 
   async function copyLink() {
@@ -113,6 +109,31 @@ export function FriendsView({ productionSite }: { productionSite: boolean }) {
       setCopied(false);
     }
   }
+
+  return <FriendsPanel data={data} today={today} saving={saving} copied={copied} onUpdate={update} onCopy={copyLink} />;
+}
+
+/** The page body. It only shows what it is given, so it can be checked with made-up counts. */
+export function FriendsPanel({
+  data,
+  today,
+  saving,
+  copied,
+  onUpdate: update,
+  onCopy: copyLink,
+}: {
+  data: FriendsData;
+  today: string;
+  saving: boolean;
+  copied: boolean;
+  onUpdate: (next: FriendChallenge) => void | Promise<void>;
+  onCopy: () => void | Promise<void>;
+}) {
+  const t = useT();
+  const { state, summary } = data;
+  const earned = earnedBadges(summary, state);
+  const day = Math.min(challengeDay(state, today), CHALLENGE_LENGTH);
+  const upNext = nextStep(state, today);
 
   return (
     <div className="stack-lg fr">

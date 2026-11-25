@@ -57,6 +57,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [PAGE_BACKGROUNDS.md](PAGE_BACKGROUNDS.md) | Page backgrounds: Calm Blue, Soft Rose, Classic Ivory, the Automatic rule, contrast limits |
 | [HEALTH_ENCYCLOPEDIA.md](HEALTH_ENCYCLOPEDIA.md) | Health Encyclopedia and LifeZoi AI: content rules, editorial workflow, migration, AI library mode, free-model research, and what is not done yet |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
+| [INVITE_A_FRIEND.md](INVITE_A_FRIEND.md) | Invite a Friend at `/friends`: personal link, 7-day Together challenge, friend badges, friend_challenge table and counts-only summary |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |
 
 ## Recommended reading order
