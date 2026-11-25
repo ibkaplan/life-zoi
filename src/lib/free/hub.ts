@@ -58,6 +58,13 @@ export const FREE_HUB: readonly HubEntry[] = [
     icon: "❤️",
     group: "calculators",
   },
+  {
+    href: "/free/health-age",
+    title: msg("How young are your habits?"),
+    summary: msg("A 2-minute check of seven everyday habits, with a result card you can share."),
+    icon: "🌱",
+    group: "discover",
+  },
 ];
 
 export function hubGroup(group: HubGroup): HubEntry[] {
