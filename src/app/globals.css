@@ -3886,6 +3886,190 @@ body::before {
   .look-swatch { width: 2.4rem; height: 1.9rem; }
 }
 
+/*
+ * Reading comfort (Settings › Text size and layout, and the "Aa" button in the header).
+ * <html data-text="large|extra"> raises the root size, so everything set in rem grows with it.
+ * <html data-calm="on"> is a calmer, simpler page: no decorative pictures or backdrops, no moving
+ * effects, more space between parts, clearer card edges, and underlined links in text.
+ * Neither changes a text colour, so every contrast ratio stays as it is (AA or better).
+ * See docs/claude-migration/READING_COMFORT.md.
+ */
+:root[data-text="large"] { font-size: 112.5%; }
+:root[data-text="extra"] { font-size: 125%; }
+
+/* Larger text gets a page widened by the same factor, so lines and the header keep their shape. */
+:root[data-text="large"] .page { width: min(1215px, calc(100% - 2rem)); }
+:root[data-text="extra"] .page { width: min(1350px, calc(100% - 2rem)); }
+
+/*
+ * The one-line main menu. At normal size it appears at 1000px and grows a step at 1160px.
+ * With larger text both points move up by the same factor (x1.125 and x1.25), so the row has
+ * exactly the room it has at normal size and never wraps. Below that, larger text uses the
+ * Home, Dashboard, Movement and Menu bar that phones and tablets already use.
+ */
+@media (min-width: 1000px) and (max-width: 1124.98px) {
+  :root[data-text="large"] .site-nav-wide, :root[data-text="large"] .site-subnav-wide { display: none; }
+  :root[data-text="large"] .site-nav-quick { display: flex; }
+  :root[data-text="large"] .site-menu { display: block; }
+  :root[data-text="large"] .site-menu[hidden] { display: none; }
+  :root[data-text="large"] .site-subnav-phone { display: block; }
+}
+@media (min-width: 1000px) and (max-width: 1249.98px) {
+  :root[data-text="extra"] .site-nav-wide, :root[data-text="extra"] .site-subnav-wide { display: none; }
+  :root[data-text="extra"] .site-nav-quick { display: flex; }
+  :root[data-text="extra"] .site-menu { display: block; }
+  :root[data-text="extra"] .site-menu[hidden] { display: none; }
+  :root[data-text="extra"] .site-subnav-phone { display: block; }
+}
+@media (min-width: 1160px) and (max-width: 1304.98px) {
+  :root[data-text="large"] .site-nav-wide a { padding: 0.4rem 0.55rem; font-size: 1rem; }
+}
+@media (min-width: 1160px) and (max-width: 1449.98px) {
+  :root[data-text="extra"] .site-nav-wide a { padding: 0.4rem 0.55rem; font-size: 1rem; }
+}
+
+/* Header "Aa" button and panel. */
+.display-switch { position: relative; }
+.site-account .display-button {
+  min-width: 44px;
+  justify-content: center;
+  padding: 0.4rem 0.6rem;
+  border-color: var(--lavender-brand);
+  background: var(--ivory);
+  color: var(--royal);
+  font-family: var(--font-display-family), Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.display-button-big { font-size: 1.35em; margin-left: 0.04em; }
+.site-account .display-button:hover { background: var(--lavender); }
+.site-account .display-button[aria-expanded="true"] { background: var(--lavender); border-color: var(--royal); }
+.display-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 50;
+  width: min(22rem, calc(100vw - 2rem));
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(23, 37, 84, 0.16);
+}
+.display-panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+/* Three size choices, each with an "Aa" drawn at its size. */
+.text-size-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.text-size-choice {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: 0.25rem;
+  min-height: 5.5rem;
+  padding: 0.6rem 0.4rem;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+  cursor: pointer;
+}
+.text-size-choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.text-size-choice:has(input:checked) { border-color: var(--royal); background: var(--sky); box-shadow: inset 0 -4px 0 var(--royal); }
+.text-size-choice:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+.text-size-sample { font-family: var(--font-display-family), Georgia, serif; font-weight: 600; line-height: 1; color: var(--heading); }
+.text-size-name { font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.text-size-choices-compact .text-size-choice { min-height: 4.75rem; }
+.text-size-choices-compact .text-size-name { font-size: 0.95rem; }
+
+.calm-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.75rem;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+}
+.calm-toggle:has(input:checked) { border-color: var(--royal); background: var(--sky); }
+.calm-toggle input { width: 1.5rem; height: 1.5rem; margin: 0.1rem 0 0; accent-color: var(--royal); }
+.calm-toggle-text { display: grid; gap: 0.2rem; }
+
+@media (max-width: 640px) {
+  /* On phones the panel opens across the whole header, under the top row, and scrolls if needed. */
+  .display-panel {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    top: var(--display-panel-top, 4.5rem);
+    width: auto;
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+  /* Sizes as a list: the sample and the name side by side, so long words never break. */
+  .text-size-choices-compact { grid-template-columns: 1fr; }
+  .text-size-choices-compact .text-size-choice {
+    min-height: 3.25rem;
+    grid-template-columns: 3.5rem 1fr;
+    justify-items: start;
+    align-items: center;
+    text-align: left;
+    padding: 0.4rem 0.75rem;
+  }
+}
+@media (max-width: 480px) {
+  /* Settings page on phones: the same list, for the same reason. */
+  .text-size-choices { grid-template-columns: 1fr; }
+  .text-size-choice {
+    min-height: 3.25rem;
+    grid-template-columns: 3.5rem 1fr;
+    justify-items: start;
+    align-items: center;
+    text-align: left;
+    padding: 0.4rem 0.75rem;
+  }
+}
+
+/* Phones with larger text: the logo gets its own line, so Log in and the buttons never run off the screen. */
+@media (max-width: 640px) {
+  :root[data-text] .site-header { grid-template-columns: 1fr; grid-template-areas: "brand" "account" "nav" "sub"; }
+  :root[data-text] .site-account { justify-content: flex-start; flex-wrap: wrap; row-gap: 0.35rem; }
+}
+
+/* Calm layout. */
+:root[data-calm="on"] body { background: var(--bg); line-height: 1.7; }
+:root[data-calm="on"] body::before { display: none; }
+:root[data-calm="on"] *,
+:root[data-calm="on"] *::before,
+:root[data-calm="on"] *::after {
+  animation-duration: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0s !important;
+  scroll-behavior: auto !important;
+}
+:root[data-calm="on"] :is(
+  .lz-photo, .page-photo, .home-hero-photo, .lz-art, .lz-mascot, .lz-topic-media,
+  .ency-hero-illustration, .fact-today-art, .fact-card-art, .mind-card-art, .mind-article-art,
+  .matter-art, .lzd-hero-art, .lzd-idea-art, .lzd-more-art
+) { display: none !important; }
+:root[data-calm="on"] :is(.home-hero, .lz-hero-row, .care-hero, .lzd-hero) { grid-template-columns: 1fr; }
+:root[data-calm="on"] :is(.card, .lz-card, .lzd-hero) { box-shadow: none; border-color: #B7A8D9; background-image: none; }
+:root[data-calm="on"] .stack { gap: 1.35rem; }
+:root[data-calm="on"] .stack-lg { gap: 1.85rem; }
+:root[data-calm="on"] main :is(p, li, dd, td) > a:not([class]) { text-decoration: underline; text-underline-offset: 0.18em; }
+
+@media print {
+  :root[data-text] { font-size: 100%; }
+}
 /* Health tips (public blog at /blog). */
 .site-account a.public-tips-link { font-weight: 650; text-decoration: none; }
 .site-account a.public-tips-link[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.25em; }

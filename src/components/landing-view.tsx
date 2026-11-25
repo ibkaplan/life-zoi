@@ -4,20 +4,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
+import { FreeCards } from "@/components/free/free-hub";
 import { useMessages, useT } from "@/components/locale-provider";
 import { PublicFooter, PublicHeader } from "@/components/public-shell";
+import { hubGroup } from "@/lib/free/hub";
 import { inviteTokenFromInput } from "@/lib/invitations/link";
 
 /**
  * The public landing page, the only feature-free page a visitor sees.
  * Logo, an introductory image, a short description, Log in, and how to join by invitation.
- * It links to no members' feature, only to the public Health tips: everything else needs a signed-in member.
+ * Members' features need a signed-in member. The only other links are the free
+ * public tools under /free (src/lib/free/hub.ts) and the public Health tips under /blog,
+ * which need no account.
  */
 export function LandingView() {
   const m = useMessages();
-  const t = useT();
   const h = m.home;
   const a = m.access;
+  const t = useT();
   const router = useRouter();
   const fieldId = useId();
   const [value, setValue] = useState("");
@@ -55,6 +59,18 @@ export function LandingView() {
               alt={h.heroAlt}
             />
           </figure>
+        </section>
+
+        <section className="page stack landing-free" aria-labelledby="landing-free-title">
+          <div className="stack">
+            <p className="kicker">{t("Free for everyone")}</p>
+            <h2 id="landing-free-title">{t("Try our free health calculators")}</h2>
+            <p>{t("No account needed. Nothing you type is sent or saved.")}</p>
+          </div>
+          <FreeCards entries={hubGroup("calculators")} />
+          <p>
+            <Link href="/free">{t("See all free tools")} →</Link>
+          </p>
         </section>
 
         <section className="page landing-tips" aria-labelledby="landing-tips-title">

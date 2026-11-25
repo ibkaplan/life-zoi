@@ -9,6 +9,15 @@ describe("members-only gate", () => {
     expect(decideGate({ pathname: "/sign-in/", status: "signed-out" })).toEqual({ kind: "next" });
   });
 
+  it("lets a visitor open every free tool under /free, and nothing that only starts with the same letters", () => {
+    for (const path of ["/free", "/free/", "/free/calorie-calculator", "/free/blood-pressure"]) {
+      expect(isPublicPath(path)).toBe(true);
+      expect(decideGate({ pathname: path, status: "signed-out" })).toEqual({ kind: "next" });
+    }
+    expect(isPublicPath("/freedom")).toBe(false);
+    expect(decideGate({ pathname: "/freebies", status: "signed-out" }).kind).toBe("redirect");
+  });
+
   it("opens Health tips and the search-engine files to visitors, and nothing that only starts the same way", () => {
     for (const path of ["/blog", "/blog/", "/blog/small-walks-add-up", "/sitemap.xml", "/robots.txt"]) {
       expect(decideGate({ pathname: path, status: "signed-out" }), path).toEqual({ kind: "next" });

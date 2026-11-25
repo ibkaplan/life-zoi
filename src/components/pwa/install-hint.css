@@ -1,0 +1,23 @@
+/* Install hint: a calm card under the page banners. Wraps to a column on phones. */
+.install-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.install-hint-icon { flex: none; width: 44px; height: 44px; border-radius: 12px; }
+.install-hint-text { flex: 1 1 auto; min-width: 0; }
+.install-hint-text p { margin: 0; color: var(--muted); }
+.install-hint-text .install-hint-title { color: var(--heading); font-weight: 700; }
+.install-hint-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; flex: none; }
+@media (max-width: 640px) {
+  .install-hint { flex-wrap: wrap; align-items: flex-start; }
+  .install-hint-text { flex-basis: calc(100% - 44px - 0.9rem); }
+  .install-hint-actions { width: 100%; }
+  .install-hint-actions .btn { flex: 1 1 auto; }
+}
+.install-hint.home-install { margin-top: 1rem; margin-bottom: 0.5rem; }

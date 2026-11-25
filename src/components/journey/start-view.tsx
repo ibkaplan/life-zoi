@@ -5,6 +5,7 @@ import "@/components/journey/journey.css";
 import { usePageFormat } from "@/components/page-format";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
+import { FriendsTeaser } from "@/components/friends/friends-teaser";
 import { journeySteps } from "@/lib/journey";
 import { assessmentHasAnswers } from "@/lib/labels";
 
@@ -61,6 +62,8 @@ export function StartView() {
           <li>{t("Your questionnaire answers are not sent to any AI service.")}</li>
         </ul>
       </section>
+
+      <FriendsTeaser />
 
       <p>
         <Link className="btn btn-secondary" href="/dashboard">
