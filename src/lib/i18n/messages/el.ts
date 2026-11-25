@@ -206,6 +206,7 @@ export const el: Messages = {
     menu: "Μενού",
     closeMenu: "Κλείσιμο μενού",
     sectionPages: "Σελίδες αυτής της ενότητας",
+    morePages: "Περισσότερα",
     allSections: "Όλες οι ενότητες",
     finishSignIn: "Ολοκλήρωση σύνδεσης",
     allPages: "Όλες οι σελίδες",

@@ -372,7 +372,8 @@ html:lang(el) :where(h1, h2, h3, .btn, .home-btn, .card, .lz-card, dt, dd, legen
 .site-menu-pages { display: flex; flex-wrap: wrap; gap: 0.2rem; padding: 0 0.25rem 0.2rem; }
 .site-nav .site-menu-pages a { min-height: 44px; font-weight: 600; white-space: normal; padding: 0.3rem 0.7rem; }
 
-/* Pages of the current section. Wraps; never hides an item. */
+/* Pages of the current section. Phones: a fold-out list. Wide screens: one line; pages that do not
+   fit move into a "More" list at the end (WideSubnav in site-nav.tsx), so no page is ever hidden. */
 .site-subnav {
   grid-area: sub;
   display: flex;
@@ -387,6 +388,56 @@ html:lang(el) :where(h1, h2, h3, .btn, .home-btn, .card, .lz-card, dt, dd, legen
 }
 
 .site-subnav a { font-weight: 600; min-height: 40px; padding: 0.3rem 0.75rem; white-space: normal; }
+.site-subnav-wide { position: relative; flex-wrap: nowrap; }
+.site-subnav-wide > a { white-space: nowrap; }
+.site-subnav-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+  height: 0;
+  overflow: hidden;
+}
+.site-subnav-measure-item { font-weight: 600; padding: 0.3rem 0.75rem; }
+.site-subnav-more-list { position: relative; flex: 0 0 auto; margin-left: auto; }
+.site-subnav-more-list > summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.site-subnav-more-list > summary::-webkit-details-marker { display: none; }
+.site-subnav-more-list > summary::after { content: "\00a0▾"; }
+.site-subnav-more-list[open] > summary::after { content: "\00a0▴"; }
+.site-subnav-more-list > summary:hover { background: var(--lavender); }
+.site-subnav-more-list:has(a[aria-current="page"]) > summary { background: var(--sage); box-shadow: inset 0 -3px 0 var(--forest); }
+.site-subnav-more-list > ul {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 40;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  min-width: 15rem;
+  display: grid;
+  gap: 0.15rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.site-subnav-more-list li { margin: 0; }
+.site-subnav-more-list ul a { display: flex; width: 100%; justify-content: flex-start; white-space: normal; }
 
 .site-subnav-label {
   flex: 0 0 auto;

@@ -208,6 +208,7 @@ export const en = {
     menu: "Menu",
     closeMenu: "Close menu",
     sectionPages: "Pages in this section",
+    morePages: "More",
     allSections: "All sections",
     finishSignIn: "Finish sign-in",
     allPages: "All pages",
