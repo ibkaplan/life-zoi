@@ -61,6 +61,8 @@ export const NAV_SECTIONS: readonly NavSection[] = [
       { href: "/what-if", label: "WHAT IF?" },
       { href: "/lab-results", label: "Understand My Lab Results" },
       { href: "/my-health/diary", label: "Health diary" },
+  { href: "/free", label: "Free health calculators" },
+      { href: "/free", label: "Free health calculators" },
       { href: "/change-lab", label: "Change Lab" },
       { href: "/ai-assistant", label: "Wellness Assistant" },
       { href: "/life-matters", label: "Your Life Matters" },
