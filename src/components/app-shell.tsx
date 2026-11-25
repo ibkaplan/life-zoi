@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SittingReminder } from "@/components/movement-breaks/tracker";
+import { TimedReminderBanner } from "@/components/reminders/reminder-banner";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
 import { PageListen } from "@/components/voice/page-listen";
@@ -52,6 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : null}
         <SittingReminder />
         <InstallHint />
+        <TimedReminderBanner />
         <PageListen pathname={pathname} />
         {children}
         <footer className="footer-note">
