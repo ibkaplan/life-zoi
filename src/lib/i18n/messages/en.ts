@@ -9,6 +9,13 @@ export const en = {
     menuLabel: "Choose a language",
     current: "Current language: {language}",
   },
+  install: {
+    title: "Add lifeZoi to your home screen",
+    body: "Open lifeZoi like an app, in its own window. Your pages still load from the internet and nothing private is kept on the phone.",
+    iosSteps: "In Safari, tap the Share button, then Add to Home Screen.",
+    install: "Install",
+    notNow: "Not now",
+  },
   music: {
     headerLabel: "Background music",
     headerPlaying: "Background music is playing. Open music controls.",
