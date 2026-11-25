@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
-import { PUBLIC_APIS, PUBLIC_PAGES } from "@/lib/auth/public-paths";
+import { PUBLIC_APIS, PUBLIC_PAGES, PUBLIC_PREFIXES } from "@/lib/auth/public-paths";
 
 const APP = join(process.cwd(), "src", "app");
 
@@ -49,6 +49,8 @@ describe("every page and API is members-only unless it is on the public list", (
       const url = urlOf(file);
       if (rel.startsWith("(members)/")) continue;
       if (rel.startsWith("(public)/") || rel === "page.tsx") {
+        // Whole public areas such as /free are listed by prefix, not page by page.
+        if (PUBLIC_PREFIXES.some((prefix) => url === prefix || url.startsWith(`${prefix}/`))) continue;
         publicPages.add(url);
         continue;
       }

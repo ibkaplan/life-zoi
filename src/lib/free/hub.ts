@@ -58,6 +58,13 @@ export const FREE_HUB: readonly HubEntry[] = [
     icon: "❤️",
     group: "calculators",
   },
+  {
+    href: "/free/meet",
+    title: msg("Meet LifeZoi"),
+    summary: msg("Hear the voice companion in a two-minute sample conversation."),
+    icon: "🎙️",
+    group: "discover",
+  },
 ];
 
 export function hubGroup(group: HubGroup): HubEntry[] {
