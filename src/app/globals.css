@@ -3885,3 +3885,44 @@ body::before {
 @media (max-width: 520px) {
   .look-swatch { width: 2.4rem; height: 1.9rem; }
 }
+
+/* Health tips (public blog at /blog). */
+.site-account a.public-tips-link { font-weight: 650; text-decoration: none; }
+.site-account a.public-tips-link[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.25em; }
+@media (max-width: 479px) { .site-account a.public-tips-link { display: none; } }
+.landing-tips .card { max-width: 44rem; }
+.blog-lead { font-size: 1.2rem; max-width: 62ch; }
+.blog-notice { max-width: 62ch; }
+.blog-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.blog-card { display: grid; gap: 0.5rem; align-content: start; }
+.blog-card p { margin: 0; }
+.blog-card-title { font-size: 1.35rem; }
+.blog-card-title a { color: var(--heading); text-decoration: none; }
+.blog-card-title a:hover, .blog-card-title a:focus-visible { text-decoration: underline; }
+.blog-article h2 { font-size: clamp(1.35rem, 2vw, 1.7rem); }
+.blog-article p { margin: 0; line-height: 1.65; }
+.blog-try ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.blog-video { margin: 0; display: grid; gap: 0.6rem; }
+.blog-video figcaption { display: grid; gap: 0.25rem; }
+.blog-video-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
+.blog-video-start {
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 16px;
+  background: var(--deep);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 650;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+.blog-video-play { font-size: 2rem; line-height: 1; }
+.blog-share { display: grid; gap: 0.5rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.blog-share-title { margin: 0; font-weight: 650; }
+.blog-share-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.blog-join { max-width: 44rem; }

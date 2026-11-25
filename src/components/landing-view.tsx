@@ -4,17 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
-import { useMessages } from "@/components/locale-provider";
+import { useMessages, useT } from "@/components/locale-provider";
 import { PublicFooter, PublicHeader } from "@/components/public-shell";
 import { inviteTokenFromInput } from "@/lib/invitations/link";
 
 /**
  * The public landing page, the only feature-free page a visitor sees.
  * Logo, an introductory image, a short description, Log in, and how to join by invitation.
- * It links to no feature: everything else needs a signed-in member.
+ * It links to no members' feature, only to the public Health tips: everything else needs a signed-in member.
  */
 export function LandingView() {
   const m = useMessages();
+  const t = useT();
   const h = m.home;
   const a = m.access;
   const router = useRouter();
@@ -54,6 +55,18 @@ export function LandingView() {
               alt={h.heroAlt}
             />
           </figure>
+        </section>
+
+        <section className="page landing-tips" aria-labelledby="landing-tips-title">
+          <div className="card stack">
+            <h2 id="landing-tips-title">{t("Free health tips for everyone")}</h2>
+            <p>{t("Short articles about walking, sleep, water, food, stress, and staying in touch, each linked to public health guidance. No account needed.")}</p>
+            <div className="actions">
+              <Link className="btn btn-primary" href="/blog">
+                {t("Read health tips")}
+              </Link>
+            </div>
+          </div>
         </section>
 
         <section id="invitation" className="page landing-invite" aria-labelledby="landing-invite-title">

@@ -10,7 +10,8 @@ import { sources } from "@/lib/sources";
 
 /**
  * Header for visitors. It shows only the logo, the language picker, and Log in.
- * No feature is linked here: members get the full navigation after signing in.
+ * No members' feature is linked here: members get the full navigation after signing in.
+ * Health tips is public, so it sits beside Log in.
  */
 export function PublicHeader() {
   const pathname = usePathname() ?? "/";
@@ -23,6 +24,9 @@ export function PublicHeader() {
         <Logo />
       </div>
       <div className="site-account">
+        <Link className="public-tips-link" href="/blog" aria-current={pathname.startsWith("/blog") ? "page" : undefined}>
+          {m.nav["/blog"]}
+        </Link>
         <LanguageSwitcher />
         {account.phase === "ready" ? (
           <Link className="site-signin" href="/">
@@ -48,6 +52,7 @@ export function PublicFooter() {
       </p>
       <nav className="footer-links" aria-label={m.access.publicLinks}>
         <Link href="/">{m.access.home}</Link>
+        <Link href="/blog">{m.nav["/blog"]}</Link>
         <Link href="/sign-in">{m.access.logIn}</Link>
         <Link href="/privacy">{m.access.privacy}</Link>
       </nav>

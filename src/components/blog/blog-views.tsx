@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useLocale, useT } from "@/components/locale-provider";
+import { useLocale, useMessages, useT } from "@/components/locale-provider";
 import { SourceList } from "@/components/sources";
 import { BLOG_ARTICLES, BLOG_VIDEOS, type BlogArticle, type BlogVideo } from "@/lib/blog/articles";
 import { parseVideoLink } from "@/lib/blog/video-link";
@@ -17,16 +17,17 @@ function publishedLabel(iso: string, htmlLang: string): string {
 
 function JoinNote() {
   const t = useT();
+  const a = useMessages().access;
   return (
     <aside className="card stack blog-join" aria-label={t("About lifeZoi")}>
       <h2>{t("Want a calm place to keep track?")}</h2>
       <p>{t("LifeZoi members can reflect on their habits, try a WHAT IF? change, and record small steps. Membership is by invitation.")}</p>
       <div className="actions">
         <Link className="btn btn-primary" href="/sign-in">
-          {t("Log in")}
+          {a.logIn}
         </Link>
         <Link className="btn btn-secondary" href="/#invitation">
-          {t("I have an invitation")}
+          {a.haveInvitation}
         </Link>
       </div>
     </aside>
@@ -109,7 +110,7 @@ export function BlogIndexView() {
       </header>
 
       <section aria-labelledby="blog-articles">
-        <h2 id="blog-articles" className="visually-hidden">
+        <h2 id="blog-articles" className="sr-only">
           {t("Articles")}
         </h2>
         <ul className="blog-grid">
