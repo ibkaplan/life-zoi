@@ -4,7 +4,7 @@ import "./meet-demo.css";
 import Link from "next/link";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
-import { useSpeechSupport, useVoiceState } from "@/components/voice/read-aloud";
+import { useSpeechSupport } from "@/components/voice/read-aloud";
 import { captionMs, MEET_DEMO, progressLabel, type DemoTurn } from "@/lib/meet-demo/script";
 import type { Locale } from "@/lib/i18n/config";
 import { player, primeSpeech } from "@/lib/voice/engine";
@@ -54,7 +54,6 @@ function Demo({ locale }: { locale: Locale }) {
   const copy = MEET_DEMO[locale];
   const total = copy.turns.length;
   const supported = useSpeechSupport();
-  const voice = useVoiceState();
   const [state, dispatch] = useReducer(reduce, { phase: "idle", index: -1 });
   const [sound, setSound] = useState(true);
   const [noVoice, setNoVoice] = useState(false);
@@ -63,7 +62,8 @@ function Demo({ locale }: { locale: Locale }) {
 
   const captionsOnly = !sound || supported === false || noVoice;
   const turn = state.index >= 0 ? copy.turns[state.index] : null;
-  const speaking = voice.owner === OWNER && voice.status === "playing";
+  // LifeZoi's turn: the orb moves whether the line is spoken or shown as captions.
+  const speaking = state.phase === "playing" && turn?.speaker === "zoi";
   const listening = state.phase === "playing" && turn?.speaker === "you";
 
   const advance = useCallback(() => dispatch({ type: "advance", total }), [total]);
@@ -147,7 +147,7 @@ function Demo({ locale }: { locale: Locale }) {
 
   const shown = state.index >= 0 ? copy.turns.slice(0, state.index + 1) : [];
   const status =
-    state.phase === "done" ? copy.finished : listening ? copy.listening : speaking || (state.phase === "playing" && !captionsOnly) ? copy.speaking : copy.ready;
+    state.phase === "done" ? copy.finished : listening ? copy.listening : speaking ? copy.speaking : copy.ready;
 
   return (
     <div className="meet-demo">

@@ -92,7 +92,7 @@
   text-align: center;
 }
 .md-caption-who { font-size: 0.95rem; font-weight: 700; color: #F2B65D; }
-.md-caption-text { font-size: clamp(1.1rem, 1rem + 0.6vw, 1.35rem); line-height: 1.45; color: #fff; overflow-wrap: anywhere; }
+.md-caption-text { hyphens: manual; font-size: clamp(1.1rem, 1rem + 0.6vw, 1.35rem); line-height: 1.45; color: #fff; overflow-wrap: anywhere; }
 .md-caption-wait { color: #E4D8F8; font-style: italic; }
 
 .md-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.75rem; }
@@ -139,7 +139,7 @@
   gap: 0.3rem;
   animation: md-in 0.35s ease-out;
 }
-.md-bubble p { margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.md-bubble p { margin: 0; hyphens: manual; line-height: 1.5; overflow-wrap: anywhere; }
 .md-zoi { justify-self: start; background: var(--lavender); border-bottom-left-radius: 6px; color: var(--ink); }
 .md-you { justify-self: end; background: #E4F1EE; border-bottom-right-radius: 6px; color: var(--ink); }
 .md-who { font-size: 0.95rem; font-weight: 700; color: var(--teal); }
