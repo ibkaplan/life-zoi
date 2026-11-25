@@ -50,6 +50,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
 | [HEALTH_AGE_QUIZ.md](HEALTH_AGE_QUIZ.md) | Public 2-minute “What is your health age?” check at `/free/health-age`: the one-year rule, what is never stored, share card, owner decision 2026-11-25 |
+| [READING_COMFORT.md](READING_COMFORT.md) | Text size (normal, large, extra large) and the calm layout: the "Aa" header button, Settings, saved on the device and in companion_state, and how the one-line desktop menu stays on one line |
 | [HEALTH_DIARY.md](HEALTH_DIARY.md) | Blood pressure, sugar & cholesterol diary at `/my-health/diary`: what the site cannot measure, ranges and sources, safety notes, health_readings table, export and delete |
 | [FREE_TOOLS.md](FREE_TOOLS.md) | Free public calculators under `/free`: calories, water, sleep, blood pressure ranges; sources, SEO, the shared hub list |
 | [REMINDERS.md](REMINDERS.md) | My reminders at `/my-health/reminders`: timed reminders for blood pressure, blood sugar, and daily habits; banner and optional browser notification; browser storage only, no migration |

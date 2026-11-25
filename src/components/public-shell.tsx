@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DisplayButton } from "@/components/display-prefs";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useMessages, useT } from "@/components/locale-provider";
 import { Logo } from "@/components/logo";
@@ -27,6 +28,7 @@ export function PublicHeader() {
         <Link className="public-free-link" href="/free" aria-current={pathname.startsWith("/free") ? "page" : undefined}>
           {t("Free tools")}
         </Link>
+        <DisplayButton />
         <LanguageSwitcher />
         {account.phase === "ready" ? (
           <Link className="site-signin" href="/">

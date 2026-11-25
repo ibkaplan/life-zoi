@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Fraunces, Noto_Serif, Source_Sans_3 } from "next/font/google";
 import { AppearanceSync } from "@/components/appearance";
+import { DisplaySync } from "@/components/display-prefs";
 import { BackgroundMusicProvider } from "@/components/background-music/provider";
 import { LocaleProvider } from "@/components/locale-provider";
 import { SkipLink, TitleSync } from "@/components/localized-text";
@@ -10,6 +11,7 @@ import { VoiceRouteGuard } from "@/components/voice/voice-route-guard";
 import { GuidedProvider } from "@/components/guided/guided-provider";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 import { LOOK_BOOT_SCRIPT } from "@/lib/appearance";
+import { DISPLAY_BOOT_SCRIPT } from "@/lib/display-prefs";
 import { LOCALE_BOOT_SCRIPT } from "@/lib/i18n/boot-script";
 import { APP_NAME, THEME_COLOR } from "@/lib/pwa/config";
 import "./globals.css";
@@ -70,6 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: LOOK_BOOT_SCRIPT }} />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <script dangerouslySetInnerHTML={{ __html: DISPLAY_BOOT_SCRIPT }} />
       </head>
       <body>
         <LocaleProvider>
@@ -82,6 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <BackgroundMusicProvider>
             <SessionProvider>
               <AppearanceSync />
+              <DisplaySync />
               <GuidedProvider>{children}</GuidedProvider>
             </SessionProvider>
           </BackgroundMusicProvider>
