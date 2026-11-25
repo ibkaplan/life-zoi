@@ -3897,10 +3897,36 @@ body::before {
 :root[data-text="large"] { font-size: 112.5%; }
 :root[data-text="extra"] { font-size: 125%; }
 
-/* Larger text needs a little more width so lines and the header keep their shape. */
-:root[data-text="large"] .page { width: min(1200px, calc(100% - 2rem)); }
-:root[data-text="extra"] .page { width: min(1320px, calc(100% - 2rem)); }
-:root[data-text="extra"] .page.narrow, :root[data-text="extra"] .narrow { width: min(860px, 100%); }
+/* Larger text gets a page widened by the same factor, so lines and the header keep their shape. */
+:root[data-text="large"] .page { width: min(1215px, calc(100% - 2rem)); }
+:root[data-text="extra"] .page { width: min(1350px, calc(100% - 2rem)); }
+
+/*
+ * The one-line main menu. At normal size it appears at 1000px and grows a step at 1160px.
+ * With larger text both points move up by the same factor (x1.125 and x1.25), so the row has
+ * exactly the room it has at normal size and never wraps. Below that, larger text uses the
+ * Home, Dashboard, Movement and Menu bar that phones and tablets already use.
+ */
+@media (min-width: 1000px) and (max-width: 1124.98px) {
+  :root[data-text="large"] .site-nav-wide, :root[data-text="large"] .site-subnav-wide { display: none; }
+  :root[data-text="large"] .site-nav-quick { display: flex; }
+  :root[data-text="large"] .site-menu { display: block; }
+  :root[data-text="large"] .site-menu[hidden] { display: none; }
+  :root[data-text="large"] .site-subnav-phone { display: block; }
+}
+@media (min-width: 1000px) and (max-width: 1249.98px) {
+  :root[data-text="extra"] .site-nav-wide, :root[data-text="extra"] .site-subnav-wide { display: none; }
+  :root[data-text="extra"] .site-nav-quick { display: flex; }
+  :root[data-text="extra"] .site-menu { display: block; }
+  :root[data-text="extra"] .site-menu[hidden] { display: none; }
+  :root[data-text="extra"] .site-subnav-phone { display: block; }
+}
+@media (min-width: 1160px) and (max-width: 1304.98px) {
+  :root[data-text="large"] .site-nav-wide a { padding: 0.4rem 0.55rem; font-size: 1rem; }
+}
+@media (min-width: 1160px) and (max-width: 1449.98px) {
+  :root[data-text="extra"] .site-nav-wide a { padding: 0.4rem 0.55rem; font-size: 1rem; }
+}
 
 /* Header "Aa" button and panel. */
 .display-switch { position: relative; }
