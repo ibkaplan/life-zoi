@@ -1,0 +1,280 @@
+/*
+ * My Streaks & Achievements. Phone first, large type, and the shared surface,
+ * line, and radius tokens so every page background works.
+ */
+
+.ach {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+.ach h2 {
+  margin: 0;
+}
+
+.ach-kicker {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-size: 0.95rem;
+}
+
+.ach-hero {
+  display: grid;
+  gap: 0.9rem;
+  border-radius: calc(var(--radius) + 6px);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(242, 182, 93, 0.28), transparent 42%),
+    radial-gradient(circle at 6% 96%, rgba(47, 143, 131, 0.18), transparent 46%),
+    linear-gradient(135deg, var(--lavender), var(--surface));
+}
+
+.ach-hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  line-height: 1.12;
+  color: var(--heading);
+}
+
+.ach-lede,
+.ach-note,
+.ach-small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.ach-note,
+.ach-small {
+  font-size: 1rem;
+}
+
+.ach-message {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ach-stats {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+@media (min-width: 760px) {
+  .ach-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.ach-stat {
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 0.7rem 0.85rem;
+}
+
+.ach-stat dt {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.ach-stat dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.ach-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 3vw, 1.4rem);
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.ach-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.ach-badges {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+}
+
+.ach-badge {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  padding: 0.85rem 1rem;
+}
+
+.ach-badge.is-earned {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--teal) 45%, var(--line));
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.ach-badge-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: var(--sky);
+  font-size: 1.35rem;
+}
+
+.ach-badge:not(.is-earned) .ach-badge-icon {
+  filter: grayscale(0.8);
+  opacity: 0.75;
+}
+
+.ach-badge-body {
+  display: grid;
+  gap: 0.15rem;
+  color: var(--muted);
+}
+
+.ach-badge-body strong {
+  color: var(--ink);
+}
+
+.ach-badge-meta {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.ach-areas {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+.ach-area-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ach-area-head h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--heading);
+}
+
+.ach-mini {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.8rem;
+  margin: 0;
+}
+
+.ach-mini dt {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.ach-mini dd {
+  margin: 0;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.ach-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ach-chips li {
+  font-size: 0.95rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.ach-chips li.is-earned {
+  border-color: color-mix(in srgb, var(--teal) 50%, var(--line));
+  background: var(--sky);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ach-area-link {
+  justify-self: start;
+}
+
+.ach-cal {
+  display: grid;
+  gap: 0.3rem;
+  max-width: 34rem;
+}
+
+.ach-cal-row {
+  display: grid;
+  grid-template-columns: 4.6rem repeat(7, minmax(0, 1fr));
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.ach-cal-week,
+.ach-cal-name {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.ach-cal-name {
+  text-align: center;
+}
+
+.ach-cal-day {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.ach-cal-day.is-active {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.ach-cal-day.is-today {
+  outline: 2px solid var(--royal);
+  outline-offset: 1px;
+}
+
+.ach-cal-day.is-future {
+  border-style: dashed;
+  opacity: 0.4;
+}

@@ -62,6 +62,9 @@ export function ProgressView() {
           <Link className="btn btn-primary" href="/progress/weekly">
             {t("Weekly check-in and reports")}
           </Link>
+          <Link className="btn btn-secondary" href="/progress/achievements">
+            {t("My Streaks & Achievements")}
+          </Link>
         </p>
       </div>
       <WeeklyProgress />

@@ -260,6 +260,7 @@ export const el: Messages = {
     "/brain-quiz/games": "Παιχνίδια μυαλού",
     "/brain-quiz/health-facts": "Κουίζ γεγονότων υγείας",
     "/progress/weekly": "Εβδομαδιαίος απολογισμός",
+    "/progress/achievements": "Οι σειρές και τα επιτεύγματά μου",
     "/food-plan/today": "Τα σημερινά γεύματα",
     "/profile": "Προφίλ",
     "/life-matters": "Η ζωή σας μετράει",
