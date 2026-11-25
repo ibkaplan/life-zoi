@@ -1,0 +1,35 @@
+/* Free public tools under /free. Uses the shared tokens from globals.css. */
+.free-hero { display: grid; gap: 0.6rem; }
+.free-hero h1 { margin: 0; }
+.free-lead { font-size: 1.12rem; max-width: 60ch; }
+.free-notice { border-left: 4px solid var(--gold); background: var(--surface); padding: 0.8rem 1rem; border-radius: 0.6rem; }
+.free-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+.free-card { display: grid; gap: 0.45rem; align-content: start; padding: 1.1rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); color: inherit; text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
+.free-card:hover, .free-card:focus-visible { border-color: var(--forest); transform: translateY(-2px); }
+.free-card-icon { font-size: 1.8rem; line-height: 1; }
+.free-card h3 { margin: 0; font-size: 1.15rem; }
+.free-card p { margin: 0; color: var(--muted); }
+.free-card-go { font-weight: 700; color: var(--forest); }
+.free-form { display: grid; gap: 1rem; }
+.free-fields { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); }
+.free-fields input, .free-fields select { width: 100%; }
+.free-segment { display: flex; flex-wrap: wrap; gap: 0.5rem; border: 0; padding: 0; margin: 0; }
+.free-segment legend { font-weight: 700; margin-bottom: 0.4rem; }
+.free-segment label { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); cursor: pointer; min-height: 2.75rem; }
+.free-segment label:has(input:checked) { border-color: var(--forest); background: var(--sage); font-weight: 700; }
+.free-segment input { accent-color: var(--forest); }
+.free-result { display: grid; gap: 0.6rem; padding: 1.2rem; border-radius: 1rem; background: var(--sage); border: 1px solid var(--line); }
+.free-result h2 { margin: 0; font-size: 1.2rem; }
+.free-big { font-size: clamp(2rem, 7vw, 2.8rem); font-weight: 800; line-height: 1.1; color: var(--ink); }
+.free-big small { font-size: 1rem; font-weight: 600; color: var(--muted); }
+.free-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.free-table th, .free-table td { text-align: left; padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.free-table tr[data-current="true"] { background: var(--sage); font-weight: 700; }
+.free-table-wrap { overflow-x: auto; }
+.free-sources ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.free-invite { display: grid; gap: 0.6rem; padding: 1.2rem; border-radius: 1rem; border: 1px dashed var(--forest); background: var(--surface); }
+.free-invite h2 { margin: 0; font-size: 1.2rem; }
+.free-crumbs { font-size: 0.98rem; }
+.free-crumbs a { font-weight: 600; }
+.free-related { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.free-tone-urgent { border-color: var(--danger); background: var(--danger-bg); }
