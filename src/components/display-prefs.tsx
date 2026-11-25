@@ -193,6 +193,7 @@ export function DisplayButton() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
   const nameId = useId();
+  const [panelTop, setPanelTop] = useState<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -223,14 +224,24 @@ export function DisplayButton() {
         aria-controls={open ? panelId : undefined}
         aria-label={t("Text size and layout")}
         title={t("Text size and layout")}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          // On phones the panel spans the screen just under this button (see .display-panel in globals.css).
+          setPanelTop(buttonRef.current ? Math.round(buttonRef.current.getBoundingClientRect().bottom + 6) : null);
+          setOpen((value) => !value);
+        }}
       >
         <span aria-hidden="true">
           A<span className="display-button-big">A</span>
         </span>
       </button>
       {open ? (
-        <div className="display-panel" id={panelId} role="group" aria-label={t("Text size and layout")}>
+        <div
+          className="display-panel"
+          id={panelId}
+          role="group"
+          aria-label={t("Text size and layout")}
+          style={panelTop === null ? undefined : ({ "--display-panel-top": `${panelTop}px` } as React.CSSProperties)}
+        >
           <p className="display-panel-title">{t("Text size")}</p>
           <SizeChoices name={`text-size-${nameId}`} compact />
           <CalmToggle />
