@@ -269,6 +269,7 @@ export const en = {
     "/brain-quiz/games": "Brain games",
     "/brain-quiz/health-facts": "Health Facts Quiz",
     "/progress/weekly": "Weekly check-in",
+    "/progress/achievements": "My Streaks & Achievements",
     "/food-plan/today": "Today's meals",
     "/profile": "Profile",
     "/life-matters": "Your Life Matters",

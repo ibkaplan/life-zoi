@@ -267,6 +267,7 @@ export const uk: Messages = {
     "/brain-quiz/games": "Ігри для розуму",
     "/brain-quiz/health-facts": "Вікторина фактів про здоров’я",
     "/progress/weekly": "Тижневий підсумок",
+    "/progress/achievements": "Мої серії та досягнення",
     "/food-plan/today": "Страви на сьогодні",
     "/profile": "Профіль",
     "/life-matters": "Ваше життя важливе",

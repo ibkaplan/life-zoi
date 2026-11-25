@@ -267,6 +267,7 @@ export const ru: Messages = {
     "/brain-quiz/games": "Игры для ума",
     "/brain-quiz/health-facts": "Викторина фактов о здоровье",
     "/progress/weekly": "Итоги недели",
+    "/progress/achievements": "Мои серии и достижения",
     "/food-plan/today": "Блюда на сегодня",
     "/profile": "Профиль",
     "/life-matters": "Ваша жизнь важна",

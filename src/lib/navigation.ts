@@ -139,6 +139,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     pages: [
       { href: "/progress", label: "Progress" },
       { href: "/progress/weekly", label: "Weekly check-in" },
+      { href: "/progress/achievements", label: "My Streaks & Achievements" },
       { href: "/habit-transformation", label: "Habit Transformation" },
       { href: "/habits", label: "Challenges" },
     ],
@@ -240,6 +241,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/brain-quiz/games", label: "Brain games" },
   { href: "/brain-quiz/health-facts", label: "Health Facts Quiz" },
   { href: "/progress/weekly", label: "Weekly check-in" },
+  { href: "/progress/achievements", label: "My Streaks & Achievements" },
   { href: "/food-plan/today", label: "Today's meals" },
   { href: "/profile", label: "Profile" },
   { href: "/life-matters", label: "Your Life Matters" },
