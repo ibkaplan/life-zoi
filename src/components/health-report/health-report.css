@@ -1,0 +1,50 @@
+/* Weekly report for a doctor. On screen it is a card; in print it is the only thing on the page. */
+.wr-page .btn-small { padding: 0.35rem 0.7rem; font-size: 0.92rem; min-height: 2.25rem; }
+.wr-week { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; }
+.wr-date { flex: 1 1 12rem; max-width: 18rem; }
+.wr-unit { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: center; }
+.wr-unit legend { font-weight: 650; margin-bottom: 0.3rem; }
+.wr-fields { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+.wr-fields textarea { width: 100%; }
+.wr-sheet { display: grid; gap: 1rem; background: #ffffff; color: var(--ink); }
+.wr-sheetHead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem 1.5rem; border-bottom: 2px solid var(--line); padding-bottom: 0.75rem; }
+.wr-sheetHead h2 { margin: 0; }
+.wr-brand { margin: 0; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-size: 0.9rem; }
+.wr-period { margin: 0.2rem 0 0; font-weight: 650; }
+.wr-meta { display: grid; grid-template-columns: auto 1fr; gap: 0.15rem 0.8rem; margin: 0; align-content: start; }
+.wr-meta dt { color: var(--muted); }
+.wr-meta dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; }
+.wr-notice { margin: 0; border-left: 5px solid var(--primary); background: var(--surface); padding: 0.6rem 0.85rem; border-radius: 8px; }
+.wr-sampleTag { margin: 0; font-weight: 700; color: #6b4a00; background: #fff6e0; border: 1px solid #f0d79a; border-radius: 8px; padding: 0.4rem 0.7rem; }
+.wr-empty { margin: 0; font-weight: 650; }
+.wr-block { display: grid; gap: 0.5rem; break-inside: avoid; }
+.wr-block h3 { margin: 0; font-size: 1.15rem; }
+.wr-none { margin: 0; color: var(--muted); }
+.wr-scroll { overflow-x: auto; max-width: 100%; }
+.wr-table { font-size: 0.98rem; }
+.wr-table th, .wr-table td { vertical-align: top; }
+.wr-readings td:nth-child(3) { overflow-wrap: anywhere; }
+.wr-facts { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+.wr-notes { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.wr-foot { border-top: 1px solid var(--line); padding-top: 0.6rem; font-size: 0.92rem; color: var(--muted); }
+.wr-foot p { margin: 0.25rem 0; }
+@media (max-width: 560px) {
+  .wr-hide-narrow { display: none; }
+  .wr-table { font-size: 0.92rem; }
+  .wr-week .btn { flex: 1 1 auto; }
+  .wr-date { max-width: none; flex-basis: 100%; order: -1; }
+}
+@media print {
+  @page { size: A4; margin: 12mm; }
+  .wr-page { gap: 0 !important; }
+  .wr-sheet { box-shadow: none !important; border: 0 !important; padding: 0 !important; gap: 0.45rem; font-size: 10pt; color: #000; background: #fff; }
+  .wr-sheet h2 { font-size: 15pt; }
+  .wr-block h3 { font-size: 11.5pt; }
+  .wr-table { font-size: 9.5pt; }
+  .wr-table th, .wr-table td { padding: 2px 5px !important; border: 1px solid #999; }
+  .wr-hide-narrow { display: table-cell; }
+  .wr-scroll { overflow: visible; }
+  .wr-notice, .wr-sampleTag { background: #fff; border-color: #000; color: #000; }
+  .wr-foot { color: #000; font-size: 8.5pt; }
+  .wr-block { gap: 0.25rem; }
+}

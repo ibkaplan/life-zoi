@@ -844,6 +844,9 @@ function ExportAndDelete({ diary }: { diary: DiaryApi }) {
         <button type="button" className="btn btn-secondary" onClick={() => window.print()} disabled={!has}>
           {t("Print summary")}
         </button>
+        <Link className="btn btn-secondary" href="/my-health/report">
+          {t("Weekly report for my doctor")}
+        </Link>
       </div>
       {diary.status === "account" ? (
         <div className="stack">
