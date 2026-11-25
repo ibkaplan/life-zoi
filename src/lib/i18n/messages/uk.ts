@@ -282,6 +282,7 @@ export const uk: Messages = {
     "/training-academy": "Академія розвитку",
     "/training-academy/journey": "Мій шлях зростання",
     "/mind": "LifeZoi Mind: емоційне здоров'я",
+    "/friends": "Запросіть друга",
     "/share-the-care": "Поділіться турботою",
     "/change-lab": "Лабораторія змін",
     "/lab-results": "Розібратися в аналізах",

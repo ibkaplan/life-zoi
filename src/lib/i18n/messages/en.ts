@@ -284,6 +284,7 @@ export const en = {
     "/training-academy": "Training Academy",
     "/training-academy/journey": "My Growth Journey",
     "/mind": "LifeZoi Mind",
+    "/friends": "Invite a friend",
     "/share-the-care": "Share the Care",
     "/change-lab": "Change Lab",
     "/lab-results": "Understand My Lab Results",

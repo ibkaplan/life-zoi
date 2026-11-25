@@ -161,6 +161,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     pages: [
       { href: "/profile", label: "Profile" },
       { href: "/settings", label: "Settings" },
+      { href: "/friends", label: "Invite a friend" },
       { href: "/share-the-care", label: "Share the Care" },
       { href: "/community", label: "Community" },
       { href: "/privacy", label: "Privacy" },
@@ -254,6 +255,7 @@ export const FOOTER_LINKS: readonly NavLink[] = [
   { href: "/training-academy/journey", label: "My Growth Journey" },
   { href: "/mind", label: "LifeZoi Mind" },
   { href: "/emotional-wellness", label: "Emotional Wellness" },
+  { href: "/friends", label: "Invite a friend" },
   { href: "/share-the-care", label: "Share the Care" },
   { href: "/change-lab", label: "Change Lab" },
   { href: "/lab-results", label: "Understand My Lab Results" },

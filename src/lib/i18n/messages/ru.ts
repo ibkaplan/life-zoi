@@ -282,6 +282,7 @@ export const ru: Messages = {
     "/training-academy": "Академия развития",
     "/training-academy/journey": "Мой путь роста",
     "/mind": "LifeZoi Mind: эмоциональное здоровье",
+    "/friends": "Пригласите друга",
     "/share-the-care": "Поделитесь заботой",
     "/change-lab": "Лаборатория перемен",
     "/lab-results": "Разобраться в анализах",
