@@ -796,7 +796,11 @@ function ReminderSettings({ prefs, onChange }: { prefs: ReminderPrefs; onChange:
   return (
     <section className="card stack no-print">
       <h2>{t("Reminders")}</h2>
-      <p className="hint">{t("Optional. When a reading is due, a reminder appears at the top of this page. LifeZoi does not send notifications, e-mails, or texts. Your choice is remembered in this browser.")}</p>
+      <p className="hint">{t("Optional. When a reading is due, a reminder appears at the top of this page. Your choice is remembered in this browser.")}</p>
+      <p className="hint">
+        {t("To be reminded at a set time of day, with an optional browser notification, use My reminders.")}{" "}
+        <Link href="/my-health/reminders">{t("Set reminder times")}</Link>
+      </p>
       <div className="hd-fields">
         {READING_KINDS.map((kind) => (
           <label key={kind} className="field" htmlFor={`hd-remind-${kind}`}>
