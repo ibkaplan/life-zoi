@@ -7,6 +7,13 @@ export const PUBLIC_PAGES = ["/", "/sign-in", "/reset-password", "/accept-invite
 
 export const PUBLIC_APIS = ["/api/status", "/api/register"] as const;
 
+/**
+ * Whole areas a visitor can open. `/free` holds the free tools anyone may use
+ * without an account (see src/lib/free/hub.ts). Pages there must not read or
+ * write account data.
+ */
+export const PUBLIC_PREFIXES = ["/free"] as const;
+
 /** Images the public landing page shows. */
 export const PUBLIC_ASSET_PREFIXES = ["/home/"] as const;
 
@@ -25,6 +32,7 @@ export function isPublicPath(pathname: string): boolean {
   const path = trimSlash(pathname);
   if ((PUBLIC_PAGES as readonly string[]).includes(path)) return true;
   if ((PUBLIC_APIS as readonly string[]).includes(path)) return true;
+  if (PUBLIC_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return true;
   return PUBLIC_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
