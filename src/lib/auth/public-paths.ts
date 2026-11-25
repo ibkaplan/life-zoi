@@ -7,6 +7,12 @@ export const PUBLIC_PAGES = ["/", "/sign-in", "/reset-password", "/accept-invite
 
 export const PUBLIC_APIS = ["/api/status", "/api/register"] as const;
 
+/** Public Health tips: "/blog" and every article under it. Only reading, no account data. */
+export const PUBLIC_PAGE_PREFIXES = ["/blog"] as const;
+
+/** Files generated for search engines. */
+export const PUBLIC_FILES = ["/sitemap.xml", "/robots.txt"] as const;
+
 /** Images the public landing page shows. */
 export const PUBLIC_ASSET_PREFIXES = ["/home/"] as const;
 
@@ -25,6 +31,8 @@ export function isPublicPath(pathname: string): boolean {
   const path = trimSlash(pathname);
   if ((PUBLIC_PAGES as readonly string[]).includes(path)) return true;
   if ((PUBLIC_APIS as readonly string[]).includes(path)) return true;
+  if ((PUBLIC_FILES as readonly string[]).includes(path)) return true;
+  if (PUBLIC_PAGE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return true;
   return PUBLIC_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 

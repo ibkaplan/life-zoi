@@ -9,6 +9,15 @@ describe("members-only gate", () => {
     expect(decideGate({ pathname: "/sign-in/", status: "signed-out" })).toEqual({ kind: "next" });
   });
 
+  it("opens Health tips and the search-engine files to visitors, and nothing that only starts the same way", () => {
+    for (const path of ["/blog", "/blog/", "/blog/small-walks-add-up", "/sitemap.xml", "/robots.txt"]) {
+      expect(decideGate({ pathname: path, status: "signed-out" }), path).toEqual({ kind: "next" });
+    }
+    for (const path of ["/blogs", "/blog-admin", "/sitemap", "/api/blog"]) {
+      expect(isPublicPath(path), path).toBe(false);
+    }
+  });
+
   it("sends a visitor who types a members' address to sign-in, keeping where they were going", () => {
     for (const path of ["/dashboard", "/assessment", "/what-if", "/ai-assistant", "/library/music", "/brain-quiz/games", "/academy/move/library", "/settings", "/admin/invitations"]) {
       const decision = decideGate({ pathname: path, status: "signed-out" });
