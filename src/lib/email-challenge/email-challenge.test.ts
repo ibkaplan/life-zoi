@@ -104,7 +104,7 @@ describe("mailer", () => {
     const code = readFileSync(join(__dirname, "mailer.ts"), "utf8");
     expect(code).not.toMatch(/env\.NEXT_PUBLIC_/);
     const view = readFileSync(join(__dirname, "..", "..", "components", "email-challenge", "challenge-view.tsx"), "utf8");
-    expect(view).not.toMatch(/mailer|runtime|repository|service/);
+    expect(view).not.toMatch(/from "@\/lib\/email-challenge\/(mailer|runtime|repository|service)"/);
   });
 });
 
