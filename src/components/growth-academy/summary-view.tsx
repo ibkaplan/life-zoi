@@ -125,10 +125,10 @@ export function summaryText(t: Translate, course: GrowthCourse, state: AcademySt
     const record = state.lessons[lesson.id];
     lines.push(`${lesson.number}. ${t(lesson.title)}${record?.completedOn ? ` (${formatDay(record.completedOn, locale)})` : ""}`);
     if (withNotes && record) {
-      for (const field of lesson.exercise.fields) if (record.answers[field.id]) lines.push(`   ${field.label}: ${record.answers[field.id]}`);
+      for (const field of lesson.exercise.fields) if (record.answers[field.id]) lines.push(`   ${t(field.label)}: ${record.answers[field.id]}`);
       for (const text of record.practice) lines.push(`   ${t("Practice answer")}: ${text}`);
       lesson.reflection.forEach((question, index) => {
-        if (record.reflections[index]) lines.push(`   ${question} ${record.reflections[index]}`);
+        if (record.reflections[index]) lines.push(`   ${t(question)} ${record.reflections[index]}`);
       });
     }
   }

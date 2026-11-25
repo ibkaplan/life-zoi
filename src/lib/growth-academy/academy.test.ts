@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 import { allAchievements, awardAchievements } from "@/lib/growth-academy/achievements";
 import { challengeFor, DAILY_CHALLENGES } from "@/lib/growth-academy/challenges";
 import { GROWTH_COURSES, growthCourse, lessonPath } from "@/lib/growth-academy/catalog";
-import { containsPhrase, practiceFeedback, words } from "@/lib/growth-academy/feedback";
+import { containsPhrase, cuePhrases, practiceFeedback, words } from "@/lib/growth-academy/feedback";
+import { cueKey } from "@/lib/growth-academy/lesson-text";
+import ukCatalog from "@/lib/i18n/catalog/uk";
+import ruCatalog from "@/lib/i18n/catalog/ru";
+import elCatalog from "@/lib/i18n/catalog/el";
 import {
   clearSavedText,
   completeChallenge,
@@ -438,5 +442,53 @@ describe("Interactive practice feedback (no AI)", () => {
           for (const phrase of cue.anyOf) expect(phrase, l.id).toBe(phrase.toLowerCase());
           expect(cue.say, l.id).not.toMatch(/\b(wrong|bad|fail|should have)\b/i);
         }
+  });
+});
+
+describe("Lessons in Ukrainian, Russian, and Greek", () => {
+  const catalogs: Record<string, Record<string, string>> = { uk: ukCatalog, ru: ruCatalog, el: elCatalog };
+
+  it("ignores accents and the typographic apostrophe when matching", () => {
+    expect(containsPhrase(words("Σας ευχαριστώ πολύ"), words("ευχαριστ"))).toBe(true);
+    expect(containsPhrase(words("ΕΥΧΑΡΙΣΤΩ"), words("ευχαριστ"))).toBe(true);
+    expect(containsPhrase(words("Я ещё подумаю"), words("еще"))).toBe(true);
+    expect(containsPhrase(words("I’m listening"), words("i'm listening"))).toBe(true);
+  });
+
+  for (const [locale, catalog] of Object.entries(catalogs)) {
+    const lookup = (key: string) => catalog[key];
+
+    it(`has ${locale} feedback words for every cue, as a "cue: " list`, () => {
+      const missing: string[] = [];
+      for (const c of GROWTH_COURSES)
+        for (const l of c.lessons)
+          for (const cue of l.practice.cues ?? []) {
+            const value = catalog[cueKey(cue)];
+            if (!value?.startsWith("cue: ") || cuePhrases(cue, lookup).length <= cue.anyOf.length) missing.push(`${l.id}: ${cueKey(cue)}`);
+          }
+      expect(missing).toEqual([]);
+    });
+
+    it(`gives a kind note for a ${locale} example answer whenever the English one gets one`, () => {
+      const quiet: string[] = [];
+      for (const c of GROWTH_COURSES)
+        for (const l of c.lessons)
+          for (const example of l.practice.examples) {
+            if (practiceFeedback(example.text, l.practice).notes.length === 0) continue;
+            const translated = catalog[example.text] ?? "";
+            if (practiceFeedback(translated, l.practice, lookup).notes.length === 0) quiet.push(`${l.id}: ${translated}`);
+          }
+      expect(quiet).toEqual([]);
+    });
+
+    it(`still understands an answer typed in English when the site is in ${locale}`, () => {
+      const practice = lesson(course("confidence"), 1).practice;
+      expect(practiceFeedback("Thank you, I really try to listen first.", practice, lookup).notes.length).toBeGreaterThan(0);
+    });
+  }
+
+  it("no longer tells readers that lessons are in English only", () => {
+    const view = readFileSync(join(__dirname, "..", "..", "components", "growth-academy", "lesson-view.tsx"), "utf8");
+    expect(view).not.toMatch(/in English for now/);
   });
 });

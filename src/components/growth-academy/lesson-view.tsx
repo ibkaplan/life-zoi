@@ -183,6 +183,12 @@ function LessonBody({
   const otherCourse = GROWTH_COURSES.find((item) => item.id !== course.id && courseProgress(state, item).remaining > 0);
   const partId = `ga-part-${lesson.id}`;
 
+  // Feedback cue words in the page's language ("cue: …" entries in the catalog); English cues always apply too.
+  const cueLookup = (key: string) => {
+    const text = t(key);
+    return text === key ? undefined : text;
+  };
+
   const listen = (steps = false) =>
     showVoice ? <ReadAloud target={partId} steps={steps} compact label={t("Listen to this part")} /> : null;
 
@@ -202,7 +208,6 @@ function LessonBody({
           <span className="ga-note">{t("About {minutes} min", { minutes: lesson.minutes })}</span>
           {record?.completedOn ? <span className="ga-note">{t("Completed {date}", { date: formatDay(record.completedOn, locale) })}</span> : null}
         </div>
-        {locale !== "en" ? <p className="ga-note">{t("The lesson text is in English for now. Menus, buttons, and titles are translated.")}</p> : null}
       </header>
 
       <nav aria-label={t("Lesson parts")}>
@@ -227,9 +232,9 @@ function LessonBody({
           <div id={partId} className="ga-part">
             <h2 id="ga-h">{t("Introduction")}</h2>
             {lesson.intro.map((text) => (
-              <p key={text}>{text}</p>
+              <p key={text}>{t(text)}</p>
             ))}
-            {lesson.care ? <p className="ga-care">{lesson.care}</p> : null}
+            {lesson.care ? <p className="ga-care">{t(lesson.care)}</p> : null}
           </div>
         </section>
       ) : null}
@@ -241,14 +246,14 @@ function LessonBody({
             <h2 id="ga-h">{t("Learn")}</h2>
             {lesson.learn.map((section) => (
               <div key={section.heading} className="ga-part">
-                <h3>{section.heading}</h3>
+                <h3>{t(section.heading)}</h3>
                 {section.paragraphs.map((text) => (
-                  <p key={text}>{text}</p>
+                  <p key={text}>{t(text)}</p>
                 ))}
                 {section.bullets?.length ? (
                   <ul>
                     {section.bullets.map((text) => (
-                      <li key={text}>{text}</li>
+                      <li key={text}>{t(text)}</li>
                     ))}
                   </ul>
                 ) : null}
@@ -264,13 +269,13 @@ function LessonBody({
           <div id={partId} className="ga-part">
             <h2 id="ga-h">{t("Real-life example")}</h2>
             <div className="ga-story">
-              <h3>{lesson.example.title}</h3>
+              <h3>{t(lesson.example.title)}</h3>
               {lesson.example.story.map((text) => (
-                <p key={text}>{text}</p>
+                <p key={text}>{t(text)}</p>
               ))}
             </div>
             <p>
-              <strong>{t("What this shows:")}</strong> {lesson.example.point}
+              <strong>{t("What this shows:")}</strong> {t(lesson.example.point)}
             </p>
           </div>
         </section>
@@ -281,12 +286,12 @@ function LessonBody({
           {listen(true)}
           <div id={partId} className="ga-part">
             <h2 id="ga-h">
-              {t("Exercise")}: {lesson.exercise.title}
+              {t("Exercise")}: {t(lesson.exercise.title)}
             </h2>
             <p className="ga-note">{t("About {minutes} min", { minutes: lesson.exercise.minutes })}</p>
             <ol>
               {lesson.exercise.steps.map((text) => (
-                <li key={text}>{text}</li>
+                <li key={text}>{t(text)}</li>
               ))}
             </ol>
           </div>
@@ -295,9 +300,9 @@ function LessonBody({
             {lesson.exercise.fields.map((field) => (
               <TextField
                 key={field.id}
-                label={field.label}
+                label={t(field.label)}
                 long={field.kind === "long"}
-                placeholder={field.placeholder}
+                placeholder={field.placeholder ? t(field.placeholder) : undefined}
                 value={draft.answers[field.id] ?? ""}
                 onChange={(value) => updateDraft((d) => ({ ...d, answers: { ...d.answers, [field.id]: value } }))}
               />
@@ -322,7 +327,7 @@ function LessonBody({
           {listen()}
           <div id={partId} className="ga-part">
             <h2 id="ga-h">{t("Practice")}</h2>
-            <p className="ga-challenge-text">{lesson.practice.prompt}</p>
+            <p className="ga-challenge-text">{t(lesson.practice.prompt)}</p>
           </div>
           <TextField
             label={t("Your answer")}
@@ -343,11 +348,11 @@ function LessonBody({
                   className="ga-example"
                   onClick={() => {
                     setFeedback(null);
-                    updateDraft((d) => ({ ...d, practice: example.text.replace(/^"|"$/g, "") }));
+                    updateDraft((d) => ({ ...d, practice: t(example.text).replace(/^["«“„]|["»”“]$/g, "") }));
                   }}
                 >
-                  <span>{example.text}</span>
-                  <small>{example.why}</small>
+                  <span>{t(example.text)}</span>
+                  <small>{t(example.why)}</small>
                   <small>{t("Use this example")}</small>
                 </button>
               ))}
@@ -358,7 +363,7 @@ function LessonBody({
               className="btn btn-primary"
               type="button"
               onClick={() => {
-                setFeedback(practiceFeedback(draft.practice, lesson.practice));
+                setFeedback(practiceFeedback(draft.practice, lesson.practice, cueLookup));
                 if (draft.practice.trim()) commit((s) => countPracticeTry(s, course, lesson, clock));
               }}
             >
@@ -390,7 +395,7 @@ function LessonBody({
               {feedback.notes.length ? (
                 <ul>
                   {feedback.notes.map((note) => (
-                    <li key={note}>{note}</li>
+                    <li key={note}>{t(note)}</li>
                   ))}
                 </ul>
               ) : null}
@@ -399,7 +404,7 @@ function LessonBody({
               </p>
               <ul>
                 {lesson.practice.lookFors.map((item) => (
-                  <li key={item}>{item}</li>
+                  <li key={item}>{t(item)}</li>
                 ))}
               </ul>
             </div>
@@ -421,7 +426,7 @@ function LessonBody({
               <TextField
                 key={question}
                 speak
-                label={question}
+                label={t(question)}
                 long
                 value={draft.reflections[index] ?? ""}
                 onChange={(value) =>
@@ -451,7 +456,7 @@ function LessonBody({
             <h2 id="ga-h">{t("Key takeaways")}</h2>
             <ul className="ga-takeaways">
               {lesson.takeaways.map((text) => (
-                <li key={text}>{text}</li>
+                <li key={text}>{t(text)}</li>
               ))}
             </ul>
           </div>

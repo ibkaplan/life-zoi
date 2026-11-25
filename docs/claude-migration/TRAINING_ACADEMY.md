@@ -58,7 +58,12 @@ Built in, no AI: it looks for each lesson's own cue words (whole words) and show
 
 ## Languages
 
-Menus, buttons, course titles, descriptions, objectives, lesson titles and skills, achievements, and daily challenges are in English, Ukrainian, Russian, and Greek. Lesson bodies (about 48,000 words) are in English only for now, and the lesson page says so in the other languages. Translating them is the main remaining work; uk/ru/el UI text also needs a read by a native speaker.
+Everything in the Academy is in English, Ukrainian, Russian, and Greek: menus, buttons, course titles, descriptions, objectives, lesson titles and skills, achievements, daily challenges, and, since 2026-11-25, every lesson body (introduction, learning sections, stories, exercise steps and boxes, practice prompts, example answers, feedback notes, reflection questions, takeaways, and care notes). English stays the fallback for any text without a translation.
+
+- Lesson bodies are translated in `src/lib/i18n/catalog/<locale>/growth-<course>-lessons.json`, keyed by the English text like every other catalog file. `src/lib/i18n/sources/growth-academy.ts` lists them (through `lessonBodyText` in `src/lib/growth-academy/lesson-text.ts`), so the catalog test fails if a new or changed English sentence has no translation.
+- Practice feedback words: each cue has a catalog entry `cue: <english words>` whose value is `cue: ` plus words in that language separated by ` | `, for example `"cue: thank | thanks": "cue: спасиб | благодар"`. A word of four or more letters also matches longer words starting with it, so stems cover word endings. Accents (Greek tonos, ё, й) are ignored when matching. English cue words always apply as well. `academy.test.ts` checks that every cue has a list in each language and that each translated example answer still gets a kind note whenever the English one does.
+- Listen reads the translated text with the device's voice for that language.
+- The translations were written by Claude and still need a read by a native speaker; the review list is in the pull request that added them. Change English text and its translations together.
 
 ## Not checked
 
