@@ -6,6 +6,7 @@ const DESCRIPTION =
   "Short, calm health tips about movement, sleep, food, stress, and connection, each linked to public health guidance. General wellness education, not medical advice.";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_ORIGIN),
   title: "Health tips",
   description: DESCRIPTION,
   alternates: { canonical: "/blog" },

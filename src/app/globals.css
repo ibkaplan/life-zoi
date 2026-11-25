@@ -3902,11 +3902,14 @@ body::before {
 .blog-article h2 { font-size: clamp(1.35rem, 2vw, 1.7rem); }
 .blog-article p { margin: 0; line-height: 1.65; }
 .blog-try ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
-.blog-video { margin: 0; display: grid; gap: 0.6rem; }
+.blog-video { margin: 0; display: grid; gap: 0.6rem; min-width: 0; align-content: start; }
 .blog-video figcaption { display: grid; gap: 0.25rem; }
 .blog-video-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
 .blog-video-start {
+  box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  padding: 0;
   max-width: 720px;
   aspect-ratio: 16 / 9;
   border: 0;

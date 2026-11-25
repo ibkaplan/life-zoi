@@ -15,6 +15,7 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
   if (!article) return {};
   const url = `${SITE_ORIGIN}/blog/${article.slug}`;
   return {
+    metadataBase: new URL(SITE_ORIGIN),
     title: article.title,
     description: article.summary,
     alternates: { canonical: `/blog/${article.slug}` },
