@@ -81,8 +81,10 @@ export function DailyTipView() {
   }, []);
 
   useEffect(() => {
-    queueMicrotask(() => setZone(deviceZone()));
-    void load();
+    queueMicrotask(() => {
+      setZone(deviceZone());
+      void load();
+    });
   }, [load]);
 
   const apply = (json: Record<string, unknown>) => {
