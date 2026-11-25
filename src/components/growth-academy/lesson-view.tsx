@@ -517,7 +517,7 @@ function LessonBody({
 
       <div className="ga-pager ga-no-print">
         <button className="btn btn-secondary" type="button" disabled={part === 0} onClick={() => goTo(part - 1)}>
-          ← {t("Previous")}
+          ← {t("Back")}
         </button>
         {part < LESSON_PARTS - 1 ? (
           <button className="btn btn-primary" type="button" onClick={() => goTo(part + 1)}>
