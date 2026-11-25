@@ -59,6 +59,13 @@ export const FREE_HUB: readonly HubEntry[] = [
     group: "calculators",
   },
   {
+    href: "/free/health-age",
+    title: msg("What is your health age?"),
+    summary: msg("A 2-minute lifestyle estimate from seven everyday habits, with a result card you can share."),
+    icon: "🌱",
+    group: "discover",
+  },
+  {
     href: "/free/meet",
     title: msg("Meet LifeZoi"),
     summary: msg("Hear the voice companion in a two-minute sample conversation."),
