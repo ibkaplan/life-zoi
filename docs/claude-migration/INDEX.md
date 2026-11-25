@@ -46,6 +46,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [MINI_COURSES.md](MINI_COURSES.md) | 7-day mini-courses on the dashboard: three courses, one short practice a day, gentle progress with no streaks |
 | [TRAINING_ACADEMY.md](TRAINING_ACADEMY.md) | Training Academy: five personal-growth courses, 50 lessons, practice feedback, achievements, My Growth Journey, academy_state storage, voice |
 | [SITE_ACHIEVEMENTS.md](SITE_ACHIEVEMENTS.md) | My Streaks & Achievements at `/progress/achievements`: site-wide active days, gentle runs, 31 badges, read from existing records with no migration |
+| [TRAINING_ACADEMY_TRANSLATION_REVIEW.md](TRAINING_ACADEMY_TRANSLATION_REVIEW.md) | Training Academy lessons in Russian, Ukrainian, Greek: phrases a native speaker should check |
 | [GUIDED_SESSIONS.md](GUIDED_SESSIONS.md) | Voice-guided Pilates, yoga, stretching, breathing, relaxation, and meditation: one player, the LifeZoi voice, music ducking, My Day launch, saved history, and voice upgrade options |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
