@@ -48,7 +48,10 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [GUIDED_SESSIONS.md](GUIDED_SESSIONS.md) | Voice-guided Pilates, yoga, stretching, breathing, relaxation, and meditation: one player, the LifeZoi voice, music ducking, My Day launch, saved history, and voice upgrade options |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
+| [HEALTH_AGE_QUIZ.md](HEALTH_AGE_QUIZ.md) | Public 2-minute “What is your health age?” check at `/free/health-age`: the one-year rule, what is never stored, share card, owner decision 2026-11-25 |
 | [HEALTH_DIARY.md](HEALTH_DIARY.md) | Blood pressure, sugar & cholesterol diary at `/my-health/diary`: what the site cannot measure, ranges and sources, safety notes, health_readings table, export and delete |
+| [FREE_TOOLS.md](FREE_TOOLS.md) | Free public calculators under `/free`: calories, water, sleep, blood pressure ranges; sources, SEO, the shared hub list |
+| [REMINDERS.md](REMINDERS.md) | My reminders at `/my-health/reminders`: timed reminders for blood pressure, blood sugar, and daily habits; banner and optional browser notification; browser storage only, no migration |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [LIFEZOI_MIND.md](LIFEZOI_MIND.md) | LifeZoi Mind: rule-based voice and text companion, PHQ-9 and GAD-7, safety handling, exercises, 7-day plan, Psychology Encyclopedia, consented progress, provider research |
@@ -56,6 +59,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Colours, heading and text tones, fonts, capitals, minimum text size, the one-line desktop menu, illustration variety |
 | [PAGE_BACKGROUNDS.md](PAGE_BACKGROUNDS.md) | Page backgrounds: Calm Blue, Soft Rose, Classic Ivory, the Automatic rule, contrast limits |
 | [HEALTH_ENCYCLOPEDIA.md](HEALTH_ENCYCLOPEDIA.md) | Health Encyclopedia and LifeZoi AI: content rules, editorial workflow, migration, AI library mode, free-model research, and what is not done yet |
+| [MEET_LIFEZOI.md](MEET_LIFEZOI.md) | Public voice demo at /free/meet: scripted conversation in four languages, browser speech, captions, no AI or microphone |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
 | [INVITE_A_FRIEND.md](INVITE_A_FRIEND.md) | Invite a Friend at `/friends`: personal link, 7-day Together challenge, friend badges, friend_challenge table and counts-only summary |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |

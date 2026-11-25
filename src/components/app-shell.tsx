@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SittingReminder } from "@/components/movement-breaks/tracker";
+import { TimedReminderBanner } from "@/components/reminders/reminder-banner";
 import { useSession } from "@/components/session-provider";
 import { SiteNav } from "@/components/site-nav";
 import { PageListen } from "@/components/voice/page-listen";
+import { InstallHint } from "@/components/pwa/install-hint";
 import { VoiceCompanion } from "@/components/voice-companion/voice-companion";
 import { useAccount } from "@/lib/account-store";
 import { useCompanion } from "@/lib/companion/store";
@@ -50,6 +52,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </p>
         ) : null}
         <SittingReminder />
+        <InstallHint />
+        <TimedReminderBanner />
         <PageListen pathname={pathname} />
         {children}
         <footer className="footer-note">
