@@ -255,6 +255,7 @@ export const ru: Messages = {
     "/progress": "Прогресс",
     "/food-plan": "Еда и благополучие",
     "/library": "Библиотека здоровья",
+    "/blog": "Советы для здоровья",
     "/encyclopedia": "Энциклопедия здоровья",
     "/lifezoi-ai": "Помощник LifeZoi AI",
     "/nature": "Природа",

@@ -14,7 +14,8 @@ import { inviteTokenFromInput } from "@/lib/invitations/link";
  * The public landing page, the only feature-free page a visitor sees.
  * Logo, an introductory image, a short description, Log in, and how to join by invitation.
  * Members' features need a signed-in member. The only other links are the free
- * public tools under /free (src/lib/free/hub.ts), which need no account.
+ * public tools under /free (src/lib/free/hub.ts) and the public Health tips under /blog,
+ * which need no account.
  */
 export function LandingView() {
   const m = useMessages();
@@ -70,6 +71,18 @@ export function LandingView() {
           <p>
             <Link href="/free">{t("See all free tools")} →</Link>
           </p>
+        </section>
+
+        <section className="page landing-tips" aria-labelledby="landing-tips-title">
+          <div className="card stack">
+            <h2 id="landing-tips-title">{t("Free health tips for everyone")}</h2>
+            <p>{t("Short articles about walking, sleep, water, food, stress, and staying in touch, each linked to public health guidance. No account needed.")}</p>
+            <div className="actions">
+              <Link className="btn btn-primary" href="/blog">
+                {t("Read health tips")}
+              </Link>
+            </div>
+          </div>
         </section>
 
         <section id="invitation" className="page landing-invite" aria-labelledby="landing-invite-title">

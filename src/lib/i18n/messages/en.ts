@@ -257,6 +257,7 @@ export const en = {
     "/progress": "Progress",
     "/food-plan": "Food & Wellness",
     "/library": "Health Library",
+    "/blog": "Health tips",
     "/encyclopedia": "Health Encyclopedia",
     "/lifezoi-ai": "LifeZoi AI",
     "/nature": "Nature",

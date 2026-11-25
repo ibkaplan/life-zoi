@@ -60,6 +60,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [REVIEWS_FEEDBACK.md](REVIEWS_FEEDBACK.md) | Reviews & Feedback: ratings, reviews, suggestions, moderation dashboard, You asked, we listened!, storage and privacy rules |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Colours, heading and text tones, fonts, capitals, minimum text size, the one-line desktop menu, illustration variety |
 | [PAGE_BACKGROUNDS.md](PAGE_BACKGROUNDS.md) | Page backgrounds: Calm Blue, Soft Rose, Classic Ivory, the Automatic rule, contrast limits |
+| [HEALTH_TIPS.md](HEALTH_TIPS.md) | Public Health tips blog at `/blog`: articles, video links, share buttons, sitemap, why indexing is still off |
 | [HEALTH_ENCYCLOPEDIA.md](HEALTH_ENCYCLOPEDIA.md) | Health Encyclopedia and LifeZoi AI: content rules, editorial workflow, migration, AI library mode, free-model research, and what is not done yet |
 | [MEET_LIFEZOI.md](MEET_LIFEZOI.md) | Public voice demo at /free/meet: scripted conversation in four languages, browser speech, captions, no AI or microphone |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |

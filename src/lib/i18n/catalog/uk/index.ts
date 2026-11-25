@@ -33,6 +33,7 @@ import meet_demo from "./meet-demo.json";
 import reminders from "./reminders.json";
 import friends from "./friends.json";
 import achievements from "./achievements.json";
+import blog from "./blog.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion, ...growth_confidence, ...growth_mindfulness, ...growth_communication, ...growth_emotional_intelligence, ...growth_resilience, ...growth_academy, ...health_diary, ...free_tools, ...health_age, ...meet_demo, ...reminders, ...friends, ...achievements };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion, ...growth_confidence, ...growth_mindfulness, ...growth_communication, ...growth_emotional_intelligence, ...growth_resilience, ...growth_academy, ...health_diary, ...free_tools, ...health_age, ...meet_demo, ...reminders, ...friends, ...achievements, ...blog };
 export default catalog;

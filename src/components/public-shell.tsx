@@ -10,7 +10,7 @@ import { useAccount } from "@/lib/account-store";
 import { sources } from "@/lib/sources";
 
 /**
- * Header for visitors. It shows the logo, the free tools, the language picker, and Log in.
+ * Header for visitors. It shows the logo, the free tools, Health tips, the language picker, and Log in.
  * No members' feature is linked here: members get the full navigation after signing in.
  */
 export function PublicHeader() {
@@ -27,6 +27,9 @@ export function PublicHeader() {
       <div className="site-account">
         <Link className="public-free-link" href="/free" aria-current={pathname.startsWith("/free") ? "page" : undefined}>
           {t("Free tools")}
+        </Link>
+        <Link className="public-tips-link" href="/blog" aria-current={pathname.startsWith("/blog") ? "page" : undefined}>
+          {m.nav["/blog"]}
         </Link>
         <DisplayButton />
         <LanguageSwitcher />
@@ -56,6 +59,7 @@ export function PublicFooter() {
       <nav className="footer-links" aria-label={m.access.publicLinks}>
         <Link href="/">{m.access.home}</Link>
         <Link href="/free">{t("Free health tools")}</Link>
+        <Link href="/blog">{m.nav["/blog"]}</Link>
         <Link href="/sign-in">{m.access.logIn}</Link>
         <Link href="/privacy">{m.access.privacy}</Link>
       </nav>

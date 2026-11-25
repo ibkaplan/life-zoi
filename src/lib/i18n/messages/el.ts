@@ -255,6 +255,7 @@ export const el: Messages = {
     "/progress": "Πρόοδος",
     "/food-plan": "Τροφή και ευεξία",
     "/library": "Βιβλιοθήκη υγείας",
+    "/blog": "Συμβουλές υγείας",
     "/encyclopedia": "Εγκυκλοπαίδεια υγείας",
     "/lifezoi-ai": "Βοηθός LifeZoi AI",
     "/nature": "Φύση",

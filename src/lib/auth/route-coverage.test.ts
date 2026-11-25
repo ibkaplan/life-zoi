@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
-import { PUBLIC_APIS, PUBLIC_PAGES, PUBLIC_PREFIXES } from "@/lib/auth/public-paths";
+import { PUBLIC_APIS, PUBLIC_PAGE_PREFIXES, PUBLIC_PAGES, PUBLIC_PREFIXES } from "@/lib/auth/public-paths";
 
 const APP = join(process.cwd(), "src", "app");
 
@@ -50,6 +50,8 @@ describe("every page and API is members-only unless it is on the public list", (
       if (rel.startsWith("(members)/")) continue;
       if (rel.startsWith("(public)/") || rel === "page.tsx") {
         if (PUBLIC_PREFIXES.some((prefix) => url === prefix || url.startsWith(`${prefix}/`))) continue;
+        // Health tips articles are public under one prefix rather than listed one by one.
+        if (PUBLIC_PAGE_PREFIXES.some((prefix) => url === prefix || url.startsWith(`${prefix}/`))) continue;
         publicPages.add(url);
         continue;
       }
