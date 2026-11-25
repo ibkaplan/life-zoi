@@ -48,6 +48,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [GUIDED_SESSIONS.md](GUIDED_SESSIONS.md) | Voice-guided Pilates, yoga, stretching, breathing, relaxation, and meditation: one player, the LifeZoi voice, music ducking, My Day launch, saved history, and voice upgrade options |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
+| [READING_COMFORT.md](READING_COMFORT.md) | Text size (normal, large, extra large) and the calm layout: the "Aa" header button, Settings, saved on the device and in companion_state, and how the one-line desktop menu stays on one line |
 | [HEALTH_DIARY.md](HEALTH_DIARY.md) | Blood pressure, sugar & cholesterol diary at `/my-health/diary`: what the site cannot measure, ranges and sources, safety notes, health_readings table, export and delete |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
