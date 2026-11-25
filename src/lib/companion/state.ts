@@ -3,6 +3,7 @@ import { emptyBreathe, isEmptyBreathe, sanitizeBreathe, type BreatheState } from
 import { emptyBrainProgress, isEmptyBrain, sanitizeBrain, type BrainProgress } from "@/lib/brain-quiz/progress";
 import { emptyFocus, isEmptyFocus, sanitizeFocus, type FocusState } from "@/lib/focus/progress";
 import { emptyCourses, isEmptyCourses, sanitizeCourses, type CoursesState } from "@/lib/courses/courses";
+import { defaultDisplay, sanitizeDisplay, type DisplayPrefs } from "@/lib/display-prefs";
 import { addGuidedRecord, emptyGuided, EXERCISE_KINDS, isEmptyGuided, recordMinutes, sanitizeGuided, type GuidedRecord, type GuidedState } from "@/lib/guided/history";
 
 /**
@@ -271,6 +272,8 @@ export type CompanionState = {
   courses: CoursesState;
   /** Voice-guided sessions (Pilates, yoga, meditation, and others) the person finished. */
   guided: GuidedState;
+  /** Reading comfort: text size and the calm layout, so the choice follows the person to another device. */
+  display: DisplayPrefs;
 };
 
 /** One break every 30 minutes across a whole day is 48. More than that is not a real count. */
@@ -339,6 +342,7 @@ export function emptyCompanion(): CompanionState {
     daily: emptyDaily(),
     courses: emptyCourses(),
     guided: emptyGuided(),
+    display: defaultDisplay(),
   };
 }
 
@@ -383,7 +387,8 @@ export function isEmptyCompanion(state: CompanionState): boolean {
     state.daily.skipped.length === 0 &&
     state.daily.explored.length === 0 &&
     isEmptyCourses(state.courses) &&
-    isEmptyGuided(state.guided)
+    isEmptyGuided(state.guided) &&
+    !state.display.updatedAt
   );
 }
 
@@ -699,6 +704,7 @@ export function sanitizeCompanion(input: unknown): CompanionState {
     daily: sanitizeDaily(record.daily),
     courses: sanitizeCourses(record.courses),
     guided: sanitizeGuided(record.guided),
+    display: sanitizeDisplay(record.display),
   };
 }
 

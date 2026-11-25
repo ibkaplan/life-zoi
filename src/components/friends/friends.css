@@ -1,0 +1,179 @@
+/*
+ * Invite a Friend: link, Together challenge, and badges.
+ * Phone first, large touch targets, plain contrast.
+ */
+.fr-hero {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(230, 170, 190, 0.35), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(168, 191, 174, 0.35), transparent 55%),
+    var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.fr-hero h1 {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1.15;
+  max-width: 28ch;
+}
+
+.fr-link-box {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px dashed var(--line);
+  background: var(--bg);
+  overflow-wrap: anywhere;
+}
+
+.fr-count {
+  font-weight: 600;
+  color: var(--heading);
+}
+
+.fr-progress {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+}
+
+.fr-progress span {
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--line);
+}
+
+.fr-progress span[data-done="yes"] {
+  background: var(--teal);
+}
+
+.fr-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.fr-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 0.95rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.fr-step[data-state="open"] {
+  border: 2px solid var(--royal);
+}
+
+.fr-step[data-state="later"] {
+  opacity: 0.75;
+}
+
+.fr-step-mark {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  font-weight: 700;
+  background: var(--lavender);
+  color: var(--deep);
+}
+
+.fr-step[data-state="done"] .fr-step-mark {
+  background: var(--teal);
+  color: #fff;
+}
+
+.fr-step-body {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.fr-step-body h3,
+.fr-step-body p {
+  margin: 0;
+}
+
+.fr-share {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.8rem;
+  border-radius: 0.75rem;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.fr-share input {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.15rem;
+  flex: none;
+}
+
+.fr-share .hint {
+  display: block;
+}
+
+.fr-badges {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: 0.7rem;
+}
+
+.fr-badge {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  text-align: center;
+  justify-items: center;
+}
+
+.fr-badge[data-earned="yes"] {
+  border: 2px solid var(--gold);
+  box-shadow: 0 6px 18px rgba(196, 150, 60, 0.18);
+}
+
+.fr-badge[data-earned="no"] .fr-badge-icon {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
+.fr-badge-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.fr-badge-state {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.fr-badge[data-earned="yes"] .fr-badge-state {
+  color: var(--heading);
+}
+
+/* Small invite card on My Profile and Get started */
+.fr-teaser {
+  display: grid;
+  gap: 0.6rem;
+  border-left: 4px solid var(--royal);
+}

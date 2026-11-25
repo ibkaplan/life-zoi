@@ -9,6 +9,7 @@ import { Art, type ArtName } from "@/components/companion/art";
 import { Logo } from "@/components/logo";
 import { SiteNav } from "@/components/site-nav";
 import { StorageNote } from "@/components/storage-note";
+import { InstallHint } from "@/components/pwa/install-hint";
 import { VoiceCompanion } from "@/components/voice-companion/voice-companion";
 import { useMessages, useT } from "@/components/locale-provider";
 import { sources } from "@/lib/sources";
@@ -84,6 +85,7 @@ export function HomeView() {
     <div className="home">
       <SiteNav />
       <main id="main">
+        <InstallHint className="page home-install" />
         {/* LifeZoi Daily comes first after logging in. The rest of the homepage is unchanged below it. */}
         <div className="page home-daily">
           <LifeZoiDaily variant="home" />

@@ -12,6 +12,7 @@ import focus from "./sources/focus";
 import assistant from "./sources/assistant";
 import mind from "./sources/mind";
 import encyclopedia from "./sources/encyclopedia";
+import blog from "./sources/blog";
 import growth_academy from "./sources/growth-academy";
 
 /**
@@ -20,7 +21,7 @@ import growth_academy from "./sources/growth-academy";
  * option or lesson cannot ship in English only. Add a data module to the area's
  * file in `./sources/` when a page starts showing it with `t`.
  */
-export const AREA_SOURCES: Record<string, unknown[]> = { "core": core, "pages": pages, "nutrition": nutrition, "wellness-challenges": wellness_challenges, "wellness-academy": wellness_academy, "wellness-urges": wellness_urges, "brain": brain, "library": library, "companion": companion, "habits": habits, "focus": focus, "assistant": assistant, "mind": mind, "encyclopedia": encyclopedia, "growth-academy": growth_academy };
+export const AREA_SOURCES: Record<string, unknown[]> = { "core": core, "pages": pages, "nutrition": nutrition, "wellness-challenges": wellness_challenges, "wellness-academy": wellness_academy, "wellness-urges": wellness_urges, "brain": brain, "library": library, "companion": companion, "habits": habits, "focus": focus, "assistant": assistant, "mind": mind, "encyclopedia": encyclopedia, "blog": blog, "growth-academy": growth_academy };
 
 /** Keys, ids, links, and other strings that are never shown as words. */
 function isText(value: string): boolean {
