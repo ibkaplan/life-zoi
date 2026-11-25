@@ -49,6 +49,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
 | [HEALTH_DIARY.md](HEALTH_DIARY.md) | Blood pressure, sugar & cholesterol diary at `/my-health/diary`: what the site cannot measure, ranges and sources, safety notes, health_readings table, export and delete |
+| [WEEKLY_REPORT.md](WEEKLY_REPORT.md) | Weekly one-page report for a doctor at `/my-health/report`: diary readings plus sleep and mood, print, CSV, not a diagnosis |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [LIFEZOI_MIND.md](LIFEZOI_MIND.md) | LifeZoi Mind: rule-based voice and text companion, PHQ-9 and GAD-7, safety handling, exercises, 7-day plan, Psychology Encyclopedia, consented progress, provider research |
