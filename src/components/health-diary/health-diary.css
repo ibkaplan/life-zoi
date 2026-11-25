@@ -1,0 +1,97 @@
+/* Health diary: blood pressure, sugar, cholesterol. Colors use the site tokens so the page backgrounds and dark text keep their contrast. */
+.hd-page .btn-small { padding: 0.35rem 0.7rem; font-size: 0.92rem; min-height: 2.25rem; }
+.hd-page input[type="time"] {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.55rem 0.75rem;
+}
+.hd-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.hd-tab {
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.55rem 1.05rem;
+  font-weight: 650;
+  font-size: 1rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+.hd-tab.is-on { border-color: var(--primary); background: var(--lavender); color: var(--deep); }
+.hd-tab:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.hd-fields { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.hd-unit { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; align-items: center; }
+.hd-unit legend { font-weight: 650; margin-bottom: 0.3rem; }
+.hd-unit .hint { flex-basis: 100%; }
+.hd-head { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between; align-items: end; }
+.hd-head h2 { margin: 0; }
+.hd-latest { display: grid; gap: 0.35rem; justify-items: start; }
+.hd-latestValue { font-size: 1.45rem; color: var(--ink); overflow-wrap: anywhere; }
+.hd-badges { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.hd-badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-weight: 650;
+  font-size: 0.95rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.hd-badge-ok { background: #e7f4ef; border-color: #b7dccd; color: #1d5c4c; }
+.hd-badge-watch { background: #fff6e0; border-color: #f0d79a; color: #6b4a00; }
+.hd-badge-high, .hd-badge-low { background: #fdeee8; border-color: #efc9bb; color: #7a2e1d; }
+.hd-badge-urgent { background: var(--danger); border-color: var(--danger); color: #ffffff; }
+.hd-safety {
+  border: 2px solid #efc9bb;
+  background: var(--danger-bg);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+}
+.hd-safety p { margin: 0.35rem 0 0; }
+.hd-safety.is-emergency { border-color: var(--danger); }
+.hd-safety.is-emergency strong { color: var(--danger); }
+.hd-safetyCard { border-left: 6px solid var(--danger); }
+.hd-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.45rem; }
+.hd-help summary { cursor: pointer; font-size: 1.08rem; }
+.hd-sources { display: grid; gap: 0.35rem; }
+.hd-figure { margin: 0; }
+.hd-chart { width: 100%; max-width: 52rem; height: auto; display: block; }
+.hd-grid { stroke: var(--line); stroke-width: 1; }
+.hd-guide { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 4; }
+.hd-guideLabel { font-size: 13px; fill: var(--muted); }
+.hd-tick { font-size: 14px; fill: var(--ink); }
+.hd-line path { stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.hd-line circle, .hd-line rect { stroke: var(--surface); stroke-width: 1.5; }
+.hd-tone0 { --hd-color: var(--primary); }
+.hd-tone1 { --hd-color: var(--teal); }
+.hd-tone2 { --hd-color: #a2541b; }
+.hd-tone3 { --hd-color: var(--ink); }
+.hd-line path { stroke: var(--hd-color); }
+.hd-line circle, .hd-line rect { fill: var(--hd-color); }
+.hd-key { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+.hd-key li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.hd-key svg line { stroke: var(--hd-color); stroke-width: 3; }
+.hd-key svg circle, .hd-key svg rect { fill: var(--hd-color); }
+.hd-history td { vertical-align: top; }
+.hd-summary { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.hd-summary li { border: 1px solid var(--line); border-radius: 14px; padding: 0.7rem 0.9rem; background: var(--surface); }
+.hd-summary dl { display: grid; grid-template-columns: auto 1fr; gap: 0.15rem 0.8rem; margin: 0.35rem 0 0; }
+.hd-summary dt { color: var(--muted); }
+.hd-summary dd { margin: 0; font-weight: 650; }
+.hd-confirm { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+.hd-print-only { display: none; }
+@media (max-width: 560px) {
+  .hd-latestValue { font-size: 1.25rem; }
+}
+@media print {
+  .hd-print-only { display: block; color: #000; }
+  .hd-print-only table { margin-bottom: 1rem; }
+  .hd-print-only th, .hd-print-only td { border: 1px solid #999; padding: 4px 6px; }
+}

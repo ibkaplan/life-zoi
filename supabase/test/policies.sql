@@ -44,6 +44,42 @@ insert into public.check_ins (user_id, habit_id, entry_date, done)
   values ('00000000-0000-0000-0000-00000000000a', 'walk', '2026-11-01', true);
 insert into public.companion_state (user_id, state) values ('00000000-0000-0000-0000-00000000000a', '{"version":1}');
 insert into public.academy_state (user_id, state) values ('00000000-0000-0000-0000-00000000000a', '{"lessons":{}}');
+insert into public.health_readings (user_id, kind, measured_at, systolic, diastolic, pulse)
+  values ('00000000-0000-0000-0000-00000000000a', 'blood_pressure', '2026-11-20 08:00+00', 124, 79, 70);
+insert into public.health_readings (user_id, kind, measured_at, glucose_mgdl, glucose_context, unit)
+  values ('00000000-0000-0000-0000-00000000000a', 'glucose', '2026-11-20 07:30+00', 95.5, 'fasting', 'mmol/L');
+
+-- A cannot write health readings for B, and the shape and number checks hold.
+do $$ begin
+  insert into public.health_readings (user_id, kind, measured_at, systolic, diastolic)
+    values ('00000000-0000-0000-0000-00000000000b', 'blood_pressure', now(), 120, 80);
+  raise exception 'FAIL: wrote a health reading for another user';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  insert into public.health_readings (user_id, kind, measured_at, systolic, diastolic)
+    values ('00000000-0000-0000-0000-00000000000a', 'blood_pressure', now(), 80, 120);
+  raise exception 'FAIL: diastolic above systolic was saved';
+exception when check_violation then null;
+end $$;
+do $$ begin
+  insert into public.health_readings (user_id, kind, measured_at, glucose_mgdl, glucose_context, unit)
+    values ('00000000-0000-0000-0000-00000000000a', 'glucose', now(), 5.6, 'fasting', 'mmol/L');
+  raise exception 'FAIL: a glucose value below the limit was saved';
+exception when check_violation then null;
+end $$;
+do $$ begin
+  insert into public.health_readings (user_id, kind, measured_at, unit)
+    values ('00000000-0000-0000-0000-00000000000a', 'cholesterol', now(), 'mg/dL');
+  raise exception 'FAIL: an empty cholesterol reading was saved';
+exception when check_violation then null;
+end $$;
+do $$ begin
+  insert into public.health_readings (user_id, kind, measured_at, systolic, diastolic, glucose_mgdl, glucose_context, unit)
+    values ('00000000-0000-0000-0000-00000000000a', 'glucose', now(), 120, 80, 100, 'fasting', 'mg/dL');
+  raise exception 'FAIL: a glucose reading with blood pressure columns was saved';
+exception when check_violation then null;
+end $$;
 
 -- A cannot write Academy progress for B, and the size check holds.
 do $$ begin
@@ -101,6 +137,7 @@ do $$ begin
   if (select count(*) from public.check_ins) <> 0 then raise exception 'FAIL: B can see A check-ins'; end if;
   if (select count(*) from public.companion_state) <> 0 then raise exception 'FAIL: B can see A companion data'; end if;
   if (select count(*) from public.academy_state) <> 0 then raise exception 'FAIL: B can see A academy data'; end if;
+  if (select count(*) from public.health_readings) <> 0 then raise exception 'FAIL: B can see A health readings'; end if;
 end $$;
 
 -- Browser roles cannot read community tables.
@@ -133,6 +170,9 @@ do $$ begin
   end if;
   if exists (select 1 from public.academy_state where user_id = '00000000-0000-0000-0000-00000000000a') then
     raise exception 'FAIL: academy data was left behind';
+  end if;
+  if exists (select 1 from public.health_readings where user_id = '00000000-0000-0000-0000-00000000000a') then
+    raise exception 'FAIL: health readings were left behind';
   end if;
   if (select count(*) from auth.users) <> 2 then raise exception 'FAIL: other logins were touched'; end if;
 end $$;

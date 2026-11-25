@@ -13,6 +13,7 @@ import {
 import { clearAssistantThread } from "@/lib/assistant";
 import { bindCompanionOwner, clearCompanionAccount, clearCompanionLocal } from "@/lib/companion/store";
 import { bindAcademyOwner, clearAcademyAccount, clearAcademyLocal } from "@/lib/growth-academy/store";
+import { clearHealthDiaryAccount } from "@/lib/health-diary/store";
 import { clearLiveSession } from "@/lib/wellness-assistant/live-session";
 import { clearRecentQuestions } from "@/lib/wellness-assistant/recent";
 import { clearChangeLab } from "@/lib/change-lab";
@@ -368,6 +369,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           void clearAccountRecords();
           void clearCompanionAccount();
           void clearAcademyAccount();
+          void clearHealthDiaryAccount();
         } else {
           clearCompanionLocal();
           clearAcademyLocal();
