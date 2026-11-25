@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useLocale, useMessages, useT } from "@/components/locale-provider";
 import { SourceList } from "@/components/sources";
 import { BLOG_ARTICLES, BLOG_VIDEOS, type BlogArticle, type BlogVideo } from "@/lib/blog/articles";
@@ -135,14 +135,18 @@ export function BlogIndexView() {
   );
 }
 
+const noSubscribe = () => () => undefined;
+
 /** Share links open the other site only when the reader presses one. No share script is loaded. */
 export function ShareButtons({ path, title }: { path: string; title: string }) {
   const t = useT();
   const [copied, setCopied] = useState(false);
-  const [canShare, setCanShare] = useState(false);
-  useEffect(() => {
-    setCanShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
-  }, []);
+  // The phone's own share sheet, where the browser has one. False on the server and in the first render.
+  const canShare = useSyncExternalStore(
+    noSubscribe,
+    () => typeof navigator.share === "function",
+    () => false,
+  );
   const url = `${SITE_ORIGIN}${path}`;
   const u = encodeURIComponent(url);
   const text = encodeURIComponent(title);
