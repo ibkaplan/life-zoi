@@ -27,7 +27,8 @@ import growth_emotional_intelligence from "./growth-emotional-intelligence.json"
 import growth_resilience from "./growth-resilience.json";
 import growth_academy from "./growth-academy.json";
 import health_diary from "./health-diary.json";
+import free_tools from "./free-tools.json";
 import meet_demo from "./meet-demo.json";
 
-const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion, ...growth_confidence, ...growth_mindfulness, ...growth_communication, ...growth_emotional_intelligence, ...growth_resilience, ...growth_academy, ...health_diary, ...meet_demo };
+const catalog: Record<string, string> = { ...core, ...pages, ...nutrition, ...wellness_challenges, ...wellness_academy, ...wellness_urges, ...brain, ...library, ...companion, ...habits, ...focus, ...assistant, ...daily, ...mind, ...reviews, ...encyclopedia, ...health_day, ...fact_quiz, ...courses, ...guided, ...voice_companion, ...growth_confidence, ...growth_mindfulness, ...growth_communication, ...growth_emotional_intelligence, ...growth_resilience, ...growth_academy, ...health_diary, ...free_tools, ...meet_demo };
 export default catalog;

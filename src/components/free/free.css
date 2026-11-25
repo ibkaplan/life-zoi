@@ -33,3 +33,5 @@
 .free-crumbs a { font-weight: 600; }
 .free-related { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .free-tone-urgent { border-color: var(--danger); background: var(--danger-bg); }
+.landing-free { margin-block: 2rem; }
+.landing-free h2 { margin: 0; }
