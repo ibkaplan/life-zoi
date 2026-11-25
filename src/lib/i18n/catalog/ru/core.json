@@ -966,5 +966,16 @@
  "Download natural voice": "Скачать естественный голос",
  "Voice license: {license}.": "Лицензия голоса: {license}.",
  "The lifeZoi natural voice {name} reads this language. The voice below is used only if it cannot start.": "Этот язык читает естественный голос lifeZoi {name}. Голос ниже используется, только если он не запустится.",
- "The lifeZoi natural voices are free Piper voices. The voice file comes from huggingface.co and the speech program from cdn.jsdelivr.net, once. The voice then runs in this browser, and the words being read stay on this device.": "Естественные голоса lifeZoi — это бесплатные голоса Piper. Файл голоса скачивается один раз с huggingface.co, а программа речи с cdn.jsdelivr.net. Дальше голос работает в этом браузере, и читаемый текст остаётся на устройстве."
+ "The lifeZoi natural voices are free Piper voices. The voice file comes from huggingface.co and the speech program from cdn.jsdelivr.net, once. The voice then runs in this browser, and the words being read stay on this device.": "Естественные голоса lifeZoi — это бесплатные голоса Piper. Файл голоса скачивается один раз с huggingface.co, а программа речи с cdn.jsdelivr.net. Дальше голос работает в этом браузере, и читаемый текст остаётся на устройстве.",
+ "Normal": "Обычный",
+ "Large": "Крупный",
+ "Extra large": "Очень крупный",
+ "Text size": "Размер текста",
+ "Text size and layout": "Размер текста и вид страницы",
+ "Calm, simple layout": "Спокойный, простой вид",
+ "Hides decorative pictures and backgrounds, stops moving effects, adds space between parts, and underlines links. Every page and feature stays.": "Скрывает декоративные картинки и фоны, останавливает движущиеся эффекты, добавляет простор между частями и подчёркивает ссылки. Все страницы и функции остаются.",
+ "Saved in this browser. Sample data is on, so it is not saved to your account.": "Сохранено в этом браузере. Включены примерные данные, поэтому в учётную запись это не сохраняется.",
+ "Saved in this browser and in your account, so it follows you to your other devices.": "Сохранено в этом браузере и в вашей учётной записи, поэтому действует и на других ваших устройствах.",
+ "Saved in this browser on this device.": "Сохранено в этом браузере на этом устройстве.",
+ "Make the words larger, or choose a calmer page with less on it. Colours stay the same, so reading is just as clear.": "Сделайте слова крупнее или выберите более спокойную страницу, на которой меньше всего. Цвета не меняются, поэтому читать так же чётко."
 }
