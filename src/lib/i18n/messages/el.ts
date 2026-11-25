@@ -275,6 +275,7 @@ export const el: Messages = {
     "/training-academy": "Ακαδημία Εξέλιξης",
     "/training-academy/journey": "Το ταξίδι της εξέλιξής μου",
     "/mind": "LifeZoi Mind: συναισθηματική υγεία",
+    "/friends": "Προσκαλέστε έναν φίλο",
     "/share-the-care": "Μοιραστείτε τη φροντίδα",
     "/change-lab": "Εργαστήριο αλλαγής",
     "/lab-results": "Κατανοήστε τις εξετάσεις μου",

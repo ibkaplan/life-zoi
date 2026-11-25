@@ -159,7 +159,9 @@ export const NAV_SECTIONS: readonly NavSection[] = [
     pages: [
       { href: "/profile", label: "Profile" },
       { href: "/settings", label: "Settings" },
-      { href: "/share-the-care", label: "Share the Care" },
+      { href: "/friends", label: "Invite a friend" },
+      { href: "/friends", label: "Invite a friend" },
+  { href: "/share-the-care", label: "Share the Care" },
       { href: "/community", label: "Community" },
       { href: "/privacy", label: "Privacy" },
     ],
