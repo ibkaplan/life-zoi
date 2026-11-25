@@ -911,3 +911,30 @@ create table if not exists public.encyclopedia_articles (
 create index if not exists encyclopedia_articles_status_idx on public.encyclopedia_articles (status);
 alter table public.encyclopedia_articles enable row level security;
 revoke all on table public.encyclopedia_articles from public, anon, authenticated;
+
+-- 7-day email challenge (also in migrations/20261125060000_email_challenge.sql). Server (service role) only.
+create table if not exists public.challenge_signups (
+  id uuid primary key,
+  email text not null unique check (char_length(email) between 3 and 254 and email = lower(email) and position('@' in email) > 1),
+  user_id uuid unique references auth.users (id) on delete cascade,
+  locale text not null default 'en' check (locale in ('en', 'uk', 'ru', 'el')),
+  time_zone text not null default 'UTC' check (char_length(time_zone) between 1 and 64),
+  consent_version text not null check (char_length(consent_version) between 1 and 20),
+  consented_at timestamptz not null,
+  status text not null default 'pending' check (status in ('pending', 'active')),
+  confirm_token uuid not null unique,
+  confirm_sent_at timestamptz,
+  confirmed_at timestamptz,
+  unsubscribe_token uuid not null unique,
+  last_sent_day smallint not null default 0 check (last_sent_day between 0 and 7),
+  last_sent_on date,
+  created_at timestamptz not null default now(),
+  constraint challenge_signups_active_confirmed check (status <> 'active' or confirmed_at is not null)
+);
+
+create index if not exists challenge_signups_status_idx on public.challenge_signups (status, created_at);
+
+alter table public.challenge_signups enable row level security;
+
+-- No policies: only the server's service role (which bypasses row level security) uses this table.
+revoke all on table public.challenge_signups from public, anon, authenticated;

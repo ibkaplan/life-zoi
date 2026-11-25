@@ -62,6 +62,16 @@ export function StartView() {
         </ul>
       </section>
 
+      <section className="card stack">
+        <h2>{t("The LifeZoi 7-day challenge")}</h2>
+        <p>{t("One short, everyday task a day for a week, on the page or by email. Free, and you can stop at any time.")}</p>
+        <p>
+          <Link className="btn btn-secondary" href="/free/challenge">
+            {t("See the 7-day challenge")}
+          </Link>
+        </p>
+      </section>
+
       <p>
         <Link className="btn btn-secondary" href="/dashboard">
           {t("Go to my Dashboard")}

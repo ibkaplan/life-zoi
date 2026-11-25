@@ -1,0 +1,29 @@
+/* 7-day email challenge. Phone first, large touch targets, plain contrast. */
+.ch-hero {
+  display: grid;
+  gap: 0.8rem;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(168, 191, 174, 0.35), transparent 55%),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+.ch-hero h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); line-height: 1.15; max-width: 28ch; }
+.ch-days { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+.ch-day { display: grid; gap: 0.35rem; align-content: start; padding: 1rem; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); }
+.ch-day-num { font-weight: 700; font-size: 0.95rem; color: var(--muted); }
+.ch-day h3 { font-size: 1.1rem; margin: 0; }
+.ch-day p { margin: 0; }
+.ch-form { display: grid; gap: 1rem; max-width: 34rem; }
+.ch-form input[type="email"] { min-height: 3rem; font-size: 1.05rem; padding: 0 0.8rem; border-radius: 0.6rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink); width: 100%; }
+.ch-consent { display: flex; gap: 0.7rem; align-items: flex-start; font-weight: 500; }
+.ch-consent input { width: 1.4rem; height: 1.4rem; margin-top: 0.15rem; flex: none; }
+.ch-hidden { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.ch-form .btn { min-height: 3.1rem; justify-self: start; padding-inline: 1.4rem; font-size: 1.05rem; }
+.ch-status { padding: 0.9rem 1rem; border-radius: 0.7rem; border: 1px solid var(--line); background: var(--sand, var(--surface)); }
+.ch-small { font-size: 0.98rem; color: var(--muted); }
+@media (max-width: 560px) {
+  .ch-form .btn { justify-self: stretch; justify-content: center; }
+}

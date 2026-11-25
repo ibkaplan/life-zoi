@@ -92,6 +92,12 @@ export default function PrivacyPage() {
         <Link href="/share-the-care"><T text="Share the Care" /></Link>
       </section>
       <section className="card stack">
+        <h2><T text="7-day challenge emails" /></h2>
+        <p>
+          <T text="If you join the 7-day challenge, the server keeps your email address, your language, your time zone, the date you agreed, and how many of the seven emails were sent. A visitor's address gets one confirmation email and nothing else until it is confirmed; an unconfirmed address is deleted after 14 days. Every email has a one-click stop link, and stopping deletes the address. After the seventh email the address is deleted too. It is not shared, sold, or sent to an AI service. When sending is switched on, the emails go out through an email delivery provider that receives the address and the email text." />
+        </p>
+      </section>
+      <section className="card stack">
         <h2><T text="What this is not" /></h2>
         <p>
           <T text="lifeZoi does not claim HIPAA, GDPR, or any other compliance. It is not a medical device, it does not diagnose, and it does not predict how long someone will live. HTTPS and row level security do not by themselves make this a complete health record." />

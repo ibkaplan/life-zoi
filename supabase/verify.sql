@@ -9,7 +9,8 @@ with expected_tables(name) as (
     ('care_invitations'), ('companion_state'), ('academy_state'), ('health_readings'), ('registration_invites'),
     ('community_profiles'), ('community_messages'), ('community_reports'),
     ('community_blocks'), ('community_mutes'),
-    ('feedback_reviews'), ('feedback_suggestions'), ('feedback_announcements')
+    ('feedback_reviews'), ('feedback_suggestions'), ('feedback_announcements'),
+    ('challenge_signups')
 ),
 expected_policies(tbl, name) as (
   values
