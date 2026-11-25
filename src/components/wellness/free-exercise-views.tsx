@@ -397,7 +397,7 @@ export function AppDirectory() {
   return (
     <div className="learn free-guide stack-lg">
       <p className="kicker">{t("Free exercise resources")}</p>
-      <h1>{t("FREE AND LOW-COST EXERCISE APPS")}</h1>
+      <h1>{t("Free and Low-Cost Exercise Apps")}</h1>
       <p className="lede">
         {t("This directory is optional. A free download is not the same as fully free functionality. lifeZoi does not depend on any app listed here.")}
       </p>

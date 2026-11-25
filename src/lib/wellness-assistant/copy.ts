@@ -1,6 +1,6 @@
 import { msg } from "@/lib/i18n/translate";
 
-export const WELLNESS_ASSISTANT_TITLE = msg("LIFEZOI WELLNESS ASSISTANT");
+export const WELLNESS_ASSISTANT_TITLE = msg("LifeZoi Wellness Assistant");
 
 export const WELLNESS_ASSISTANT_SUBTITLE = msg("Your everyday companion for healthier living.");
 
@@ -10,7 +10,7 @@ export const WELLNESS_ASSISTANT_WELCOME =
 export const WELLNESS_ASSISTANT_NOTE =
   msg("LifeZoi Wellness Assistant provides prepared educational information to support everyday wellness. It is not a live AI medical service and does not diagnose or treat health conditions.");
 
-export const FEELING_HEADING = msg("I WANT TO TALK ABOUT HOW I FEEL");
+export const FEELING_HEADING = msg("I want to talk about how I feel");
 
 export const WELLNESS_ASSISTANT_EMERGENCY =
   msg("If you have emergency symptoms, contact emergency services. If a symptom persists, talk with a healthcare professional.");

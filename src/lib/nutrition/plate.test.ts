@@ -168,7 +168,7 @@ describe("nutrition plate", () => {
     expect(containsProhibitedClaim(text)).toBe(false);
     expect(text).not.toMatch(/\bpercent\b|%|lifespan|years of life|miracle/i);
     expect(text).not.toMatch(/always causes a crash|sugar always causes/i);
-    expect(text).toContain("BUILD YOUR HEALTHY PLATE");
+    expect(text).toContain("Build Your Healthy Plate");
     expect(text).toContain("Seven small steps. Better everyday choices.");
   });
 });

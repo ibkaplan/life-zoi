@@ -16,7 +16,7 @@ const P = {
   ink: "#3B2462",
 };
 
-export type ArtName = "yoga" | "meal" | "music" | "book" | "brain" | "walk" | "sleep" | "plan" | "day" | "chair" | "checkin";
+export type ArtName = "yoga" | "meal" | "music" | "breath" | "book" | "brain" | "walk" | "sleep" | "plan" | "day" | "chair" | "checkin";
 
 function Frame({ children, label, bg }: { children: React.ReactNode; label?: string; bg: string }) {
   return (
@@ -34,8 +34,28 @@ function Frame({ children, label, bg }: { children: React.ReactNode; label?: str
   );
 }
 
-function Sun({ x = 262, y = 46, r = 22 }: { x?: number; y?: number; r?: number }) {
-  return <circle cx={x} cy={y} r={r} fill={P.gold} opacity="0.9" />;
+/*
+ * Small corner motifs. Until 2026-11-25 most pictures had the same gold sun in a corner; the owner
+ * asked for more variety, so the sun now appears only in "day" and each picture has its own detail.
+ */
+function Leaf({ x, y, flip = false }: { x: number; y: number; flip?: boolean }) {
+  return (
+    <g transform={`translate(${x} ${y}) ${flip ? "scale(-1 1)" : ""}`}>
+      <path d="M0 30 C 0 10, 14 -2, 32 -4 C 30 14, 18 28, 0 30 Z" fill="#7FB38E" />
+      <path d="M0 30 C 10 18, 18 8, 30 -2" stroke="#3F7356" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Cloud({ x, y }: { x: number; y: number }) {
+  return (
+    <path
+      d={`M${x} ${y} a14 14 0 0 1 26 -8 a18 18 0 0 1 32 6 a12 12 0 0 1 2 24 h-58 a11 11 0 0 1 -2 -22 z`}
+      fill="#fff"
+      stroke={P.lavender}
+      strokeWidth="3"
+    />
+  );
 }
 
 export function Art({ name, label }: { name: ArtName; label?: string }) {
@@ -43,7 +63,8 @@ export function Art({ name, label }: { name: ArtName; label?: string }) {
     case "yoga":
       return (
         <Frame bg="#F1E8FB" label={label}>
-          <Sun />
+          <Leaf x={238} y={40} />
+          <Leaf x={82} y={52} flip />
           <ellipse cx="160" cy="176" rx="110" ry="10" fill={P.lavender} opacity="0.6" />
           <rect x="70" y="166" width="180" height="10" rx="5" fill={P.teal} />
           <circle cx="160" cy="70" r="15" fill={P.skin} />
@@ -55,7 +76,9 @@ export function Art({ name, label }: { name: ArtName; label?: string }) {
     case "chair":
       return (
         <Frame bg="#FDF4E4" label={label}>
-          <Sun x={52} />
+          <path d="M40 170 l6 -34 h28 l6 34 z" fill="#D9826A" />
+          <Leaf x={58} y={104} flip />
+          <Leaf x={62} y={100} />
           <path d="M150 110 h70 v60 M150 110 v60 M150 140 h70" stroke={P.teal} strokeWidth="7" strokeLinecap="round" fill="none" />
           <path d="M218 110 v-50" stroke={P.teal} strokeWidth="7" strokeLinecap="round" />
           <circle cx="182" cy="56" r="14" fill={P.skin2} />
@@ -92,6 +115,37 @@ export function Art({ name, label }: { name: ArtName; label?: string }) {
           <ellipse cx="220" cy="94" rx="11" ry="8" fill={P.teal} />
           <circle cx="262" cy="56" r="6" fill={P.gold} />
           <circle cx="76" cy="62" r="4" fill={P.gold} />
+        </Frame>
+      );
+    case "breath":
+      return (
+        <Frame bg="#E9F4F1" label={label}>
+          <path d="M160 48 v54" stroke={P.teal} strokeWidth="6" strokeLinecap="round" />
+          <path d="M156 98 C 130 92, 104 112, 104 146 C 104 166, 126 170, 142 160 C 154 152, 156 130, 156 98 Z" fill="#7FB38E" />
+          <path d="M164 98 C 190 92, 216 112, 216 146 C 216 166, 194 170, 178 160 C 166 152, 164 130, 164 98 Z" fill="#7FB38E" />
+          <path d="M156 104 C 140 116, 128 128, 120 146 M164 104 C 180 116, 192 128, 200 146" stroke="#3F7356" strokeWidth="3" fill="none" strokeLinecap="round" />
+          {[0, 1, 2].map((i) => (
+            <path
+              key={i}
+              d={`M${230 + i * 6} ${70 + i * 22} c 14 -10, 28 10, 42 0 s 20 -8, 30 0`}
+              stroke={i === 1 ? P.lavender : P.teal}
+              strokeWidth="5"
+              fill="none"
+              strokeLinecap="round"
+              opacity={0.9 - i * 0.2}
+            />
+          ))}
+          {[0, 1, 2].map((i) => (
+            <path
+              key={`l${i}`}
+              d={`M${20 + i * 6} ${70 + i * 22} c 14 -10, 28 10, 42 0 s 20 -8, 30 0`}
+              stroke={i === 1 ? P.lavender : P.teal}
+              strokeWidth="5"
+              fill="none"
+              strokeLinecap="round"
+              opacity={0.9 - i * 0.2}
+            />
+          ))}
         </Frame>
       );
     case "book":
@@ -137,8 +191,9 @@ export function Art({ name, label }: { name: ArtName; label?: string }) {
       );
     case "walk":
       return (
-        <Frame bg="#EEF5F3" label={label}>
-          <Sun x={60} y={50} />
+        <Frame bg="#EAF2FB" label={label}>
+          <Cloud x={40} y={56} />
+          <Cloud x={226} y={34} />
           <path d="M0 150 C 80 120, 160 170, 320 130 V200 H0 Z" fill={P.sage} />
           <path d="M240 150 v-40 M240 110 c-20 0 -20 -28 0 -36 c20 8 20 36 0 36" fill="#5F9C76" stroke="#3F7356" strokeWidth="3" />
           <circle cx="150" cy="64" r="13" fill={P.skin} />
@@ -170,7 +225,12 @@ export function Art({ name, label }: { name: ArtName; label?: string }) {
               <path d={`M132 ${y} h80`} stroke={i === 2 ? P.lavender : P.royal} strokeWidth="6" strokeLinecap="round" />
             </g>
           ))}
-          <circle cx="252" cy="40" r="16" fill={P.gold} />
+          <g transform="rotate(35 262 70)">
+            <rect x="254" y="24" width="16" height="78" rx="3" fill={P.gold} />
+            <path d="M254 102 h16 l-8 16 z" fill="#E8B48F" />
+            <path d="M259 112 h6 l-3 6 z" fill={P.ink} />
+            <rect x="254" y="18" width="16" height="10" rx="3" fill="#D9826A" />
+          </g>
         </Frame>
       );
     case "day":
@@ -194,7 +254,8 @@ export function Art({ name, label }: { name: ArtName; label?: string }) {
             <rect key={i} x={50 + i * 32} y={150 - (20 + ((i * 37) % 70))} width="22" height={20 + ((i * 37) % 70)} rx="6" fill={i % 2 ? P.teal : P.royal} />
           ))}
           <path d="M40 152 h240" stroke={P.ink} strokeWidth="3" strokeLinecap="round" />
-          <circle cx="262" cy="44" r="16" fill={P.gold} />
+          <path d="M60 70 C 120 60, 170 50, 252 30" stroke={P.gold} strokeWidth="5" fill="none" strokeLinecap="round" strokeDasharray="2 10" />
+          <path d="M240 24 l16 5 l-9 14" stroke={P.gold} strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </Frame>
       );
   }

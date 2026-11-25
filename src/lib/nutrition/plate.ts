@@ -137,7 +137,7 @@ export const plateExamples = [
 ] as const;
 
 export const plateIntro = {
-  title: "BUILD YOUR HEALTHY PLATE",
+  title: "Build Your Healthy Plate",
   lead: "A useful picture is half vegetables and fruit, a quarter protein, and a quarter whole grains or other carbohydrate foods. Healthy fats sit in a modest amount, beside that picture rather than as a fourth quarter.",
   vary: "Portions vary from person to person and from meal to meal. This is a pattern for building a plate, not a measured diet and not a personal target.",
   empty: "Pick a vegetable or fruit, a protein food, and a grain or other carbohydrate food. Fats stay in a modest amount. Portions vary.",
@@ -264,7 +264,7 @@ export const proteinCards: readonly (FoodVisual & {
 ];
 
 export const proteinCopy = {
-  title: "PROTEIN & STRONG MUSCLES",
+  title: "Protein & Strong Muscles",
   lead: "Protein foods help build and repair muscle. They also help a meal feel satisfying. Needs vary. This page does not set a gram target and it does not measure your muscle.",
   aging: "Muscle size and strength tend to decline as people get older. Protein foods are one part of looking after muscle. They are not a special cure, and they do not replace movement.",
   recovery: "After you use your muscles, a meal or snack with protein and a carbohydrate food is a common pattern. When you eat, and how much, is individual.",
@@ -282,7 +282,7 @@ export const saltPlaces = [
 ];
 
 export const saltCopy = {
-  title: "HIDDEN SALT — PROTECT YOUR HEART",
+  title: "Hidden Salt — Protect Your Heart",
   titleNote: "The heading is a reminder to notice sodium. It is not a promise that a meal protects your heart.",
   saltVersusSodium: "Salt is a crystal that contains sodium. The Nutrition Facts label lists sodium in milligrams. That number is sodium, not the weight of the salt you might picture in a spoon. You do not need a conversion chart for this lesson. Read the sodium line and the serving size.",
   pressure: "Public heart-health pages describe an association between higher sodium intake and higher blood pressure. An association in groups of people is not a certainty for one person. This page does not measure your blood pressure and it does not diagnose hypertension.",
@@ -347,7 +347,7 @@ export const fatKinds = [
 ];
 
 export const fatCopy = {
-  title: "HEALTHY FATS",
+  title: "Healthy Fats",
   lead: "Replacing some saturated fat with unsaturated fat can support heart health. That is a general pattern from public guidance. It is not a promise that a food prevents disease.",
   modest: "Fat is part of cooking and of feeling satisfied. Modest means a spoon, a slice, or a small handful, not a measured prescription.",
 };
@@ -418,13 +418,13 @@ export const plantGroups = [
 ] as const;
 
 export const rainbowCopy = {
-  title: "EAT THE RAINBOW — 30 PLANTS CHALLENGE",
+  title: "Eat the Rainbow — 30 Plants Challenge",
   lead: "Color is a simple way to remember variety: green, red, orange or yellow, blue or purple, plus beans, nuts and seeds, whole grains, and herbs. Thirty is a nickname for many plants, not a requirement to hit 30.",
   count: "Each plant counts once this week, even if you eat it again. A new calendar week starts a fresh list. You can also reset this week.",
 };
 
 export const groceryCopy = {
-  title: "SMART GROCERY SHOPPING",
+  title: "Smart Grocery Shopping",
   lead: "Compare two yogurts, breads, cereals, sauces, soups, or snacks. Start with an illustrative sample, or type the numbers you see on a package in your hand. lifeZoi does not look up products and it does not invent a missing number.",
   checklistTitle: "Grocery checklist",
   checklistNote: "A reminder you can mark and print. It is not a required shopping list.",
@@ -442,7 +442,7 @@ export const groceryChecklist = [
 ] as const;
 
 export const challengeCopy = {
-  title: "MY NUTRITION CHALLENGE",
+  title: "My Nutrition Challenge",
   motto: "Seven small steps. Better everyday choices.",
   lead: "Mark a step when you try it. The marks stay in this browser tab with your other check-ins. There is no account and no score that follows you.",
   done: "You marked all seven small steps. They stay in this browser tab until you restart. Nothing here is a grade or a medical result.",

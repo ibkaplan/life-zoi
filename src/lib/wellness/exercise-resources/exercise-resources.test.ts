@@ -52,9 +52,9 @@ describe("free exercise resources", () => {
     const text = publicExerciseText();
     expect(containsProhibitedClaim(text)).toBe(false);
     expect(text).not.toMatch(/aiseniors|live longer|lifespan|we diagnose|this treats/i);
-    expect(text).toContain("FREE EXERCISE RESOURCES");
+    expect(text).toContain("Free Exercise Resources");
     expect(text).toContain("Explore free exercise videos, printable guides, and simple movement routines to help you stay active at home.");
-    expect(text).toContain("LIVE BETTER. MAKE LIFE MATTER.");
+    expect(text).toContain("Live better. Make life matter.");
     expect(text).toContain("not treatment");
     expect(text).toContain("not a diagnosis");
     expect(text).toContain("not physical therapy");
@@ -107,7 +107,7 @@ describe("free exercise resources", () => {
       const text = pdfPlainText(bytes);
       expect(text).toContain(guide.title);
       expect(text).toContain("These guides are not treatment.");
-      expect(text).toContain("LIVE BETTER. MAKE LIFE MATTER.");
+      expect(text).toContain("Live better. Make life matter.");
       expect(text).toContain(`https://www.lifezoi.com/academy/move/resources/guides/${guide.slug}`);
       expect(text).toContain(guide.safety.slice(0, 40));
     }

@@ -5,7 +5,7 @@
  */
 export const en = {
   language: {
-    button: "LANGUAGE",
+    button: "Language",
     menuLabel: "Choose a language",
     current: "Current language: {language}",
   },
@@ -14,8 +14,8 @@ export const en = {
     headerPlaying: "Background music is playing. Open music controls.",
     headerPaused: "Background music is paused. Open music controls.",
     headerOff: "Background music is off. Open music controls.",
-    playMusic: "PLAY MUSIC",
-    playMorning: "PLAY MORNING MUSIC",
+    playMusic: "Play music",
+    playMorning: "Play morning music",
     panelIntro: "Music from the LifeZoi library while you explore. It is optional and only plays after you choose it.",
     play: "Play",
     pause: "Pause",
@@ -304,6 +304,20 @@ export const en = {
     profile: "My Profile",
     reviews: "Reviews & Feedback",
   },
+  /** Shorter labels for the one-line desktop menu. The phone menu and page titles keep the full names. */
+  sectionsShort: {
+    home: "Home",
+    dashboard: "Dashboard",
+    myHealth: "My Health",
+    food: "Food",
+    nutrition: "Nutrition",
+    movement: "Movement",
+    library: "Library",
+    brain: "Brain & Mind",
+    progress: "Progress",
+    profile: "Profile",
+    reviews: "Reviews",
+  },
   myHealth: {
     kicker: "My Health",
     title: "Your health, in one place",
@@ -321,15 +335,15 @@ export const en = {
   },
   home: {
     kicker: "LIFEZOI",
-    brand: "LIVE BETTER. MAKE LIFE MATTER.",
+    brand: "Live better. Make life matter.",
     brandLine: "Live Joy. Live Better.",
-    title: "YOUR LIFE. YOUR HEALTH. YOUR FUTURE.",
+    title: "Your life. Your health. Your future.",
     support: "Have you ever wondered what your future health might look like?",
     intro:
       "Your everyday choices matter more than you may realize. Your future is not a fixed number. The longevity outlook looks at the habits you describe and the public guidance around them, so you can see where you stand today. It is an educational picture, not a count of years and not a diagnosis.",
-    cta: "FILL OUT YOUR ASSESSMENT",
+    cta: "Fill out your assessment",
     ctaSub: "Get your personal health and longevity outlook",
-    dashboardCta: "OPEN MY DASHBOARD",
+    dashboardCta: "Open my dashboard",
     dashboardCtaSub: "Today's plan, check-in, and news",
     disclaimer:
       "LifeZoi provides educational information and statistical estimates. It cannot predict your exact lifespan, diagnose medical conditions, or replace professional medical advice.",
@@ -358,11 +372,11 @@ export const en = {
       food: { title: "Eat well. Feel better.", alt: "Green herbs and a crate of apples at a market." },
       move: { title: "Movement is life", alt: "An older woman smiles while walking outdoors in a red jacket." },
     },
-    freeExerciseTitle: "FREE EXERCISE RESOURCES",
+    freeExerciseTitle: "Free Exercise Resources",
     freeExerciseText:
       "Explore free exercise videos, printable guides, and simple movement routines to help you stay active at home.",
     openInMovement: "Open in Movement",
-    worksTitle: "HOW LIFEZOI WORKS",
+    worksTitle: "How LifeZoi Works",
     steps: {
       assessment: "Fill out your assessment",
       outlook: "Get your life outlook",
@@ -380,7 +394,7 @@ export const en = {
     creditSectionCc0: "Section photos are CC0, via Wikimedia Commons:",
   },
   gauge: {
-    title: "YOUR LIFE OUTLOOK",
+    title: "Your Life Outlook",
     before: "Complete your assessment to explore your personal lifestyle profile.",
     after: "Your lifestyle profile is a reading of what you reported. These words are labels, not a result.",
     labels: {
@@ -588,7 +602,7 @@ export const en = {
     lede:
       "lifeZoi helps you look at everyday habits, explore a hypothetical change in WHAT IF?, and keep a simple record of what you try. It does not diagnose illness or predict how long anyone will live.",
     assistantKicker: "Wellness Assistant",
-    assistantTitle: "LIFEZOI WELLNESS ASSISTANT",
+    assistantTitle: "LifeZoi Wellness Assistant",
     assistantText: "Choose a prepared question about everyday health. You can read the answer or listen to it.",
     assistantHint: "This is a prepared wellness information assistant, not a live chatbot or medical care.",
     assistantOpen: "Open the wellness assistant",
@@ -695,7 +709,7 @@ export const en = {
         why: "Choose at least one focus. lifeZoi uses this, with your other answers, to decide what to emphasize.",
       },
       results: {
-        title: "UPLOAD YOUR HEALTH RESULTS (OPTIONAL)",
+        title: "Upload your health results (optional)",
         why: "Nothing is uploaded or analyzed. This step does not send a file anywhere.",
       },
       review: {

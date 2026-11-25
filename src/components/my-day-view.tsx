@@ -91,7 +91,7 @@ export function MyDayView() {
     <div className="stack-lg">
       <section className="stack">
         <p className="kicker">{t("My Day at LifeZoi")}</p>
-        <h1>{t("TAKE CARE OF YOUR HEALTH EASILY")}</h1>
+        <h1>{t("Take care of your health easily")}</h1>
         <p className="lede">{t("Take Care of Your Health Easily.")}</p>
         <p>
           {t("One day, in the order you can walk through it. Times you have saved stay yours. Other times are labeled suggested, and you can change them.")}

@@ -193,7 +193,7 @@ export function ProteinWhy() {
   const { t } = useFoodFormat();
   return (
     <article className="stack-lg">
-      <p className="kicker">{t("WHY YOUR BODY NEEDS PROTEIN EVERY DAY")}</p>
+      <p className="kicker">{t("Why Your Body Needs Protein Every Day")}</p>
       <h1>{t("Why your body needs protein every day")}</h1>
       <p>{t("Protein foods supply amino acids used to maintain body tissues. Public guidance treats protein as a daily part of eating, alongside vegetables, fruit, fiber, whole grains, and fats. LifeZoi does not diagnose a protein deficiency and does not say a supplement is required.")}</p>
       <p>{t("The general adult RDA is 0.8 g per kg of body weight per day. Some papers discuss 1.2–1.6 g/kg/day for suitable adults. That higher range is a reference, not a target for every person, and it is not used for pregnancy, kidney disease, or liver disease here.")}</p>
@@ -207,7 +207,7 @@ export function ProteinMuscle() {
   const { t } = useFoodFormat();
   return (
     <article className="stack-lg">
-      <p className="kicker">{t("WEIGHT LOSS WITHOUT IGNORING YOUR MUSCLES")}</p>
+      <p className="kicker">{t("Weight Loss Without Ignoring Your Muscles")}</p>
       <h1>{t("Weight loss without ignoring your muscles")}</h1>
       <p>{t("If weight loss is your goal, a moderate calorie reduction is the estimate LifeZoi will show, and only when it stays at or above 1,500 kcal. Very-low-calorie diets are not offered. Protein can support muscle while someone eats less, and resistance exercise is the activity that trains muscle. Protein by itself does not cause weight loss or build muscle. Sleep, consistency, vegetables, and fiber matter too.")}</p>
       <p>{t("No result is guaranteed. A clinician or registered dietitian should guide pregnancy, kidney disease, liver disease, and complex medical diets. LifeZoi will not raise protein for those situations.")}</p>

@@ -19,5 +19,5 @@ Owner request, 2026-11-22: replace the plain light page background with a soft, 
 
 - The backdrop is CSS gradients and small inline SVG (waves, circles). No image downloads, no licensed images.
 - Cards, text colours and buttons do not change, so text inside cards keeps its contrast.
-- Tints behind text that sits directly on the backdrop were checked to keep ink, muted, royal, and teal text at 4.5:1 or more (WCAG AA). Keep the peak tint alphas at or below the current values when editing.
+- Tints behind text that sits directly on the backdrop were checked to keep ink, muted, heading, royal, and teal text at 4.5:1 or more (WCAG AA). Since 2026-11-25 muted, heading and teal are darker and reach 6.5:1 or more on all three backgrounds (see DESIGN_SYSTEM.md). Keep the peak tint alphas at or below the current values when editing.
 - Printing hides the decoration.

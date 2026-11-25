@@ -1,9 +1,9 @@
 /* Focus & Brain Training. LifeZoi palette; large text and buttons for comfortable use. */
 .focus-page { --focus-accent: var(--royal); --break-accent: var(--teal); --long-accent: #B7791F; }
 
-.focus-hero { background: linear-gradient(145deg, #52288A 0%, #6A3DA8 45%, #2F8F83 100%); }
+.focus-hero { background: linear-gradient(145deg, #52288A 0%, #6A3DA8 45%, var(--teal) 100%); }
 .focus-hero h1 { color: #F9F7F2; }
-.focus-hero .kicker { color: #F2D9A0; }
+.focus-hero .kicker { color: #FFFFFF; }
 .focus-hero p { margin: 0; max-width: 46rem; }
 
 .focus-timer {
@@ -159,7 +159,7 @@
 }
 .focus-preset strong { font-size: 1.15rem; }
 .focus-preset span { color: var(--muted); }
-.focus-preset em { font-style: normal; font-size: 0.85rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; }
+.focus-preset em { font-style: normal; font-size: 0.95rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; }
 .focus-preset[aria-checked="true"] { border-color: var(--royal); background: #F4EDFC; box-shadow: 0 0 0 3px rgba(106, 61, 168, 0.15); }
 
 .focus-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -201,7 +201,7 @@
 .focus-stats strong { font-size: 2rem; line-height: 1.1; color: var(--deep); }
 
 .focus-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.4rem; align-items: end; }
-.focus-day { display: grid; justify-items: center; gap: 0.2rem; font-size: 0.9rem; }
+.focus-day { display: grid; justify-items: center; gap: 0.2rem; font-size: 0.95rem; }
 .focus-day-bar {
   width: 100%;
   max-width: 2.6rem;
@@ -214,7 +214,7 @@
 }
 .focus-day-bar span { display: block; width: 100%; background: linear-gradient(180deg, var(--lavender-brand), var(--royal)); border-radius: 10px 10px 0 0; }
 .focus-day[data-today="true"] .focus-day-name { font-weight: 700; color: var(--royal); }
-.focus-day-minutes { color: var(--muted); white-space: nowrap; font-size: 0.8rem; }
+.focus-day-minutes { color: var(--muted); white-space: nowrap; font-size: 0.95rem; }
 
 @media (max-width: 520px) {
   .focus-controls { grid-template-columns: 1fr; }

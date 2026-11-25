@@ -110,7 +110,7 @@ export const MB = {
     lede: "Why short movement breaks matter, how your calves help your blood return to your heart, and a 2 to 3 minute break you can do at your desk or in your chair.",
   },
   water: {
-    heading: "WATER + MOVEMENT = A HEALTHIER BODY",
+    heading: "Water + movement = a healthier body",
     key: "Drinking enough water is important, but water alone cannot replace physical movement. Your muscles, breathing, heart, blood vessels, and lymphatic system all work together to support circulation and fluid balance.",
     points: [
       "Water supports normal hydration and fluid balance, even when you are sitting. Drinking still matters on a quiet day.",
@@ -131,7 +131,7 @@ export const MB = {
       "The heart pumps blood out through arteries (red) and it returns through veins (blue). Lymph vessels (green) collect extra fluid from tissues and return it to the bloodstream near the heart. Muscles and breathing help both return paths.",
   },
   why: {
-    heading: "WHY YOUR BODY NEEDS A MOVEMENT BREAK",
+    heading: "Why Your Body Needs a Movement Break",
     key: "Your body was designed to move, not to remain seated for hours. Even if you drink enough water and eat healthy food, prolonged sitting keeps important muscle groups inactive.",
     intro:
       "When you sit for a long time, your leg muscles are barely working. Your calf muscles normally help push blood from your lower legs back toward your heart. When you remain seated, this muscle pump becomes less active.",
@@ -184,7 +184,7 @@ export const MB = {
     ] satisfies BodyTopic[],
   },
   calves: {
-    heading: "YOUR CALVES: THE SECOND HEART",
+    heading: "Your Calves: The Second Heart",
     key: "The muscles in your lower legs play an important role in helping blood return from your legs to your heart.",
     points: [
       "When you walk, move your ankles, or rise onto your toes, your calf muscles tighten.",
@@ -201,8 +201,8 @@ export const MB = {
     },
   },
   rule: {
-    heading: "EVERY 30 MINUTES – GET UP AND MOVE!",
-    prompt: "HAVE YOU BEEN SITTING FOR 30 MINUTES? TIME TO MOVE!",
+    heading: "Every 30 minutes – get up and move!",
+    prompt: "Have you been sitting for 30 minutes? Time to move!",
     explain:
       "Long periods of uninterrupted sitting reduce the activity of your leg muscles and can affect blood flow in your lower body. A short movement break helps reactivate your muscles.",
     notDeadline:
@@ -227,7 +227,7 @@ export const MB = {
     followUp: "More guided breathing sessions are on the way in the Breathe for Life program.",
   },
   principles: {
-    heading: "DRINK. BREATHE. MOVE. NOURISH. REST.",
+    heading: "Drink. Breathe. Move. Nourish. Rest.",
     intro: "These five everyday habits support each other. None of them replaces another.",
     items: [
       { word: "Drink", text: "Hydration supports normal body functions. Drink according to your own needs and any instructions from your healthcare professional." },

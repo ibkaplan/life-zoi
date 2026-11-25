@@ -29,7 +29,7 @@ export function TodayPanel({ today, level }: { today: string; level: Difficulty 
   const logic = freshFor(progress, "logic", level, today, 1)[0];
   const memory = freshFor(progress, "memory", level, today, 1)[0];
   const attention = freshFor(progress, "attention", level, today, 1)[0];
-  const action = done ? t("See today’s results") : picks > 0 ? t("Continue today’s challenge") : t("START DAILY CHALLENGE");
+  const action = done ? t("See today’s results") : picks > 0 ? t("Continue today’s challenge") : t("Start daily challenge");
 
   return (
     <>

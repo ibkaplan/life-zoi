@@ -47,7 +47,7 @@ export function BrainQuizHub() {
           {t("Seven short games and a daily set of five. Points are for play: easy 10, medium 20, hard 30, and 25 more when a daily challenge is finished.")}
         </p>
         <div className="actions">
-          <Link className="btn btn-primary" href="/brain-quiz/daily">{t("START DAILY CHALLENGE")}</Link>
+          <Link className="btn btn-primary" href="/brain-quiz/daily">{t("Start daily challenge")}</Link>
           <Link className="btn btn-secondary" href="/brain-quiz/journey">{t("My Brain Journey")}</Link>
           <Link className="btn btn-secondary" href="/brain-quiz/health-facts">{t("Health Facts Quiz")}</Link>
           <Link className="btn btn-secondary" href="/brain-quiz/games">{t("Sudoku, memory, and logic games")}</Link>

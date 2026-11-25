@@ -51,7 +51,7 @@ const companion: { key: CompanionKey; href: string; art: ArtName }[] = [
   { key: "day", href: "/my-day", art: "day" },
   { key: "library", href: "/academy/move/library", art: "yoga" },
   { key: "meals", href: "/food-plan/today", art: "meal" },
-  { key: "breathe", href: "/breathe", art: "music" },
+  { key: "breathe", href: "/breathe", art: "breath" },
   { key: "music", href: "/library/music", art: "music" },
   { key: "books", href: "/library/books", art: "book" },
   { key: "games", href: "/brain-quiz/games", art: "brain" },
@@ -98,7 +98,6 @@ export function HomeView() {
           <div className="home-copy">
             <p className="home-kicker">{h.kicker}</p>
             <p className="home-brand">{h.brand}</p>
-            <p className="script brand-line">{h.brandLine}</p>
             <h1>{h.title}</h1>
             <p className="home-support">{h.support}</p>
             <p className="home-intro">{h.intro}</p>

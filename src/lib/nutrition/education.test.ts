@@ -58,7 +58,7 @@ describe("nutrition education", () => {
     expect(text).toContain("may not remember every bite");
     expect(text).toContain("not automatically healthier");
     expect(text).toContain("22 to 34 grams");
-    expect(text).toContain("FEED YOUR GUT");
+    expect(text).toContain("Feed your gut");
     expect(text).toContain("simplified illustration");
     expect(containsProhibitedClaim(text)).toBe(false);
     expect(banned.test(text)).toBe(false);
