@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DisplayButton } from "@/components/display-prefs";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useMessages } from "@/components/locale-provider";
 import { Logo } from "@/components/logo";
@@ -23,6 +24,7 @@ export function PublicHeader() {
         <Logo />
       </div>
       <div className="site-account">
+        <DisplayButton />
         <LanguageSwitcher />
         {account.phase === "ready" ? (
           <Link className="site-signin" href="/">

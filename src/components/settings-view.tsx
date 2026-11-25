@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppearanceSettingsSection } from "@/components/appearance";
+import { DisplaySettingsSection } from "@/components/display-prefs";
 import { AccountPanel } from "@/components/account-panel";
 import { LanguageChoice } from "@/components/language-choice";
 import { VoiceSettingsSection } from "@/components/voice/voice-settings";
@@ -61,6 +62,7 @@ export function SettingsView() {
         <p>{t.languageText}</p>
         <LanguageChoice />
       </section>
+      <DisplaySettingsSection />
       <AppearanceSettingsSection />
       <VoiceSettingsSection />
       <CompanionSettingsSection />
