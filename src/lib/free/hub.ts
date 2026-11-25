@@ -6,7 +6,7 @@ import { msg } from "@/lib/i18n/translate";
  *
  * The hub page at `/free`, the landing page, and the members' My Health menu all
  * read this list, so a new free tool needs one entry here and nothing else.
- * Write `title` and `summary` in English with `msg("…")`; the translations go in
+ * Write `title` and `summary` in English, each wrapped in msg(); the translations go in
  * the tool's own file in `src/lib/i18n/catalog/<locale>/`.
  */
 export type HubGroup = "calculators" | "discover";

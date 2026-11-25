@@ -49,7 +49,6 @@ describe("every page and API is members-only unless it is on the public list", (
       const url = urlOf(file);
       if (rel.startsWith("(members)/")) continue;
       if (rel.startsWith("(public)/") || rel === "page.tsx") {
-        // Whole public areas such as /free are listed by prefix, not page by page.
         if (PUBLIC_PREFIXES.some((prefix) => url === prefix || url.startsWith(`${prefix}/`))) continue;
         publicPages.add(url);
         continue;
