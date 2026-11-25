@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
       title: article.title,
       description: article.summary,
       publishedTime: article.published,
-      images: [{ url: "/home/hero-meadow.webp", width: 1600, height: 1200 }],
+      images: [{ url: `${SITE_ORIGIN}/home/hero-meadow.webp`, width: 1600, height: 1200 }],
     },
     twitter: { card: "summary_large_image", title: article.title, description: article.summary },
   };

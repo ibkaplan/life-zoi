@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "lifeZoi",
     title: "Health tips · lifeZoi",
     description: DESCRIPTION,
-    images: [{ url: "/home/hero-meadow.webp", width: 1600, height: 1200 }],
+    images: [{ url: `${SITE_ORIGIN}/home/hero-meadow.webp`, width: 1600, height: 1200 }],
   },
   twitter: { card: "summary_large_image", title: "Health tips · lifeZoi", description: DESCRIPTION },
 };
