@@ -60,8 +60,8 @@ export const FREE_HUB: readonly HubEntry[] = [
   },
   {
     href: "/free/health-age",
-    title: msg("How young are your habits?"),
-    summary: msg("A 2-minute check of seven everyday habits, with a result card you can share."),
+    title: msg("What is your health age?"),
+    summary: msg("A 2-minute lifestyle estimate from seven everyday habits, with a result card you can share."),
     icon: "🌱",
     group: "discover",
   },

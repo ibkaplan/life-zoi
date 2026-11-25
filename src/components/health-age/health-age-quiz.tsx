@@ -2,18 +2,18 @@
 
 import "@/components/health-age/health-age.css";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useLocale } from "@/components/locale-provider";
-import { BAND_MESSAGE, QUIZ_QUESTIONS, quizResult, type QuizAnswers, type QuizResult } from "@/lib/health-age/quiz";
-import type { Translate } from "@/lib/i18n/translate";
+import { AGE_MAX, AGE_MIN, BAND_MESSAGE, BAND_TITLE, QUIZ_QUESTIONS, parseAge, quizResult, type QuizAnswers, type QuizResult } from "@/lib/health-age/quiz";
+import { msg, type Translate } from "@/lib/i18n/translate";
 import { areaById } from "@/lib/wellness-score";
 
-type Stage = "intro" | "quiz" | "result";
+type Stage = "intro" | "age" | "quiz" | "result";
 
 const RING = 2 * Math.PI * 52;
 
 /**
- * The free 2-minute habits check. Answers stay in this component's state:
+ * The free 2-minute health age check. Answers stay in this component's state:
  * nothing is sent to a server or written to browser storage, and the result
  * card is drawn in the browser.
  */
@@ -22,8 +22,11 @@ export function HealthAgeQuiz() {
   const [stage, setStage] = useState<Stage>("intro");
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({});
+  const [ageText, setAgeText] = useState("");
+  const [ageProblem, setAgeProblem] = useState("");
+  const ageId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const result = quizResult(answers);
+  const result = quizResult(answers, ageText);
 
   useEffect(() => {
     if (stage !== "intro") headingRef.current?.focus();
@@ -39,7 +42,7 @@ export function HealthAgeQuiz() {
   function restart() {
     setAnswers({});
     setIndex(0);
-    setStage("quiz");
+    setStage("age");
   }
 
   if (stage === "intro") {
@@ -47,17 +50,71 @@ export function HealthAgeQuiz() {
       <div className="ha stack-lg">
         <section className="ha-hero">
           <p className="kicker">{t("Free · 2 minutes · no sign-up")}</p>
-          <h1>{t("How young are your habits?")}</h1>
+          <h1>{t("What is your health age?")}</h1>
           <p className="lede">
-            {t("Seven quick questions about sleep, movement, food, tobacco, alcohol, stress, and the people around you. See which everyday habits already work for you and the one small step that would help most.")}
+            {t("Your age and seven quick questions about sleep, movement, food, tobacco, alcohol, stress, and the people around you. See your lifestyle health age, which habits already work for you, and the small step that would help most.")}
           </p>
-          <button className="btn btn-primary ha-go" type="button" onClick={() => setStage("quiz")}>
+          <button className="btn btn-primary ha-go" type="button" onClick={() => setStage("age")}>
             {t("Start the check")} <span aria-hidden="true">→</span>
           </button>
           <ul className="ha-promises">
             <li>{t("Your answers stay on this page. Nothing is sent or saved.")}</li>
-            <li>{t("A lifestyle check for education, not a medical test or a diagnosis.")}</li>
+            <li>{t("A lifestyle estimate for education, not a medical test, a diagnosis, or a prediction.")}</li>
           </ul>
+        </section>
+      </div>
+    );
+  }
+
+  if (stage === "age") {
+    return (
+      <div className="ha stack-lg">
+        <section className="ha-card" aria-labelledby="ha-age-title">
+          <p className="ha-step">{t("Before we start")}</p>
+          <h2 id="ha-age-title" ref={headingRef} tabIndex={-1}>
+            {t("How old are you?")}
+          </h2>
+          <form
+            className="stack"
+            noValidate
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (parseAge(ageText) === null) {
+                setAgeProblem(t("Enter your age in whole years, from {min} to {max}.", { min: AGE_MIN, max: AGE_MAX }));
+                return;
+              }
+              setAgeProblem("");
+              setStage("quiz");
+            }}
+          >
+            <label className="field ha-age-field" htmlFor={ageId}>
+              <span>{t("Age in years")}</span>
+              <input
+                id={ageId}
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={3}
+                value={ageText}
+                aria-invalid={ageProblem ? true : undefined}
+                aria-describedby={ageProblem ? `${ageId}-problem` : undefined}
+                onChange={(event) => setAgeText(event.target.value.replace(/[^0-9]/g, ""))}
+              />
+            </label>
+            {ageProblem ? (
+              <p id={`${ageId}-problem`} className="alert alert-error" role="alert">
+                {ageProblem}
+              </p>
+            ) : null}
+            <p className="hint">{t("Your age is only used on this page to work out the estimate.")}</p>
+            <div className="ha-nav">
+              <button className="btn btn-secondary" type="button" onClick={() => setStage("intro")}>
+                <span aria-hidden="true">←</span> {t("Back")}
+              </button>
+              <button className="btn btn-primary" type="submit">
+                {t("Continue")} <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </form>
         </section>
       </div>
     );
@@ -109,7 +166,7 @@ export function HealthAgeQuiz() {
               <span aria-hidden="true">←</span> {t("Back")}
             </button>
           ) : (
-            <button className="btn btn-secondary" type="button" onClick={() => setStage("intro")}>
+            <button className="btn btn-secondary" type="button" onClick={() => setStage("age")}>
               <span aria-hidden="true">←</span> {t("Back")}
             </button>
           )}
@@ -132,16 +189,17 @@ function ResultView({
   const [shareNote, setShareNote] = useState("");
   const share = result.counted === 0 ? 0 : result.met.length / result.counted;
   const countLine = t("{met} of {counted} habit areas on track", { met: result.met.length, counted: result.counted });
+  const compare = compareLine(result, t);
 
   async function shareCard() {
     setShareNote("");
     try {
       const blob = await drawCard(result, t);
       const file = new File([blob], "lifezoi-habits.png", { type: "image/png" });
-      const text = `${countLine} · ${t("How young are your habits?")}`;
+      const text = `${t("My lifestyle health age: about {age}", { age: result.lifestyleAge })} · ${t("What is your health age?")}`;
       const url = `${window.location.origin}/free/health-age`;
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: t("How young are your habits?"), text: `${text} ${url}` });
+        await navigator.share({ files: [file], title: t("What is your health age?"), text: `${text} ${url}` });
         return;
       }
       const link = document.createElement("a");
@@ -168,7 +226,7 @@ function ResultView({
   return (
     <div className="ha stack-lg">
       <section className="ha-result" aria-labelledby="ha-result-title">
-        <p className="ha-result-kicker">{t("Your habits check")}</p>
+        <p className="ha-result-kicker">{t("Your lifestyle health age")}</p>
         <div className="ha-result-main">
           <div className="ha-ring" aria-hidden="true">
             <svg viewBox="0 0 120 120">
@@ -182,16 +240,16 @@ function ResultView({
                 strokeDashoffset={RING * (1 - share)}
               />
             </svg>
-            <span>
-              {result.met.length}
-              <small>/{result.counted}</small>
-            </span>
+            <span>{result.lifestyleAge}</span>
           </div>
           <div className="stack">
             <h1 id="ha-result-title" ref={headingRef} tabIndex={-1}>
-              {t(result.band.label)}
+              {t("About {age}", { age: result.lifestyleAge })}
             </h1>
-            <p className="ha-count">{countLine}</p>
+            <p className="ha-count">{compare}</p>
+            <p>
+              <strong>{t(BAND_TITLE[result.band.id])}</strong> · {countLine}
+            </p>
             <p>{t(BAND_MESSAGE[result.band.id])}</p>
           </div>
         </div>
@@ -210,7 +268,17 @@ function ResultView({
             );
           })}
         </ul>
-        <p className="ha-note">{t("A lifestyle check for education, not a medical test or a diagnosis.")}</p>
+        <p className="ha-note">{t("A lifestyle estimate for education, not a medical test, a diagnosis, or a prediction.")}</p>
+      </section>
+
+      <section className="card stack" aria-labelledby="ha-how">
+        <h2 id="ha-how">{t("How this number is made")}</h2>
+        <p>
+          {t("We start from the age you typed. For each of the seven habit areas that matches public health guidance we take away one year, and for each one that needs attention we add one year. An area you chose not to answer does not change the number.")}
+        </p>
+        <p>
+          {t("The one-year step is LifeZoi's own simple rule to show which way your habits point. It is not taken from a study, it does not measure your body, and it does not say anything about how long you will live. A doctor or nurse can talk with you about your own health.")}
+        </p>
       </section>
 
       <div className="ha-actions">
@@ -295,7 +363,7 @@ async function drawCard(result: QuizResult, t: Translate): Promise<Blob> {
   ctx.fillText("LifeZoi", 90, 130);
   ctx.font = `600 36px ${sans}`;
   ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.fillText(t("Your habits check"), 90, 190);
+  ctx.fillText(t("Your lifestyle health age"), 90, 190);
 
   const cx = width / 2;
   const cy = 470;
@@ -315,14 +383,14 @@ async function drawCard(result: QuizResult, t: Translate): Promise<Blob> {
   }
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
-  ctx.font = `800 150px ${sans}`;
-  ctx.fillText(`${result.met.length}/${result.counted}`, cx, cy + 52);
+  ctx.font = `800 170px ${sans}`;
+  ctx.fillText(String(result.lifestyleAge), cx, cy + 60);
 
-  ctx.font = `700 64px ${sans}`;
-  fitText(ctx, t(result.band.label), cx, 770, width - 160);
+  ctx.font = `700 56px ${sans}`;
+  fitText(ctx, compareLine(result, t), cx, 770, width - 160);
   ctx.font = `500 38px ${sans}`;
   ctx.fillStyle = "rgba(255,255,255,0.9)";
-  fitText(ctx, t("{met} of {counted} habit areas on track", { met: result.met.length, counted: result.counted }), cx, 835, width - 160);
+  fitText(ctx, `${t(BAND_TITLE[result.band.id])} · ${t("{met} of {counted} habit areas on track", { met: result.met.length, counted: result.counted })}`, cx, 835, width - 160);
 
   ctx.textAlign = "left";
   ctx.font = `600 34px ${sans}`;
@@ -341,7 +409,7 @@ async function drawCard(result: QuizResult, t: Translate): Promise<Blob> {
   ctx.textAlign = "center";
   ctx.font = `500 28px ${sans}`;
   ctx.fillStyle = "rgba(255,255,255,0.8)";
-  fitText(ctx, t("A lifestyle check for education, not a medical test or a diagnosis."), cx, height - 110, width - 140);
+  fitText(ctx, t("An estimate from habits, not a medical test or a prediction."), cx, height - 110, width - 140);
   ctx.font = `700 30px ${sans}`;
   ctx.fillStyle = "#ffffff";
   fitText(ctx, t("Try it free: {url}", { url: `${window.location.host}/free/health-age` }), cx, height - 60, width - 140);
@@ -349,6 +417,30 @@ async function drawCard(result: QuizResult, t: Translate): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("no blob"))), "image/png");
   });
+}
+
+/** The word for "years" in the right form for the number, so Russian and Ukrainian read 1 год, 3 года, 5 лет. */
+const YEAR_FORMS: Record<Intl.LDMLPluralRule, string> = {
+  zero: msg("years (form other)"),
+  one: msg("years (form one)"),
+  two: msg("years (form other)"),
+  few: msg("years (form few)"),
+  many: msg("years (form many)"),
+  other: msg("years (form other)"),
+};
+
+function yearsWord(n: number, t: Translate): string {
+  const lang = document.documentElement.lang || "en";
+  if (lang.startsWith("en")) return n === 1 ? "year" : "years";
+  return t(YEAR_FORMS[new Intl.PluralRules(lang).select(n)]);
+}
+
+/** "3 years younger than your age", "2 years older…", or "the same as your age". */
+function compareLine(result: QuizResult, t: Translate): string {
+  const n = Math.abs(result.difference);
+  if (result.difference < 0) return t("{n} {years} younger than your age", { n, years: yearsWord(n, t) });
+  if (result.difference > 0) return t("{n} {years} older than your age", { n, years: yearsWord(n, t) });
+  return t("The same as your age");
 }
 
 /** Shrinks the font until the line fits. */
