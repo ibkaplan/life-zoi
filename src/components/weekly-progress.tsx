@@ -93,7 +93,7 @@ export function WeeklyProgress() {
     <div className="week-layout">
       <section id="my-progress" className="stack" aria-labelledby="my-progress-title">
         <div className="stack">
-          <h2 id="my-progress-title">{t("MY PROGRESS")}</h2>
+          <h2 id="my-progress-title">{t("My Progress")}</h2>
           <p className="lede">{t("Every small step counts.")}</p>
           {sample ? (
             <p className="banner banner-sample" role="status">
@@ -248,7 +248,7 @@ export function WeeklyProgress() {
 
       <section id="weekly-check-in" className="card stack" aria-labelledby="weekly-check-in-title">
         <div className="stack">
-          <h2 id="weekly-check-in-title">{t("MY WEEKLY CHECK-IN")}</h2>
+          <h2 id="weekly-check-in-title">{t("My Weekly Check-In")}</h2>
           <p className="lede">{t("Your week. Your progress. Your next step.")}</p>
           <p className="hint">
             {t("{week}. Nothing here is marked until you choose it.", { week: formatWeekRange(week.start, week.end, longDate) })}

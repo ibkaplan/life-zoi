@@ -135,13 +135,13 @@ export const nutritionCss = `
 
 .nz-panel h2,
 .nz-panel h3 {
-  color: #5725a8;
+  color: var(--heading);
 }
 
 .nz-kicker {
   margin: 0;
-  color: #7136c8;
-  font-size: 0.86rem;
+  color: var(--teal);
+  font-size: 0.95rem;
   font-weight: 750;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -161,7 +161,7 @@ export const nutritionCss = `
   border-radius: 999px;
   border: 1px solid #e9ddfb;
   background: #ffffff;
-  color: #5725a8;
+  color: var(--heading);
   text-decoration: none;
   font-weight: 700;
 }
@@ -187,7 +187,7 @@ export const nutritionCss = `
 }
 
 .nz-cardTitle {
-  color: #5725a8;
+  color: var(--heading);
 }
 
 .nz-meta {
@@ -246,7 +246,7 @@ export const nutritionCss = `
 .nz-then {
   margin: 0;
   text-align: center;
-  color: #7136c8;
+  color: var(--teal);
   font-weight: 750;
 }
 
@@ -353,7 +353,7 @@ export const nutritionCss = `
   min-height: 44px;
   display: flex;
   align-items: center;
-  color: #5725a8;
+  color: var(--heading);
 }
 
 .nz-day {
@@ -393,7 +393,7 @@ export const nutritionCss = `
 }
 
 .nz-note {
-  color: #3e4e80;
+  color: var(--muted);
 }
 
 @media (min-width: 720px) {

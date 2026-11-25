@@ -48,7 +48,7 @@ export const FOOD_LINKS = {
   fdc: { name: "USDA FoodData Central", url: "https://fdc.nal.usda.gov/" },
 } as const;
 
-export const FOOD_TITLE = msg("LIFEZOI — MY PERSONAL FOOD & WELLNESS PLAN");
+export const FOOD_TITLE = msg("LifeZoi — My Personal Food & Wellness Plan");
 export const FOOD_SUBTITLE = msg("Discover Seasonal Foods. Explore Ayurveda. Build a Balanced Way of Eating.");
 export const FOOD_TAGLINE = msg("Eat Well. Follow the Seasons. Feel Your Best.");
 export const SIMPLE_MESSAGE = msg(

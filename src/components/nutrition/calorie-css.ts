@@ -2,8 +2,8 @@
 export const calorieCss = `
 .cc { min-width: 0; }
 .cc h3 { margin: 0; }
-.cc-muted { color: #3e4e80; font-size: 0.98rem; }
-.cc-label { margin: 0; color: #5725a8; font-weight: 700; font-size: 1rem; }
+.cc-muted { color: var(--muted); font-size: 0.98rem; }
+.cc-label { margin: 0; color: var(--heading); font-weight: 700; font-size: 1rem; }
 .cc-warn {
   margin: 0;
   padding: 0.7rem 0.85rem;
@@ -81,7 +81,7 @@ export const calorieCss = `
 .cc-check { display: flex; gap: 0.6rem; align-items: flex-start; overflow-wrap: anywhere; }
 .cc-check input { width: 24px; height: 24px; margin-top: 0.2rem; flex: none; }
 .cc-gramsField input { max-width: 9rem; }
-.cc-empty { margin: 0; color: #3e4e80; }
+.cc-empty { margin: 0; color: var(--muted); }
 .cc-mealBlock { display: grid; gap: 0.5rem; background: #ffffff; border: 1px solid #e9ddfb; border-radius: 16px; padding: 1rem; }
 .cc-mealHead { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
 .cc-mealHead p { margin: 0; }

@@ -10,7 +10,7 @@ export function MomentsIndex() {
   return (
     <div className="library stack-lg">
       <p className="kicker">{t("Health Library")}</p>
-      <h1>{t("HAVING A HARD MOMENT?")}</h1>
+      <h1>{t("Having a hard moment?")}</h1>
       <p className="lede">
         {t("Short, nonjudgmental notes. You can close the page. Nothing here is a score, a diagnosis, or a reason to be hard on yourself.")}
       </p>

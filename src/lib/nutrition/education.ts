@@ -170,7 +170,7 @@ export const labels = {
 };
 
 export const dailyChoices = {
-  title: "YOUR BODY REMEMBERS YOUR DAILY CHOICES",
+  title: "Your Body Remembers Your Daily Choices",
   subtitle:
     "Everyday food choices add up. What you eat regularly can influence your metabolism, blood vessels, and long-term heart health.",
   message:
@@ -235,7 +235,7 @@ export const teaspoonNote =
   "A kitchen estimate. About 4 grams of granulated sugar is 1 teaspoon. Use it to picture a label. It is not a diet.";
 
 export const hiding = {
-  title: "SUGAR HIDING IN YOUR EVERYDAY FOOD",
+  title: "Sugar Hiding in Your Everyday Food",
   intro:
     "Added sugar sometimes shows up in foods that are not desserts. Some packaged breads, buns, sauces, dressings, cereals, flavored yogurts, granola bars, peanut butters, and canned foods contain it. Some do not. This is not a claim about every American bread or every packaged food. The label is how you tell.",
   places: [
@@ -338,7 +338,7 @@ export const awareness = {
 };
 
 export const breadIntro = {
-  title: "BAKE YOUR OWN BREAD. KNOW WHAT YOU EAT.",
+  title: "Bake your own bread. Know what you eat.",
   body: "Homemade means you choose the ingredients. It is not automatically healthier, and it is not automatically lower in calories. A homemade loaf can still be a large source of carbohydrate. The point is knowing what went in.",
 };
 
@@ -479,7 +479,7 @@ export function breadRecipe(slug: string) {
 }
 
 export const gut = {
-  title: "FEED YOUR GUT. NOURISH YOUR LIFE.",
+  title: "Feed your gut. Nourish your life.",
   message:
     "Your gut does much more than digest food. It is home to a complex community of microorganisms that interacts with digestion, metabolism, and the immune system.",
   illustrationLabel: "Simplified drawing of the digestive tract for teaching. It is not a medical diagram or a diagnosis.",

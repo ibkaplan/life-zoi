@@ -24,7 +24,7 @@ function downloadCard(title: string, text: string, slug: string, t: Translate) {
   ctx.font = "700 42px Georgia, serif";
   ctx.fillText("lifeZoi", 168, 122);
   ctx.font = "700 28px sans-serif";
-  ctx.fillText(t("SHARE A HEALTHY IDEA"), 72, 220);
+  ctx.fillText(t("Share a healthy idea"), 72, 220);
   ctx.font = "560 64px Georgia, serif";
   wrapFill(ctx, title, 72, 320, 936, 76);
   ctx.font = "400 36px sans-serif";
@@ -68,12 +68,12 @@ export function CardsIndex() {
   return (
     <div className="library stack-lg">
       <p className="kicker">{t("Health Library")}</p>
-      <h1>{t("SHARE A HEALTHY IDEA")}</h1>
+      <h1>{t("Share a healthy idea")}</h1>
       <p className="lede">{t("Download a square image, share the page, or open the guide. These cards do not promise a result.")}</p>
       <div className="library-grid">
         {healthCards.map((card) => (
           <article key={card.slug} className="idea-card">
-            <p>{t("SHARE A HEALTHY IDEA")}</p>
+            <p>{t("Share a healthy idea")}</p>
             <h2>{t(card.title)}</h2>
             <p>{t(card.text)}</p>
             <p>{t(LIBRARY_BRAND)}</p>
@@ -122,7 +122,7 @@ export function CardDetail({ slug }: { slug: string }) {
   return (
     <div className="library stack-lg">
       <article className="idea-card">
-        <p>{t("SHARE A HEALTHY IDEA")}</p>
+        <p>{t("Share a healthy idea")}</p>
         <h1>{t(card.title)}</h1>
         <p>{t(card.text)}</p>
         <p>{t(LIBRARY_BRAND)}</p>

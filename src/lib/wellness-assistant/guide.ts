@@ -36,7 +36,7 @@ export type GuideAnswer = {
   links: readonly GuideLink[];
 };
 
-export const GUIDE_TITLE = "LIFEZOI WELLNESS ASSISTANT";
+export const GUIDE_TITLE = "LifeZoi Wellness Assistant";
 export const GUIDE_WELCOME =
   "Choose a question and discover simple, helpful information about your everyday health and wellbeing.";
 export const GUIDE_NOTE =

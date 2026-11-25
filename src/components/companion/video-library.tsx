@@ -347,7 +347,7 @@ function SlotCard({ slot, level, activity, onPlay }: { slot: LibrarySlot; level:
         {!matchesLevel ? ` ${t("No class at your chosen level for this length yet, so this one is shown.")}` : ""}
       </p>
       <button type="button" className="btn btn-primary vl-big vl-play" onClick={() => onPlay(video)}>
-        ▶ {t("PLAY VIDEO")}
+        ▶ {t("Play video")}
       </button>
     </article>
   );

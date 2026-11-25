@@ -7,7 +7,7 @@ export type Difficulty = "easy" | "medium" | "hard";
 
 export const POINT_VALUES = { easy: 10, medium: 20, hard: 30, dailyBonus: 25 } as const;
 
-export const QUIZ_TITLE = msg("LIFEZOI BRAIN & HABIT QUIZ");
+export const QUIZ_TITLE = msg("LifeZoi Brain & Habit Quiz");
 export const QUIZ_TAGLINE = msg("Challenge Your Mind. Discover Your Habits. Keep Learning.");
 export const QUIZ_NOTICE = msg(
   "LifeZoi Brain & Habit Quiz is designed for educational entertainment and everyday learning. Game scores do not measure intelligence, diagnose cognitive conditions, or replace professional medical assessment.",

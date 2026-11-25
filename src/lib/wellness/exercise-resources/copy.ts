@@ -15,10 +15,10 @@ export function isOffered(tier: ResourceTier): boolean {
   return tier === "free";
 }
 
-export const FREE_EXERCISE_TITLE = "FREE EXERCISE RESOURCES";
+export const FREE_EXERCISE_TITLE = "Free Exercise Resources";
 export const FREE_EXERCISE_MESSAGE =
   "Explore free exercise videos, printable guides, and simple movement routines to help you stay active at home.";
-export const BRAND_LINE = "LIVE BETTER. MAKE LIFE MATTER.";
+export const BRAND_LINE = "Live better. Make life matter.";
 export const LIFEZOI_ORIGIN = SITE_ORIGIN;
 export const LINK_CHECKED = "2026-11-06";
 

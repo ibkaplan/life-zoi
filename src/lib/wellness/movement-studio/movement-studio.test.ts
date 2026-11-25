@@ -53,8 +53,8 @@ const verifiedLengths: Record<string, string> = {
 
 describe("movement studio catalog", () => {
   it("uses the studio hero, nine categories, and the safety line", () => {
-    expect(STUDIO_HERO).toBe("MOVE BETTER. FEEL STRONGER. LIVE FULLY.");
-    expect(STUDIO_SECTION).toBe("CHOOSE YOUR MOVEMENT");
+    expect(STUDIO_HERO).toBe("Move better. Feel stronger. Live fully.");
+    expect(STUDIO_SECTION).toBe("Choose Your Movement");
     expect(studioCategories).toHaveLength(9);
     expect(studioCategories.map((category) => category.title)).toEqual([
       "Chair Movement Studio",

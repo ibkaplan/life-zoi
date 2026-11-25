@@ -190,7 +190,7 @@ const stepCopy: Record<StepId, { title: string; why: string }> = {
     why: msg("Choose at least one focus. lifeZoi uses this, with your other answers, to decide what to emphasize."),
   },
   results: {
-    title: msg("UPLOAD YOUR HEALTH RESULTS (OPTIONAL)"),
+    title: msg("Upload your health results (optional)"),
     why: msg("Nothing is uploaded or analyzed. This step does not send a file anywhere."),
   },
   review: {

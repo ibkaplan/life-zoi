@@ -24,7 +24,7 @@
   padding: 0.12rem 0.5rem;
   border-radius: 999px;
   background: rgba(23, 20, 46, 0.55);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
@@ -112,7 +112,7 @@
 
 .lz-topics { display: grid; gap: 1rem; }
 .lz-topics-head { display: grid; gap: 0.35rem; }
-.lz-topics-head h2 { color: var(--deep, #52288A); }
+.lz-topics-head h2 { color: var(--heading); }
 .lz-topics-lede { color: var(--muted); font-size: 1.08rem; }
 
 .lz-topic-grid {
@@ -171,7 +171,7 @@
 .lz-topic-body { position: relative; display: grid; gap: 0.25rem; padding: 1.4rem 0.85rem 0.9rem; }
 .lz-topic-title { font-weight: 750; font-size: 1.08rem; color: var(--topic-ink, #52288A); line-height: 1.25; }
 .lz-topic-text { font-size: 0.98rem; color: var(--muted); line-height: 1.4; }
-@media (max-width: 420px) { .lz-topic-text { font-size: 0.92rem; } }
+@media (max-width: 420px) { .lz-topic-text { font-size: 0.95rem; } }
 
 .lz-topic-energy { --topic-soft: #FDF1DC; --topic-ink: #8A5A0B; }
 .lz-topic-nutrition { --topic-soft: #E8F1EA; --topic-ink: #2F5A44; }
@@ -181,7 +181,7 @@
 .lz-topic-heart { --topic-soft: #E3F2EF; --topic-ink: #1E625C; }
 .lz-topic-longevity { --topic-soft: #FBF3E2; --topic-ink: #6A4A0E; }
 
-.lz-topics-credits { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.lz-topics-credits { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
 .lz-topics-credits a { color: inherit; }
 
 /* ---------- Wellness score photo ---------- */

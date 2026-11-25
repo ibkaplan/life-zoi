@@ -3,7 +3,7 @@ import { libraryGuides } from "@/lib/library/guides";
 import { dailyLessons, hardMoments } from "@/lib/library/lessons";
 import { libraryExercises, movementPrograms } from "@/lib/library/movement";
 
-export const LIBRARY_HEADLINE = "YOUR FREE LIBRARY FOR A HEALTHIER LIFE";
+export const LIBRARY_HEADLINE = "Your Free Library for a Healthier Life";
 export const LIBRARY_SUBTITLE =
   "Discover practical health guides, nutrition tips, exercise routines, recipes, and simple habits you can use every day.";
 export const LIBRARY_BRAND = BRAND_LINE;

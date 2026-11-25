@@ -112,7 +112,7 @@ a.mind-card:hover, a.mind-card:focus-visible { border-color: var(--royal); }
   width: fit-content;
   border-radius: 999px;
   padding: 0.15rem 0.7rem;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
   background: var(--lavender);
   color: var(--deep);
@@ -143,7 +143,7 @@ a.mind-card:hover, a.mind-card:focus-visible { border-color: var(--royal); }
 .mind-bubble-mind { background: #ffffff; border: 1px solid var(--line); justify-self: start; border-bottom-left-radius: 6px; }
 .mind-bubble-person { background: var(--royal); color: #fff; justify-self: end; border-bottom-right-radius: 6px; }
 .mind-bubble-crisis { background: #fff5f3; border: 2px solid #b9433a; color: #5c1d17; }
-.mind-bubble-who { font-size: 0.9rem; font-weight: 700; color: var(--muted); }
+.mind-bubble-who { font-size: 0.95rem; font-weight: 700; color: var(--muted); }
 .mind-bubble-person .mind-bubble-who { color: #EFE5FA; }
 
 .mind-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -304,7 +304,7 @@ a.mind-card:hover, a.mind-card:focus-visible { border-color: var(--royal); }
 .mind-article { display: grid; gap: 1.2rem; max-width: 46rem; }
 .mind-article section { display: grid; gap: 0.6rem; }
 .mind-article-art { width: 100%; max-width: 46rem; height: auto; border-radius: 24px; background: linear-gradient(135deg, #f3ecfb, #eef7f5); }
-.mind-evidence { font-size: 0.92rem; font-weight: 700; color: #164e49; background: #e3f2ef; border-radius: 999px; padding: 0.1rem 0.7rem; width: fit-content; }
+.mind-evidence { font-size: 0.95rem; font-weight: 700; color: #164e49; background: #e3f2ef; border-radius: 999px; padding: 0.1rem 0.7rem; width: fit-content; }
 .mind-evidence[data-level="emerging"] { background: #fdf1dc; color: #6b4306; }
 .mind-evidence[data-level="preliminary"] { background: #fbe7e4; color: #7a221a; }
 .mind-evidence[data-level="unproven"] { background: #eee; color: #333; }

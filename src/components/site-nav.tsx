@@ -58,7 +58,8 @@ function SectionMark({ section }: { section: NavSection }) {
 
 /**
  * One header for every page.
- * Wide screens: the eleven main sections in one bar that wraps instead of scrolling, so no item is cut off.
+ * Wide screens: the eleven main sections on one line, with short labels (the full name is the
+ * tooltip and is used everywhere else), in a bar that wraps instead of scrolling if it must.
  * Phones and small tablets: a tab bar at the bottom of the screen with Home, Dashboard, Movement,
  * and Menu, which opens every section (and, when signed in, Account and Sign out).
  * Under the bar, the pages of the current section.
@@ -93,6 +94,7 @@ export function SiteNav() {
   }, [menuOpen]);
 
   const sectionLabel = (section: NavSection) => m.sections[section.key];
+  const shortLabel = (section: NavSection) => m.sectionsShort[section.key];
   const isCurrentSection = (section: NavSection) => current?.key === section.key;
   const quick = NAV_SECTIONS.filter((section) => PHONE_QUICK_SECTIONS.includes(section.key));
   const currentPage = current ? currentPageIn(current, pathname) : null;
@@ -132,10 +134,11 @@ export function SiteNav() {
               <Link
                 href={section.href}
                 data-section={section.key}
+                title={shortLabel(section) !== sectionLabel(section) ? sectionLabel(section) : undefined}
                 aria-current={isCurrentSection(section) ? (pathname === section.href ? "page" : "true") : undefined}
               >
                 <SectionMark section={section} />
-                {sectionLabel(section)}
+                {shortLabel(section)}
               </Link>
             </li>
           ))}

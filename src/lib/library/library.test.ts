@@ -19,7 +19,7 @@ const sweetener = /\b(sugar|honey|syrup|molasses|agave|juice)\b/i;
 
 describe("health library", () => {
   it("keeps the public headline and does not invent a lifespan claim", () => {
-    expect(LIBRARY_HEADLINE).toBe("YOUR FREE LIBRARY FOR A HEALTHIER LIFE");
+    expect(LIBRARY_HEADLINE).toBe("Your Free Library for a Healthier Life");
     expect(LIBRARY_SUBTITLE).toBe(
       "Discover practical health guides, nutrition tips, exercise routines, recipes, and simple habits you can use every day.",
     );

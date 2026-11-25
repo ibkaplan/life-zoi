@@ -44,7 +44,7 @@ export function SimpleMeals() {
   const meals = SIMPLE_MEALS.filter((meal) => mealAllowed(meal, filter, { time: true, budget: false, minimal: false }));
   return (
     <div className="stack-lg food-simple">
-      <p className="kicker">{t("SIMPLE PROTEIN, SIMPLE MEALS")}</p>
+      <p className="kicker">{t("Simple Protein, Simple Meals")}</p>
       <h1>{t("Simple protein, simple meals")}</h1>
       <p className="lede">{t(SIMPLE_MESSAGE)}</p>
       <section className="card food-card stack">
@@ -214,7 +214,7 @@ export function SimpleKeep() {
   const { t } = useFoodFormat();
   return (
     <article className="stack-lg food-simple">
-      <p className="kicker">{t("LOSE FAT. SUPPORT YOUR MUSCLES. KEEP YOUR MEALS SIMPLE.")}</p>
+      <p className="kicker">{t("Lose fat. Support your muscles. Keep your meals simple.")}</p>
       <h1>{t("Lose fat. Support your muscles. Keep your meals simple.")}</h1>
       <ul>
         <li>{t("A moderate calorie deficit is the only reduction LifeZoi will estimate, and it will not go into a very-low-calorie diet.")}</li>

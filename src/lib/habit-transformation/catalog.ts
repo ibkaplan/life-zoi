@@ -20,7 +20,7 @@ export type CombPart = "capability" | "opportunity" | "motivation";
 export type Choice = { id: string; label: string; cue?: string };
 
 export const TITLE = "Small Steps. Real Changes. A Healthier Life.";
-export const KICKER = "LIFEZOI HABIT TRANSFORMATION";
+export const KICKER = "LifeZoi Habit Transformation";
 export const DIFFICULT_LINE = "Here is what may be making this habit difficult to change.";
 export const RESTART_LINE = "Every day is a new opportunity. Would you like to try a smaller step today?";
 export const NOTICE =

@@ -24,8 +24,8 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--deep);
-  font-size: 0.9rem;
+  color: var(--teal);
+  font-size: 0.95rem;
 }
 
 .ga-hero {
@@ -113,7 +113,7 @@
 }
 
 .ga-stat dt {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--muted);
   font-weight: 600;
 }
@@ -186,7 +186,7 @@
 }
 
 .ga-meta li {
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 700;
   border-radius: 999px;
   padding: 0.15rem 0.65rem;
@@ -230,7 +230,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.86rem;
+  font-size: 0.95rem;
   font-weight: 800;
   border-radius: 999px;
   padding: 0.15rem 0.65rem;
@@ -328,7 +328,7 @@
   border-radius: 999px;
   padding: 0.35rem 0.8rem;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -437,7 +437,7 @@
 
 .ga-example small {
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.95rem;
 }
 
 .ga-feedback {
@@ -546,7 +546,7 @@
 }
 
 .ga-award p {
-  font-size: 0.93rem;
+  font-size: 0.95rem;
   color: var(--muted);
 }
 

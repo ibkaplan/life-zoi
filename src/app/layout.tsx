@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Caveat, Fraunces, Noto_Serif_Display, Source_Sans_3 } from "next/font/google";
+import { Fraunces, Noto_Serif, Source_Sans_3 } from "next/font/google";
 import { AppearanceSync } from "@/components/appearance";
 import { BackgroundMusicProvider } from "@/components/background-music/provider";
 import { LocaleProvider } from "@/components/locale-provider";
@@ -20,17 +20,12 @@ const display = Fraunces({
 /**
  * Fraunces has no Cyrillic or Greek letters. Ukrainian, Russian, and Greek pages use this
  * open-licence serif for headings instead (see `:lang()` rules in globals.css).
+ * Noto Serif (not Noto Serif Display) since 2026-11-25: its thin strokes are heavier, so
+ * Cyrillic and Greek headings read as clearly as the English ones.
  */
-const displayIntl = Noto_Serif_Display({
+const displayIntl = Noto_Serif({
   subsets: ["cyrillic", "greek", "latin"],
   variable: "--font-display-intl-family",
-});
-
-/** Handwritten accent, used only for short inspirational lines and brand statements. */
-const script = Caveat({
-  subsets: ["latin", "cyrillic"],
-  weight: ["500", "700"],
-  variable: "--font-script-family",
 });
 
 const sans = Source_Sans_3({
@@ -56,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${display.variable} ${displayIntl.variable} ${sans.variable} ${script.variable}`}
+      className={`${display.variable} ${displayIntl.variable} ${sans.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />

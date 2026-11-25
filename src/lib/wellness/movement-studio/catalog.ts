@@ -1,7 +1,7 @@
 import { SCRIPT_LABEL, scriptById, type RoutineScript } from "@/lib/wellness/movement-studio/scripts";
 
-export const STUDIO_HERO = "MOVE BETTER. FEEL STRONGER. LIVE FULLY.";
-export const STUDIO_SECTION = "CHOOSE YOUR MOVEMENT";
+export const STUDIO_HERO = "Move better. Feel stronger. Live fully.";
+export const STUDIO_SECTION = "Choose Your Movement";
 export const LINK_CHECKED = "2026-11-06";
 
 export const SAFETY_LINE =

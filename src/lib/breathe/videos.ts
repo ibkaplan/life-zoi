@@ -144,9 +144,9 @@ export function videosForTechnique(technique: Technique["id"], videos: BreatheVi
 export const BREATHE_VIDEO_TEXT = {
   heading: "Breathing videos for nitric oxide",
   intro: "Humming and soft nose breathing are the two practices linked with more nasal nitric oxide. Slow belly breathing and alternate nostril breathing are here for calm. Press play and follow along.",
-  play: "PLAY VIDEO",
+  play: "Play video",
   close: "Close video",
-  openOnYoutube: "OPEN ON YOUTUBE",
+  openOnYoutube: "Open on YouTube",
   noHold: "Some teachers add breath holding or fast breathing. lifeZoi never asks for that: skip those parts and keep breathing gently.",
   playerNote: "Each video plays in YouTube's player and stays on YouTube. lifeZoi does not copy it, and the player loads only when you press play. If it shows an error, use OPEN ON YOUTUBE.",
   checked: "Checked on {date}: each video was public and its owner allowed it to be shown on other websites. Titles and channels come from YouTube. lifeZoi has not watched every video in full.",

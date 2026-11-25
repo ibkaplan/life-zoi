@@ -164,7 +164,7 @@ describe("prepared wellness assistant", () => {
   });
 
   it("shows the prepared assistant wording", () => {
-    expect(WELLNESS_ASSISTANT_TITLE).toBe("LIFEZOI WELLNESS ASSISTANT");
+    expect(WELLNESS_ASSISTANT_TITLE).toBe("LifeZoi Wellness Assistant");
     expect(WELLNESS_ASSISTANT_SUBTITLE).toBe("Your everyday companion for healthier living.");
     expect(WELLNESS_ASSISTANT_WELCOME).toBe(
       "How are you feeling today? Let's find a helpful next step together.",
