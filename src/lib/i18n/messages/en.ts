@@ -244,6 +244,7 @@ export const en = {
     "/academy/move/studio/daily-movement": "Daily Movement",
     "/academy/move/studio/chair-yoga": "Chair Yoga Studio",
     "/daily": "LifeZoi Daily",
+    "/daily/tip": "Daily tip by email or Telegram",
     "/courses": "7-day mini-courses",
     "/my-day": "My Day",
     "/plan": "My Plan",
