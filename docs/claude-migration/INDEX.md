@@ -58,6 +58,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [LIFEZOI_MIND.md](LIFEZOI_MIND.md) | LifeZoi Mind: rule-based voice and text companion, PHQ-9 and GAD-7, safety handling, exercises, 7-day plan, Psychology Encyclopedia, consented progress, provider research |
+| [EMAIL_CHALLENGE.md](EMAIL_CHALLENGE.md) | 7-day email challenge at `/free/challenge`: consent, confirmation, one-click stop, challenge_signups table, sending switched off until the owner sets Resend and a schedule |
 | [REVIEWS_FEEDBACK.md](REVIEWS_FEEDBACK.md) | Reviews & Feedback: ratings, reviews, suggestions, moderation dashboard, You asked, we listened!, storage and privacy rules |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Colours, heading and text tones, fonts, capitals, minimum text size, the one-line desktop menu, illustration variety |
 | [PAGE_BACKGROUNDS.md](PAGE_BACKGROUNDS.md) | Page backgrounds: Calm Blue, Soft Rose, Classic Ivory, the Automatic rule, contrast limits |

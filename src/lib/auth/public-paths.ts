@@ -3,13 +3,30 @@
  * Everything else, pages and APIs alike, needs a signed-in member.
  * Keep this list short. A new page is members-only unless it is added here.
  */
-export const PUBLIC_PAGES = ["/", "/sign-in", "/reset-password", "/accept-invite", "/welcome", "/privacy"] as const;
+export const PUBLIC_PAGES = [
+  "/",
+  "/sign-in",
+  "/reset-password",
+  "/accept-invite",
+  "/welcome",
+  "/privacy",
+] as const;
 
-export const PUBLIC_APIS = ["/api/status", "/api/register"] as const;
+export const PUBLIC_APIS = [
+  "/api/status",
+  "/api/register",
+  // 7-day email challenge. Sign-up needs consent; confirm and stop need a link token;
+  // the sending run needs CRON_SECRET. None of them reads account data.
+  "/api/challenge",
+  "/api/challenge/confirm",
+  "/api/challenge/unsubscribe",
+  "/api/challenge/send",
+] as const;
 
 /**
  * Whole areas a visitor can open. `/free` holds the free tools anyone may use
- * without an account (see src/lib/free/hub.ts). Pages there must not read or
+ * without an account (see src/lib/free/hub.ts), including the 7-day email
+ * challenge pages under `/free/challenge` (docs/claude-migration/EMAIL_CHALLENGE.md). Pages there must not read or
  * write account data.
  */
 export const PUBLIC_PREFIXES = ["/free"] as const;
