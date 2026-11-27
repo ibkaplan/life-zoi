@@ -10,8 +10,10 @@
  * - Short UI-facing fields (course title, tagline, description, goal,
  *   objectives, lesson title, lesson skill) are wrapped in `msg()` so the
  *   catalog test requires a Ukrainian, Russian, and Greek translation.
- * - Lesson bodies are plain English strings for this release. The lesson page
- *   says so when the site is shown in another language.
+ * - Lesson bodies are plain English strings, shown with `t(text)`. Their
+ *   translations live in `src/lib/i18n/catalog/<locale>/growth-<course>-lessons.json`
+ *   (see `lesson-text.ts`), and the catalog test requires every one.
+ * - Feedback cue words are translated as word lists under `cueKey(cue)`.
  */
 
 export type GrowthDifficulty = "beginner" | "intermediate" | "advanced";

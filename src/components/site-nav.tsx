@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { HeaderMusicButton } from "@/components/background-music/header-button";
+import { DisplayButton } from "@/components/display-prefs";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useMessages } from "@/components/locale-provider";
 import { Logo } from "@/components/logo";
@@ -240,6 +241,7 @@ export function SiteNav() {
       </div>
       <div className="site-account">
         <HeaderMusicButton />
+        <DisplayButton />
         <LanguageSwitcher />
         {signedIn ? (
           <>

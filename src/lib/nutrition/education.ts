@@ -350,7 +350,7 @@ export const breadRecipes: BreadRecipe[] = [
       "A round country loaf made with flour, water, starter, and salt. The open crumb in the photo is the goal, and the clock matters more than extra ingredients.",
     prep: "About 30 minutes of hands-on time, then 4 to 6 hours of rising. An overnight rest in the refrigerator is optional.",
     bake: "About 45 minutes.",
-    difficulty: "Practice",
+    difficulty: "Takes practice",
     makes: "1 round loaf, about 12 slices.",
     image: "/nutrition/sourdough-loaf.jpg",
     imageAlt: "A round sourdough loaf, sliced open, with a floury brown crust and an open crumb.",

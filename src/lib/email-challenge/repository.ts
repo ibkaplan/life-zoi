@@ -5,7 +5,7 @@ import type { Signup } from "./types";
 
 /**
  * Storage for challenge signups. The Supabase table `challenge_signups`
- * (supabase/migrations/20261125060000_email_challenge.sql) has no browser
+ * (supabase/migrations/20261127180000_email_challenge.sql) has no browser
  * grants: only this server module reads or writes it, with the service role.
  */
 export const CHALLENGE_TABLE = "challenge_signups";

@@ -14,7 +14,7 @@ Owner request, 2026-11-25: "7-day challenge with emails. A person leaves an emai
 
 ## Data and privacy
 
-Table `challenge_signups` (`supabase/migrations/20261125060000_email_challenge.sql`, also in `schema.sql` and `verify.sql`). New table only; nothing existing changes. Row level security is on with no policies and no browser grants: only the server's service role uses it.
+Table `challenge_signups` (`supabase/migrations/20261127180000_email_challenge.sql`, also in `schema.sql` and `verify.sql`). New table only; nothing existing changes. Row level security is on with no policies and no browser grants: only the server's service role uses it.
 
 Kept: email, language, time zone, consent time and wording version (`CONSENT_VERSION` in `types.ts`), confirm and stop tokens, how many emails were sent and the local date of the last one. No health data, and the address is never sent to an AI service.
 

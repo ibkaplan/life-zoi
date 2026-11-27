@@ -10,10 +10,6 @@ export const PUBLIC_PAGES = [
   "/accept-invite",
   "/welcome",
   "/privacy",
-  // The 7-day email challenge: anyone may join, confirm, or stop it (docs/claude-migration/EMAIL_CHALLENGE.md).
-  "/free/challenge",
-  "/free/challenge/confirm",
-  "/free/challenge/stop",
 ] as const;
 
 export const PUBLIC_APIS = [
@@ -27,8 +23,28 @@ export const PUBLIC_APIS = [
   "/api/challenge/send",
 ] as const;
 
-/** Images the public landing page shows. */
-export const PUBLIC_ASSET_PREFIXES = ["/home/"] as const;
+/**
+ * Whole areas a visitor can open. `/free` holds the free tools anyone may use
+ * without an account (see src/lib/free/hub.ts), including the 7-day email
+ * challenge pages under `/free/challenge` (docs/claude-migration/EMAIL_CHALLENGE.md). Pages there must not read or
+ * write account data.
+ */
+export const PUBLIC_PREFIXES = ["/free"] as const;
+
+/** Images the public landing page shows, and the installable-app icons. */
+export const PUBLIC_ASSET_PREFIXES = ["/home/", "/icons/"] as const;
+
+/**
+ * Files a phone fetches to install lifeZoi as an app. The browser asks for the manifest
+ * without the sign-in cookie, so these must open for everyone. They hold nothing personal.
+ */
+export const PUBLIC_APP_FILES = ["/manifest.webmanifest", "/sw.js", "/offline.html"] as const;
+
+/** Public Health tips: "/blog" and every article under it. Only reading, no account data. */
+export const PUBLIC_PAGE_PREFIXES = ["/blog"] as const;
+
+/** Files generated for search engines. */
+export const PUBLIC_FILES = ["/sitemap.xml", "/robots.txt"] as const;
 
 /** Where "/" is served from for a signed-in member. The address bar keeps "/". */
 export const MEMBER_HOME = "/home";
@@ -45,6 +61,10 @@ export function isPublicPath(pathname: string): boolean {
   const path = trimSlash(pathname);
   if ((PUBLIC_PAGES as readonly string[]).includes(path)) return true;
   if ((PUBLIC_APIS as readonly string[]).includes(path)) return true;
+  if (PUBLIC_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return true;
+  if ((PUBLIC_APP_FILES as readonly string[]).includes(pathname)) return true;
+  if ((PUBLIC_FILES as readonly string[]).includes(path)) return true;
+  if (PUBLIC_PAGE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))) return true;
   return PUBLIC_ASSET_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
