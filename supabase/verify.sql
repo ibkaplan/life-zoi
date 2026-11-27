@@ -6,10 +6,11 @@
 with expected_tables(name) as (
   values
     ('profiles'), ('assessments'), ('scenarios'), ('habit_goals'), ('check_ins'),
-    ('care_invitations'), ('companion_state'), ('academy_state'), ('health_readings'), ('daily_tip_subscriptions'), ('registration_invites'),
+    ('care_invitations'), ('companion_state'), ('academy_state'), ('health_readings'), ('friend_challenge'), ('daily_tip_subscriptions'), ('registration_invites'),
     ('community_profiles'), ('community_messages'), ('community_reports'),
     ('community_blocks'), ('community_mutes'),
-    ('feedback_reviews'), ('feedback_suggestions'), ('feedback_announcements')
+    ('feedback_reviews'), ('feedback_suggestions'), ('feedback_announcements'),
+    ('challenge_signups')
 ),
 expected_policies(tbl, name) as (
   values
@@ -23,13 +24,15 @@ expected_policies(tbl, name) as (
     ('companion_state', 'companion_state_own_rows'),
     ('academy_state', 'academy_state_own_rows'),
     ('health_readings', 'health_readings_own_rows'),
+    ('friend_challenge', 'friend_challenge_own_rows'),
     ('daily_tip_subscriptions', 'daily_tip_subscriptions_own_rows')
 ),
 expected_functions(name) as (
   values
     ('auth_session_may_use_rows'), ('enforce_profile_role'), ('reject_sample_assessment'),
     ('delete_own_account'), ('revoke_care_invitation'), ('note_care_invitation'),
-    ('account_email_allowed'), ('enforce_account_allowlist'), ('claim_registration_invite')
+    ('account_email_allowed'), ('enforce_account_allowlist'), ('claim_registration_invite'),
+    ('friend_circle_summary')
 ),
 expected_triggers(tbl, name) as (
   values ('profiles', 'profiles_enforce_role'), ('assessments', 'assessments_reject_sample')

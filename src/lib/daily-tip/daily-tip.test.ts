@@ -192,7 +192,7 @@ describe("daily send", () => {
 });
 
 describe("migration", () => {
-  const sql = readFileSync(join(process.cwd(), "supabase", "migrations", "20261125120000_daily_tip_subscriptions.sql"), "utf8");
+  const sql = readFileSync(join(process.cwd(), "supabase", "migrations", "20261127180100_daily_tip_subscriptions.sql"), "utf8");
   it("is additive, owner-only, and stores no email address", () => {
     expect(sql).not.toMatch(/\bdrop table\b|\bdelete from\b|\balter table [^;]* drop\b/i);
     expect(sql).toContain("enable row level security");

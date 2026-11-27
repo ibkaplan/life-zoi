@@ -45,19 +45,29 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [LIFEZOI_DAILY.md](LIFEZOI_DAILY.md) | LifeZoi Daily: one idea a day from the assessment, optional feeling tap, three separate progress indicators, weekly report |
 | [MINI_COURSES.md](MINI_COURSES.md) | 7-day mini-courses on the dashboard: three courses, one short practice a day, gentle progress with no streaks |
 | [TRAINING_ACADEMY.md](TRAINING_ACADEMY.md) | Training Academy: five personal-growth courses, 50 lessons, practice feedback, achievements, My Growth Journey, academy_state storage, voice |
+| [SITE_ACHIEVEMENTS.md](SITE_ACHIEVEMENTS.md) | My Streaks & Achievements at `/progress/achievements`: site-wide active days, gentle runs, 31 badges, read from existing records with no migration |
+| [TRAINING_ACADEMY_TRANSLATION_REVIEW.md](TRAINING_ACADEMY_TRANSLATION_REVIEW.md) | Training Academy lessons in Russian, Ukrainian, Greek: phrases a native speaker should check |
 | [GUIDED_SESSIONS.md](GUIDED_SESSIONS.md) | Voice-guided Pilates, yoga, stretching, breathing, relaxation, and meditation: one player, the LifeZoi voice, music ducking, My Day launch, saved history, and voice upgrade options |
 | [MY_HEALTH_DAY.md](MY_HEALTH_DAY.md) | My Health Day on the members' home: today's habits, movement, breathing, food, Fact of the Day; feeling-matched breathing, music, movement (fixed rules, no AI) |
 | [VOICE_COMPANION.md](VOICE_COMPANION.md) | Voice companion: spoken welcome by profile status, hands-free listening, local voice commands in four languages, guided-session start event, LifeZoi AI microphone |
+| [HEALTH_AGE_QUIZ.md](HEALTH_AGE_QUIZ.md) | Public 2-minute “What is your health age?” check at `/free/health-age`: the one-year rule, what is never stored, share card, owner decision 2026-11-25 |
+| [READING_COMFORT.md](READING_COMFORT.md) | Text size (normal, large, extra large) and the calm layout: the "Aa" header button, Settings, saved on the device and in companion_state, and how the one-line desktop menu stays on one line |
 | [HEALTH_DIARY.md](HEALTH_DIARY.md) | Blood pressure, sugar & cholesterol diary at `/my-health/diary`: what the site cannot measure, ranges and sources, safety notes, health_readings table, export and delete |
+| [FREE_TOOLS.md](FREE_TOOLS.md) | Free public calculators under `/free`: calories, water, sleep, blood pressure ranges; sources, SEO, the shared hub list |
+| [REMINDERS.md](REMINDERS.md) | My reminders at `/my-health/reminders`: timed reminders for blood pressure, blood sugar, and daily habits; banner and optional browser notification; browser storage only, no migration |
 | [DAILY_TIP.md](DAILY_TIP.md) | Daily tip by email or Telegram at `/daily/tip`: tip bank in four languages, choices, Telegram linking, messaging adapter, dry-run send, and what must be set up before anything is sent |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [LIFEZOI_MIND.md](LIFEZOI_MIND.md) | LifeZoi Mind: rule-based voice and text companion, PHQ-9 and GAD-7, safety handling, exercises, 7-day plan, Psychology Encyclopedia, consented progress, provider research |
+| [EMAIL_CHALLENGE.md](EMAIL_CHALLENGE.md) | 7-day email challenge at `/free/challenge`: consent, confirmation, one-click stop, challenge_signups table, sending switched off until the owner sets Resend and a schedule |
 | [REVIEWS_FEEDBACK.md](REVIEWS_FEEDBACK.md) | Reviews & Feedback: ratings, reviews, suggestions, moderation dashboard, You asked, we listened!, storage and privacy rules |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Colours, heading and text tones, fonts, capitals, minimum text size, the one-line desktop menu, illustration variety |
 | [PAGE_BACKGROUNDS.md](PAGE_BACKGROUNDS.md) | Page backgrounds: Calm Blue, Soft Rose, Classic Ivory, the Automatic rule, contrast limits |
+| [HEALTH_TIPS.md](HEALTH_TIPS.md) | Public Health tips blog at `/blog`: articles, video links, share buttons, sitemap, why indexing is still off |
 | [HEALTH_ENCYCLOPEDIA.md](HEALTH_ENCYCLOPEDIA.md) | Health Encyclopedia and LifeZoi AI: content rules, editorial workflow, migration, AI library mode, free-model research, and what is not done yet |
+| [MEET_LIFEZOI.md](MEET_LIFEZOI.md) | Public voice demo at /free/meet: scripted conversation in four languages, browser speech, captions, no AI or microphone |
 | [MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md) | Checks before relying on Claude Code and retiring Cursor |
+| [INVITE_A_FRIEND.md](INVITE_A_FRIEND.md) | Invite a Friend at `/friends`: personal link, 7-day Together challenge, friend badges, friend_challenge table and counts-only summary |
 | [DOCUMENT_PROCESSING_PLAN.md](DOCUMENT_PROCESSING_PLAN.md) | Future rules for lab documents. Not implemented. |
 
 ## Recommended reading order

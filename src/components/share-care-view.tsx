@@ -304,6 +304,10 @@ export function ShareCareView({ productionSite }: { productionSite: boolean }) {
         </figure>
       </div>
 
+      <p className="hint">
+        {t("Want to do it together?")} <Link href="/friends">{t("Take the 7-day Together challenge and collect friend badges.")}</Link>
+      </p>
+
       <section className="card stack">
         <h2>{t("Who might enjoy LifeZoi?")}</h2>
         <p>

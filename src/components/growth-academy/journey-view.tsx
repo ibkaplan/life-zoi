@@ -150,7 +150,7 @@ export function JourneyView() {
                   .map((field) => (
                     <div key={field.id}>
                       <p>
-                        <strong>{field.label}</strong>
+                        <strong>{t(field.label)}</strong>
                       </p>
                       <p className="ga-saved">{record.answers[field.id]}</p>
                     </div>
@@ -167,7 +167,7 @@ export function JourneyView() {
                   record.reflections[index] ? (
                     <div key={question}>
                       <p>
-                        <strong>{question}</strong>
+                        <strong>{t(question)}</strong>
                       </p>
                       <p className="ga-saved">{record.reflections[index]}</p>
                     </div>

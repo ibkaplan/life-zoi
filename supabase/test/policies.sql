@@ -44,6 +44,7 @@ insert into public.check_ins (user_id, habit_id, entry_date, done)
   values ('00000000-0000-0000-0000-00000000000a', 'walk', '2026-11-01', true);
 insert into public.companion_state (user_id, state) values ('00000000-0000-0000-0000-00000000000a', '{"version":1}');
 insert into public.academy_state (user_id, state) values ('00000000-0000-0000-0000-00000000000a', '{"lessons":{}}');
+insert into public.friend_challenge (user_id, started_on, done_days) values ('00000000-0000-0000-0000-00000000000a', '2026-11-20', '{1}');
 insert into public.health_readings (user_id, kind, measured_at, systolic, diastolic, pulse)
   values ('00000000-0000-0000-0000-00000000000a', 'blood_pressure', '2026-11-20 08:00+00', 124, 79, 70);
 insert into public.health_readings (user_id, kind, measured_at, glucose_mgdl, glucose_context, unit)
@@ -192,6 +193,9 @@ do $$ begin
   if exists (select 1 from public.daily_tip_subscriptions where user_id = '00000000-0000-0000-0000-00000000000a') then
     raise exception 'FAIL: daily tip choices were left behind';
   end if;
+  if exists (select 1 from public.friend_challenge where user_id = '00000000-0000-0000-0000-00000000000a') then
+    raise exception 'FAIL: friend challenge was left behind';
+  end if;
   if (select count(*) from auth.users) <> 2 then raise exception 'FAIL: other logins were touched'; end if;
 end $$;
 
@@ -249,6 +253,57 @@ do $$ begin
     raise exception 'FAIL: the Share the Care registration was not counted';
   end if;
 end $$;
+
+-- Invite a Friend: each person sees only their own challenge row, and the
+-- shared summary returns counts, never another person's steps or id.
+set role authenticated;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5', 'aal1');
+insert into public.friend_challenge (user_id, started_on, done_days, share_with_friends)
+  values ('00000000-0000-0000-0000-0000000000d5', '2026-11-20', '{1,2}', true);
+do $$ begin
+  insert into public.friend_challenge (user_id, started_on)
+    values ('00000000-0000-0000-0000-0000000000b0', '2026-11-20');
+  raise exception 'FAIL: wrote a challenge row for another user';
+exception when insufficient_privilege or foreign_key_violation then null;
+end $$;
+do $$ begin
+  update public.friend_challenge set done_days = '{1,8}';
+  raise exception 'FAIL: a challenge day outside 1 to 7 was accepted';
+exception when check_violation then null;
+end $$;
+do $$ declare s jsonb := public.friend_circle_summary(); begin
+  if not (s ->> 'joined_through_friend')::boolean then raise exception 'FAIL: the friend was not linked to the inviter'; end if;
+  if (s ->> 'friends_joined')::int <> 0 then raise exception 'FAIL: the friend was counted as an inviter'; end if;
+  if (s ->> 'together_days')::int <> 2 then raise exception 'FAIL: own days were not counted (%).', s; end if;
+  if s ? 'user_id' or s::text like '%0000-0000%' then raise exception 'FAIL: the summary returned an id'; end if;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-00000000000b', 'aal2');
+insert into public.friend_challenge (user_id, started_on, done_days)
+  values ('00000000-0000-0000-0000-00000000000b', '2026-11-21', '{1}');
+do $$ declare s jsonb := public.friend_circle_summary(); begin
+  if (select count(*) from public.friend_challenge) <> 1 then raise exception 'FAIL: B can see a friend''s challenge row'; end if;
+  if (s ->> 'friends_joined')::int <> 1 then raise exception 'FAIL: the friend who joined was not counted'; end if;
+  if (s ->> 'joined_through_friend')::boolean then raise exception 'FAIL: B was marked as invited'; end if;
+  if (s ->> 'friends_sharing')::int <> 1 or (s ->> 'together_days')::int <> 3 then
+    raise exception 'FAIL: the shared total is wrong (%).', s;
+  end if;
+end $$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d5', 'aal1');
+update public.friend_challenge set share_with_friends = false;
+select pg_temp.as_user('00000000-0000-0000-0000-00000000000b', 'aal2');
+do $$ declare s jsonb := public.friend_circle_summary(); begin
+  if (s ->> 'friends_sharing')::int <> 0 or (s ->> 'together_days')::int <> 1 then
+    raise exception 'FAIL: a friend who stopped sharing was still added (%).', s;
+  end if;
+end $$;
+reset role;
+set role anon;
+do $$ begin
+  perform public.friend_circle_summary();
+  raise exception 'FAIL: the signed-out role can call the friend summary';
+exception when insufficient_privilege then null;
+end $$;
+reset role;
 
 -- Browsers cannot read invitations or add a registration count.
 set role anon;

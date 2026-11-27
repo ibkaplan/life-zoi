@@ -4,7 +4,7 @@ import { isTimeZone } from "./schedule";
 import { DEFAULT_HOUR, SEND_HOURS, type TipPrefs, type TipSubscription } from "./types";
 
 /**
- * `daily_tip_subscriptions` (supabase/migrations/20261125120000_daily_tip_subscriptions.sql).
+ * `daily_tip_subscriptions` (supabase/migrations/20261127180100_daily_tip_subscriptions.sql).
  * A member's own calls use their sign-in, so row level security limits them to
  * their own row. Only the daily send uses the service role, on the server, to
  * read every active row. No email address is stored here: the send reads the

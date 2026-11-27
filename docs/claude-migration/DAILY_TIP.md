@@ -10,7 +10,7 @@ Members can ask for one short, general wellness tip a day at `/daily/tip` (menu:
 - **Telegram linking without a webhook**: the member makes a private link (`t.me/<bot>?start=<code>`, valid 30 minutes), presses Start in Telegram, then "I pressed Start". The server reads the bot's recent messages (`getUpdates`) for `/start <code>` from a private chat and stores only that chat id. No new public address is needed.
 - **Adapter**: `src/lib/messaging/` (`OutboundMessage`, `Sender`, Resend email, Telegram, dry run). The 7-day email challenge uses the same environment variable names and can switch to it.
 - **Daily send**: `runDailySend` in `src/lib/daily-tip/sender.ts` sends each due member one tip once their local hour is reached, at most once per local day (`last_sent_on`). `POST /api/admin/daily-tip` (administrator only) runs one pass now and returns counts.
-- **Storage**: `daily_tip_subscriptions` (`supabase/migrations/20261125120000_daily_tip_subscriptions.sql`, additive only). Owner-only row level security, deleted with the account (cascade). Also added to `schema.sql`, `verify.sql` and `supabase/test/policies.sql`.
+- **Storage**: `daily_tip_subscriptions` (`supabase/migrations/20261127180100_daily_tip_subscriptions.sql`, additive only). Owner-only row level security, deleted with the account (cascade). Also added to `schema.sql`, `verify.sql` and `supabase/test/policies.sql`.
 
 ## Off by default
 

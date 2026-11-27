@@ -1,5 +1,6 @@
 import { msg } from "@/lib/i18n/translate";
-import type { LessonPractice } from "@/lib/growth-academy/types";
+import { CUE_SEPARATOR, cueKey } from "@/lib/growth-academy/lesson-text";
+import type { FeedbackCue, LessonPractice } from "@/lib/growth-academy/types";
 
 /**
  * Built-in practice feedback. No AI and no network call: it looks for the
@@ -7,7 +8,7 @@ import type { LessonPractice } from "@/lib/growth-academy/types";
  * judges, or criticises an answer.
  */
 export type PracticeFeedback = {
-  /** Positive notes from the lesson's cues. Lesson text, in English. */
+  /** Positive notes from the lesson's cues. Lesson text in English; the page shows it with `t`. */
   notes: string[];
   /** A general note (translated with `t`). */
   general: string;
@@ -17,16 +18,47 @@ export const FEEDBACK_EMPTY = msg("Write a few words or pick an example, then pr
 export const FEEDBACK_SHORT = msg("Short answers are fine. If you like, add one detail about what you would say or do.");
 export const FEEDBACK_GOOD = msg("Thank you for practicing. Compare your answer with the points below and keep what feels right for you.");
 
+/**
+ * Lower-case words without accents, so "Ευχαριστώ" matches "ευχαριστω" and
+ * "ещё" matches "еще". The typographic apostrophe counts as an apostrophe.
+ */
 export function words(text: string): string[] {
-  return text.toLowerCase().normalize("NFKC").match(/[\p{L}\p{N}']+/gu) ?? [];
+  return (
+    text
+      .toLowerCase()
+      .normalize("NFKC")
+      .normalize("NFD")
+      .replace(/\p{M}+/gu, "")
+      .replace(/\u2019/g, "'")
+      .match(/[\p{L}\p{N}']+/gu) ?? []
+  );
 }
 
-export function practiceFeedback(text: string, practice: LessonPractice): PracticeFeedback {
+/** Looks up translated text; returns undefined when there is none. */
+export type CueLookup = (key: string) => string | undefined;
+
+/**
+ * The phrases one cue looks for: its English words plus, in another language,
+ * the translated list stored under `cueKey(cue)` ("cue: спасиб | благодар").
+ * English is always kept, so an answer typed in English still gets its note.
+ */
+export function cuePhrases(cue: FeedbackCue, lookup?: CueLookup): string[] {
+  const translated = lookup?.(cueKey(cue));
+  if (!translated || !translated.startsWith("cue: ")) return cue.anyOf;
+  const local = translated
+    .slice("cue: ".length)
+    .split(CUE_SEPARATOR.trim())
+    .map((phrase) => phrase.trim())
+    .filter(Boolean);
+  return [...local, ...cue.anyOf];
+}
+
+export function practiceFeedback(text: string, practice: LessonPractice, lookup?: CueLookup): PracticeFeedback {
   const clean = text.trim();
   if (!clean) return { notes: [], general: FEEDBACK_EMPTY };
   const tokens = words(clean);
   const notes = (practice.cues ?? [])
-    .filter((cue) => cue.anyOf.some((phrase) => containsPhrase(tokens, words(phrase))))
+    .filter((cue) => cuePhrases(cue, lookup).some((phrase) => containsPhrase(tokens, words(phrase))))
     .map((cue) => cue.say);
   const general = tokens.length < 4 ? FEEDBACK_SHORT : FEEDBACK_GOOD;
   return { notes: [...new Set(notes)], general };

@@ -5,6 +5,7 @@ import "@/components/journey/journey.css";
 import { usePageFormat } from "@/components/page-format";
 import { useSession } from "@/components/session-provider";
 import { LoadingState } from "@/components/sources";
+import { FriendsTeaser } from "@/components/friends/friends-teaser";
 import { journeySteps } from "@/lib/journey";
 import { assessmentHasAnswers } from "@/lib/labels";
 
@@ -61,6 +62,17 @@ export function StartView() {
           <li>{t("Your questionnaire answers are not sent to any AI service.")}</li>
         </ul>
       </section>
+
+      <section className="card stack">
+        <h2>{t("The LifeZoi 7-day challenge")}</h2>
+        <p>{t("One short, everyday task a day for a week, on the page or by email. Free, and you can stop at any time.")}</p>
+        <p>
+          <Link className="btn btn-secondary" href="/free/challenge">
+            {t("See the 7-day challenge")}
+          </Link>
+        </p>
+      </section>
+      <FriendsTeaser />
 
       <p>
         <Link className="btn btn-secondary" href="/dashboard">
