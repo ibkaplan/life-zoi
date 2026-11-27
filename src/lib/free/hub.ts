@@ -72,6 +72,13 @@ export const FREE_HUB: readonly HubEntry[] = [
     icon: "🎙️",
     group: "discover",
   },
+  {
+    href: "/free/challenge",
+    title: msg("7-day challenge"),
+    summary: msg("One short, everyday task a day for a week, on the page or by email. Free, and you can stop at any time."),
+    icon: "📅",
+    group: "discover",
+  },
 ];
 
 export function hubGroup(group: HubGroup): HubEntry[] {
