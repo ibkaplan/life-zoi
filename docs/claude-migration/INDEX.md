@@ -55,6 +55,7 @@ Migration documentation landed in pull request #2 (`c9f003a`) and was refreshed 
 | [HEALTH_DIARY.md](HEALTH_DIARY.md) | Blood pressure, sugar & cholesterol diary at `/my-health/diary`: what the site cannot measure, ranges and sources, safety notes, health_readings table, export and delete |
 | [FREE_TOOLS.md](FREE_TOOLS.md) | Free public calculators under `/free`: calories, water, sleep, blood pressure ranges; sources, SEO, the shared hub list |
 | [REMINDERS.md](REMINDERS.md) | My reminders at `/my-health/reminders`: timed reminders for blood pressure, blood sugar, and daily habits; banner and optional browser notification; browser storage only, no migration |
+| [DAILY_TIP.md](DAILY_TIP.md) | Daily tip by email or Telegram at `/daily/tip`: tip bank in four languages, choices, Telegram linking, messaging adapter, dry-run send, and what must be set up before anything is sent |
 | [CALORIE_COUNTER.md](CALORIE_COUNTER.md) | Nutrition calorie counter: food search, photo of a plate through the free Gemini tier, its conditions, storage, and what is not done yet |
 | [FIND_MY_MOVEMENT_VIDEOS.md](FIND_MY_MOVEMENT_VIDEOS.md) | Find My Movement: 60 videos, filters, licensing, gaps, and voice |
 | [LIFEZOI_MIND.md](LIFEZOI_MIND.md) | LifeZoi Mind: rule-based voice and text companion, PHQ-9 and GAD-7, safety handling, exercises, 7-day plan, Psychology Encyclopedia, consented progress, provider research |

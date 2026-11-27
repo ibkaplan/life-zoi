@@ -49,6 +49,20 @@ insert into public.health_readings (user_id, kind, measured_at, systolic, diasto
   values ('00000000-0000-0000-0000-00000000000a', 'blood_pressure', '2026-11-20 08:00+00', 124, 79, 70);
 insert into public.health_readings (user_id, kind, measured_at, glucose_mgdl, glucose_context, unit)
   values ('00000000-0000-0000-0000-00000000000a', 'glucose', '2026-11-20 07:30+00', 95.5, 'fasting', 'mmol/L');
+insert into public.daily_tip_subscriptions (user_id, email_enabled, locale, send_hour, time_zone)
+  values ('00000000-0000-0000-0000-00000000000a', true, 'ru', 8, 'Europe/Kyiv');
+
+-- A cannot choose tips for B, and the hour check holds.
+do $$ begin
+  insert into public.daily_tip_subscriptions (user_id, email_enabled) values ('00000000-0000-0000-0000-00000000000b', true);
+  raise exception 'FAIL: A wrote daily tip choices for B';
+exception when insufficient_privilege then null;
+end $$;
+do $$ begin
+  update public.daily_tip_subscriptions set send_hour = 3 where user_id = '00000000-0000-0000-0000-00000000000a';
+  raise exception 'FAIL: send hour outside 6 to 21 was accepted';
+exception when check_violation then null;
+end $$;
 
 -- A cannot write health readings for B, and the shape and number checks hold.
 do $$ begin
@@ -139,6 +153,7 @@ do $$ begin
   if (select count(*) from public.companion_state) <> 0 then raise exception 'FAIL: B can see A companion data'; end if;
   if (select count(*) from public.academy_state) <> 0 then raise exception 'FAIL: B can see A academy data'; end if;
   if (select count(*) from public.health_readings) <> 0 then raise exception 'FAIL: B can see A health readings'; end if;
+  if (select count(*) from public.daily_tip_subscriptions) <> 0 then raise exception 'FAIL: B can see A daily tip choices'; end if;
 end $$;
 
 -- Browser roles cannot read community tables.
@@ -174,6 +189,9 @@ do $$ begin
   end if;
   if exists (select 1 from public.health_readings where user_id = '00000000-0000-0000-0000-00000000000a') then
     raise exception 'FAIL: health readings were left behind';
+  end if;
+  if exists (select 1 from public.daily_tip_subscriptions where user_id = '00000000-0000-0000-0000-00000000000a') then
+    raise exception 'FAIL: daily tip choices were left behind';
   end if;
   if exists (select 1 from public.friend_challenge where user_id = '00000000-0000-0000-0000-00000000000a') then
     raise exception 'FAIL: friend challenge was left behind';

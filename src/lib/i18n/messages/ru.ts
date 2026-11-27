@@ -249,6 +249,7 @@ export const ru: Messages = {
     "/academy/move/studio/daily-movement": "Ежедневное движение",
     "/academy/move/studio/chair-yoga": "Студия йоги на стуле",
     "/daily": "LifeZoi на каждый день",
+    "/daily/tip": "Совет дня на почту или в Telegram",
     "/courses": "Мини-курсы на 7 дней",
     "/my-day": "Мой день",
     "/plan": "Мой план",

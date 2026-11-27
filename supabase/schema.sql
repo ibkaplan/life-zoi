@@ -912,6 +912,37 @@ create index if not exists encyclopedia_articles_status_idx on public.encycloped
 alter table public.encyclopedia_articles enable row level security;
 revoke all on table public.encyclopedia_articles from public, anon, authenticated;
 
+-- Daily tip by email or Telegram. Also in
+-- supabase/migrations/20261127180100_daily_tip_subscriptions.sql.
+create table if not exists public.daily_tip_subscriptions (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  email_enabled boolean not null default false,
+  telegram_enabled boolean not null default false,
+  telegram_chat_id bigint,
+  telegram_link_code text check (telegram_link_code ~ '^[A-Za-z0-9]{6,32}$'),
+  telegram_code_expires_at timestamptz,
+  locale text not null default 'en' check (locale in ('en', 'uk', 'ru', 'el')),
+  send_hour smallint not null default 8 check (send_hour between 6 and 21),
+  time_zone text not null default 'UTC' check (char_length(time_zone) between 1 and 64),
+  last_sent_on date,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists daily_tip_subscriptions_active
+  on public.daily_tip_subscriptions (user_id)
+  where email_enabled or telegram_enabled;
+
+alter table public.daily_tip_subscriptions enable row level security;
+
+revoke all on table public.daily_tip_subscriptions from public, anon;
+grant select, insert, update, delete on table public.daily_tip_subscriptions to authenticated;
+
+drop policy if exists daily_tip_subscriptions_own_rows on public.daily_tip_subscriptions;
+create policy daily_tip_subscriptions_own_rows on public.daily_tip_subscriptions
+  for all
+  using (auth.uid() = user_id and public.auth_session_may_use_rows())
+  with check (auth.uid() = user_id and public.auth_session_may_use_rows());
 -- 7-day email challenge (also in migrations/20261127180000_email_challenge.sql). Server (service role) only.
 create table if not exists public.challenge_signups (
   id uuid primary key,
